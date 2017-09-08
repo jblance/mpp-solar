@@ -9,6 +9,14 @@ import mppcommands
 
 logger = logging.getLogger()
 
+def getVal(_dict, key, ind=None):
+    if key not in _dict:
+        return ""
+    if ind is None:
+        return _dict[key]
+    else:
+        return _dict[key][ind]
+
 
 class mppUtils:
     """
@@ -98,7 +106,9 @@ class mppUtils:
 
         for item in items:
             key = '{}'.format(item).lower().replace(" ", "_")
-            settings[key] = {"value": current_settings[key][0], "unit": current_settings[key][1], "default": default_settings[key][0]}
+            settings[key] = {"value": getVal(current_settings, key, 0),
+                             "unit": getVal(current_settings, key, 1),
+                             "default": getVal(default_settings, key, 0)}
 
         return settings
 
