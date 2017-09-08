@@ -12,8 +12,7 @@ import re
 import logging
 logger = logging.getLogger()
 
-COMMAND = {
-           'QPIRI': {'description': 'Device Current Settings inquiry', 'resp_code': 'QPIRI', 'type': 'QUERY'},
+COMMAND = {'QPIRI': {'description': 'Device Current Settings inquiry', 'resp_code': 'QPIRI', 'type': 'QUERY'},
            'QDI': {'description': 'Device Default Settings inquiry', 'resp_code': 'QDI', 'type': 'QUERY'},
            'QPIGS': {'description': 'Device General Status Parameters inquiry', 'resp_code': 'QPIGS', 'type': 'QUERY'},
            'QPGSn': {'description': 'Parallel Information inquiry', 'resp_code': 'QPGSn', 'regex': re.compile(r'QPGS\d$'), 'type': 'QUERY'},
