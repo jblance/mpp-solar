@@ -1,0 +1,25 @@
+language: python
+
+env:
+  - TOXENV=py27
+  - TOXENV=py33
+  - TOXENV=py34
+
+install: 
+  - "pip install python-coveralls"
+  - "pip install coverage"
+  - "pip install flake8"
+  - "python ./setup.py install"
+
+before_script:
+  - "flake8 setup.py jasper tests"
+
+script: 
+  - "coverage run ./setup.py test"
+  
+after_success:
+  - "coverage report"
+  - "coveralls"
+    
+notifications:
+  email: false
