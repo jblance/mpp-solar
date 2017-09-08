@@ -38,10 +38,13 @@ def main():
     elif(args.getStatus):
         fullStatus = mp.getFullStatus() 
         for key in fullStatus:
-            print key, fullStatus[key]['value'], fullStatus[key]['unit']
+            print "{}\t{} {}".format(key, fullStatus[key]['value'], fullStatus[key]['unit'])
     elif(args.getSettings):
-        for line in mp.getSettings():
-            print line, line['value'], line['unit']
+        settings = mp.getSettings()
+        for key in settings:
+            print "{}\t{}\t{} {}".format(key, settings[key]['default'],
+                                         settings[key]['value'],
+                                         settings[key]['unit'])
     else:
         # TODO: check if command is valid
         # maybe check if query or setter and ...
