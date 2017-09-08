@@ -89,7 +89,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
         'console_scripts': [
-            'mpp-solar=mpprun:main',
+            'mpp-solar=mppsolar:main',
         ],
     },
 

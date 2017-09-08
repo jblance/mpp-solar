@@ -19,6 +19,15 @@ class mppUtils:
         self.mp = mppcommands.mppCommands(serial_device, baud_rate)
         self._serial_number = None
 
+    def getKnownCommands(self):
+        return self.mp.getKnownCommands()
+
+    def getResponsePretty(self, cmd):
+        return self.mp.getResponsePretty(cmd)
+
+    def getResponse(self, cmd):
+        return self.mp.getResponse(cmd)
+
     def getSerialNumber(self):
         if self._serial_number is None:
             response = self.mp.getResponseDict("QID")
