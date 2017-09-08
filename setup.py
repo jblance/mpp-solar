@@ -25,8 +25,7 @@ setup(
     # https://packaging.python.org/en/latest/single_source_version.html
     version='0.1.0',
 
-    # pylint: disable=line-too-long
-    description='Python package to communicate with MPP Solar PIP-4048MS inverter',
+    description='Package to communicate with MPP Solar PIP-4048MS inverter',
     long_description=long_description,
 
     # The project's main homepage.
