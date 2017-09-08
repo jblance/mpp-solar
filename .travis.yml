@@ -10,7 +10,7 @@ install:
   - "python ./setup.py install"
 
 before_script:
-  - "flake8 setup.py jasper tests"
+  - "flake8 setup.py mppsolar tests"
 
 script: 
   - "coverage run ./setup.py test"
