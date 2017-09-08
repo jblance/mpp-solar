@@ -9,6 +9,7 @@ import mppcommands
 
 logger = logging.getLogger()
 
+
 def getVal(_dict, key, ind=None):
     if key not in _dict:
         return ""

@@ -9,7 +9,6 @@ import mpputils
 logger = logging.getLogger()
 
 
-# if __name__ == '__main__':
 def main():
     parser = ArgumentParser(description='MPP Solar Command Utility')
     parser.add_argument('-c', '--command', help='Command to run', default='QID')
@@ -36,15 +35,15 @@ def main():
         for line in mp.getKnownCommands():
             print line
     elif(args.getStatus):
-        fullStatus = mp.getFullStatus() 
+        fullStatus = mp.getFullStatus()
         for key in fullStatus:
             print "{:<30}\t{:<15} {}".format(key, fullStatus[key]['value'], fullStatus[key]['unit'])
     elif(args.getSettings):
         settings = mp.getSettings()
         for key in settings:
             print "{:<30}\t{:<10}\t{:<10} {}".format(key, settings[key]['default'],
-                                         settings[key]['value'],
-                                         settings[key]['unit'])
+                                                     settings[key]['value'],
+                                                     settings[key]['unit'])
     else:
         # TODO: check if command is valid
         # maybe check if query or setter and ...
