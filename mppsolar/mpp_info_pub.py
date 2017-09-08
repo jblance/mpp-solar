@@ -2,9 +2,10 @@
 #
 #
 # mpp_info_pub.py
-# 
+#
 # script to query MPP Solar PIP-4048MS inverter/charger
-# - inverter connected to computer via serial (USB to Serial converter used for testing)
+# - inverter connected to computer via serial
+#      (USB to Serial converter used for testing)
 # - posts results to MQTT broker
 # - uses mpputils.py / mppcommands.py to abstract PIP communications
 #
@@ -14,6 +15,7 @@ import mpputils
 
 grab_settings = False
 
+# pylint: disable=line-too-long
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser(description='MPP Solar Inverter Info Utility')
