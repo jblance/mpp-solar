@@ -1,4 +1,4 @@
-# pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
+# pylint: disable=line-too-long
 """A setuptools based setup module.
 
 See:
@@ -9,7 +9,7 @@ https://github.com/pypa/sampleproject
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
 # To use a consistent encoding
-from codecs import open # pylint: disable=redefined-builtin
+from codecs import open   # pylint: disable=redefined-builtin
 from os import path
 
 here = path.abspath(path.dirname(__file__))
