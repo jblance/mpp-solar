@@ -33,8 +33,7 @@ COMMAND = {'QPIRI': {'description': 'Device Current Settings inquiry', 'resp_cod
            'PSDVnn.n': {'description': 'Set Battery Cut-off Voltage', 'resp_code': 'SET', 'regex': re.compile(r'PSDV\d\d\.\d$'), 'type': 'SETTER'},
            }
 
-RESPONSE = {
-            'QPIRI': [['float', 'AC Input Voltage', 'V'],
+RESPONSE = {'QPIRI': [['float', 'AC Input Voltage', 'V'],
                       ['float', 'AC Input Current', 'A'],
                       ['float', 'AC Output Voltage', 'V'],
                       ['float', 'AC Output Frequency', 'Hz'],
@@ -62,7 +61,7 @@ RESPONSE = {
                                                  'Phase 3 of 3 Phase output']],
                       ['float', 'Battery Redischarge Voltage', 'V'],
                       ['option', 'PV OK Condition', ['As long as one unit of inverters has connect PV, parallel system will consider PV OK',
-                                                                  'Only All of inverters have connect PV, parallel system will consider PV OK']],
+                                                     'Only All of inverters have connect PV, parallel system will consider PV OK']],
                       ['option', 'PV Power Balance', ['PV input max current will be the max charged current',
                                                       'PV input max power will be the sum of the max charged power and loads power']],
                       ],
@@ -163,7 +162,7 @@ RESPONSE = {
                       ['int', 'Max AC charger current', 'A'],
                       ['int', 'PV input current', 'A'],
                       ['int', 'Battery discharge current', 'A']],
-            'QFLAG': [['enflags', 'Device Status', {'a': {'name': 'Buzzer', 'state': 'disabled'}, 
+            'QFLAG': [['enflags', 'Device Status', {'a': {'name': 'Buzzer', 'state': 'disabled'},
                                                     'b': {'name': 'Overload Bypass', 'state': 'disabled'},
                                                     'j': {'name': 'Power Saving', 'state': 'disabled'},
                                                     'k': {'name': 'LCD Reset to Default', 'state': 'disabled'},
@@ -171,7 +170,7 @@ RESPONSE = {
                                                     'v': {'name': 'Over Temperature Restart', 'state': 'disabled'},
                                                     'x': {'name': 'LCD Backlight', 'state': 'disabled'},
                                                     'y': {'name': 'Primary Source Interrupt Alarm', 'state': 'disabled'},
-                                                    'z': {'name': 'Record Fault Code',  'state': 'disabled'}}]],
+                                                    'z': {'name': 'Record Fault Code', 'state': 'disabled'}}]],
             'QVFW': [['string', 'Main CPU firmware version', '']],
             'QVFW2': [['string', 'Secondary CPU firmware version', '']],
             'QPI': [['string', 'Protocol ID', '']],
@@ -213,7 +212,7 @@ RESPONSE = {
                                                'Phase 3 of 3 Phase output']],
                     ['float', 'Battery Redischarge Voltage', 'V'],
                     ['option', 'PV OK condition', ['As long as one unit of inverters has connect PV, parallel system will consider PV OK',
-                                                                'Only All of inverters have connect PV, parallel system will consider PV OK']],
+                                                   'Only All of inverters have connect PV, parallel system will consider PV OK']],
                     ['option', 'PV Power Balance', ['PV input max current will be the max charged current',
                                                     'PV input max power will be the sum of the max charged power and loads power']]],
             'Q1': [['int', 'Time until the end of absorb charging', 'sec'],
@@ -267,6 +266,7 @@ RESPONSE = {
                                                         'Reserved']]]
             }
 
+
 def trunc(text):
     """
     Truncates / right pads supplied text
@@ -275,6 +275,7 @@ def trunc(text):
         text = text[:30]
         return '{:<30}...'.format(text)
     return '{:<30}   '.format(text)
+
 
 def crc(cmd):
     """
@@ -343,11 +344,11 @@ class mppCommands:
         msgs.append('-------- List of known commands --------')
         for cmd in sorted(COMMAND):
             msgs.append('{}: {}'.format(cmd, COMMAND[cmd]['description']))
-        return msgs        
+        return msgs
 
     def getCommandFullString(self, cmd):
         """
-        Generates a full command including CRC and CR 
+        Generates a full command including CRC and CR
         """
         logging.debug('Generate full command for %s', cmd)
         crc_high, crc_low = crc(cmd)
@@ -360,12 +361,12 @@ class mppCommands:
         Determines the type of command (QUERY, SETTER, UNKNOWN)
         """
         # Check if it is a known command
-        #if not self.isValidCommand(cmd):
+        # if not self.isValidCommand(cmd):
         #    return False
         if (cmd in COMMAND):
             logging.debug('Command %s is a %s - simple match', cmd, COMMAND[cmd]['type'])
             return COMMAND[cmd]['type']
-        #Look through more complex matches
+        # Look through more complex matches
         for item in COMMAND:
             logging.debug('Checking %s', item)
             # If a regex is defined...
@@ -410,7 +411,7 @@ class mppCommands:
             return None
         else:
             return RESPONSE[COMMAND[cmd_reference]['resp_code']]
-            
+
     def isCommandValid(self, cmd):
         """
         Checks if supplied command is valid (i.e. a known command with a defined response)
@@ -488,24 +489,24 @@ class mppCommands:
         Returns the response unchanged
         """
         return self.execute(cmd)
-        
+
     def getResponseDict(self, cmd):
         """
         Returns the response in a dict (with value, unit array)
         """
         msgs = {}
-        
-        #Execute command
+
+        # Execute command
         response = self.execute(cmd)
-        if (response is None): 
+        if (response is None):
             logging.info('Command execution failed')
             return msgs
-        
-        cmd_reference = self.getCommandCode(cmd)
+
+        # cmd_reference = self.getCommandCode(cmd)
         response_definition = self.getResponseDefinition(cmd)
-        if (response_definition is None): 
+        if (response_definition is None):
             logging.info('Was not valid response')
-            return msgs        
+            return msgs
 
         responses = response.split(" ")
         for i, result in enumerate(responses):
@@ -531,7 +532,7 @@ class mppCommands:
                 for j, flag in enumerate(result):
                     output = '{}\n\t- {}'.format(output,
                                                  resp_format[2][j][int(flag)])
-                msgs[key] = [output, ''] 
+                msgs[key] = [output, '']
             # eg. ['stat_flags', 'Warning status', ['Reserved', 'Inver...
             elif (resp_format[0] == 'stat_flags'):
                 output = ''
@@ -540,9 +541,9 @@ class mppCommands:
                         output = ('{}\n\t- {}'.format(output,
                                                       resp_format[2][j]))
                 msgs[key] = [output, '']
-            # eg. ['enflags', 'Device Status', {'a': {'name': 'Buzzer', 'state': 'disabled'}, 
+            # eg. ['enflags', 'Device Status', {'a': {'name': 'Buzzer', 'state': 'disabled'},
             elif (resp_format[0] == 'enflags'):
-                #output = {}
+                # output = {}
                 status = 'unknown'
                 for item in result:
                     if (item == 'E'):
@@ -550,31 +551,31 @@ class mppCommands:
                     elif (item == 'D'):
                         status = 'disabled'
                     else:
-                        #output[resp_format[2][item]['name']] = status
+                        # output[resp_format[2][item]['name']] = status
                         msgs[resp_format[2][item]['name']] = [status, '']
-                #msgs[key] = [output, '']
+                # msgs[key] = [output, '']
             else:
                 msgs[i] = [result, '']
         return msgs
-            
+
     def getResponsePretty(self, cmd):
         """
         Returns the response in a human readable format
         """
         msgs = []
-        
-        #Execute command
+
+        # Execute command
         response = self.execute(cmd)
-        if (response is None): 
+        if (response is None):
             logging.info('Command execution failed')
             return msgs
 
         cmd_reference = self.getCommandCode(cmd)
         response_definition = self.getResponseDefinition(cmd)
-        if (response_definition is None): 
+        if (response_definition is None):
             logging.info('Was not valid response')
             return msgs
-        
+
         msgs.append('-------- {} --------'.format(COMMAND[cmd_reference]['description']))
         responses = response.split(" ")
         for i, result in enumerate(responses):
@@ -623,7 +624,7 @@ class mppCommands:
                 msg = '{}:{}'.format(trunc(resp_format[1]), result)
                 msgs.append(msg)
             # eg. ['enflags', 'Device status', {'a': 'Buzzer', 'b': 'O ...
-            # eg. ['enflags', 'Device Status', {'a': {'name': 'Buzzer', 'state': 'disabled'}, 
+            # eg. ['enflags', 'Device Status', {'a': {'name': 'Buzzer', 'state': 'disabled'},
             elif (resp_format[0] == 'enflags'):
                 output = ''
                 status = 'unknown'
@@ -654,12 +655,12 @@ class mppCommands:
             # Execute command multiple times, increase timeouts each time
             for x in (1, 2, 3, 4):
                 logging.debug('Command execution attempt %d...', x)
-                s.timeout = 1+x
-                s.write_timeout = 1+x
+                s.timeout = 1 + x
+                s.write_timeout = 1 + x
                 s.flushInput()
                 s.flushOutput()
                 s.write(full_cmd)
-                time.sleep(0.5*x)  # give serial port time to receive the data
+                time.sleep(0.5 * x)  # give serial port time to receive the data
                 response_line = s.readline()
                 logging.debug('serial response was: %s', response_line)
                 if self.isResponseValid(cmd, response_line):
