@@ -15,7 +15,6 @@ import mpputils
 
 grab_settings = False
 
-""" pylint: disable=line-too-long """
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser(description='MPP Solar Inverter Info Utility')
@@ -24,42 +23,41 @@ if __name__ == '__main__':
     parser.add_argument('-b', '--baud', type=int, help='Baud rate for serial communications', default=2400)
     parser.add_argument('-q', '--broker', type=str, help='MQTT Broker hostname', default='mqtt_broker')
     args = parser.parse_args()
-    
-    #Process / loop through all supplied devices
+
+    # Process / loop through all supplied devices
     for usb_port in args.device.split(','):
         mp = mpputils.mppUtils(usb_port, args.baud)
         serial_number = mp.getSerialNumber()
-        
-        #Collect Inverter Settings and publish
+
+        # Collect Inverter Settings and publish
         if args.grabsettings:
             msgs = []
             settings = mp.getSettings()
-            
+
             for setting in settings:
                 for i in ['value', 'default', 'unit']:
-                    # 92931509101901/settings/battery_bulk_charge_voltage/value 56.4 
                     topic = '{}/settings/{}/{}'.format(serial_number, setting, i)
-                    msg = {'topic': topic, 'payload': '{}'.format(setting[i]) }
+                    msg = {'topic': topic, 'payload': '{}'.format(setting[i])}
                     msgs.append(msg)
-            #publish.multiple(msgs, hostname=args.broker)
+            # publish.multiple(msgs, hostname=args.broker)
             print msgs
             print args.broker
-        
-        #Collect Inverter Status data and publish
+
+        # Collect Inverter Status data and publish
         msgs = []
         status_data = mp.getFullStatus()
         for status_line in status_data:
                 for i in ['value', 'unit']:
                     # 92931509101901/status/total_output_active_power/value 1250
-                    # 92931509101901/status/total_output_active_power/unit W 
+                    # 92931509101901/status/total_output_active_power/unit W
                     topic = '{}/settings/{}/{}'.format(serial_number, status_line, i)
-                    msg = {'topic': topic, 'payload': '{}'.format(status_line[i]) }
+                    msg = {'topic': topic, 'payload': '{}'.format(status_line[i])}
                     msgs.append(msg)
-        #publish.multiple(msgs, hostname=args.broker)
+        # publish.multiple(msgs, hostname=args.broker)
         print msgs
         print args.broker
         print status_data
-    
+
 """
 Adafruit IO has:
     Battery Capacity (as %)         inverter-one-battery-capacity-percent
@@ -72,5 +70,3 @@ Adafruit IO has:
     Inverter 2 charging current (A) inverter-two-battery-charging-current-a
     Load (as %)                     inverter-one-load-percentage-percent
 """
-
-            
