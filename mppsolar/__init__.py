@@ -40,7 +40,7 @@ def main():
             print line
     elif(args.getSettings):
         for line in mp.getSettings():
-            print line
+            print line, line['value'], line['unit']
     else:
         # TODO: check if command is valid
         # maybe check if query or setter and ...
