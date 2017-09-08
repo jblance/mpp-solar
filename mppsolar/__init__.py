@@ -38,11 +38,11 @@ def main():
     elif(args.getStatus):
         fullStatus = mp.getFullStatus() 
         for key in fullStatus:
-            print "{}\t{} {}".format(key, fullStatus[key]['value'], fullStatus[key]['unit'])
+            print "{:<30}\t{:<15} {}".format(key, fullStatus[key]['value'], fullStatus[key]['unit'])
     elif(args.getSettings):
         settings = mp.getSettings()
         for key in settings:
-            print "{}\t{}\t{} {}".format(key, settings[key]['default'],
+            print "{:<30}\t{:<10}\t{:<10} {}".format(key, settings[key]['default'],
                                          settings[key]['value'],
                                          settings[key]['unit'])
     else:
