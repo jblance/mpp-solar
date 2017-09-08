@@ -15,7 +15,7 @@ import mpputils
 
 grab_settings = False
 
-# pylint: disable=line-too-long
+""" pylint: disable=line-too-long """
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser(description='MPP Solar Inverter Info Utility')
