@@ -36,8 +36,9 @@ def main():
         for line in mp.getKnownCommands():
             print line
     elif(args.getStatus):
-        for line in mp.getFullStatus():
-            print line, line['value'], line['unit']
+        fullStatus = mp.getFullStatus() 
+        for key in fullStatus:
+            print key, fullStatus[key]['value'], fullStatus[key]['unit']
     elif(args.getSettings):
         for line in mp.getSettings():
             print line, line['value'], line['unit']
