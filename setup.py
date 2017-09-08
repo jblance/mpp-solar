@@ -92,4 +92,6 @@ setup(
             'mpp-solar=mpprun:main',
         ],
     },
+    
+    test_suite='tests'
 )
