@@ -37,7 +37,7 @@ def main():
             print line
     elif(args.getStatus):
         for line in mp.getFullStatus():
-            print line
+            print line, line['value'], line['unit']
     elif(args.getSettings):
         for line in mp.getSettings():
             print line, line['value'], line['unit']
