@@ -1,9 +1,7 @@
 language: python
-
-env:
-  - TOXENV=py27
-  - TOXENV=py33
-  - TOXENV=py34
+sudo: false
+python:
+    - "2.7"
 
 install: 
   - "pip install python-coveralls"
