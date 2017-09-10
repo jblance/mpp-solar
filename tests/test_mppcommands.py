@@ -1,5 +1,5 @@
 import unittest
-from mppsolar.mpputils import mppUtils
+from mpputils import mppUtils
 
 
 class test_mppcommands(unittest.TestCase):
