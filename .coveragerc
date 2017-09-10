@@ -1,5 +1,6 @@
 [paths]
-*/mppsolar/
+source =
+   */mppsolar/
 
 [report]
 omit =  
