@@ -1,9 +1,9 @@
 import unittest
-from mppsolar.mppcommands import mppCommands
+from mppsolar import mpputils
 
 
 class test_mppcommands(unittest.TestCase):
     def testOne(self):
-        mp = mppCommands('/dev/ttyUSB0')
+        mp = mpputils.mppUtils('/dev/ttyUSB0')
         mp.getKnownCommands()
         return True
