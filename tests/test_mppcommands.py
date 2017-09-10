@@ -1,5 +1,5 @@
 import mppcommands
 
-mp = mpcommands.mppCommand()
-
-return True
+def check_1():
+  mp = mppcommands.mppCommands()
+  return True
