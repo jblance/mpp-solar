@@ -1,9 +1,9 @@
 import unittest
-import mppcommands
+from mppcommands import mppCommands
 
 
 class test_mppcommands(unittest.TestCase):
     def check_1(self):
-        mp = mppcommands.mppCommands()
+        mp = mppCommands()
         mp.getKnownCommands()
         return True
