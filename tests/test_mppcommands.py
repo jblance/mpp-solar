@@ -48,7 +48,7 @@ class test_mppcommands(unittest.TestCase):
         self.assertEqual(mp.getCommandCode('QPIGS'), 'QPIGS')
         self.assertEqual(mp.getCommandCode('QPIRI'), 'QPIRI')
         self.assertEqual(mp.getCommandCode('QPGS0'), 'QPGSn')
-        self.assertEqual(mp.getCommandCode('PSDV56.4'), 'SET')
+        self.assertEqual(mp.getCommandCode('PSDV56.4'), 'PSDVnn.n')
 
     def test_getresponsedefinition(self):
         """ """
