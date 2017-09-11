@@ -3,7 +3,6 @@ MPP Solar Inverter Command Library
 reference library of serial commands (and responses) for PIP-4048MS inverters
 mppcommands.py
 """
-# TODO: check with pylint...
 
 import ctypes
 import serial
@@ -472,11 +471,16 @@ class mppCommands:
 
         # Check if this is a query or set command
         cmd_type = self.getCommandType(cmd)
-        if (cmd_type != 'QUERY'):
+        if (cmd_type == 'SETTER'):
             # Is set command - default to 'is valid'
             # TODO: what are valid responses...
-            logging.debug('Response valid as is not query')
-            return True
+            if (response == '(ACK9 \r'):
+                logging.debug('Response valid as setter with ACK resp')
+                return True
+            if (response == '(NAKss\r'):
+                logging.debug('Response valid as setter with NAK resp')
+                return True
+            return False
         # Check if we know about the command
         cmd_reference = self.getCommandCode(cmd)
         if (cmd_reference is None):
