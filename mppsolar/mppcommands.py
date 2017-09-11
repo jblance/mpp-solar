@@ -12,6 +12,9 @@ import re
 import logging
 logger = logging.getLogger()
 
+class MppSolarError(Exception): pass
+class NoDeviceError(MppSolarError): pass
+
 COMMAND = {'QPIRI': {'description': 'Device Current Settings inquiry', 'resp_code': 'QPIRI', 'type': 'QUERY'},
            'QDI': {'description': 'Device Default Settings inquiry', 'resp_code': 'QDI', 'type': 'QUERY'},
            'QPIGS': {'description': 'Device General Status Parameters inquiry', 'resp_code': 'QPIGS', 'type': 'QUERY'},
@@ -332,7 +335,9 @@ class mppCommands:
         { Double.valueOf(value) }));
     """
 
-    def __init__(self, serial_device, baud_rate=2400):
+    def __init__(self, serial_device=None, baud_rate=2400):
+        if (serial_device is None):
+           raise self.NoDeviceError()
         self._baud_rate = baud_rate
         self._serial_device = serial_device
 
