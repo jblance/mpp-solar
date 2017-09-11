@@ -53,8 +53,8 @@ class test_mppcommands(unittest.TestCase):
     def test_getcommandcode_invalid(self):
         """ getcommand code returns None when invalid command used """
         mp = mppcommands.mppCommands('/dev/ttyUSB0')
-        self.assertNone(mp.getCommandCode('PBT99'))  # Invalid option
-        self.assertNone(mp.getCommandCode('INVALID'))  # Invalid command
+        self.assertIsNone(mp.getCommandCode('PBT99'))  # Invalid option
+        self.assertIsNone(mp.getCommandCode('INVALID'))  # Invalid command
 
     def test_getresponsedefinition(self):
         """ getResponseDefinition should return correct response code for valid commands """
