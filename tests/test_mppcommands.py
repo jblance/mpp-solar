@@ -40,4 +40,16 @@ class test_mppcommands(unittest.TestCase):
         """ check getcommandtype returns UNKNOWN for unknown commands """
         mp = mppcommands.mppCommands('/dev/ttyUSB0')
         self.assertEqual(mp.getCommandType('NOTREAL'), 'UNKNOWN')  # Not a valid command
-        self.assertEqual(mp.getCommandType('PVT03'), 'UNKNOWN')  # Invalid option
+        self.assertEqual(mp.getCommandType('PBT03'), 'UNKNOWN')  # Invalid option
+
+    def test_getcommandcode(self):
+        """ check getcommand code returns correct code """
+        mp = mppcommands.mppCommands('/dev/ttyUSB0')
+        self.assertEqual(mp.getCommandCode('QPIGS'), 'QPIGS')
+        self.assertEqual(mp.getCommandCode('QPIRI'), 'QPIRI')
+        self.assertEqual(mp.getCommandCode('QPGS0'), 'QPGSn')
+        self.assertEqual(mp.getCommandCode('PSDV56.4'), 'SET')
+
+    def test_getresponsedefinition(self):
+        """ """
+        pass
