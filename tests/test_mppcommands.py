@@ -50,6 +50,14 @@ class test_mppcommands(unittest.TestCase):
         self.assertEqual(mp.getCommandCode('QPGS0'), 'QPGSn')
         self.assertEqual(mp.getCommandCode('PSDV56.4'), 'PSDVnn.n')
 
+    def test_getcommandcode_invalid(self):
+        """ getcommand code returns None when invalid command used """
+        mp = mppcommands.mppCommands('/dev/ttyUSB0')
+        self.assertNone(mp.getCommandCode('PBT99'))  # Invalid option
+        self.assertNone(mp.getCommandCode('INVALID'))  # Invalid command
+
     def test_getresponsedefinition(self):
-        """ """
-        pass
+        """ getResponseDefinition should return correct response code for valid commands """
+        mp = mppcommands.mppCommands('/dev/ttyUSB0')
+        self.assertEqual(mp.getResponseDefinition('QVFW'), [['string', 'Main CPU firmware version', '']])
+        self.assertEqual(mp.getResponseDefinition('PBT01'), [['ack', 'Command execution', {'NAK': 'Failed', 'ACK': 'Successful'}]])
