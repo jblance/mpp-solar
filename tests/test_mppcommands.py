@@ -1,4 +1,5 @@
 import unittest
+import array
 from mppsolar import mppcommands
 
 
