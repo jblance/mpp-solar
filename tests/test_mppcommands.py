@@ -71,9 +71,26 @@ class test_mppcommands(unittest.TestCase):
     def test_iscommandvalid(self):
         """ isCommandValid should return True for valid commands """
         mp = mppcommands.mppCommands('/dev/ttyUSB0')
-        self.assertTrue(mp.isCommandValid('QPIGS'))
+        self.assertTrue(mp.isCommandValid('QPIGS'))  # Simple match
+        self.assertTrue(mp.isCommandValid('PSDV56.4'))  # Complex match
 
     def test_iscommandvalid_invalid(self):
         """ isCommandValid should return False for invalid commands """
         mp = mppcommands.mppCommands('/dev/ttyUSB0')
         self.assertFalse(mp.isCommandValid('INVALID'))
+
+    def test_isresponsevalid(self):
+        """ isResponseVaild should return true for valid responses """
+        mp = mppcommands.mppCommands('/dev/ttyUSB0')
+        qpiri_resp = "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1o~"
+        self.assertTrue(mp.isResponseValid('QPIRI', qpiri_resp))
+
+    def test_isresponsevalid_invalid(self):
+        """ isResponseValid should return false for invalid responses """
+        mp = mppcommands.mppCommands('/dev/ttyUSB0')
+        qpiri_resp = "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1o~"
+        qpiri_resp_nocrc = "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0"
+        qpiri_resp_missing = "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6"
+        self.assertFalse(mp.isResponseValid('QPIRI', '(2'))  # Response too short
+        self.assertFalse(mp.isResponseValid('QPIRI', qpiri_resp_missing))  # To few elements in response
+        self.assertFalse(mp.isResponseValid('INVALID', qpiri_resp))  # Invalid command
