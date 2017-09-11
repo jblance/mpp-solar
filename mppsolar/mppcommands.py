@@ -688,20 +688,8 @@ class mppCommands:
         """
         Sends a command (as supplied) to inverter and returns the raw response
         """
-        # Execute logic is different for a query compared to a setter
         cmd_type = self.getCommandType(cmd)
         full_cmd = self.getCommandFullString(cmd)
         logging.debug('called: execute with query %s', full_cmd)
         logging.debug('\t%s command type is %s', cmd, cmd_type)
-        if (cmd_type == 'QUERY'):
-            return self.doSerialCommand(full_cmd, cmd)
-        elif (cmd_type == 'SETTER'):
-            # TODO: now what...
-            # ie. execute with cmd = PBT01 or PSDV44.0
-            # how to show valid options?
-            # show before and after?
-            return self.doSerialCommand(full_cmd, cmd)
-        else:
-            # TODO: unknown command
-            # Unknown command
-            return self.doSerialCommand(full_cmd, cmd)
+        return self.doSerialCommand(full_cmd, cmd)
