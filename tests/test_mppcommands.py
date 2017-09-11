@@ -13,6 +13,8 @@ class test_mppcommands(unittest.TestCase):
         self.assertListEqual(mppcommands.crc('QPIGS'), [183, 169])
         self.assertListEqual(mppcommands.crc('QPIRI'), [248, 84])
         self.assertListEqual(mppcommands.crc('PSDV56.4'), [249, 224])
+        self.assertListEqual(mppcommands.crc('186'), [41, 60])
+        self.assertListEqual(mppcommands.crc('196'), [27, 14])
 
     def test_failed_initialisation(self):
         """ Initialisation should fail if no device provided """
@@ -84,6 +86,8 @@ class test_mppcommands(unittest.TestCase):
         mp = mppcommands.mppCommands('/dev/ttyUSB0')
         qpiri_resp = "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1o~\r"
         self.assertTrue(mp.isResponseValid('QPIRI', qpiri_resp))
+        self.assertTrue(mp.isResponseValid('PBT01', '(NAKss\r'))
+        self.assertTrue(mp.isResponseValid('PBT01', '(ACK9 \r'))
 
     def test_isresponsevalid_invalid(self):
         """ isResponseValid should return false for invalid responses """
@@ -91,7 +95,7 @@ class test_mppcommands(unittest.TestCase):
         qpiri_resp = "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1o~\r"
         qpiri_resp_inv_crc = "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1oo\r"
         qpiri_resp_nocrc = "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0"
-        qpiri_resp_missing = "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 \x12h\r"
+        qpiri_resp_missing = "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10\x86\xc1\r"
         self.assertFalse(mp.isResponseValid('QPIRI', '(2'))  # Response too short
         self.assertFalse(mp.isResponseValid('QPIRI', qpiri_resp_inv_crc))  # Invalid crc in response
         self.assertFalse(mp.isResponseValid('QPIRI', qpiri_resp_nocrc))  # No crc in response
