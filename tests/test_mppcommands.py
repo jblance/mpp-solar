@@ -89,9 +89,12 @@ class test_mppcommands(unittest.TestCase):
         """ isResponseValid should return false for invalid responses """
         mp = mppcommands.mppCommands('/dev/ttyUSB0')
         qpiri_resp = "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1o~"
+        qpiri_resp_inv_crc = "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1oo"
         qpiri_resp_nocrc = "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0"
         qpiri_resp_missing = "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 \x12h"
         self.assertFalse(mp.isResponseValid('QPIRI', '(2'))  # Response too short
+        self.assertFalse(mp.isResponseValid('QPIRI', qpiri_resp_inv_crc))  # Invalid crc in response
+        self.assertFalse(mp.isResponseValid('QPIRI', qpiri_resp_nocrc))  # No crc in response
         self.assertFalse(mp.isResponseValid('QPIRI', qpiri_resp_missing))  # To few elements in response
         self.assertFalse(mp.isResponseValid('INVALID', qpiri_resp))  # Invalid command
 
