@@ -343,7 +343,7 @@ class mppCommands:
 
     def __init__(self, serial_device=None, baud_rate=2400):
         if (serial_device is None):
-            raise NoDeviceError, "A device to communicate by must be supplied, e.g. /dev/ttyUSB0"
+            raise NoDeviceError("A device to communicate by must be supplied, e.g. /dev/ttyUSB0")
         self._baud_rate = baud_rate
         self._serial_device = serial_device
 
