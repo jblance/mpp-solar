@@ -22,3 +22,22 @@ class test_mppcommands(unittest.TestCase):
         """ getKnownCommands should return a list """
         mp = mppcommands.mppCommands('/dev/ttyUSB0')
         self.assertIsInstance(mp.getKnownCommands(), list)
+
+    def test_getcommandtype(self):
+        """ check getcommandtype returns correct type for simple matches """
+        mp = mppcommands.mppCommands('/dev/ttyUSB0')
+        self.assertEqual(mp.getCommandType('QPIRI'), 'QUERY')
+        self.assertEqual(mp.getCommandType('QMCHGCR'), 'QUERY')
+
+    def test_getcommandtype_complex(self):
+        """ check getcommandtype returns correct type for complex (regex) matches """
+        mp = mppcommands.mppCommands('/dev/ttyUSB0')
+        self.assertEqual(mp.getCommandType('QPGS0'), 'QUERY')
+        self.assertEqual(mp.getCommandType('PBT02'), 'SETTER')
+        self.assertEqual(mp.getCommandType('PSDV56.4'), 'SETTER')
+
+    def test_getcommandtype_unknown(self):
+        """ check getcommandtype returns UNKNOWN for unknown commands """
+        mp = mppcommands.mppCommands('/dev/ttyUSB0')
+        self.assertEqual(mp.getCommandType('NOTREAL'), 'UNKNOWN') # Not a valid command
+        self.assertEqual(mp.getCommandType('PVT03'), 'UNKNOWN')  # Invalid option
