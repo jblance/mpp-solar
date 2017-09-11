@@ -61,3 +61,19 @@ class test_mppcommands(unittest.TestCase):
         mp = mppcommands.mppCommands('/dev/ttyUSB0')
         self.assertEqual(mp.getResponseDefinition('QVFW'), [['string', 'Main CPU firmware version', '']])
         self.assertEqual(mp.getResponseDefinition('PBT01'), [['ack', 'Command execution', {'NAK': 'Failed', 'ACK': 'Successful'}]])
+
+    def test_getresponsedefinition_invalid(self):
+        """ getResponseDefinition should return none for invalid commands """
+        mp = mppcommands.mppCommands('/dev/ttyUSB0')
+        self.assertIsNone(mp.getResponseDefinition('PBT69'))  # Invalid option
+        self.assertIsNone(mp.getResponseDefinition('INVALID'))  # Invalid command
+
+    def test_iscommandvalid(self):
+        """ isCommandValid should return True for valid commands """
+        mp = mppcommands.mppCommands('/dev/ttyUSB0')
+        self.assertTrue(mp.isCommandValid('QPIGS'))
+
+    def test_iscommandvalid_invalid(self):
+        """ isCommandValid should return False for invalid commands """
+        mp = mppcommands.mppCommands('/dev/ttyUSB0')
+        self.assertFalse(mp.isCommandValid('INVALID'))
