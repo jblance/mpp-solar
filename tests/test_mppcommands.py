@@ -7,3 +7,7 @@ class test_mppcommands(unittest.TestCase):
         mp = mppcommands.mppCommands('/dev/ttyUSB0')
         mp.getKnownCommands()
         return True
+
+    def test_init1(self):
+        """ Initialisation should fail if no device provided """
+        self.assertRaises(mppcommands.NoDeviceError, mppcommands.mppCommands)
