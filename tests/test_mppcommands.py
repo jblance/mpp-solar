@@ -101,9 +101,17 @@ class test_mppcommands(unittest.TestCase):
         self.assertFalse(mp.isResponseValid('QPIRI', qpiri_resp_nocrc))  # No crc in response
         self.assertFalse(mp.isResponseValid('QPIRI', qpiri_resp_missing))  # To few elements in response
         self.assertFalse(mp.isResponseValid('INVALID', qpiri_resp))  # Invalid command
+        self.assertFalse(mp.isResponseValid('PBT01', '(INV%A\r'))  # Invalid command
 
     def test_getcommandfullstring(self):
         """ getCommandFullString should return full command """
         mp = mppcommands.mppCommands('/dev/ttyUSB0')
         self.assertEqual(mp.getCommandFullString('QPIRI'), 'QPIRI\xf8T\r')
         self.assertEqual(mp.getCommandFullString('QPIGS'), 'QPIGS\xb7\xa9\r')
+    
+    def test_getresponse(self):
+        """ getResponse should return a valid raw response - only for QPIRI """
+        mp = mppcommands.mppCommands('TEST')  # Use test serial device
+        qpiri_resp = mp.getResponse('QPIRI')
+        self.assertTrue(mp.isResponseValid('QPIRI', qpiri_resp))
+        self.assertEqual(qpiri_resp, "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1o~\r"
