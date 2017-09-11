@@ -330,15 +330,6 @@ class mppCommands:
     """
     MPP Solar Inverter Command Library
     """
-    """
-    boolean setBatteryType(String value) # PBT<NN><cr>: Setting battery type
-    result = excuteCommand("PBT", getFomatStr(value, 2));
-
-    boolean setBatteryUnder(double value) # PSDV<nn.n><cr>:
-        Setting battery cut-off voltage (Battery under voltage)
-    result = excuteCommand("PSDV", String.format("%04.01f", new Object[]
-        { Double.valueOf(value) }));
-    """
 
     def __init__(self, serial_device=None, baud_rate=2400):
         if (serial_device is None):
@@ -666,6 +657,10 @@ class mppCommands:
         """
         response_line = None
         logging.debug('port %s, baudrate %s', self._serial_device, self._baud_rate)
+        if (self._serial_device == 'TEST'):
+            # Return a valid QPIRI response if _serial_device is TEST
+            response_line = '(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1o~\r'
+            return response_line
         with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
             # Execute command multiple times, increase timeouts each time
             for x in (1, 2, 3, 4):
