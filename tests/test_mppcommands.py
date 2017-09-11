@@ -39,5 +39,5 @@ class test_mppcommands(unittest.TestCase):
     def test_getcommandtype_unknown(self):
         """ check getcommandtype returns UNKNOWN for unknown commands """
         mp = mppcommands.mppCommands('/dev/ttyUSB0')
-        self.assertEqual(mp.getCommandType('NOTREAL'), 'UNKNOWN') # Not a valid command
+        self.assertEqual(mp.getCommandType('NOTREAL'), 'UNKNOWN')  # Not a valid command
         self.assertEqual(mp.getCommandType('PVT03'), 'UNKNOWN')  # Invalid option
