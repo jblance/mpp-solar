@@ -120,4 +120,4 @@ class test_mppcommands(unittest.TestCase):
         """ getResponseDict should return a valid dict """
         mp = mppcommands.mppCommands('TEST')  # Use test serial device
         qpiri_resp = mp.getResponseDict('QPIRI')
-        #Need to determine how to check response...
+        self.assertEqual(qpiri_resp, qpiri_resp)  # TODO Fix
