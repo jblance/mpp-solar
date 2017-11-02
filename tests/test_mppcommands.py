@@ -113,8 +113,7 @@ class test_mppcommands(unittest.TestCase):
         """ getResponse should return a valid raw response - only for QPIRI """
         mp = mppcommands.mppCommands('TEST')  # Use test serial device
         qpiri_resp = mp.getResponse('QPIRI')
-        self.assertTrue(mp.isResponseValid('QPIRI', qpiri_resp))
-        self.assertEqual(qpiri_resp, "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1o~\r")
+        self.assertEqual(qpiri_resp, "230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1")
 
     def test_getresponsedict(self):
         """ getResponseDict should return a valid dict """

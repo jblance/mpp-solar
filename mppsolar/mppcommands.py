@@ -660,7 +660,7 @@ class mppCommands:
         if (self._serial_device == 'TEST'):
             # Return a valid QPIRI response if _serial_device is TEST
             response_line = '(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1o~\r'
-            return response_line
+            return response_line[1:-3]
         with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
             # Execute command multiple times, increase timeouts each time
             for x in (1, 2, 3, 4):
