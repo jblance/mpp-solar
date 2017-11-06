@@ -20,6 +20,10 @@ class NoDeviceError(MppSolarError):
     pass
 
 
+class NoTestResponseDefined(MppSolarError):
+    pass
+
+
 COMMAND = {'QPIRI': {'description': 'Device Current Settings inquiry', 'resp_code': 'QPIRI', 'type': 'QUERY'},
            'QDI': {'description': 'Device Default Settings inquiry', 'resp_code': 'QDI', 'type': 'QUERY'},
            'QPIGS': {'description': 'Device General Status Parameters inquiry', 'resp_code': 'QPIGS', 'type': 'QUERY'},
@@ -40,6 +44,14 @@ COMMAND = {'QPIRI': {'description': 'Device Current Settings inquiry', 'resp_cod
            'PBTnn': {'description': 'Set Battery Type', 'resp_code': 'SET', 'regex': re.compile(r'PBT0[012]$'), 'type': 'SETTER'},
            'PSDVnn.n': {'description': 'Set Battery Cut-off Voltage', 'resp_code': 'SET', 'regex': re.compile(r'PSDV\d\d\.\d$'), 'type': 'SETTER'},
            }
+
+TEST_RESPONSE = {'QPIRI': '(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1o~\r',
+                 'QID': '(9293333010501\xbb\x07\r',
+                 'Q1': '00000 00000 01 01 00 062 044 054 069 00 00 000 0038 0608 0000 49.99 122-\r',
+                 'QPIGS': '000.0 00.0 230.0 49.9 0161 0119 003 460 57.50 012 100 0069 0014 103.8 57.45 00000 00110110 00 00 00856 010jd\r',
+                 'QDI': '230.0 50.0 0030 42.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 0 0 1 0 54.0 0 1 000\x10\x11\r',
+                 'QFLAG': 'EakxyDbjuvzZ!\r',
+                 }
 
 RESPONSE = {'QPIRI': [['float', 'AC Input Voltage', 'V'],
                       ['float', 'AC Input Current', 'A'],
@@ -576,9 +588,13 @@ class mppCommands:
         response_line = None
         logging.debug('port %s, baudrate %s', self._serial_device, self._baud_rate)
         if (self._serial_device == 'TEST'):
-            # Return a valid QPIRI response if _serial_device is TEST
-            response_line = '(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1o~\r'
-            return response_line[1:-3]
+            # Return a valid response if _serial_device is TEST
+            # - for those commands that have test responses defined
+            if (cmd in TEST_RESPONSE):
+                response_line = TEST_RESPONSE[cmd]
+                return response_line[1:-3]
+            else:
+                raise NoTestResponseDefined("No TEST_RESPONSE defined for %s", cmd)
         with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
             # Execute command multiple times, increase timeouts each time
             for x in (1, 2, 3, 4):

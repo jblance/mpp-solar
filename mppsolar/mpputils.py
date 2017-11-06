@@ -42,7 +42,7 @@ class mppUtils:
     def getSerialNumber(self):
         if self._serial_number is None:
             response = self.mp.getResponseDict("QID")
-            self._serial_number = response["serial_number"]
+            self._serial_number = response["serial_number"][0]
         return self._serial_number
 
     def getInverterStatus(self):
