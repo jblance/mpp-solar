@@ -31,8 +31,8 @@ class mppUtils:
     def getKnownCommands(self):
         return self.mp.getKnownCommands()
 
-    def getResponsePretty(self, cmd):
-        return self.mp.getResponsePretty(cmd)
+    def getResponseDict(self, cmd):
+        return self.mp.getResponseDict(cmd)
 
     def getResponse(self, cmd):
         return self.mp.getResponse(cmd)
