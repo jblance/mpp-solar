@@ -33,42 +33,70 @@ class test_mpputils(unittest.TestCase):
 
     def test_getfullstatus(self):
         """ Should return full status """
-        testStatus = {'sync_frequency': {'unit': '', 'value': '49.99'}, 'pv_input_current_for_battery': {'unit': 'A', 'value': '0014'}, 'ac_input_frequency': {'unit': 'Hz', 'value': '00.0'}, 'inverter_charge_status': {'unit': '', 'value': 'absorb'}, 'pv_input_voltage': {'unit': 'V', 'value': '103.8'}, 'inverter_temperature': {'unit': 'Deg_C', 'value': '044'}, 'battery_charging_current': {'unit': 'A', 'value': '012'}, 'ac_output_frequency': {'unit': 'Hz', 'value': '49.9'}, 'ac_input_voltage': {'unit': 'V', 'value': '00.0'}, 'battery_temperature': {'unit': 'Deg_C', 'value': '054'}, 'chargeaveragecurrent': {'unit': '', 'value': '00'}, 'battery_discharge_current': {'unit': 'A', 'value': '00000'}, 'battery_voltage': {'unit': 'V', 'value': '57.50'}, 'scc_pwm_temperature': {'unit': 'Deg_C', 'value': '062'}, 'battery_voltage_from_scc': {'unit': 'V', 'value': '57.45'}, 'fan_lock_status': {'unit': '', 'value': 'Not locked'}, 'allowscconflag': {'unit': '', 'value': '01'}, 'ac_output_load': {'unit': '%', 'value': '003'}, 'inverter_heat_sink_temperature': {'unit': 'Deg_C', 'value': '0069'}, 'fan_pwm_speed': {'unit': 'Percent', 'value': '0038'}, 'ac_output_active_power': {'unit': 'W', 'value': '0119'}, 'bus_voltage': {'unit': 'V', 'value': '460'}, 'scc_charge_power': {'unit': 'W', 'value': '0608'}, 'ac_output_voltage': {'unit': 'V', 'value': '230.0'}, 'battery_capacity': {'unit': '%', 'value': '100'}, 'transformer_temperature': {'unit': 'Deg_C', 'value': '069'}, 'scc_flag': {'unit': '', 'value': 'SCC is powered and communicating'}, 'ac_output_apparent_power': {'unit': 'VA', 'value': '0161'}}
+        self.maxDiff = 6000
+        testStatus = {'sync_frequency': {'unit': '', 'value': '50.00'},
+                      'pv_input_current_for_battery': {'unit': 'A', 'value': '0014'},
+                      'ac_input_frequency': {'unit': 'Hz', 'value': '00.0'},
+                      'inverter_charge_status': {'unit': '', 'value': 'float'},
+                      'pv_input_voltage': {'unit': 'V', 'value': '103.8'},
+                      'inverter_temperature': {'unit': 'Deg_C', 'value': '045'},
+                      'battery_charging_current': {'unit': 'A', 'value': '012'},
+                      'ac_output_frequency': {'unit': 'Hz', 'value': '49.9'},
+                      'ac_input_voltage': {'unit': 'V', 'value': '000.0'},
+                      'battery_temperature': {'unit': 'Deg_C', 'value': '053'},
+                      'chargeaveragecurrent': {'unit': '', 'value': '00'},
+                      'battery_discharge_current': {'unit': 'A', 'value': '00000'},
+                      'battery_voltage': {'unit': 'V', 'value': '57.50'},
+                      'scc_pwm_temperature': {'unit': 'Deg_C', 'value': '059'},
+                      'battery_voltage_from_scc': {'unit': 'V', 'value': '57.45'},
+                      'fan_lock_status': {'unit': '', 'value': 'Not locked'},
+                      'allowscconflag': {'unit': '', 'value': '01'},
+                      'ac_output_load': {'unit': '%', 'value': '003'},
+                      'inverter_heat_sink_temperature': {'unit': 'Deg_C', 'value': '0069'},
+                      'fan_pwm_speed': {'unit': 'Percent', 'value': '0040'},
+                      'ac_output_active_power': {'unit': 'W', 'value': '0119'},
+                      'bus_voltage': {'unit': 'V', 'value': '460'},
+                      'scc_charge_power': {'unit': 'W', 'value': '0580'},
+                      'ac_output_voltage': {'unit': 'V', 'value': '230.0'},
+                      'battery_capacity': {'unit': '%', 'value': '100'},
+                      'transformer_temperature': {'unit': 'Deg_C', 'value': '068'},
+                      'scc_flag': {'unit': '', 'value': 'SCC is powered and communicating'},
+                      'ac_output_apparent_power': {'unit': 'VA', 'value': '0161'}}
         mp = mpputils.mppUtils('TEST')
         status = mp.getFullStatus()
         self.assertDictEqual(status, testStatus)
 
     def test_getSettings(self):
         """ Should return the settings """
-        self.maxDiff = 3000
+        self.maxDiff = 6000
         testSettings = {'ac_output_frequency': {'default': '50.0', 'unit': 'Hz', 'value': '50.0'},
-                        'ac_output_voltage': {'default': '30.0', 'unit': 'V', 'value': '230.0'},
+                        'ac_output_voltage': {'default': '230.0', 'unit': 'V', 'value': '230.0'},
                         'battery_bulk_charge_voltage': {'default': '56.4', 'unit': 'V', 'value': '56.4'},
                         'battery_float_charge_voltage': {'default': '54.0', 'unit': 'V', 'value': '54.0'},
                         'battery_recharge_voltage': {'default': '46.0', 'unit': 'V', 'value': '46.0'},
                         'battery_redischarge_voltage': {'default': '54.0', 'unit': 'V', 'value': '54.0'},
                         'battery_type': {'default': 'AGM', 'unit': '', 'value': 'AGM'},
                         'battery_under_voltage': {'default': '42.0', 'unit': 'V', 'value': '42.0'},
-                        'buzzer': {'default': 'Enable', 'unit': '', 'value': ''},
+                        'buzzer': {'default': 'enabled', 'unit': '', 'value': 'enabled'},
                         'charger_source_priority': {'default': 'Solar + Utility', 'unit': '', 'value': 'Utility first'},
                         'input_voltage_range': {'default': 'Appliance', 'unit': '', 'value': 'UPS'},
-                        'lcd_backlight': {'default': 'On', 'unit': '', 'value': ''},
-                        'lcd_reset_to_default': {'default': '', 'unit': '', 'value': ''},
+                        'lcd_backlight': {'default': 'enabled', 'unit': '', 'value': 'enabled'},
+                        'lcd_reset_to_default': {'default': 'enabled', 'unit': '', 'value': 'enabled'},
                         'machine_type': {'default': '', 'unit': '', 'value': 'Off Grid'},
                         'max_ac_charging_current': {'default': '0030', 'unit': 'A', 'value': '10'},
                         'max_charging_current': {'default': '60', 'unit': 'A', 'value': '010'},
                         'output_mode': {'default': 'single machine output', 'unit': '', 'value': 'single machine output'},
                         'output_source_priority': {'default': 'Utility first', 'unit': '', 'value': 'Utility first'},
-                        'over_temperature_restart': {'default': 'Disable', 'unit': '', 'value': ''},
-                        'overload_bypass': {'default': 'Disable', 'unit': '', 'value': ''},
-                        'overload_restart': {'default': 'Disable', 'unit': '', 'value': ''},
-                        'power_saving': {'default': 'Disable', 'unit': '', 'value': ''},
-                        'primary_source_interrupt_alarm': {'default': 'Enable', 'unit': '', 'value': ''},
+                        'over_temperature_restart': {'default': 'disabled', 'unit': '', 'value': 'disabled'},
+                        'overload_bypass': {'default': 'disabled', 'unit': '', 'value': 'disabled'},
+                        'overload_restart': {'default': 'disabled', 'unit': '', 'value': 'disabled'},
+                        'power_saving': {'default': 'disabled', 'unit': '', 'value': 'disabled'},
+                        'primary_source_interrupt_alarm': {'default': 'enabled', 'unit': '', 'value': 'enabled'},
                         'pv_ok_condition': {'default': 'As long as one unit of inverters has connect PV, parallel system will consider PV OK', 'unit': '',
                                             'value': 'As long as one unit of inverters has connect PV, parallel system will consider PV OK'},
                         'pv_power_balance': {'default': 'PV input max power will be the sum of the max charged power and loads power', 'unit': '',
                                              'value': 'PV input max power will be the sum of the max charged power and loads power'},
-                        'record_fault_code': {'default': 'Disable', 'unit': '', 'value': ''}}
+                        'record_fault_code': {'default': 'disabled', 'unit': '', 'value': 'disabled'}}
         mp = mpputils.mppUtils('TEST')
         settings = mp.getSettings()
         self.assertDictEqual(settings, testSettings)

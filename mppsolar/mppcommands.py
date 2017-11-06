@@ -47,10 +47,10 @@ COMMAND = {'QPIRI': {'description': 'Device Current Settings inquiry', 'resp_cod
 
 TEST_RESPONSE = {'QPIRI': '(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1o~\r',
                  'QID': '(9293333010501\xbb\x07\r',
-                 'Q1': '00000 00000 01 01 00 062 044 054 069 00 00 000 0038 0608 0000 49.99 122-\r',
-                 'QPIGS': '000.0 00.0 230.0 49.9 0161 0119 003 460 57.50 012 100 0069 0014 103.8 57.45 00000 00110110 00 00 00856 010jd\r',
-                 'QDI': '230.0 50.0 0030 42.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 0 0 1 0 54.0 0 1 000\x10\x11\r',
-                 'QFLAG': 'EakxyDbjuvzZ!\r',
+                 'Q1': '(00000 00000 01 01 00 059 045 053 068 00 00 000 0040 0580 0000 50.00 139\xb9\r',
+                 'QPIGS': '(000.0 00.0 230.0 49.9 0161 0119 003 460 57.50 012 100 0069 0014 103.8 57.45 00000 00110110 00 00 00856 010$\x8c\r',
+                 'QDI': '(230.0 50.0 0030 42.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 0 0 1 0 54.0 0 1 000\x9e`\r',
+                 'QFLAG': '(EakxyDbjuvz/)\r',
                  }
 
 RESPONSE = {'QPIRI': [['float', 'AC Input Voltage', 'V'],
@@ -216,15 +216,15 @@ RESPONSE = {'QPIRI': [['float', 'AC Input Voltage', 'V'],
                     ['option', 'Output Source Priority', ['Utility first', 'Solar first', 'SBU first']],
                     ['option', 'Charger Source Priority', ['Utility first', 'Solar first', 'Solar + Utility', 'Only solar charging permitted']],
                     ['option', 'Battery Type', ['AGM', 'Flooded', 'User']],
-                    ['option', 'Buzzer', ['Enable', 'Disable']],
-                    ['option', 'Power saving', ['Disable', 'Enable']],
-                    ['option', 'Overload restart', ['Disable', 'Enable']],
-                    ['option', 'Over temperature restart', ['Disable', 'Enable']],
-                    ['option', 'LCD Backlight', ['Off', 'On']],
-                    ['option', 'Primary source interrupt alarm', ['Disable', 'Enable']],
-                    ['option', 'Record fault code', ['Disable', 'Enable']],
-                    ['option', 'Overload bypass', ['Disable', 'Enable']],
-                    ['option', 'LCD reset to default after 1min', ['Disable', 'Enable']],
+                    ['option', 'Buzzer', ['enabled', 'disabled']],
+                    ['option', 'Power saving', ['disabled', 'enabled']],
+                    ['option', 'Overload restart', ['disabled', 'enabled']],
+                    ['option', 'Over temperature restart', ['disabled', 'enabled']],
+                    ['option', 'LCD Backlight', ['disabled', 'enabled']],
+                    ['option', 'Primary source interrupt alarm', ['disabled', 'enabled']],
+                    ['option', 'Record fault code', ['disabled', 'enabled']],
+                    ['option', 'Overload bypass', ['disabled', 'enabled']],
+                    ['option', 'LCD reset to default', ['disabled', 'enabled']],
                     ['option', 'Output mode', ['single machine output',
                                                'parallel output',
                                                'Phase 1 of 3 Phase output',
@@ -569,11 +569,14 @@ class mppCommands:
                 status = 'unknown'
                 for item in result:
                     if (item == 'E'):
+                        print "setting status to enabled"
                         status = 'enabled'
                     elif (item == 'D'):
+                        print "setting status to disabled"
                         status = 'disabled'
                     else:
                         # output[resp_format[2][item]['name']] = status
+                        print "setting {} to {}".format(resp_format[2][item]['name'], status)
                         msgs[resp_format[2][item]['name']] = [status, '']
                 # msgs[key] = [output, '']
             else:

@@ -95,7 +95,7 @@ class mppUtils:
         default_settings = self.mp.getResponseDict("QDI")
         current_settings = self.mp.getResponseDict("QPIRI")
         flag_settings = self.mp.getResponseDict("QFLAG")
-        current_settings.update(flag_settings)  # Combine current and flag settings dicts
+        # current_settings.update(flag_settings)  # Combine current and flag settings dicts
 
         settings = {}
         # {"Battery Bulk Charge Voltage": {"unit": "V", "default": 56.4, "value": 57.4}}
@@ -112,6 +112,9 @@ class mppUtils:
             settings[key] = {"value": getVal(current_settings, key, 0),
                              "unit": getVal(current_settings, key, 1),
                              "default": getVal(default_settings, key, 0)}
+        for key in flag_settings:
+            _key = '{}'.format(key).lower().replace(" ", "_")
+            settings[_key]['value'] = getVal(flag_settings, key, 0)
 #        QPIRI
 #        ['float', 'AC Input Voltage', 'V'],
 #        ['float', 'AC Input Current', 'A'],
