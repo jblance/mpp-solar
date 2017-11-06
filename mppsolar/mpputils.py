@@ -24,7 +24,9 @@ class mppUtils:
     MPP Solar Inverter Utility Library
     """
 
-    def __init__(self, serial_device, baud_rate=2400):
+    def __init__(self, serial_device=None, baud_rate=2400):
+        if (serial_device is None):
+            raise mppcommands.NoDeviceError("A serial device must be supplied, e.g. /dev/ttyUSB0")
         self.mp = mppcommands.mppCommands(serial_device, baud_rate)
         self._serial_number = None
 
