@@ -326,6 +326,75 @@ def crc(cmd):
     return [crc_high, crc_low]
 
 
+def getKnownCommands():
+    """
+    Provides a human readable list of all defined commands
+    """
+    msgs = []
+    msgs.append('-------- List of known commands --------')
+    for cmd in sorted(COMMAND):
+        msgs.append('{}: {}'.format(cmd, COMMAND[cmd]['description']))
+    return msgs
+
+
+def getCommandFullString(cmd):
+    """
+    Generates a full command including CRC and CR
+    """
+    logging.debug('Generate full command for %s', cmd)
+    crc_high, crc_low = crc(cmd)
+    full_command = '{}{}{}\x0d'.format(cmd, chr(crc_high), chr(crc_low))
+    logging.debug('Full command: %s', full_command)
+    return full_command
+
+
+def getCommandType(cmd):
+    """
+    Determines the type of command (QUERY, SETTER, UNKNOWN)
+    """
+    # Check if it is a known command
+    # if not self.isValidCommand(cmd):
+    #    return False
+    if (cmd in COMMAND):
+        logging.debug('Command %s is a %s - simple match', cmd, COMMAND[cmd]['type'])
+        return COMMAND[cmd]['type']
+    # Look through more complex matches
+    for item in COMMAND:
+        logging.debug('Checking %s', item)
+        # If a regex is defined...
+        if ('regex' in COMMAND[item]):
+            logging.debug('Checking regex %s', COMMAND[item]['regex'])
+            # ...check if the regex matches the supplied cmd
+            if (COMMAND[item]['regex'].match(cmd)):
+                logging.debug('Command %s is a %s - complex match', cmd, COMMAND[item]['type'])
+                return COMMAND[item]['type']
+    logging.info('Command %s is unknown', cmd)
+    return 'UNKNOWN'
+
+
+def getCommandCode(cmd):
+    """
+    Returns reference for supplied command
+    """
+    if (cmd in COMMAND):
+        logging.debug('Command %s reference is %s - simple match', cmd, cmd)
+        return cmd  # This is the simple cast where cmd matches COMMAND keys (i.e. most queries)
+
+    # What about complex cases like cmd = PBT01 (PBTnn) or PSDV44.0 (PSDVnn.n)
+    # Loop through all known commands
+    for item in COMMAND:
+        logging.debug('Checking %s', item)
+        # If a regex is defined...
+        if ('regex' in COMMAND[item]):
+            logging.debug('Checking regex %s', COMMAND[item]['regex'])
+            # ...check if the regex matches the supplied cmd
+            if (COMMAND[item]['regex'].match(cmd)):
+                logging.debug('Command %s reference is %s - complex match', cmd, item)
+                return item
+    logging.info('Command %s has no reference', cmd)
+    return None
+
+
 class mppCommands:
     """
     MPP Solar Inverter Command Library
@@ -337,77 +406,12 @@ class mppCommands:
         self._baud_rate = baud_rate
         self._serial_device = serial_device
 
-    def getKnownCommands(self):
-        """
-        Provides a human readable list of all defined commands
-        """
-        msgs = []
-        msgs.append('-------- List of known commands --------')
-        for cmd in sorted(COMMAND):
-            msgs.append('{}: {}'.format(cmd, COMMAND[cmd]['description']))
-        return msgs
-
-    def getCommandFullString(self, cmd):
-        """
-        Generates a full command including CRC and CR
-        """
-        logging.debug('Generate full command for %s', cmd)
-        crc_high, crc_low = crc(cmd)
-        full_command = '{}{}{}\x0d'.format(cmd, chr(crc_high), chr(crc_low))
-        logging.debug('Full command: %s', full_command)
-        return full_command
-
-    def getCommandType(self, cmd):
-        """
-        Determines the type of command (QUERY, SETTER, UNKNOWN)
-        """
-        # Check if it is a known command
-        # if not self.isValidCommand(cmd):
-        #    return False
-        if (cmd in COMMAND):
-            logging.debug('Command %s is a %s - simple match', cmd, COMMAND[cmd]['type'])
-            return COMMAND[cmd]['type']
-        # Look through more complex matches
-        for item in COMMAND:
-            logging.debug('Checking %s', item)
-            # If a regex is defined...
-            if ('regex' in COMMAND[item]):
-                logging.debug('Checking regex %s', COMMAND[item]['regex'])
-                # ...check if the regex matches the supplied cmd
-                if (COMMAND[item]['regex'].match(cmd)):
-                    logging.debug('Command %s is a %s - complex match', cmd, COMMAND[item]['type'])
-                    return COMMAND[item]['type']
-        logging.info('Command %s is unknown', cmd)
-        return 'UNKNOWN'
-
-    def getCommandCode(self, cmd):
-        """
-        Returns reference for supplied command
-        """
-        if (cmd in COMMAND):
-            logging.debug('Command %s reference is %s - simple match', cmd, cmd)
-            return cmd  # This is the simple cast where cmd matches COMMAND keys (i.e. most queries)
-
-        # What about complex cases like cmd = PBT01 (PBTnn) or PSDV44.0 (PSDVnn.n)
-        # Loop through all known commands
-        for item in COMMAND:
-            logging.debug('Checking %s', item)
-            # If a regex is defined...
-            if ('regex' in COMMAND[item]):
-                logging.debug('Checking regex %s', COMMAND[item]['regex'])
-                # ...check if the regex matches the supplied cmd
-                if (COMMAND[item]['regex'].match(cmd)):
-                    logging.debug('Command %s reference is %s - complex match', cmd, item)
-                    return item
-        logging.info('Command %s has no reference', cmd)
-        return None
-
     def getResponseDefinition(self, cmd):
         """
         Gets response definition of supplied command
         """
         logging.debug('Looking for a response for %s', cmd)
-        cmd_reference = self.getCommandCode(cmd)
+        cmd_reference = getCommandCode(cmd)
         if (cmd_reference is None):
             return None
         else:
@@ -461,7 +465,7 @@ class mppCommands:
             return False
 
         # Check if this is a query or set command
-        cmd_type = self.getCommandType(cmd)
+        cmd_type = getCommandType(cmd)
         if (cmd_type == 'SETTER'):
             # Is set command - default to 'is valid'
             # TODO: what are valid responses...
@@ -473,7 +477,7 @@ class mppCommands:
                 return True
             return False
         # Check if we know about the command
-        cmd_reference = self.getCommandCode(cmd)
+        cmd_reference = getCommandCode(cmd)
         if (cmd_reference is None):
             logging.debug('Response invalid as no COMMAND defined for %s', cmd)
             return False
@@ -508,7 +512,7 @@ class mppCommands:
             logging.info('Command execution failed')
             return msgs
 
-        # cmd_reference = self.getCommandCode(cmd)
+        # cmd_reference = getCommandCode(cmd)
         response_definition = self.getResponseDefinition(cmd)
         if (response_definition is None):
             logging.info('Was not valid response')
@@ -597,8 +601,8 @@ class mppCommands:
         """
         Sends a command (as supplied) to inverter and returns the raw response
         """
-        cmd_type = self.getCommandType(cmd)
-        full_cmd = self.getCommandFullString(cmd)
+        cmd_type = getCommandType(cmd)
+        full_cmd = getCommandFullString(cmd)
         logging.debug('called: execute with query %s', full_cmd)
         logging.debug('\t%s command type is %s', cmd, cmd_type)
         return self.doSerialCommand(full_cmd, cmd)

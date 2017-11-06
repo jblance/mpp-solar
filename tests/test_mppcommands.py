@@ -22,41 +22,35 @@ class test_mppcommands(unittest.TestCase):
 
     def test_knowncommands(self):
         """ getKnownCommands should return a list """
-        mp = mppcommands.mppCommands('/dev/ttyUSB0')
-        self.assertIsInstance(mp.getKnownCommands(), list)
+        self.assertIsInstance(mppcommands.getKnownCommands(), list)
 
     def test_getcommandtype(self):
         """ check getcommandtype returns correct type for simple matches """
-        mp = mppcommands.mppCommands('/dev/ttyUSB0')
-        self.assertEqual(mp.getCommandType('QPIRI'), 'QUERY')
-        self.assertEqual(mp.getCommandType('QMCHGCR'), 'QUERY')
+        self.assertEqual(mppcommands.getCommandType('QPIRI'), 'QUERY')
+        self.assertEqual(mppcommands.getCommandType('QMCHGCR'), 'QUERY')
 
     def test_getcommandtype_complex(self):
         """ check getcommandtype returns correct type for complex (regex) matches """
-        mp = mppcommands.mppCommands('/dev/ttyUSB0')
-        self.assertEqual(mp.getCommandType('QPGS0'), 'QUERY')
-        self.assertEqual(mp.getCommandType('PBT02'), 'SETTER')
-        self.assertEqual(mp.getCommandType('PSDV56.4'), 'SETTER')
+        self.assertEqual(mppcommands.getCommandType('QPGS0'), 'QUERY')
+        self.assertEqual(mppcommands.getCommandType('PBT02'), 'SETTER')
+        self.assertEqual(mppcommands.getCommandType('PSDV56.4'), 'SETTER')
 
     def test_getcommandtype_unknown(self):
         """ check getcommandtype returns UNKNOWN for unknown commands """
-        mp = mppcommands.mppCommands('/dev/ttyUSB0')
-        self.assertEqual(mp.getCommandType('NOTREAL'), 'UNKNOWN')  # Not a valid command
-        self.assertEqual(mp.getCommandType('PBT03'), 'UNKNOWN')  # Invalid option
+        self.assertEqual(mppcommands.getCommandType('NOTREAL'), 'UNKNOWN')  # Not a valid command
+        self.assertEqual(mppcommands.getCommandType('PBT03'), 'UNKNOWN')  # Invalid option
 
     def test_getcommandcode(self):
         """ check getcommand code returns correct code """
-        mp = mppcommands.mppCommands('/dev/ttyUSB0')
-        self.assertEqual(mp.getCommandCode('QPIGS'), 'QPIGS')
-        self.assertEqual(mp.getCommandCode('QPIRI'), 'QPIRI')
-        self.assertEqual(mp.getCommandCode('QPGS0'), 'QPGSn')
-        self.assertEqual(mp.getCommandCode('PSDV56.4'), 'PSDVnn.n')
+        self.assertEqual(mppcommands.getCommandCode('QPIGS'), 'QPIGS')
+        self.assertEqual(mppcommands.getCommandCode('QPIRI'), 'QPIRI')
+        self.assertEqual(mppcommands.getCommandCode('QPGS0'), 'QPGSn')
+        self.assertEqual(mppcommands.getCommandCode('PSDV56.4'), 'PSDVnn.n')
 
     def test_getcommandcode_invalid(self):
         """ getcommand code returns None when invalid command used """
-        mp = mppcommands.mppCommands('/dev/ttyUSB0')
-        self.assertIsNone(mp.getCommandCode('PBT99'))  # Invalid option
-        self.assertIsNone(mp.getCommandCode('INVALID'))  # Invalid command
+        self.assertIsNone(mppcommands.getCommandCode('PBT99'))  # Invalid option
+        self.assertIsNone(mppcommands.getCommandCode('INVALID'))  # Invalid command
 
     def test_getresponsedefinition(self):
         """ getResponseDefinition should return correct response code for valid commands """
@@ -105,9 +99,8 @@ class test_mppcommands(unittest.TestCase):
 
     def test_getcommandfullstring(self):
         """ getCommandFullString should return full command """
-        mp = mppcommands.mppCommands('/dev/ttyUSB0')
-        self.assertEqual(mp.getCommandFullString('QPIRI'), 'QPIRI\xf8T\r')
-        self.assertEqual(mp.getCommandFullString('QPIGS'), 'QPIGS\xb7\xa9\r')
+        self.assertEqual(mppcommands.getCommandFullString('QPIRI'), 'QPIRI\xf8T\r')
+        self.assertEqual(mppcommands.getCommandFullString('QPIGS'), 'QPIGS\xb7\xa9\r')
 
     def test_getresponse(self):
         """ getResponse should return a valid raw response - only for QPIRI """

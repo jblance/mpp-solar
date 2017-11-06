@@ -58,15 +58,13 @@ if __name__ == '__main__':
         print args.broker
         print status_data
 
-"""
-Adafruit IO has:
-    Battery Capacity (as %)         inverter-one-battery-capacity-percent
-    Output Power (W)                inverter-one-total-output-active-power-w
-    Fault Code (text text)          fault-code
-    Battery Voltage                 inverter-one-battery-voltage-v
-    Inverter Charge Status (text)   inverter-charge-status
-    Total Charging Current (A)      inverter-one-total-charging-current-a
-    Inverter 1 charging current (A) inverter-one-battery-charging-current-a
-    Inverter 2 charging current (A) inverter-two-battery-charging-current-a
-    Load (as %)                     inverter-one-load-percentage-percent
-"""
+# Adafruit IO has:
+#    Battery Capacity (as %)         inverter-one-battery-capacity-percent
+#    Output Power (W)                inverter-one-total-output-active-power-w
+#    Fault Code (text text)          fault-code
+#    Battery Voltage                 inverter-one-battery-voltage-v
+#    Inverter Charge Status (text)   inverter-charge-status
+#    Total Charging Current (A)      inverter-one-total-charging-current-a
+#    Inverter 1 charging current (A) inverter-one-battery-charging-current-a
+#    Inverter 2 charging current (A) inverter-two-battery-charging-current-a
+#    Load (as %)                     inverter-one-load-percentage-percent

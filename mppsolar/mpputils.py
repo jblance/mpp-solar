@@ -29,7 +29,7 @@ class mppUtils:
         self._serial_number = None
 
     def getKnownCommands(self):
-        return self.mp.getKnownCommands()
+        return mppcommands.getKnownCommands()
 
     def getResponseDict(self, cmd):
         return self.mp.getResponseDict(cmd)
@@ -110,17 +110,13 @@ class mppUtils:
             settings[key] = {"value": getVal(current_settings, key, 0),
                              "unit": getVal(current_settings, key, 1),
                              "default": getVal(default_settings, key, 0)}
-
+#        QPIRI
+#        ['float', 'AC Input Voltage', 'V'],
+#        ['float', 'AC Input Current', 'A'],
+#        ['float', 'AC output rating current', 'A'],
+#        ['int', 'AC output rating apparent power', 'VA'],
+#        ['int', 'AC output rating active power', 'W'],
+#        ['float', 'Battery rating voltage', 'V'],
+#        ['int', 'Parallel max num', 'units'],
+#        ['option', 'Topology', ['transformerless', 'transformer']],
         return settings
-
-        """
-        QPIRI
-        ['float', 'AC Input Voltage', 'V'],
-        ['float', 'AC Input Current', 'A'],
-        ['float', 'AC output rating current', 'A'],
-        ['int', 'AC output rating apparent power', 'VA'],
-        ['int', 'AC output rating active power', 'W'],
-        ['float', 'Battery rating voltage', 'V'],
-        ['int', 'Parallel max num', 'units'],
-        ['option', 'Topology', ['transformerless', 'transformer']],
-        """
