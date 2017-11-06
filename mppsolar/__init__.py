@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # !/usr/bin/python
 import logging
 from argparse import ArgumentParser
@@ -21,7 +20,7 @@ def main():
     parser.add_argument('-l', '--listknown', action='store_true', help='List known commands')
     parser.add_argument('-s', '--getStatus', action='store_true', help='Get Inverter Status')
     parser.add_argument('-t', '--getSettings', action='store_true', help='Get Inverter Settings')
-    parser.add_argument('-H', '--makepretty', action='store_true', help='Display result with descriptions etc if possible')
+    parser.add_argument('-R', '--showraw', action='store_true', help='Display the raw results')
     args = parser.parse_args()
     logging.basicConfig(level=args.loglevel)
 
@@ -47,8 +46,9 @@ def main():
     else:
         # TODO: check if command is valid
         # maybe check if query or setter and ...
-        if(args.makepretty):
-            for line in mp.getResponsePretty(args.command):
-                print line
-        else:
+        if(args.showraw):
             print mp.getResponse(args.command)
+        else:
+            results = mp.getResponseDict(args.command)
+            for key in results:
+                print "{:<30}\t{:<15} {}".format(key, results[key]['value'], results[key]['unit'])
