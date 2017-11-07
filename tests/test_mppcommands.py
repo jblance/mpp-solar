@@ -106,7 +106,14 @@ class test_mppcommands(unittest.TestCase):
         """ getResponse should return a valid raw response - only for QPIRI """
         mp = mppcommands.mppCommands('TEST')  # Use test serial device
         qpiri_resp = mp.getResponse('QPIRI')
+        qpiws_resp = mp.getResponse('QPIWS')
         self.assertEqual(qpiri_resp, "230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1")
+        self.assertEqual(qpiws_resp, "00000100000000000000000000000000")
+
+    def test_invalidtestcommand(self):
+        """ getResponse should raise an exception if a test is attempted for a command without a test defined"""
+        mp = mppcommands.mppCommands('TEST')  # Use test serial device
+        self.assertRaises(mppcommands.NoTestResponseDefined, mp.getResponse, 'QPGS0')
 
     def test_getresponsedict(self):
         """ getResponseDict should return a valid dict """

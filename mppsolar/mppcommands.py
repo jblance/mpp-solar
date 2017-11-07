@@ -51,6 +51,7 @@ TEST_RESPONSE = {'QPIRI': '(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 
                  'QPIGS': '(000.0 00.0 230.0 49.9 0161 0119 003 460 57.50 012 100 0069 0014 103.8 57.45 00000 00110110 00 00 00856 010$\x8c\r',
                  'QDI': '(230.0 50.0 0030 42.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 0 0 1 0 54.0 0 1 000\x9e`\r',
                  'QFLAG': '(EakxyDbjuvz/)\r',
+                 'QPIWS': '(00000100000000000000000000000000\xfe\x82\r'
                  }
 
 RESPONSE = {'QPIRI': [['float', 'AC Input Voltage', 'V'],
@@ -597,7 +598,7 @@ class mppCommands:
                 response_line = TEST_RESPONSE[cmd]
                 return response_line[1:-3]
             else:
-                raise NoTestResponseDefined("No TEST_RESPONSE defined for %s", cmd)
+                raise NoTestResponseDefined("No TEST_RESPONSE defined for %s" % cmd)
         with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
             # Execute command multiple times, increase timeouts each time
             for x in (1, 2, 3, 4):
