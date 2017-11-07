@@ -34,7 +34,6 @@ class mppUtils:
         self.mp = mppcommands.mppCommands(serial_device, baud_rate)
         self._serial_number = None
 
-
     def getResponseDict(self, cmd):
         return self.mp.getResponseDict(cmd)
 
