@@ -35,10 +35,14 @@ def main():
             print line
     elif(args.getStatus):
         fullStatus = mp.getFullStatus()
+        print "================ Status =================="
+        print "{:<30}\t{:<15} {}".format('Parameter', 'Value', 'Unit')
         for key in sorted(fullStatus):
             print "{:<30}\t{:<15} {}".format(key, fullStatus[key]['value'], fullStatus[key]['unit'])
     elif(args.getSettings):
         settings = mp.getSettings()
+        print "================ Settings =================="
+        print "{:<30}\t{:<10}\t{:<10} {}".format('Parameter', 'Default', 'Current', 'Unit')
         for key in sorted(settings):
             print "{:<30}\t{:<10}\t{:<10} {}".format(key, settings[key]['default'],
                                                      settings[key]['value'],

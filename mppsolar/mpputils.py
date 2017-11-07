@@ -106,7 +106,8 @@ class mppUtils:
                  "Charger Source Priority", "Max AC Charging Current", "Max Charging Current", "Output Source Priority",
                  "AC Output Voltage", "AC Output Frequency", "PV OK Condition", "PV Power Balance",
                  "Buzzer", "Power Saving", "Overload Restart", "Over Temperature Restart", "LCD Backlight", "Primary Source Interrupt Alarm",
-                 "Record Fault Code", "Overload Bypass", "LCD Reset to Default", "Machine Type"]
+                 "Record Fault Code", "Overload Bypass", "LCD Reset to Default", "Machine Type", "AC Input Voltage", "AC Input Current",
+                 "AC Output Current", "AC Output Apparent Power", "AC Output Active Power", "Battery Voltage", "Max Parallel Units"]
 
         for item in items:
             key = '{}'.format(item).lower().replace(" ", "_")
@@ -116,13 +117,4 @@ class mppUtils:
         for key in flag_settings:
             _key = '{}'.format(key).lower().replace(" ", "_")
             settings[_key]['value'] = getVal(flag_settings, key, 0)
-#        QPIRI
-#        ['float', 'AC Input Voltage', 'V'],
-#        ['float', 'AC Input Current', 'A'],
-#        ['float', 'AC output rating current', 'A'],
-#        ['int', 'AC output rating apparent power', 'VA'],
-#        ['int', 'AC output rating active power', 'W'],
-#        ['float', 'Battery rating voltage', 'V'],
-#        ['int', 'Parallel max num', 'units'],
-#        ['option', 'Topology', ['transformerless', 'transformer']],
         return settings

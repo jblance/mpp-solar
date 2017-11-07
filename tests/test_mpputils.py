@@ -63,7 +63,7 @@ class test_mpputils(unittest.TestCase):
                       'ac_output_apparent_power': {'unit': 'VA', 'value': '0161'}}
         mp = mpputils.mppUtils('TEST')
         status = mp.getFullStatus()
-        self.assertDictEqual(status, testStatus)
+        self.assertDictContainsSubset(testStatus, status)
 
     def test_getSettings(self):
         """ Should return the settings """
@@ -98,4 +98,4 @@ class test_mpputils(unittest.TestCase):
                         'record_fault_code': {'default': 'disabled', 'unit': '', 'value': 'disabled'}}
         mp = mpputils.mppUtils('TEST')
         settings = mp.getSettings()
-        self.assertDictEqual(settings, testSettings)
+        self.assertDictContainsSubset(testSettings, settings)
