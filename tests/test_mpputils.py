@@ -16,8 +16,7 @@ class test_mpputils(unittest.TestCase):
     def test_getknowncommands(self):
         """ Should return the list of commands """
         testCommands = ['-------- List of known commands --------', 'PBTnn: Set Battery Type', 'PSDVnn.n: Set Battery Cut-off Voltage', 'Q1: Q1 query', 'QBOOT: DSP Has Bootstrap inquiry', 'QDI: Device Default Settings inquiry', 'QDM: QDM query', 'QFLAG: Device Flag Status inquiry', 'QID: Device Serial Number inquiry', 'QMCHGCR: Max Charging Current Options inquiry', 'QMN: QMN query', 'QMUCHGCR: Max Utility Charging Current Options inquiry', 'QOPM: Output Mode inquiry', 'QPGSn: Parallel Information inquiry', 'QPI: Device Protocol ID inquiry', 'QPIGS: Device General Status Parameters inquiry', 'QPIRI: Device Current Settings inquiry', 'QPIWS: Device warning status inquiry', 'QVFW: Main CPU firmware version inquiry', 'QVFW2: Secondary CPU firmware version inquiry']
-        mp = mpputils.mppUtils('TEST')
-        knownCommands = mp.getKnownCommands()
+        knownCommands = mpputils.getKnownCommands()
         self.assertListEqual(testCommands, knownCommands)
 
     def test_getreponse(self):

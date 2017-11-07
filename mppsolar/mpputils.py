@@ -19,6 +19,10 @@ def getVal(_dict, key, ind=None):
         return _dict[key][ind]
 
 
+def getKnownCommands():
+    return mppcommands.getKnownCommands()
+
+
 class mppUtils:
     """
     MPP Solar Inverter Utility Library
@@ -30,8 +34,6 @@ class mppUtils:
         self.mp = mppcommands.mppCommands(serial_device, baud_rate)
         self._serial_number = None
 
-    def getKnownCommands(self):
-        return mppcommands.getKnownCommands()
 
     def getResponseDict(self, cmd):
         return self.mp.getResponseDict(cmd)

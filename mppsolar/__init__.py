@@ -31,7 +31,7 @@ def main():
     mp = mpputils.mppUtils(args.device, args.baud)
 
     if(args.listknown):
-        for line in mp.getKnownCommands():
+        for line in mpputils.getKnownCommands():
             print line
     elif(args.getStatus):
         fullStatus = mp.getFullStatus()

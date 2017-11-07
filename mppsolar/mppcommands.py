@@ -408,6 +408,41 @@ def getCommandCode(cmd):
     return None
 
 
+def getResponseDefinition(cmd):
+    """
+    Gets response definition of supplied command
+    """
+    logging.debug('Looking for a response for %s', cmd)
+    cmd_reference = getCommandCode(cmd)
+    if (cmd_reference is None):
+        return None
+    else:
+        return RESPONSE[COMMAND[cmd_reference]['resp_code']]
+
+
+def isCommandValid(cmd):
+    """
+    Checks if supplied command is valid (i.e. a known command with a defined response)
+    """
+    if (cmd in COMMAND):
+        logging.debug('Command %s is valid - simple match', cmd)
+        return True  # This is the simple cast where cmd matches COMMAND keys (i.e. most queries)
+
+    # What about complex cases like cmd = PBT01 (PBTnn) or PSDV44.0 (PSDVnn.n)
+    # Loop through all known commands
+    for item in COMMAND:
+        logging.debug('Checking %s', item)
+        # If a regex is defined...
+        if ('regex' in COMMAND[item]):
+            logging.debug('Checking regex %s', COMMAND[item]['regex'])
+            # ...check if the regex matches the supplied cmd
+            if (COMMAND[item]['regex'].match(cmd)):
+                logging.debug('Command %s is valid - complex match', cmd)
+                return True
+    logging.info('Command %s is invalid', cmd)
+    return False
+
+
 class mppCommands:
     """
     MPP Solar Inverter Command Library
@@ -418,39 +453,6 @@ class mppCommands:
             raise NoDeviceError("A device to communicate by must be supplied, e.g. /dev/ttyUSB0")
         self._baud_rate = baud_rate
         self._serial_device = serial_device
-
-    def getResponseDefinition(self, cmd):
-        """
-        Gets response definition of supplied command
-        """
-        logging.debug('Looking for a response for %s', cmd)
-        cmd_reference = getCommandCode(cmd)
-        if (cmd_reference is None):
-            return None
-        else:
-            return RESPONSE[COMMAND[cmd_reference]['resp_code']]
-
-    def isCommandValid(self, cmd):
-        """
-        Checks if supplied command is valid (i.e. a known command with a defined response)
-        """
-        if (cmd in COMMAND):
-            logging.debug('Command %s is valid - simple match', cmd)
-            return True  # This is the simple cast where cmd matches COMMAND keys (i.e. most queries)
-
-        # What about complex cases like cmd = PBT01 (PBTnn) or PSDV44.0 (PSDVnn.n)
-        # Loop through all known commands
-        for item in COMMAND:
-            logging.debug('Checking %s', item)
-            # If a regex is defined...
-            if ('regex' in COMMAND[item]):
-                logging.debug('Checking regex %s', COMMAND[item]['regex'])
-                # ...check if the regex matches the supplied cmd
-                if (COMMAND[item]['regex'].match(cmd)):
-                    logging.debug('Command %s is valid - complex match', cmd)
-                    return True
-        logging.info('Command %s is invalid', cmd)
-        return False
 
     def isResponseValid(self, cmd, response):
         """
@@ -495,7 +497,7 @@ class mppCommands:
             logging.debug('Response invalid as no COMMAND defined for %s', cmd)
             return False
         # Check if valid response is defined for this command
-        resp = self.getResponseDefinition(cmd)
+        resp = getResponseDefinition(cmd)
         if (resp is None):
             logging.debug('Response invalid as no RESPONSE defined for %s', cmd)
             return False
@@ -526,7 +528,7 @@ class mppCommands:
             return msgs
 
         # cmd_reference = getCommandCode(cmd)
-        response_definition = self.getResponseDefinition(cmd)
+        response_definition = getResponseDefinition(cmd)
         if (response_definition is None):
             logging.info('Was not valid response')
             return msgs

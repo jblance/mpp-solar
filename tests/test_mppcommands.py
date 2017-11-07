@@ -54,26 +54,22 @@ class test_mppcommands(unittest.TestCase):
 
     def test_getresponsedefinition(self):
         """ getResponseDefinition should return correct response code for valid commands """
-        mp = mppcommands.mppCommands('/dev/ttyUSB0')
-        self.assertEqual(mp.getResponseDefinition('QVFW'), [['string', 'Main CPU firmware version', '']])
-        self.assertEqual(mp.getResponseDefinition('PBT01'), [['ack', 'Command execution', {'NAK': 'Failed', 'ACK': 'Successful'}]])
+        self.assertEqual(mppcommands.getResponseDefinition('QVFW'), [['string', 'Main CPU firmware version', '']])
+        self.assertEqual(mppcommands.getResponseDefinition('PBT01'), [['ack', 'Command execution', {'NAK': 'Failed', 'ACK': 'Successful'}]])
 
     def test_getresponsedefinition_invalid(self):
         """ getResponseDefinition should return none for invalid commands """
-        mp = mppcommands.mppCommands('/dev/ttyUSB0')
-        self.assertIsNone(mp.getResponseDefinition('PBT69'))  # Invalid option
-        self.assertIsNone(mp.getResponseDefinition('INVALID'))  # Invalid command
+        self.assertIsNone(mppcommands.getResponseDefinition('PBT69'))  # Invalid option
+        self.assertIsNone(mppcommands.getResponseDefinition('INVALID'))  # Invalid command
 
     def test_iscommandvalid(self):
         """ isCommandValid should return True for valid commands """
-        mp = mppcommands.mppCommands('/dev/ttyUSB0')
-        self.assertTrue(mp.isCommandValid('QPIGS'))  # Simple match
-        self.assertTrue(mp.isCommandValid('PSDV56.4'))  # Complex match
+        self.assertTrue(mppcommands.isCommandValid('QPIGS'))  # Simple match
+        self.assertTrue(mppcommands.isCommandValid('PSDV56.4'))  # Complex match
 
     def test_iscommandvalid_invalid(self):
         """ isCommandValid should return False for invalid commands """
-        mp = mppcommands.mppCommands('/dev/ttyUSB0')
-        self.assertFalse(mp.isCommandValid('INVALID'))
+        self.assertFalse(mppcommands.isCommandValid('INVALID'))
 
     def test_isresponsevalid(self):
         """ isResponseVaild should return true for valid responses """
