@@ -35,11 +35,11 @@ def main():
             print line
     elif(args.getStatus):
         fullStatus = mp.getFullStatus()
-        for key in fullStatus:
+        for key in sorted(fullStatus):
             print "{:<30}\t{:<15} {}".format(key, fullStatus[key]['value'], fullStatus[key]['unit'])
     elif(args.getSettings):
         settings = mp.getSettings()
-        for key in settings:
+        for key in sorted(settings):
             print "{:<30}\t{:<10}\t{:<10} {}".format(key, settings[key]['default'],
                                                      settings[key]['value'],
                                                      settings[key]['unit'])
@@ -50,5 +50,5 @@ def main():
             print mp.getResponse(args.command)
         else:
             results = mp.getResponseDict(args.command)
-            for key in results:
+            for key in sorted(results):
                 print "{:<30}\t{:<15} {}".format(key, results[key]['value'], results[key]['unit'])
