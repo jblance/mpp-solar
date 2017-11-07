@@ -570,14 +570,11 @@ class mppCommands:
                 status = 'unknown'
                 for item in result:
                     if (item == 'E'):
-                        print "setting status to enabled"
                         status = 'enabled'
                     elif (item == 'D'):
-                        print "setting status to disabled"
                         status = 'disabled'
                     else:
                         # output[resp_format[2][item]['name']] = status
-                        print "setting {} to {}".format(resp_format[2][item]['name'], status)
                         msgs[resp_format[2][item]['name']] = [status, '']
                 # msgs[key] = [output, '']
             else:
