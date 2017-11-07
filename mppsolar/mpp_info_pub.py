@@ -11,11 +11,11 @@
 #
 # import paho.mqtt.publish as publish
 
-import mpputils
 
+import mpputils
 grab_settings = False
 
-#if __name__ == '__main__':
+
 def main():
     from argparse import ArgumentParser
     parser = ArgumentParser(description='MPP Solar Inverter Info Utility')
