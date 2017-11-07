@@ -90,6 +90,7 @@ setup(
     entry_points={
         'console_scripts': [
             'mpp-solar=mppsolar:main',
+            'mpp-info-pub=mppsolar.mpp_info_pub:main',
         ],
     },
 

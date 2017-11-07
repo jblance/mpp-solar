@@ -15,7 +15,8 @@ import mpputils
 
 grab_settings = False
 
-if __name__ == '__main__':
+#if __name__ == '__main__':
+def main():
     from argparse import ArgumentParser
     parser = ArgumentParser(description='MPP Solar Inverter Info Utility')
     parser.add_argument('-s', '--grabsettings', action='store_true', help='Also get the inverter settings')
