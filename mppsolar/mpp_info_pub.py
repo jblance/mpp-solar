@@ -38,7 +38,7 @@ def main():
             for setting in settings:
                 for i in ['value', 'default', 'unit']:
                     topic = '{}/settings/{}/{}'.format(serial_number, setting, i)
-                    msg = {'topic': topic, 'payload': '{}'.format(setting[i])}
+                    msg = {'topic': topic, 'payload': '{}'.format(settings[setting][i])}
                     msgs.append(msg)
             # publish.multiple(msgs, hostname=args.broker)
             print msgs
@@ -52,7 +52,7 @@ def main():
                     # 92931509101901/status/total_output_active_power/value 1250
                     # 92931509101901/status/total_output_active_power/unit W
                     topic = '{}/settings/{}/{}'.format(serial_number, status_line, i)
-                    msg = {'topic': topic, 'payload': '{}'.format(status_line[i])}
+                    msg = {'topic': topic, 'payload': '{}'.format(status_data[status_line][i])}
                     msgs.append(msg)
         # publish.multiple(msgs, hostname=args.broker)
         print msgs
