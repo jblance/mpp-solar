@@ -1,0 +1,12 @@
+{
+    "name": "QPI",
+    "description": "Device Protocol ID inquiry",
+    "type": "QUERY",
+    "response": [
+            ["string", "Protocol ID", ""]
+        ],
+    "test_responses": [
+           ""
+        ],
+	"regex": ""
+}

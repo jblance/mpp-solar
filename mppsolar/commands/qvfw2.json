@@ -1,0 +1,12 @@
+{
+    "name": "QVFW2",
+    "description": "Secondary CPU firmware version inquiry",
+    "type": "QUERY",
+    "response": [
+            ["string", "Secondary CPU firmware version", ""]
+        ],
+    "test_responses": [
+           ""
+        ],
+	"regex": ""
+}

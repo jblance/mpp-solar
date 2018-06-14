@@ -1,0 +1,16 @@
+{
+    "name": "QOPM",
+    "description": "Output Mode inquiry",
+    "type": "QUERY",
+    "response": [
+        ["option", "Output mode", ["single machine output",
+                                   "parallel output",
+                                   "Phase 1 of 3 Phase output",
+                                   "Phase 2 of 3 Phase output",
+                                   "Phase 3 of 3 Phase output"]]
+        ],
+    "test_responses": [
+           ""
+        ],
+	"regex": ""
+}

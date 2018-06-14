@@ -1,0 +1,12 @@
+{
+    "name": "QBOOT",
+    "description": "DSP Has Bootstrap inquiry",
+    "type": "QUERY",
+    "response": [
+            ["option", "DSP Has Bootstrap", ["No", "Yes"]]
+        ],
+    "test_responses": [
+           ""
+        ],
+	"regex": ""
+}

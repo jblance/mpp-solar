@@ -1,0 +1,28 @@
+{
+    "name": "Q1",
+    "description": "Q1 query",
+    "type": "QUERY",
+    "response": [
+            ["int", "Time until the end of absorb charging", "sec"],
+            ["int", "Time until the end of float charging", "sec"],
+            ["option", "SCC Flag", ["SCC not communicating?", "SCC is powered and communicating"]],
+            ["string", "AllowSccOnFlag", ""],
+            ["string", "ChargeAverageCurrent", ""],
+            ["int", "SCC PWM temperature", "Deg_C"],
+            ["int", "Inverter temperature", "Deg_C"],
+            ["int", "Battery temperature", "Deg_C"],
+            ["int", "Transformer temperature", "Deg_C"],
+            ["int", "GPIO13", ""],
+            ["option", "Fan lock status", ["Not locked", "Locked"]],
+            ["string", "Not used", ""],
+            ["int", "Fan PWM speed", "Percent"],
+            ["int", "SCC charge power", "W"],
+            ["string", "Parallel Warning??", ""],
+            ["float", "Sync frequency", ""],
+            ["keyed", "Inverter charge status", {"10": "nocharging", "11": "bulk stage", "12": "absorb", "13": "float"}]
+        ],
+    "test_responses": [
+           "(00000 00000 01 01 00 059 045 053 068 00 00 000 0040 0580 0000 50.00 139\u00b9\r"
+        ],
+	"regex": ""
+}

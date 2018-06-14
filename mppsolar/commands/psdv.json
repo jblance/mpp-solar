@@ -1,0 +1,13 @@
+{
+    "name": "PSDV",
+    "description": "Set Battery Cut-off Voltage",
+    "type": "SETTER",
+    "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
+    "test_responses": [
+           "(NAKss\r",
+           "(ACK9 \r"
+        ],
+	"regex": "PSDV(\\d\\d\\.\\d)$"
+}

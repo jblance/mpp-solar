@@ -1,0 +1,38 @@
+{
+    "name": "QPIGS",
+    "description": "Device General Status Parameters inquiry",
+    "type": "QUERY",
+    "response": [
+            ["float", "AC Input Voltage", "V"],
+            ["float", "AC Input Frequency", "Hz"],
+            ["float", "AC Output Voltage", "V"],
+            ["float", "AC Output Frequency", "Hz"],
+            ["int", "AC Output Apparent Power", "VA"],
+            ["int", "AC Output Active Power", "W"],
+            ["int", "AC Output Load", "%"],
+            ["int", "BUS Voltage", "V"],
+            ["float", "Battery Voltage", "V"],
+            ["int", "Battery Charging Current", "A"],
+            ["int", "Battery Capacity", "%"],
+            ["int", "Inverter Heat Sink Temperature", "Deg_C"],
+            ["int", "PV Input Current for Battery", "A"],
+            ["float", "PV Input Voltage", "V"],
+            ["float", "Battery Voltage from SCC", "V"],
+            ["int", "Battery Discharge Current", "A"],
+            ["flags", "Device Status", [
+                ["Add SBU priority version - No", "Add SBU priority version - Yes"],
+                ["Configuration unchanged", "Configuration changed"],
+                ["SCC firmware version unchanged", "SCC firmware version updated"],
+                ["Load off", "Load on"],
+                ["Battery voltage not to steady while charging", "Battery voltage to steady while charging"],
+                ["Charging off", "Charging on"],
+                ["SCC charging off", "SCC charging on"],
+                ["AC charging off", "AC charging on"]
+                ]
+            ]
+        ],
+    "test_responses": [
+            "(000.0 00.0 230.0 49.9 0161 0119 003 460 57.50 012 100 0069 0014 103.8 57.45 00000 00110110 00 00 00856 010$\u008c\r"
+        ],
+	"regex": ""
+}

@@ -1,0 +1,12 @@
+{
+    "name": "QMCHGCR",
+    "description": "Max Charging Current Options inquiry",
+    "type": "QUERY",
+    "response": [
+            ["string", "Response", ""]
+        ],
+    "test_responses": [
+           ""
+        ],
+	"regex": ""
+}

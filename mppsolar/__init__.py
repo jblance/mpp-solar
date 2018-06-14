@@ -55,4 +55,4 @@ def main():
         else:
             results = mp.getResponseDict(args.command)
             for key in sorted(results):
-                print "{:<30}\t{:<15} {}".format(key, results[key]['value'], results[key]['unit'])
+                print "{:<30}\t{:<15} {}".format(key, results[key]['value'], results[key]['unit'])  # TODO: Some error here... "TypeError: list indices must be integers, not str"

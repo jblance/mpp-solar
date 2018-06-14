@@ -1,0 +1,12 @@
+{
+    "name": "QMUCHGCR",
+    "description": "Max Utility Charging Current Options inquiry",
+    "type": "QUERY",
+    "response": [
+            ["string", "Response", ""]
+        ],
+    "test_responses": [
+           ""
+        ],
+	"regex": ""
+}

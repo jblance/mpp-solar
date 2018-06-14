@@ -1,0 +1,43 @@
+{
+    "name": "QDI",
+    "description": "Device Default Settings inquiry",
+    "type": "QUERY",
+    "response": [
+            ["float", "AC Output Voltage", "V"],
+            ["float", "AC Output Frequency", "Hz"],
+            ["int", "Max AC Charging Current", "A"],
+            ["float", "Battery Under Voltage", "V"],
+            ["float", "Battery Float Charge Voltage", "V"],
+            ["float", "Battery Bulk Charge Voltage", "V"],
+            ["float", "Battery Recharge Voltage", "V"],
+            ["int", "Max Charging Current", "A"],
+            ["option", "Input Voltage Range", ["Appliance", "UPS"]],
+            ["option", "Output Source Priority", ["Utility first", "Solar first", "SBU first"]],
+            ["option", "Charger Source Priority", ["Utility first", "Solar first", "Solar + Utility", "Only solar charging permitted"]],
+            ["option", "Battery Type", ["AGM", "Flooded", "User"]],
+            ["option", "Buzzer", ["enabled", "disabled"]],
+            ["option", "Power saving", ["disabled", "enabled"]],
+            ["option", "Overload restart", ["disabled", "enabled"]],
+            ["option", "Over temperature restart", ["disabled", "enabled"]],
+            ["option", "LCD Backlight", ["disabled", "enabled"]],
+            ["option", "Primary source interrupt alarm", ["disabled", "enabled"]],
+            ["option", "Record fault code", ["disabled", "enabled"]],
+            ["option", "Overload bypass", ["disabled", "enabled"]],
+            ["option", "LCD reset to default", ["disabled", "enabled"]],
+            ["option", "Output mode", ["single machine output",
+                                       "parallel output",
+                                       "Phase 1 of 3 Phase output",
+                                       "Phase 2 of 3 Phase output",
+                                       "Phase 3 of 3 Phase output"]
+                                       ],
+            ["float", "Battery Redischarge Voltage", "V"],
+            ["option", "PV OK condition", ["As long as one unit of inverters has connect PV, parallel system will consider PV OK",
+                                           "Only All of inverters have connect PV, parallel system will consider PV OK"]],
+            ["option", "PV Power Balance", ["PV input max current will be the max charged current",
+                                            "PV input max power will be the sum of the max charged power and loads power"]]
+        ],
+    "test_responses": [
+           "(230.0 50.0 0030 42.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 0 0 1 0 54.0 0 1 000\u009e\u0060\r"
+        ],
+	"regex": ""
+}

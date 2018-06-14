@@ -1,0 +1,13 @@
+{
+    "name": "PBT",
+    "description": "Set Battery Type",
+    "type": "SETTER",
+    "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
+    "test_responses": [
+           "(NAKss\r",
+           "(ACK9 \r"
+        ],
+	"regex": "PBT(0[012])$"
+}
