@@ -10,7 +10,7 @@ import re
 import logging
 import json
 import glob
-from pprint import pprint
+# from pprint import pprint
 from os import path
 from argparse import ArgumentParser
 
@@ -32,23 +32,24 @@ class NoTestResponseDefined(MppSolarError):
 
 
 # Read in all the json files in the commands subdirectory
-## this builds a list of all valid commands
+# this builds a list of all valid commands
 COMMANDS = []
 here = path.abspath(path.dirname(__file__))
-files = glob.glob(here+'/commands/*.json')
+files = glob.glob(here + '/commands/*.json')
 for file in sorted(files):
     with open(file) as f:
         try:
-             data = json.load(f)
+            data = json.load(f)
         except Exception, e:
             print("Error processing JSON in {}".format(file))
             print(e)
-        #print("Command: {} ({}) - expects {} response(s) [regex: {}]".format(data['name'], data['description'], len(data['response']), data['regex']))
+        # print("Command: {} ({}) - expects {} response(s) [regex: {}]".format(data['name'], data['description'], len(data['response']), data['regex']))
         if data['regex']:
             regex = re.compile(data['regex'])
         else:
             regex = None
         COMMANDS.append(mppCommand(data['name'], data['description'], data['type'], data['response'], data['test_responses'], regex))
+
 
 def trunc(text):
     """
@@ -70,6 +71,7 @@ def getKnownCommands():
         msgs.append('{}: {}'.format(cmd.name, cmd.description))
     return msgs
 
+
 def getCommand(cmd):
     """
     Returns the mppcommand object of the supplied cmd string
@@ -85,7 +87,7 @@ def getCommand(cmd):
                 print command.name, command.regex
                 print ("Matched: {} Value: {}".format(command.name, match.group(1)))
                 command.set_value(match.group(1))
-                #logging.debug('Command %s is a %s - complex match', cmd, command.command_type)
+                # logging.debug('Command %s is a %s - complex match', cmd, command.command_type)
                 return command
     return None
 
@@ -101,7 +103,6 @@ class mppCommands:
         self._baud_rate = baud_rate
         self._serial_device = serial_device
 
-
     def doSerialCommand(self, command):
         """
         Opens serial connection, sends command (multiple times if needed)
@@ -112,8 +113,8 @@ class mppCommands:
         if (self._serial_device == 'TEST'):
             # Return a valid response if _serial_device is TEST
             # - for those commands that have test responses defined
-            #print "TEST"
-            #print command.get_test_response()
+            # print "TEST"
+            # print command.get_test_response()
             command.set_response(command.get_test_response())
             return command
         with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
@@ -158,9 +159,9 @@ if __name__ == '__main__':
 
     mp = mppCommands("TEST")
     cmd = mp.execute(args.command)
-    print "response: ",cmd.response
-    #print len(cmd.response_definition)
-    print "valid? ",cmd.valid_response
-    print "response_dict: ",cmd.response_dict
-    #for line in getKnownCommands():
+    print "response: ", cmd.response
+    # print len(cmd.response_definition)
+    print "valid? ", cmd.valid_response
+    print "response_dict: ", cmd.response_dict
+    # for line in getKnownCommands():
     #    print line

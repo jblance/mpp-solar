@@ -4,14 +4,11 @@ reference library of serial commands (and responses) for PIP-4048MS inverters
 mppcommand.py
 """
 import ctypes
-import json
-import glob
-import re
 import logging
 import random
-from os import path
 
 logger = logging.getLogger()
+
 
 def crc(cmd):
     """
@@ -53,6 +50,7 @@ def crc(cmd):
     logging.debug('Generated CRC %x %x %x', crc_high, crc_low, crc)
     return [crc_high, crc_low]
 
+
 def get_full_command(cmd):
     """
     Generates a full command including CRC and CR
@@ -62,6 +60,7 @@ def get_full_command(cmd):
     full_command = '{}{}{}\x0d'.format(cmd, chr(crc_high), chr(crc_low))
     logging.debug('Full command: %s', full_command)
     return full_command
+
 
 class mppCommand(object):
     """
@@ -94,7 +93,6 @@ class mppCommand(object):
             cmd_str = "{}{}".format(self.name, self.value)
         self.full_command = get_full_command(cmd_str)
         self.valid_response = False
-
 
     def set_value(self, value):
         self.value = value
