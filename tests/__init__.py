@@ -1,5 +1,4 @@
-# Empty __init__ file
-import os.path
+# __init__ file
 import unittest
 
 
