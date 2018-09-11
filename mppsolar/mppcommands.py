@@ -40,7 +40,7 @@ for file in sorted(files):
     with open(file) as f:
         try:
             data = json.load(f)
-        except Exception, e:
+        except Exception as e:
             print("Error processing JSON in {}".format(file))
             print(e)
         # print("Command: {} ({}) - expects {} response(s) [regex: {}]".format(data['name'], data['description'], len(data['response']), data['regex']))
@@ -76,7 +76,7 @@ def getCommand(cmd):
     """
     Returns the mppcommand object of the supplied cmd string
     """
-    print ("Searching for cmd '{}'".format(cmd))
+    print("Searching for cmd '{}'".format(cmd))
     for command in COMMANDS:
         if not command.regex:
             if cmd == command.name:
@@ -84,8 +84,8 @@ def getCommand(cmd):
         else:
             match = command.regex.match(cmd)
             if match:
-                print command.name, command.regex
-                print ("Matched: {} Value: {}".format(command.name, match.group(1)))
+                print(command.name, command.regex)
+                print("Matched: {} Value: {}".format(command.name, match.group(1)))
                 command.set_value(match.group(1))
                 # logging.debug('Command %s is a %s - complex match', cmd, command.command_type)
                 return command
@@ -145,7 +145,7 @@ class mppCommands:
             logging.critical("Command not found")
             return None
         else:
-            print "Command valid {}".format(command.name)
+            print("Command valid {}".format(command.name))
             logging.debug('called: execute with query %s', command)
             return self.doSerialCommand(command)
 
@@ -159,9 +159,9 @@ if __name__ == '__main__':
 
     mp = mppCommands("TEST")
     cmd = mp.execute(args.command)
-    print "response: ", cmd.response
+    print("response: ", cmd.response)
     # print len(cmd.response_definition)
-    print "valid? ", cmd.valid_response
-    print "response_dict: ", cmd.response_dict
+    print("valid? ", cmd.valid_response)
+    print("response_dict: ", cmd.response_dict)
     # for line in getKnownCommands():
     #    print line

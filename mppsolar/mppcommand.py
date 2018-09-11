@@ -133,7 +133,7 @@ class mppCommand(object):
             logging.debug('CRCs match')
         else:
             logging.debug('Response invalid as calculated CRC does not match response CRC')
-            print ('Response invalid as calculated CRC does not match response CRC')
+            print('Response invalid as calculated CRC does not match response CRC')
             return False
         # Check if this is a query or set command
         if (self.command_type == 'SETTER'):

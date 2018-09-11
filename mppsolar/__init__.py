@@ -32,27 +32,27 @@ def main():
 
     if(args.listknown):
         for line in mpputils.getKnownCommands():
-            print line
+            print(line)
     elif(args.getStatus):
         fullStatus = mp.getFullStatus()
-        print "================ Status =================="
-        print "{:<30}\t{:<15} {}".format('Parameter', 'Value', 'Unit')
+        print("================ Status ==================")
+        print("{:<30}\t{:<15} {}".format('Parameter', 'Value', 'Unit'))
         for key in sorted(fullStatus):
-            print "{:<30}\t{:<15} {}".format(key, fullStatus[key]['value'], fullStatus[key]['unit'])
+            print("{:<30}\t{:<15} {}".format(key, fullStatus[key]['value'], fullStatus[key]['unit']))
     elif(args.getSettings):
         settings = mp.getSettings()
-        print "================ Settings =================="
-        print "{:<30}\t{:<10}\t{:<10} {}".format('Parameter', 'Default', 'Current', 'Unit')
+        print("================ Settings ==================")
+        print("{:<30}\t{:<10}\t{:<10} {}".format('Parameter', 'Default', 'Current', 'Unit'))
         for key in sorted(settings):
-            print "{:<30}\t{:<10}\t{:<10} {}".format(key, settings[key]['default'],
+            print("{:<30}\t{:<10}\t{:<10} {}".format(key, settings[key]['default'],
                                                      settings[key]['value'],
-                                                     settings[key]['unit'])
+                                                     settings[key]['unit']))
     else:
         # TODO: check if command is valid
         # maybe check if query or setter and ...
         if(args.showraw):
-            print mp.getResponse(args.command)
+            print(mp.getResponse(args.command))
         else:
             results = mp.getResponseDict(args.command)
             for key in sorted(results):
-                print "{:<30}\t{:<15} {}".format(key, results[key]['value'], results[key]['unit'])  # TODO: Some error here... "TypeError: list indices must be integers, not str"
+                print("{:<30}\t{:<15} {}".format(key, results[key]['value'], results[key]['unit']))  # TODO: Some error here... "TypeError: list indices must be integers, not str"

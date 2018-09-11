@@ -41,8 +41,8 @@ def main():
                     msg = {'topic': topic, 'payload': '{}'.format(settings[setting][i])}
                     msgs.append(msg)
             # publish.multiple(msgs, hostname=args.broker)
-            print msgs
-            print args.broker
+            print(msgs)
+            print(args.broker)
 
         # Collect Inverter Status data and publish
         msgs = []
@@ -55,9 +55,9 @@ def main():
                     msg = {'topic': topic, 'payload': '{}'.format(status_data[status_line][i])}
                     msgs.append(msg)
         # publish.multiple(msgs, hostname=args.broker)
-        print msgs
-        print args.broker
-        print status_data
+        print(msgs)
+        print(args.broker)
+        print(status_data)
 
 # Adafruit IO has:
 #    Battery Capacity (as %)         inverter-one-battery-capacity-percent
