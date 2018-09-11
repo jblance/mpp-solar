@@ -1,2 +1,2 @@
 # Empty __init__ file
-import mppsolar  # noqa: F401
+import .mppsolar  # noqa: F401

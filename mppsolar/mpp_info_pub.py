@@ -12,7 +12,7 @@
 # import paho.mqtt.publish as publish
 
 
-import mpputils
+import .mpputils
 grab_settings = False
 
 

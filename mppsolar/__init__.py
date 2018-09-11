@@ -3,7 +3,7 @@ import logging
 from argparse import ArgumentParser
 
 # import mppcommands
-import mpputils
+import .mpputils
 
 logger = logging.getLogger()
 

@@ -14,7 +14,7 @@ import glob
 from os import path
 from argparse import ArgumentParser
 
-from mppcommand import mppCommand
+from .mppcommand import mppCommand
 
 logger = logging.getLogger()
 
