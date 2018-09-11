@@ -35,25 +35,16 @@ class mppUtils:
         return self.mp.getKnownCommands()
 
     def getResponseDict(self, cmd):
-        return self.mp.getResponseDict(cmd)
+        return self.mp.execute(cmd).response_dict
 
     def getResponse(self, cmd):
-        return self.mp.getResponse(cmd)
+        return self.mp.execute(cmd).response
 
     def getSerialNumber(self):
         if self._serial_number is None:
-            response = self.mp.getResponseDict("QID")
+            response = self.mp.execute("QID").response_dict
             self._serial_number = response["serial_number"][0]
         return self._serial_number
-
-    def getInverterStatus(self):
-        """
-        Helper function that returns the inverter status
-        """
-        response = self.mp.getResponseDict('Q1')
-        # TODO: fix etc
-        # is this better? - if so need to be able to build a dict of responses
-        return response['inverter charge status']
 
     def getFullStatus(self):
         """
@@ -61,8 +52,8 @@ class mppUtils:
         """
         status = {}
         # serial_number = self.getSerialNumber()
-        data = self.mp.getResponseDict("Q1")
-        data.update(self.mp.getResponseDict("QPIGS"))  # TODO: check if this actually works...
+        data = self.mp.execute("Q1").response_dict
+        data.update(self.mp.execute("QPIGS").response_dict)  # TODO: check if this actually works...
 
         # Need to get 'Parallel' info, but dont know what the parallel number for the correct inverter is...
         # parallel_data = self.mp.getResponseDict("QPGS0")

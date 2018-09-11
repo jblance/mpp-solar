@@ -67,7 +67,7 @@ def getKnownCommands():
     """
     msgs = []
     msgs.append('-------- List of known commands --------')
-    for cmd in sorted(COMMANDS):
+    for cmd in COMMANDS:
         msgs.append('{}: {}'.format(cmd.name, cmd.description))
     return msgs
 
@@ -102,6 +102,12 @@ class mppCommands:
             raise NoDeviceError("A device to communicate by must be supplied, e.g. /dev/ttyUSB0")
         self._baud_rate = baud_rate
         self._serial_device = serial_device
+
+    def getKnownCommands(self):
+        """
+        Return list of defined commands
+        """
+        return getKnownCommands()
 
     def doSerialCommand(self, command):
         """
