@@ -76,7 +76,7 @@ def getCommand(cmd):
     """
     Returns the mppcommand object of the supplied cmd string
     """
-    print("Searching for cmd '{}'".format(cmd))
+    logging.debug("Searching for cmd '{}'".format(cmd))
     for command in COMMANDS:
         if not command.regex:
             if cmd == command.name:
@@ -84,10 +84,9 @@ def getCommand(cmd):
         else:
             match = command.regex.match(cmd)
             if match:
-                print(command.name, command.regex)
-                print("Matched: {} Value: {}".format(command.name, match.group(1)))
+                logging.debug(command.name, command.regex)
+                logging.debug("Matched: {} Value: {}".format(command.name, match.group(1)))
                 command.set_value(match.group(1))
-                # logging.debug('Command %s is a %s - complex match', cmd, command.command_type)
                 return command
     return None
 
@@ -151,7 +150,7 @@ class mppCommands:
             logging.critical("Command not found")
             return None
         else:
-            print("Command valid {}".format(command.name))
+            logging.debug("Command valid {}".format(command.name))
             logging.debug('called: execute with query %s', command)
             return self.doSerialCommand(command)
 
