@@ -84,9 +84,9 @@ class mppUtils:
         Query inverter for all current settings
         """
         # serial_number = self.getSerialNumber()
-        default_settings = self.mp.getResponseDict("QDI")
-        current_settings = self.mp.getResponseDict("QPIRI")
-        flag_settings = self.mp.getResponseDict("QFLAG")
+        default_settings = self.mp.execute("QDI").response_dict
+        current_settings = self.mp.execute("QPIRI").response_dict
+        flag_settings = self.mp.execute("QFLAG").response_dict
         # current_settings.update(flag_settings)  # Combine current and flag settings dicts
 
         settings = {}
