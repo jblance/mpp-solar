@@ -3,7 +3,7 @@ import logging
 from argparse import ArgumentParser
 
 # import mppcommands
-import .mpputils
+from .mpputils import mppUtils
 
 logger = logging.getLogger()
 
@@ -28,10 +28,10 @@ def main():
     logging.debug('Serial device used: %s, baud rate: %d', args.device, args.baud)
 
     # mp = mppcommands.mppCommands(args.device, args.baud)
-    mp = mpputils.mppUtils(args.device, args.baud)
+    mp = mppUtils(args.device, args.baud)
 
     if(args.listknown):
-        for line in mpputils.getKnownCommands():
+        for line in mp.getKnownCommands():
             print(line)
     elif(args.getStatus):
         fullStatus = mp.getFullStatus()

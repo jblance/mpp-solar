@@ -12,7 +12,7 @@
 # import paho.mqtt.publish as publish
 
 
-import .mpputils
+from .mpputils import mppUtils
 grab_settings = False
 
 
@@ -27,7 +27,7 @@ def main():
 
     # Process / loop through all supplied devices
     for usb_port in args.device.split(','):
-        mp = mpputils.mppUtils(usb_port, args.baud)
+        mp = mppUtils(usb_port, args.baud)
         serial_number = mp.getSerialNumber()
 
         # Collect Inverter Settings and publish

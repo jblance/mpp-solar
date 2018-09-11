@@ -1,4 +1,4 @@
-import .unittest
+import unittest
 from mppsolar import mppcommands
 
 
