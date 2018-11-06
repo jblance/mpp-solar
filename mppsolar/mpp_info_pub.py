@@ -9,7 +9,7 @@
 # - posts results to MQTT broker
 # - uses mpputils.py / mppcommands.py to abstract PIP communications
 #
-# import paho.mqtt.publish as publish
+import paho.mqtt.publish as publish
 
 
 from .mpputils import mppUtils
