@@ -51,13 +51,13 @@ def main():
                 for i in ['value', 'unit']:
                     # 92931509101901/status/total_output_active_power/value 1250
                     # 92931509101901/status/total_output_active_power/unit W
-                    topic = '{}/settings/{}/{}'.format(serial_number, status_line, i)
+                    topic = '{}/status/{}/{}'.format(serial_number, status_line, i)
                     msg = {'topic': topic, 'payload': '{}'.format(status_data[status_line][i])}
                     msgs.append(msg)
-        # publish.multiple(msgs, hostname=args.broker)
-        print(msgs)
-        print(args.broker)
-        print(status_data)
+        publish.multiple(msgs, hostname=args.broker)
+        #print(msgs)
+        #print(args.broker)
+        #print(status_data)
 
 # Adafruit IO has:
 #    Battery Capacity (as %)         inverter-one-battery-capacity-percent
