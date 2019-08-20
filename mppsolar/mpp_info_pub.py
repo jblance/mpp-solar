@@ -48,16 +48,16 @@ def main():
         msgs = []
         status_data = mp.getFullStatus()
         for status_line in status_data:
-                for i in ['value', 'unit']:
-                    # 92931509101901/status/total_output_active_power/value 1250
-                    # 92931509101901/status/total_output_active_power/unit W
-                    topic = '{}/status/{}/{}'.format(serial_number, status_line, i)
-                    msg = {'topic': topic, 'payload': '{}'.format(status_data[status_line][i])}
-                    msgs.append(msg)
+            for i in ['value', 'unit']:
+                # 92931509101901/status/total_output_active_power/value 1250
+                # 92931509101901/status/total_output_active_power/unit W
+                topic = '{}/status/{}/{}'.format(serial_number, status_line, i)
+                msg = {'topic': topic, 'payload': '{}'.format(status_data[status_line][i])}
+                msgs.append(msg)
         publish.multiple(msgs, hostname=args.broker)
-        #print(msgs)
-        #print(args.broker)
-        #print(status_data)
+        # print(msgs)
+        # print(args.broker)
+        # print(status_data)
 
 # Adafruit IO has:
 #    Battery Capacity (as %)         inverter-one-battery-capacity-percent
