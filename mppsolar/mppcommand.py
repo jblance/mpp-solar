@@ -220,6 +220,8 @@ class mppCommand(object):
                         # output[resp_format[2][item]['name']] = status
                         msgs[resp_format[2][item]['name']] = [status, '']
                 # msgs[key] = [output, '']
+            elif self.command_type == 'SETTER':
+                msgs[self.name] = [result, '']
             else:
                 msgs[i] = [result, '']
         return msgs
