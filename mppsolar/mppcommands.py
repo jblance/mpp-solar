@@ -156,9 +156,9 @@ class mppCommands:
             while True:
                 time.sleep(0.15)
                 r = os.read(usb0, 256)
-                print("USB read.....")
                 print(r)
                 response_line += r
+                print(response_line)
                 if '\r' in r: break
             logging.debug('usb response was: %s', response_line)
             if command.is_response_valid(response_line):
