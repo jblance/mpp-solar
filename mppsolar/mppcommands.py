@@ -17,7 +17,7 @@ from argparse import ArgumentParser
 
 from .mppcommand import mppCommand
 
-logger = logging.getLogger()
+log = logging.getLogger()
 
 
 class MppSolarError(Exception):
@@ -77,7 +77,7 @@ def getCommand(cmd):
     """
     Returns the mppcommand object of the supplied cmd string
     """
-    logging.debug("Searching for cmd '{}'".format(cmd))
+    log.debug("Searching for cmd '{}'".format(cmd))
     for command in COMMANDS:
         if not command.regex:
             if cmd == command.name:
@@ -85,8 +85,8 @@ def getCommand(cmd):
         else:
             match = command.regex.match(cmd)
             if match:
-                logging.debug(command.name, command.regex)
-                logging.debug("Matched: {} Value: {}".format(command.name, match.group(1)))
+                log.debug(command.name, command.regex)
+                log.debug("Matched: {} Value: {}".format(command.name, match.group(1)))
                 command.set_value(match.group(1))
                 return command
     return None
@@ -129,7 +129,7 @@ class mppCommands:
         and returns the response
         """
         response_line = None
-        logging.debug('port %s, baudrate %s', self._serial_device, self._baud_rate)
+        log.debug('port %s, baudrate %s', self._serial_device, self._baud_rate)
         if (self._serial_device == 'TEST'):
             # Return a valid response if _serial_device is TEST
             # - for those commands that have test responses defined
@@ -164,7 +164,7 @@ class mppCommands:
                     response_line = response_line[:response_line.find('\r') + 1]
                     break
             # print ('usb response was: %s', response_line)
-            logging.debug('usb response was: %s', response_line)
+            log.debug('usb response was: %s', response_line)
             if command.is_response_valid(response_line):
                 command.set_response(response_line)
                 # return response without the start byte and the crc
@@ -174,7 +174,7 @@ class mppCommands:
             with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
                 # Execute command multiple times, increase timeouts each time
                 for x in (1, 2, 3, 4):
-                    logging.debug('Command execution attempt %d...', x)
+                    log.debug('Command execution attempt %d...', x)
                     s.timeout = 1 + x
                     s.write_timeout = 1 + x
                     s.flushInput()
@@ -182,12 +182,12 @@ class mppCommands:
                     s.write(command.full_command)
                     time.sleep(0.5 * x)  # give serial port time to receive the data
                     response_line = s.readline()
-                    logging.debug('serial response was: %s', response_line)
+                    log.debug('serial response was: %s', response_line)
                     if command.is_response_valid(response_line):
                         command.set_response(response_line)
                         # return response without the start byte and the crc
                         return command
-        logging.critical('Command execution failed')
+        log.critical('Command execution failed')
         return None
 
     def execute(self, cmd):
@@ -196,11 +196,11 @@ class mppCommands:
         """
         command = getCommand(cmd)
         if command is None:
-            logging.critical("Command not found")
+            log.critical("Command not found")
             return None
         else:
-            logging.debug("Command valid {}".format(command.name))
-            logging.debug('called: execute with query %s', command)
+            log.debug("Command valid {}".format(command.name))
+            log.debug('called: execute with query %s', command)
             return self.doSerialCommand(command)
 
 
@@ -209,7 +209,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--command', help='Command to run', default='QID')
     args = parser.parse_args()
 
-    logging.basicConfig(level='DEBUG')
+    # log.basicConfig(level='DEBUG')
 
     mp = mppCommands("TEST")
     cmd = mp.execute(args.command)

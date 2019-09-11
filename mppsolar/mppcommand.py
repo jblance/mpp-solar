@@ -7,14 +7,14 @@ import ctypes
 import logging
 import random
 
-logger = logging.getLogger()
+log = logging.getLogger()
 
 
 def crc(cmd):
     """
     Calculates CRC for supplied text
     """
-    logging.info('Calculating CRC for %s', cmd)
+    log.info('Calculating CRC for %s', cmd)
 
     crc = 0
     da = 0
@@ -24,7 +24,7 @@ def crc(cmd):
               0xc18c, 0xd1ad, 0xe1ce, 0xf1ef]
 
     for c in cmd:
-        logging.debug('Encoding %s', c)
+        log.debug('Encoding %s', c)
         t_da = ctypes.c_uint8(crc >> 8)
         da = t_da.value >> 4
         crc <<= 4
@@ -47,7 +47,7 @@ def crc(cmd):
     crc = crc_high << 8
     crc += crc_low
 
-    logging.debug('Generated CRC %x %x %x', crc_high, crc_low, crc)
+    log.debug('Generated CRC %x %x %x', crc_high, crc_low, crc)
     return [crc_high, crc_low]
 
 
@@ -55,10 +55,10 @@ def get_full_command(cmd):
     """
     Generates a full command including CRC and CR
     """
-    logging.debug('Generate full command for %s', cmd)
+    log.debug('Generate full command for %s', cmd)
     crc_high, crc_low = crc(cmd)
     full_command = '{}{}{}\x0d'.format(cmd, chr(crc_high), chr(crc_low))
-    logging.debug('Full command: %s', full_command)
+    log.debug('Full command: %s', full_command)
     return full_command
 
 
@@ -119,23 +119,23 @@ class mppCommand(object):
             - check CRC is correct
         """
         # Check length of response
-        logging.debug('Response length: %d', len(response))
+        log.debug('Response length: %d', len(response))
         if len(response) < 3:
-            logging.debug('Response invalid as too short')
+            log.debug('Response invalid as too short')
             return False
         # Check we got a CRC response that matches the data
         resp = response[:-3]
         resp_crc = response[-3:-1]
-        logging.debug('CRC resp\t%x %x', ord(resp_crc[0]), ord(resp_crc[1]))
+        log.debug('CRC resp\t%x %x', ord(resp_crc[0]), ord(resp_crc[1]))
         # print(resp)
         # print('CRC resp\t', ord(resp_crc[0]), ord(resp_crc[1]))
         # print('CRC resp\t', (resp_crc[0]), (resp_crc[1]))
         calc_crc_h, calc_crc_l = crc(resp)
-        logging.debug('CRC calc\t%x %x', calc_crc_h, calc_crc_l)
+        log.debug('CRC calc\t%x %x', calc_crc_h, calc_crc_l)
         if ((ord(resp_crc[0]) == calc_crc_h) and (ord(resp_crc[1]) == calc_crc_l)):
-            logging.debug('CRCs match')
+            log.debug('CRCs match')
         else:
-            logging.debug('Response invalid as calculated CRC does not match response CRC')
+            log.debug('Response invalid as calculated CRC does not match response CRC')
             print('Response invalid as calculated CRC does not match response CRC')
             return False
         # Check if this is a query or set command
@@ -143,22 +143,22 @@ class mppCommand(object):
             # Is set command - default to 'is valid'
             # TODO: what are valid responses...
             if (response == '(ACK9 \r'):
-                logging.debug('Response valid as setter with ACK resp')
+                log.debug('Response valid as setter with ACK resp')
                 return True
             if (response == '(NAKss\r'):
-                logging.debug('Response valid as setter with NAK resp')
+                log.debug('Response valid as setter with NAK resp')
                 return True
             return False
         # Check if valid response is defined for this command
         if (self.response_definition is None):
-            logging.debug('Response invalid as no RESPONSE defined for %s', self.name)
+            log.debug('Response invalid as no RESPONSE defined for %s', self.name)
             return False
         # Check we got the expected number of responses
         responses = response.split(" ")
         if (len(responses) < len(self.response_definition)):
-            logging.error("Response invalid as insufficient number of elements in response. Got %d, expected as least %d", len(responses), len(self.response_definition))
+            log.error("Response invalid as insufficient number of elements in response. Got %d, expected as least %d", len(responses), len(self.response_definition))
             return False
-        logging.debug('Response valid as no invalid situations found')
+        log.debug('Response valid as no invalid situations found')
         return True
 
     def get_response_dict(self):
@@ -168,13 +168,13 @@ class mppCommand(object):
         msgs = {}
 
         if (self.response is None):
-            logging.info('No response')
+            log.info('No response')
             return msgs
         if (not self.valid_response):
-            logging.info('Invalid response')
+            log.info('Invalid response')
             return msgs
         if (self.response_definition is None):
-            logging.info('No response definition')
+            log.info('No response definition')
             return msgs
 
         responses = self.response[1:-3].split(" ")

@@ -8,7 +8,7 @@ import logging
 from .mppcommands import mppCommands
 from .mppcommands import NoDeviceError
 
-logger = logging.getLogger()
+log = logging.getLogger()
 
 
 def getVal(_dict, key, ind=None):

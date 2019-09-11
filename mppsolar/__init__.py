@@ -11,10 +11,7 @@ log = logging.getLogger('MPP-Solar')
 def main():
     parser = ArgumentParser(description='MPP Solar Command Utility')
     parser.add_argument('-c', '--command', help='Command to run', default='QID')
-    parser.add_argument('-ll', '--loglevel',
-                        type=str,
-                        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-                        help='Set the logging level')
+    parser.add_argument('-db', '--debug: ', action='store_true', help='Enable Debug')
     parser.add_argument('-d', '--device', type=str, help='Serial device to communicate with', default='/dev/ttyUSB0')
     parser.add_argument('-b', '--baud', type=int, help='Baud rate for serial communications', default=2400)
     parser.add_argument('-l', '--listknown', action='store_true', help='List known commands')
@@ -22,10 +19,10 @@ def main():
     parser.add_argument('-t', '--getSettings', action='store_true', help='Get Inverter Settings')
     parser.add_argument('-R', '--showraw', action='store_true', help='Display the raw results')
     args = parser.parse_args()
-    # logging.basicConfig(level=args.loglevel)
-    log.setLevel(logging.DEBUG)
-    # create console handler with a higher log level
 
+    # Turn on debug if needed
+    if(args.debug):
+        log.setLevel(logging.DEBUG)
 
     log.debug('command %s', args.command)
     log.debug('Serial device used: %s, baud rate: %d', args.device, args.baud)
