@@ -158,8 +158,8 @@ class mppCommands:
                 r = os.read(usb0, 256)
                 print(r)
                 response_line += r
-                print(response_line)
                 if '\r' in r: break
+            print ('usb response was: %s', response_line)
             logging.debug('usb response was: %s', response_line)
             if command.is_response_valid(response_line):
                 command.set_response(response_line)
