@@ -158,7 +158,9 @@ class mppCommands:
                 r = os.read(usb0, 256)
                 print(r)
                 response_line += r
-                if '\r' in r: break
+                if '\r' in r:
+                    response_line = [:response_line.find('\r')]
+                    break
             print ('usb response was: %s', response_line)
             logging.debug('usb response was: %s', response_line)
             if command.is_response_valid(response_line):
