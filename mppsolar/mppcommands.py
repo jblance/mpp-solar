@@ -160,7 +160,7 @@ class mppCommands:
                 try:
                     time.sleep(0.15)
                     r = os.read(usb0, 256)
-                    log.debug('usb read:', r)
+                    # log.debug('usb read:', r)
                     response_line += r
                 except Exception as e:
                     log.debug('USB read error', e.strerror)
