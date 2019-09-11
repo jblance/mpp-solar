@@ -18,6 +18,10 @@ http://forums.aeva.asn.au/viewtopic.php?f=31&t=4332
 - using 2x USB to serial adapters (like https://www.adafruit.com/product/18)
 - to connect to 2x PIP-4048MS inverters connected in parallel
 
+Also
+- a Raspberry Pi 3
+- USB cable to USB port of PIP-4048MS (connected to Pi as /dev/hidraw0)
+
 ## Install
 `python ./setup.py install`
 
