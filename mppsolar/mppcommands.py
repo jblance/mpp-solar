@@ -112,8 +112,8 @@ class mppCommands:
         if (self._serial_device is None):
             return False
         if (self._serial_device == '/dev/hidraw0'):
-            return true
-        return false
+            return True
+        return False
 
     def getKnownCommands(self):
         """
