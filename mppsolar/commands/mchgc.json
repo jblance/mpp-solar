@@ -1,0 +1,14 @@
+{
+  "name": "MCHGC",
+  "description": "Set Max Charging Current (for parallel units)",
+  "help": "MCHGC040 (set unit 0 to max charging current of 40A)",
+  "type": "SETTER",
+  "response": [
+          ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+      ],
+  "test_responses": [
+         "(NAKss\r",
+         "(ACK9 \r"
+      ],
+  "regex": "MCHGC(\\d\\d\\d)$"
+}
