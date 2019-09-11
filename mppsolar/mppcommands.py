@@ -159,7 +159,7 @@ class mppCommands:
                 print(r)
                 response_line += r
                 if '\r' in r:
-                    response_line = response_line[:response_line.find('\r')]
+                    response_line = response_line[:response_line.find('\r')+1]
                     break
             print ('usb response was: %s', response_line)
             logging.debug('usb response was: %s', response_line)
