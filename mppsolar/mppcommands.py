@@ -163,7 +163,7 @@ class mppCommands:
                     log.debug('usb read:', r)
                     response_line += r
                 except Exception as e:
-                    log.debug('USB read error', e)
+                    log.debug('USB read error', e.strerror)
                 # Finished is \r is in response
                 if ('\r' in response_line):
                     # remove anything after the \r
