@@ -160,8 +160,10 @@ class mppCommands:
                 try:
                     time.sleep(0.15)
                     r = os.read(usb0, 256)
+                    log.debug('usb read:', r)
                     response_line += r
                 except Exception as e:
+                    print(e)
                     pass
                 # Finished is \r is in response
                 if ('\r' in response_line):
