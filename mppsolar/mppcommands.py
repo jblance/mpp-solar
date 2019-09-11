@@ -113,6 +113,8 @@ class mppCommands:
             return False
         if (self._serial_device == '/dev/hidraw0'):
             return True
+        if (self._serial_device == '/dev/hidraw1'):
+            return True
         return False
 
     def getKnownCommands(self):
@@ -156,12 +158,12 @@ class mppCommands:
             while True:
                 time.sleep(0.15)
                 r = os.read(usb0, 256)
-                print(r)
+                #print(r)
                 response_line += r
                 if '\r' in r:
                     response_line = response_line[:response_line.find('\r')+1]
                     break
-            print ('usb response was: %s', response_line)
+            #print ('usb response was: %s', response_line)
             logging.debug('usb response was: %s', response_line)
             if command.is_response_valid(response_line):
                 command.set_response(response_line)
