@@ -10,6 +10,7 @@ import re
 import logging
 import json
 import glob
+import os
 # from pprint import pprint
 from os import path
 from argparse import ArgumentParser
@@ -122,7 +123,38 @@ class mppCommands:
             # print command.get_test_response()
             command.set_response(command.get_test_response())
             return command
-        with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
+        elif (self.is_rawdevice()):
+            #Do stuff with usb...
+            usb0 = os.open(self._serial_device, os.O_RDWR | os.O_NONBLOCK)
+            response_line = ""
+            #for x in (1, 2, 3, 4):
+            command_crc = command.full_command
+            if len(command_crc) < 9:
+                time.sleep(0.35)
+                os.write(usb0, command_crc)
+            else:
+                cmd1 = command_crc[:8]
+                cmd2 = command_crc[8:]
+                time.sleep(0.35)
+                os.write(usb0, cmd1)
+                time.sleep(0.35)
+                os.write(usb0, cmd2)
+                time.sleep(0.25)
+
+            while True:
+                time.sleep(0.15)
+                r = os.read(usb0, 256)
+                print("USB read.....")
+                print(r)
+                response_line += r
+                if '\r' in r: break
+            logging.debug('usb response was: %s', response_line)
+            if command.is_response_valid(response_line):
+                command.set_response(response_line)
+                # return response without the start byte and the crc
+                return command
+
+        else with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
             # Execute command multiple times, increase timeouts each time
             for x in (1, 2, 3, 4):
                 logging.debug('Command execution attempt %d...', x)
@@ -138,8 +170,8 @@ class mppCommands:
                     command.set_response(response_line)
                     # return response without the start byte and the crc
                     return command
-            logging.critical('Command execution failed')
-            return None
+        logging.critical('Command execution failed')
+        return None
 
     def execute(self, cmd):
         """
