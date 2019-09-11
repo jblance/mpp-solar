@@ -108,7 +108,7 @@ class mppCommands:
         Determine if this instance is using direct USB connection
         (instead of a serial connection)
         """
-        ##### TODO: expand usb definition
+        # TODO: expand usb definition
         if (self._serial_device is None):
             return False
         if (self._serial_device == '/dev/hidraw0'):
@@ -138,10 +138,10 @@ class mppCommands:
             command.set_response(command.get_test_response())
             return command
         elif (self.is_rawdevice()):
-            #Do stuff with usb...
+            # Do stuff with usb...
             usb0 = os.open(self._serial_device, os.O_RDWR | os.O_NONBLOCK)
             response_line = ""
-            #for x in (1, 2, 3, 4):
+            # for x in (1, 2, 3, 4):
             command_crc = command.full_command
             if len(command_crc) < 9:
                 time.sleep(0.35)
@@ -158,12 +158,12 @@ class mppCommands:
             while True:
                 time.sleep(0.15)
                 r = os.read(usb0, 256)
-                #print(r)
+                # print(r)
                 response_line += r
                 if '\r' in r:
-                    response_line = response_line[:response_line.find('\r')+1]
+                    response_line = response_line[:response_line.find('\r') + 1]
                     break
-            #print ('usb response was: %s', response_line)
+            # print ('usb response was: %s', response_line)
             logging.debug('usb response was: %s', response_line)
             if command.is_response_valid(response_line):
                 command.set_response(response_line)
@@ -172,7 +172,7 @@ class mppCommands:
 
         else:
             with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
-            # Execute command multiple times, increase timeouts each time
+                # Execute command multiple times, increase timeouts each time
                 for x in (1, 2, 3, 4):
                     logging.debug('Command execution attempt %d...', x)
                     s.timeout = 1 + x

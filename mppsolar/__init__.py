@@ -22,7 +22,7 @@ def main():
     parser.add_argument('-t', '--getSettings', action='store_true', help='Get Inverter Settings')
     parser.add_argument('-R', '--showraw', action='store_true', help='Display the raw results')
     args = parser.parse_args()
-    #logging.basicConfig(level=args.loglevel)
+    # logging.basicConfig(level=args.loglevel)
     logger.setLevel(logging.DEBUG)
     # create console handler with a higher log level
     ch = logging.StreamHandler()
