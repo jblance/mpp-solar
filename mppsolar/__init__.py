@@ -31,7 +31,6 @@ def main():
         # add the handlers to logger
         log.addHandler(ch)
 
-
     log.debug('command %s', args.command)
     log.debug('Serial device used: %s, baud rate: %d', args.device, args.baud)
 
