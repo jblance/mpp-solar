@@ -22,7 +22,9 @@ def main():
     parser.add_argument('-t', '--getSettings', action='store_true', help='Get Inverter Settings')
     parser.add_argument('-R', '--showraw', action='store_true', help='Display the raw results')
     args = parser.parse_args()
-    logging.basicConfig(level=args.loglevel)
+    #logging.basicConfig(level=args.loglevel)
+    logging.basicConfig(level=logging.DEBUG)
+
 
     logging.debug('command %s', args.command)
     logging.debug('Serial device used: %s, baud rate: %d', args.device, args.baud)
