@@ -127,6 +127,7 @@ class mppCommand(object):
         resp = response[:-3]
         resp_crc = response[-3:-1]
         logging.debug('CRC resp\t%x %x', ord(resp_crc[0]), ord(resp_crc[1]))
+        print(resp)
         print('CRC resp\t', ord(resp_crc[0]), ord(resp_crc[1]))
         print('CRC resp\t', (resp_crc[0]), (resp_crc[1]))
         calc_crc_h, calc_crc_l = crc(resp)
