@@ -156,11 +156,16 @@ class mppCommands:
                 time.sleep(0.25)
 
             while True:
-                time.sleep(0.15)
-                r = os.read(usb0, 256)
-                # print(r)
-                response_line += r
-                if '\r' in r:
+                # attempt to deal with resource busy and other failures to read
+                try:
+                    time.sleep(0.15)
+                    r = os.read(usb0, 256)
+                    response_line += r
+                except Exception as e:
+                    pass
+                # Finished is \r is in response
+                if ('\r' in response_line):
+                    # remove anything after the \r
                     response_line = response_line[:response_line.find('\r') + 1]
                     break
             # print ('usb response was: %s', response_line)
