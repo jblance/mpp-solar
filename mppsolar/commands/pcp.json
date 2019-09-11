@@ -1,0 +1,14 @@
+{
+  "name": "PCP",
+  "description": "Set Device Charger Priority",
+  "help": "examples: PCP00 (set utility first), PCP01 (set solar first), PCP02 (HS only: set solar and utility), PCP03 (set solar only charging)",
+  "type": "SETTER",
+  "response": [
+          ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+      ],
+  "test_responses": [
+         "(NAKss\r",
+         "(ACK9 \r"
+      ],
+	"regex": "PCP(0[0123])$"
+}
