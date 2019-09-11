@@ -103,6 +103,18 @@ class mppCommands:
         self._baud_rate = baud_rate
         self._serial_device = serial_device
 
+    def is_rawdevice(self):
+        """
+        Determine if this instance is using direct USB connection
+        (instead of a serial connection)
+        """
+        ##### TODO: expand usb definition
+        if (self._serial_device is None):
+            return False
+        if (self._serial_device == '/dev/hidraw0'):
+            return true
+        return false
+
     def getKnownCommands(self):
         """
         Return list of defined commands
@@ -154,7 +166,8 @@ class mppCommands:
                 # return response without the start byte and the crc
                 return command
 
-        else with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
+        else:
+            with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
             # Execute command multiple times, increase timeouts each time
             for x in (1, 2, 3, 4):
                 logging.debug('Command execution attempt %d...', x)
