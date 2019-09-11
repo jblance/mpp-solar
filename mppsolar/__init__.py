@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 # import mppcommands
 from .mpputils import mppUtils
 
-logger = logging.getLogger()
+logger = logging.getLogger('MPP-Solar')
 
 
 def main():
@@ -23,8 +23,15 @@ def main():
     parser.add_argument('-R', '--showraw', action='store_true', help='Display the raw results')
     args = parser.parse_args()
     #logging.basicConfig(level=args.loglevel)
-    logging.basicConfig(level=logging.DEBUG)
-
+    logger.setLevel(logging.DEBUG)
+    # create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    # add the handlers to logger
+    logger.addHandler(ch)
 
     logging.debug('command %s', args.command)
     logging.debug('Serial device used: %s, baud rate: %d', args.device, args.baud)
