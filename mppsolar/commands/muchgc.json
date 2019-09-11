@@ -1,0 +1,14 @@
+{
+  "name": "MUCHGC",
+  "description": "Set Utility Max Charging Current",
+  "help": "MUCHGC130 (set unit 1 utility max charging current to 30A)",
+  "type": "SETTER",
+  "response": [
+          ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+      ],
+  "test_responses": [
+         "(NAKss\r",
+         "(ACK9 \r"
+      ],
+  "regex": "MUCHGC(\\d\\d\\d)$"
+}
