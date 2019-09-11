@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 # import mppcommands
 from .mpputils import mppUtils
 
-log = logging.getLogger('MPP-Solar')
+log = logging.getLogger()
 
 
 def main():
