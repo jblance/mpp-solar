@@ -17,7 +17,7 @@ from argparse import ArgumentParser
 
 from .mppcommand import mppCommand
 
-log = logging.getLogger()
+log = logging.getLogger('MPP-Solar')
 
 
 class MppSolarError(Exception):

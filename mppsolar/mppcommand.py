@@ -7,7 +7,7 @@ import ctypes
 import logging
 import random
 
-log = logging.getLogger()
+log = logging.getLogger('MPP-Solar')
 
 
 def crc(cmd):

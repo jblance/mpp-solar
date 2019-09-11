@@ -8,7 +8,7 @@ import logging
 from .mppcommands import mppCommands
 from .mppcommands import NoDeviceError
 
-log = logging.getLogger()
+log = logging.getLogger('MPP-Solar')
 
 
 def getVal(_dict, key, ind=None):
