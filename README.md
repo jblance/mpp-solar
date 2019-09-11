@@ -24,9 +24,8 @@ http://forums.aeva.asn.au/viewtopic.php?f=31&t=4332
 ## Usage
 `$ mpp-solar -h`
 ```
-usage: mpp-solar-script.py [-h] [-c COMMAND]
-                           [-ll {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
-                           [-d DEVICE] [-b BAUD] [-l] [-s] [-t] [-R]
+usage: mpp-solar [-h] [-c COMMAND] [-D] [-d DEVICE] [-b BAUD] [-l] [-s] [-t]
+                 [-R]
 
 MPP Solar Command Utility
 
@@ -34,8 +33,7 @@ optional arguments:
   -h, --help            show this help message and exit
   -c COMMAND, --command COMMAND
                         Command to run
-  -ll {DEBUG,INFO,WARNING,ERROR,CRITICAL}, --loglevel {DEBUG,INFO,WARNING,ERROR,CRITICAL}
-                        Set the logging level
+  -D, --enableDebug     Enable Debug
   -d DEVICE, --device DEVICE
                         Serial device to communicate with
   -b BAUD, --baud BAUD  Baud rate for serial communications
@@ -43,13 +41,19 @@ optional arguments:
   -s, --getStatus       Get Inverter Status
   -t, --getSettings     Get Inverter Settings
   -R, --showraw         Display the raw results
+
 ```
 
 ## Available Commands
 `$ mpp-solar -l`
 ```
 -------- List of known commands --------
+MCHGC: Set Max Charging Current (for parallel units)
+MUCHGC: Set Utility Max Charging Current
 PBT: Set Battery Type
+PCP: Set Device Charger Priority
+PCVV: Set Battery C.V. (constant voltage) charging voltage
+POP: Set Device Output Source Priority
 PSDV: Set Battery Cut-off Voltage
 Q1: Q1 query
 QBOOT: DSP Has Bootstrap inquiry
@@ -57,6 +61,7 @@ QDI: Device Default Settings inquiry
 QFLAG: Device Flag Status inquiry
 QID: Device Serial Number inquiry
 QMCHGCR: Max Charging Current Options inquiry
+QMOD: Device Mode inquiry
 QMUCHGCR: Max Utility Charging Current Options inquiry
 QOPM: Output Mode inquiry
 QPGSn: Parallel Information inquiry
