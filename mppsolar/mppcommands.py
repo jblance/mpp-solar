@@ -103,7 +103,7 @@ class mppCommands:
         self._baud_rate = baud_rate
         self._serial_device = serial_device
 
-    def is_rawdevice(self):
+    def isRawDevice(self):
         """
         Determine if this instance is using direct USB connection
         (instead of a serial connection)
@@ -137,7 +137,7 @@ class mppCommands:
             # print command.get_test_response()
             command.set_response(command.get_test_response())
             return command
-        elif (self.is_rawdevice()):
+        elif (self.isRawDevice()):
             # Do stuff with usb...
             usb0 = os.open(self._serial_device, os.O_RDWR | os.O_NONBLOCK)
             response_line = ""
