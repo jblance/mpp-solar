@@ -171,10 +171,8 @@ class mppCommands:
                     break
             # print ('usb response was: %s', response_line)
             log.debug('usb response was: %s', response_line)
-            if command.is_response_valid(response_line):
-                command.set_response(response_line)
-                # return response without the start byte and the crc
-                return command
+            command.set_response(response_line)
+            return command
 
         else:
             with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
@@ -189,12 +187,10 @@ class mppCommands:
                     time.sleep(0.5 * x)  # give serial port time to receive the data
                     response_line = s.readline()
                     log.debug('serial response was: %s', response_line)
-                    if command.is_response_valid(response_line):
-                        command.set_response(response_line)
-                        # return response without the start byte and the crc
-                        return command
+                    command.set_response(response_line)
+                    return command
         log.critical('Command execution failed')
-        return None
+        return command
 
     def execute(self, cmd):
         """
