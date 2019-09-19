@@ -112,9 +112,9 @@ class mppCommands:
         if (self._serial_device is None):
             return False
         match = re.search("^.*hidraw\d$", self._serial_device)
-            if match:
-                log.debug("Device matches hidraw regex")
-                return True
+        if match:
+            log.debug("Device matches hidraw regex")
+            return True
         if (self._serial_device == '/dev/hidraw0'):
             return True
         if (self._serial_device == '/dev/hidraw1'):
