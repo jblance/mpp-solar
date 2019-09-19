@@ -111,7 +111,7 @@ class mppCommands:
         # TODO: expand usb definition
         if (self._serial_device is None):
             return False
-        match = re.search("^.*hidraw\d$", self._serial_device)
+        match = re.search("^.*hidraw\\d$", self._serial_device)
         if match:
             log.debug("Device matches hidraw regex")
             return True
