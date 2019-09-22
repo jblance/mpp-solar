@@ -33,7 +33,7 @@ class NoTestResponseDefined(MppSolarError):
 
 
 def getCommandsFromJson():
-    """ 
+    """
     Read in all the json files in the commands subdirectory
     this builds a list of all valid commands
     """
@@ -56,6 +56,7 @@ def getCommandsFromJson():
             COMMANDS.append(mppCommand(data['name'], data['description'], data['type'], data['response'], data['test_responses'], regex, help=data['help']))
     return COMMANDS
 
+
 def isTestDevice(serial_device):
     """
     Determine if this instance is just a Test connection
@@ -63,6 +64,7 @@ def isTestDevice(serial_device):
     if serial_device == 'TEST':
         return True
     return False
+
 
 def isDirectUsbDevice(serial_device):
     """
@@ -98,7 +100,7 @@ class mppInverter:
         self._direct_usb = isDirectUsbDevice(serial_device)
         self._commands = getCommandsFromJson()
         # TODO: text descrption of inverter? version numbers?
-        
+
     def __str__(self):
         """
         """
@@ -149,7 +151,7 @@ class mppInverter:
         log.debug('Performing test command with %s', command)
         command.set_response(command.get_test_response())
         return command
-    
+
     def _doSerialCommand(self, command):
         """
         Opens serial connection, sends command (multiple times if needed)
@@ -173,7 +175,7 @@ class mppInverter:
                 return command
         log.critical('Command execution failed')
         return command
-    
+
     def _doDirectUsbCommand(self, command):
         """
         Opens direct USB connection, sends command (multiple times if needed)
