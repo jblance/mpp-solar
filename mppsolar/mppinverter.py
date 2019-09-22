@@ -155,6 +155,7 @@ class mppInverter:
         """
         Performs a test command execution
         """
+        command.set_response(None)
         log.debug('Performing test command with %s', command)
         command.set_response(command.get_test_response())
         return command
@@ -164,6 +165,7 @@ class mppInverter:
         Opens serial connection, sends command (multiple times if needed)
         and returns the response
         """
+        command.set_response(None)
         response_line = None
         log.debug('port %s, baudrate %s', self._serial_device, self._baud_rate)
         with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
@@ -188,10 +190,12 @@ class mppInverter:
         Opens direct USB connection, sends command (multiple times if needed)
         and returns the response
         """
-        # Do stuff with usb...
-        usb0 = os.open(self._serial_device, os.O_RDWR | os.O_NONBLOCK)
+        command.set_response(None)
         response_line = ""
+        usb0 = os.open(self._serial_device, os.O_RDWR | os.O_NONBLOCK)
         # for x in (1, 2, 3, 4):
+        # TODO: investigate write/read timings and chunking 
+        # make generic if possible
         command_crc = command.full_command
         if len(command_crc) < 9:
             time.sleep(0.35)
@@ -210,7 +214,6 @@ class mppInverter:
             try:
                 time.sleep(0.15)
                 r = os.read(usb0, 256)
-                # log.debug('usb read:', r)
                 response_line += r
             except Exception as e:
                 log.debug('USB read error', e.strerror)
@@ -219,7 +222,6 @@ class mppInverter:
                 # remove anything after the \r
                 response_line = response_line[:response_line.find('\r') + 1]
                 break
-        # print ('usb response was: %s', response_line)
         log.debug('usb response was: %s', response_line)
         command.set_response(response_line)
         return command
