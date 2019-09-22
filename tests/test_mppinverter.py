@@ -1,14 +1,9 @@
 import unittest
-from mppsolar import mppcommands
+from mppsolar import mppinverter
 from mppsolar import mppcommand
 
 
-class test_mppcommands(unittest.TestCase):
-    def test_trunc_function(self):
-        """ Test trunc function correctly returns truncated / padded text """
-        self.assertEqual(mppcommands.trunc('Short test'), 'Short test                       ')
-        self.assertEqual(mppcommands.trunc('A very much looonnger test string'), 'A very much looonnger test str...')
-
+class test_mppinverter(unittest.TestCase):
     def test_crc(self):
         """ Test crc function generates correct crc """
         self.assertListEqual(mppcommand.crc('QPIGS'), [183, 169])
@@ -19,7 +14,7 @@ class test_mppcommands(unittest.TestCase):
 
     def test_failed_initialisation(self):
         """ Initialisation should fail if no device provided """
-        self.assertRaises(mppcommands.NoDeviceError, mppcommands.mppCommands)
+        self.assertRaises(mppinverter.NoDeviceError, mppinverter.mppInverter)
 
 #     #def test_knowncommands(self):
 #         #""" getKnownCommands should return a list """
