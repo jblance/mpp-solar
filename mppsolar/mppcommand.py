@@ -65,21 +65,25 @@ def get_full_command(cmd):
 class mppCommand(object):
     """
    Base Class for MPP Inverter Commands
+   Each command (as stored in a <command>.json file) will be an instance of this class
     """
 
     def __str__(self):
+        # TODO: fix so print(class) provides the the decription and help etc??
         sb = []
         for key in sorted(self.__dict__):
             sb.append("{key}='{value}'".format(key=key, value=self.__dict__[key]))
         return ', '.join(sb)
 
     def __repr__(self):
+        # TODO: fix to display the 'code' that would reproduce the instanced class
         return self.__str__()
 
-    def __init__(self, name, description, command_type, response_definition, test_responses=[], regex="", value=None):
+    def __init__(self, name, description, command_type, response_definition, test_responses=[], regex="", value=None, help=""):
         """ Return a command object """
         self.name = name
         self.description = description
+        self.help = help
         self.command_type = command_type
         self.response_definition = response_definition
         self.response = None
