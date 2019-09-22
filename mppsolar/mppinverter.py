@@ -117,6 +117,19 @@ class mppInverter:
                 inverter += '{}: {}'.format(cmd.name, cmd.description)
         return inverter
 
+    def getSerialNumber(self):
+        if self._serial_number is None:
+            response = self.execute("QID").response_dict
+            if response:
+                self._serial_number = response["serial_number"][0]
+        return self._serial_number
+
+    def getAllCommands(self):
+        """
+        Return list of defined commands
+        """
+        return self._commands
+
     def _getCommand(self, cmd):
         """
         Returns the mppcommand object of the supplied cmd string
@@ -137,12 +150,6 @@ class mppInverter:
                     command.set_value(match.group(1))
                     return command
         return None
-
-    def getAllCommands(self):
-        """
-        Return list of defined commands
-        """
-        return self._commands
 
     def _doTestCommand(self, command):
         """
