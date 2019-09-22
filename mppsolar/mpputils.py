@@ -5,7 +5,7 @@ mpputils.py
 """
 
 import logging
-from .mppcommands import mppCommands
+from .mppcommands import mppInverter
 from .mppcommands import NoDeviceError
 
 log = logging.getLogger('MPP-Solar')
@@ -28,11 +28,11 @@ class mppUtils:
     def __init__(self, serial_device=None, baud_rate=2400):
         if (serial_device is None):
             raise NoDeviceError("A serial device must be supplied, e.g. /dev/ttyUSB0")
-        self.mp = mppCommands(serial_device, baud_rate)
+        self.mp = mppInverter(serial_device, baud_rate)
         self._serial_number = None
 
     def getKnownCommands(self):
-        return self.mp.getKnownCommands()
+        return self.mp.getAllCommands()
 
     def getResponseDict(self, cmd):
         return self.mp.execute(cmd).response_dict
