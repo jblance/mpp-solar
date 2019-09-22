@@ -5,8 +5,8 @@ mpputils.py
 """
 
 import logging
-from .mppcommands import mppInverter
-from .mppcommands import NoDeviceError
+from .mppinverter import mppInverter
+from .mppinverter import NoDeviceError
 
 log = logging.getLogger('MPP-Solar')
 
