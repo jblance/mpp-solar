@@ -55,7 +55,7 @@ class test_mppinverter(unittest.TestCase):
     def test_print_inverter_test(self):
         """ test string representation of inverter """
         inverter = mppinverter.mppInverter('TEST')
-        self.assertIsInstance(print(inverter), string)
+        self.assertIsInstance(print(inverter), str)
 
 #     #def test_knowncommands(self):
 #         #""" getKnownCommands should return a list """
