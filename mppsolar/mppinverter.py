@@ -169,21 +169,25 @@ class mppInverter:
         command.clearResponse()
         response_line = None
         log.debug('port %s, baudrate %s', self._serial_device, self._baud_rate)
-        with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
-            # Execute command multiple times, increase timeouts each time
-            for x in range(1, 5):
-                log.debug('Command execution attempt %d...', x)
-                s.timeout = 1 + x
-                s.write_timeout = 1 + x
-                s.flushInput()
-                s.flushOutput()
-                s.write(command.full_command)
-                time.sleep(0.5 * x)  # give serial port time to receive the data
-                response_line = s.readline()
-                log.debug('serial response was: %s', response_line)
-                command.set_response(response_line)
-                return command
-        log.critical('Command execution failed')
+        try:
+            with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
+                # Execute command multiple times, increase timeouts each time
+                for x in range(1, 5):
+                    log.debug('Command execution attempt %d...', x)
+                    s.timeout = 1 + x
+                    s.write_timeout = 1 + x
+                    s.flushInput()
+                    s.flushOutput()
+                    s.write(command.full_command)
+                    time.sleep(0.5 * x)  # give serial port time to receive the data
+                    response_line = s.readline()
+                    log.debug('serial response was: %s', response_line)
+                    command.set_response(response_line)
+                    return command
+        except SerialException as e:
+            log.debug('Serial read error', e.strerror)
+        log.info('Command execution failed')
+        print('Command execution failed')
         return command
 
     def _doDirectUsbCommand(self, command):
