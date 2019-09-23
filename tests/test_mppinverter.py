@@ -112,3 +112,10 @@ class test_mppinverter(unittest.TestCase):
         command = inverter.execute('QPIWS')
         print(command)
         self.assertIsInstance(command, mppcommand.mppCommand)
+
+    def test_execute_q1_cmd(self):
+        """ test execute of Q1 command (TEST connection)"""
+        inverter = mppinverter.mppInverter('TEST')
+        command = inverter.execute('Q1')
+        print(command)
+        self.assertIsInstance(command, mppcommand.mppCommand)
