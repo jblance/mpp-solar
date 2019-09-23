@@ -159,7 +159,7 @@ class mppInverter:
         """
         Performs a test command execution
         """
-        command.set_response(None)
+        command.clearResponse()
         log.debug('Performing test command with %s', command)
         command.set_response(command.get_test_response())
         return command
@@ -169,7 +169,7 @@ class mppInverter:
         Opens serial connection, sends command (multiple times if needed)
         and returns the response
         """
-        command.set_response(None)
+        command.clearResponse()
         response_line = None
         log.debug('port %s, baudrate %s', self._serial_device, self._baud_rate)
         with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
@@ -194,7 +194,7 @@ class mppInverter:
         Opens direct USB connection, sends command (multiple times if needed)
         and returns the response
         """
-        command.set_response(None)
+        command.clearResponse()
         response_line = ""
         usb0 = os.open(self._serial_device, os.O_RDWR | os.O_NONBLOCK)
         # for x in (1, 2, 3, 4):
