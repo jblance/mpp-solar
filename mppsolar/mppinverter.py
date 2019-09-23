@@ -184,8 +184,9 @@ class mppInverter:
                     log.debug('serial response was: %s', response_line)
                     command.set_response(response_line)
                     return command
-        except SerialException as e:
+        except Exception as e:
             log.debug('Serial read error', e.strerror)
+            print('Serial read error', e.strerror)
         log.info('Command execution failed')
         print('Command execution failed')
         return command
