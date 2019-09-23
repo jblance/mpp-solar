@@ -53,7 +53,11 @@ def getCommandsFromJson():
                 regex = re.compile(data['regex'])
             else:
                 regex = None
-            COMMANDS.append(mppCommand(data['name'], data['description'], data['type'], data['response'], data['test_responses'], regex, data['help']))
+            if data['help']:
+                help = data['help']
+            else:
+                help = ""
+            COMMANDS.append(mppCommand(data['name'], data['description'], data['type'], data['response'], data['test_responses'], regex, help=help))
     return COMMANDS
 
 
