@@ -7,6 +7,15 @@ class test_mppinverter(unittest.TestCase):
         """ Initialisation should fail if no device provided """
         self.assertRaises(mppinverter.NoDeviceError, mppinverter.mppInverter)
 
+    def test_init(self):
+        """ test initialisation defaults for a serial connected inverter """
+        inverter = mppinverter.mppInverter('/dev/ttyUSB0')
+        self.assertEqual(inverter._baud_rate, 2400)
+        self.assertEqual(inverter._serial_device, '/dev/ttyUSB0')
+        self.assertIsNone(inverter._serial_number)
+        self.assertFalse(inverter._test_device)
+        self.assertFalse(inverter._direct_usb)
+
 #     #def test_knowncommands(self):
 #         #""" getKnownCommands should return a list """
 #         #self.assertIsInstance(mppcommands.getKnownCommands(), list)
