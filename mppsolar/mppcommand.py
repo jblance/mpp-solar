@@ -70,14 +70,8 @@ class mppCommand(object):
 
     def __str__(self):
         # TODO: fix so print(class) provides the the decription and help etc??
-        sb = []
-        for key in sorted(self.__dict__):
-            sb.append("{key}='{value}'".format(key=key, value=self.__dict__[key]))
-        return ', '.join(sb)
-
-    def __repr__(self):
-        # TODO: fix to display the 'code' that would reproduce the instanced class
-        return self.__str__()
+        result = "{}\n{}\n{}\n{}\n{}".format(self.name, self.description, self.help, self.response, self.response_dict)
+        return result
 
     def __init__(self, name, description, command_type, response_definition, test_responses=[], regex="", value=None, help=""):
         """ Return a command object """
