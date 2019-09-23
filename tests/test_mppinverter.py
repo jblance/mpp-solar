@@ -97,7 +97,7 @@ class test_mppinverter(unittest.TestCase):
         inverter = mppinverter.mppInverter('TEST')
         command = inverter.execute('INVALID99')
         print(command)
-        self.assertIsInstance(command, mppcommand.mppCommand)
+        self.assertIsNone(command)
 
     def test_execute_enflags_cmd(self):
         """ test execute of enflags command (TEST connection)"""
