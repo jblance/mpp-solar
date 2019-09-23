@@ -48,6 +48,7 @@ def getCommandsFromJson():
             except Exception as e:
                 print("Error processing JSON in {}".format(file))
                 print(e)
+                continue
             # print("Command: {} ({}) - expects {} response(s) [regex: {}]".format(data['name'], data['description'], len(data['response']), data['regex']))
             if data['regex']:
                 regex = re.compile(data['regex'])
@@ -170,7 +171,7 @@ class mppInverter:
         log.debug('port %s, baudrate %s', self._serial_device, self._baud_rate)
         with serial.serial_for_url(self._serial_device, self._baud_rate) as s:
             # Execute command multiple times, increase timeouts each time
-            for x in (1, 2, 3, 4):
+            for x in range(1, 5):
                 log.debug('Command execution attempt %d...', x)
                 s.timeout = 1 + x
                 s.write_timeout = 1 + x
