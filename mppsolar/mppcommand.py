@@ -69,8 +69,14 @@ class mppCommand(object):
     """
 
     def __str__(self):
-        # TODO: fix so print(class) provides the the decription and help etc??
-        result = "{}\n{}\n{}\n{!a}\n{}".format(self.name, self.description, self.help, self.response, self.response_dict)
+        """ String representation of the command (including response)
+        if(self.response is None):
+            response = ""
+            response_dict = ""
+        else:
+            response = self.response
+            response_dict = self.response_dict
+        result = "{}\n{}\n{}\n{}\n{}".format(self.name, self.description, self.help, response, response_dict)
         return result
 
     def __init__(self, name, description, command_type, response_definition, test_responses=[], regex="", value=None, help=""):
