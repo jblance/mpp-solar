@@ -194,7 +194,7 @@ class mppInverter:
         response_line = ""
         usb0 = os.open(self._serial_device, os.O_RDWR | os.O_NONBLOCK)
         # for x in (1, 2, 3, 4):
-        # TODO: investigate write/read timings and chunking 
+        # TODO: investigate write/read timings and chunking
         # make generic if possible
         command_crc = command.full_command
         if len(command_crc) < 9:
