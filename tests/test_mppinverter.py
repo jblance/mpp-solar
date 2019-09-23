@@ -7,7 +7,7 @@ class test_mppinverter(unittest.TestCase):
         """ Initialisation should fail if no device provided """
         self.assertRaises(mppinverter.NoDeviceError, mppinverter.mppInverter)
 
-    def test_init(self):
+    def test_init_serial(self):
         """ test initialisation defaults for a serial connected inverter """
         inverter = mppinverter.mppInverter('/dev/ttyUSB0')
         self.assertEqual(inverter._baud_rate, 2400)
@@ -17,7 +17,7 @@ class test_mppinverter(unittest.TestCase):
         self.assertFalse(inverter._direct_usb)
         self.assertIsInstance(inverter.getAllCommands(), list)
 
-    def test_hidraw0(self):
+    def test_init_hidraw0(self):
         """ test initialisation as usb direct device """
         inverter = mppinverter.mppInverter('/dev/hidraw0')
         self.assertEqual(inverter._baud_rate, 2400)
@@ -27,7 +27,7 @@ class test_mppinverter(unittest.TestCase):
         self.assertTrue(inverter._direct_usb)
         self.assertIsInstance(inverter.getAllCommands(), list)
 
-    def test_hidraw9(self):
+    def test_init_hidraw9(self):
         """ test initialisation as usb direct device (high numbered device) """
         inverter = mppinverter.mppInverter('/dev/hidraw9')
         self.assertEqual(inverter._baud_rate, 2400)
@@ -36,6 +36,21 @@ class test_mppinverter(unittest.TestCase):
         self.assertFalse(inverter._test_device)
         self.assertTrue(inverter._direct_usb)
         self.assertIsInstance(inverter.getAllCommands(), list)
+
+    def test_init_test(self):
+        """ test initialisation as a test device """
+        inverter = mppinverter.mppInverter('TEST')
+        self.assertEqual(inverter._baud_rate, 2400)
+        self.assertEqual(inverter._serial_device, 'TEST')
+        self.assertIsNone(inverter._serial_number)
+        self.assertTrue(inverter._test_device)
+        self.assertFalse(inverter._direct_usb)
+        self.assertIsInstance(inverter.getAllCommands(), list)
+
+    def test_serial_number(self):
+        """ getSerialNumber should return the test serial number """
+        inverter = mppinverter.mppInverter('TEST')
+        elf.assertEqual(inverter.getSerialNumber(), '9293333010501')
 
 #     #def test_knowncommands(self):
 #         #""" getKnownCommands should return a list """
