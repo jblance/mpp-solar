@@ -53,7 +53,7 @@ def getCommandsFromJson():
                 regex = re.compile(data['regex'])
             else:
                 regex = None
-            if data['help']:
+            if 'help' in data:
                 help = data['help']
             else:
                 help = ""
