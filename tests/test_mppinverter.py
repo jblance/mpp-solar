@@ -15,6 +15,27 @@ class test_mppinverter(unittest.TestCase):
         self.assertIsNone(inverter._serial_number)
         self.assertFalse(inverter._test_device)
         self.assertFalse(inverter._direct_usb)
+        self.assertIsInstance(inverter.getAllCommands(), list)
+
+    def test_hidraw0(self):
+        """ test initialisation as usb direct device """
+        inverter = mppinverter.mppInverter('/dev/hidraw0')
+        self.assertEqual(inverter._baud_rate, 2400)
+        self.assertEqual(inverter._serial_device, '/dev/hidraw0')
+        self.assertIsNone(inverter._serial_number)
+        self.assertFalse(inverter._test_device)
+        self.assertTrue(inverter._direct_usb)
+        self.assertIsInstance(inverter.getAllCommands(), list)
+
+    def test_hidraw9(self):
+        """ test initialisation as usb direct device (high numbered device) """
+        inverter = mppinverter.mppInverter('/dev/hidraw90')
+        self.assertEqual(inverter._baud_rate, 2400)
+        self.assertEqual(inverter._serial_device, '/dev/hidraw9')
+        self.assertIsNone(inverter._serial_number)
+        self.assertFalse(inverter._test_device)
+        self.assertTrue(inverter._direct_usb)
+        self.assertIsInstance(inverter.getAllCommands(), list)
 
 #     #def test_knowncommands(self):
 #         #""" getKnownCommands should return a list """
