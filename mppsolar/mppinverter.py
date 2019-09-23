@@ -81,10 +81,6 @@ def isDirectUsbDevice(serial_device):
     if match:
         log.debug("Device matches hidraw regex")
         return True
-    if (serial_device == '/dev/hidraw0'):
-        return True
-    if (serial_device == '/dev/hidraw1'):
-        return True
     return False
 
 
