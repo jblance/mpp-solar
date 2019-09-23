@@ -50,7 +50,12 @@ class test_mppinverter(unittest.TestCase):
     def test_serial_number(self):
         """ getSerialNumber should return the test serial number """
         inverter = mppinverter.mppInverter('TEST')
-        elf.assertEqual(inverter.getSerialNumber(), '9293333010501')
+        self.assertEqual(inverter.getSerialNumber(), '9293333010501')
+
+    def test_print_inverter_test(self):
+        """ test string representation of inverter """
+        inverter = mppinverter.mppInverter('TEST')
+        self.assertIsInstance(print(inverter), string)
 
 #     #def test_knowncommands(self):
 #         #""" getKnownCommands should return a list """
