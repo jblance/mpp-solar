@@ -29,7 +29,7 @@ class test_mppinverter(unittest.TestCase):
 
     def test_hidraw9(self):
         """ test initialisation as usb direct device (high numbered device) """
-        inverter = mppinverter.mppInverter('/dev/hidraw90')
+        inverter = mppinverter.mppInverter('/dev/hidraw9')
         self.assertEqual(inverter._baud_rate, 2400)
         self.assertEqual(inverter._serial_device, '/dev/hidraw9')
         self.assertIsNone(inverter._serial_number)
