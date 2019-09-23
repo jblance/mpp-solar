@@ -70,7 +70,7 @@ class mppCommand(object):
 
     def __str__(self):
         # TODO: fix so print(class) provides the the decription and help etc??
-        result = "{}\n{}\n{}\n{}\n{}".format(self.name, self.description, self.help, self.response, self.response_dict)
+        result = "{}\n{}\n{}\n{!a}\n{}".format(self.name, self.description, self.help, self.response, self.response_dict)
         return result
 
     def __init__(self, name, description, command_type, response_definition, test_responses=[], regex="", value=None, help=""):
@@ -100,10 +100,7 @@ class mppCommand(object):
         self.response = None
 
     def set_response(self, response):
-        if(response is None):
-            self.response = response
-            return
-        self.response = response.encode('utf-8')
+        self.response = response
         self.valid_response = self.is_response_valid(response)
         if self.valid_response:
             self.response_dict = self.get_response_dict()
