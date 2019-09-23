@@ -1,5 +1,6 @@
 import unittest
 from mppsolar import mppinverter
+from mppsolar import mppcommand
 
 
 class test_mppinverter(unittest.TestCase):
@@ -53,9 +54,27 @@ class test_mppinverter(unittest.TestCase):
         self.assertEqual(inverter.getSerialNumber(), '9293333010501')
 
     def test_print_inverter_test(self):
-        """ test string representation of inverter """
+        """ test string representation of inverter (TEST connection)"""
         inverter = mppinverter.mppInverter('TEST')
+        print(inverter)
         self.assertIsInstance(inverter.__str__(), str)
+
+    def test_print_inverter_usb(self):
+        """ test string representation of inverter (Direct USB connected)"""
+        inverter = mppinverter.mppInverter('/dev/hidraw0')
+        print(inverter)
+        self.assertIsInstance(inverter.__str__(), str)
+
+    def test_print_inverter_serial(self):
+        """ test string representation of inverter (Serial connected)"""
+        inverter = mppinverter.mppInverter('/dev/ttyUSB0')
+        print(inverter)
+        self.assertIsInstance(inverter.__str__(), str)
+
+    def test_execute_query_cmd(self):
+        """ test execute of QUERY command (TEST connection)"""
+        inverter = mppinverter.mppInverter('TEST')
+        self.assertIsInstance(inverter.execute('QPIRI'), mppcommand.mppCommand)
 
 #     #def test_knowncommands(self):
 #         #""" getKnownCommands should return a list """
