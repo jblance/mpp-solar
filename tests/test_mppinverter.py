@@ -76,6 +76,21 @@ class test_mppinverter(unittest.TestCase):
         inverter = mppinverter.mppInverter('TEST')
         self.assertIsInstance(inverter.execute('QPIRI'), mppcommand.mppCommand)
 
+    def test_execute_setter_cmd(self):
+        """ test execute of SETTER command (TEST connection)"""
+        inverter = mppinverter.mppInverter('TEST')
+        self.assertIsInstance(inverter.execute('PSDV56.4'), mppcommand.mppCommand)
+
+    def test_execute_regex_cmd(self):
+        """ test execute of regex command (TEST connection)"""
+        inverter = mppinverter.mppInverter('TEST')
+        self.assertIsInstance(inverter.execute('QPGS0'), mppcommand.mppCommand)
+
+    def test_execute_invalid_cmd(self):
+        """ test execute of INVALID command (TEST connection) - should return None"""
+        inverter = mppinverter.mppInverter('TEST')
+        self.assertIsNone(inverter.execute('INVALID99'))
+
 #     #def test_knowncommands(self):
 #         #""" getKnownCommands should return a list """
 #         #self.assertIsInstance(mppcommands.getKnownCommands(), list)
