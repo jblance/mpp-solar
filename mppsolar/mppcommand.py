@@ -74,7 +74,7 @@ class mppCommand(object):
             response = ""
             response_dict = ""
         else:
-            response = self.response
+            response = self.response.encode('utf-8')
             response_dict = self.response_dict
         result = "{}\n{}\n{}\n{}\n{}".format(self.name, self.description, self.help, response, response_dict)
         return result
