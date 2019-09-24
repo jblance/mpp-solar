@@ -112,7 +112,7 @@ class mppCommand(object):
             self.response_dict = self.getResponseDict()
 
     def getResponse(self):
-        return self.responses
+        return self.response
 
     def getTestResponse(self):
         """
