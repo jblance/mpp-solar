@@ -14,3 +14,10 @@ class test_mpputils(unittest.TestCase):
         # command = inverter.execute('QPIWS')
         # print(command)
         self.assertIsInstance(utils, mpputils.mppUtils)
+
+    def test_serial_number(self):
+        """ test serial number response from mppUtils """
+        utils = mpputils.mppUtils('TEST')
+        serial = utils.getSerialNumber()
+        print(serial)
+        self.assertEqual(serial, '9293333010501')
