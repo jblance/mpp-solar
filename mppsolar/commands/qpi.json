@@ -1,12 +1,13 @@
 {
     "name": "QPI",
     "description": "Device Protocol ID inquiry",
+    "help": "  Requests the device protocol ID. e.g. 30 for HS series",
     "type": "QUERY",
     "response": [
             ["string", "Protocol ID", ""]
         ],
     "test_responses": [
-           ""
+           "(PI30\u009a\u000b\r"
         ],
 	"regex": ""
 }
