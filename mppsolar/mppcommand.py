@@ -134,9 +134,6 @@ class mppCommand(object):
         resp = response[:-3]
         resp_crc = response[-3:-1]
         log.debug('CRC resp\t%x %x', ord(resp_crc[0]), ord(resp_crc[1]))
-        # print(resp)
-        # print('CRC resp\t', ord(resp_crc[0]), ord(resp_crc[1]))
-        # print('CRC resp\t', (resp_crc[0]), (resp_crc[1]))
         calc_crc_h, calc_crc_l = crc(resp)
         log.debug('CRC calc\t%x %x', calc_crc_h, calc_crc_l)
         if ((ord(resp_crc[0]) == calc_crc_h) and (ord(resp_crc[1]) == calc_crc_l)):
@@ -147,8 +144,6 @@ class mppCommand(object):
             return False
         # Check if this is a query or set command
         if (self.command_type == 'SETTER'):
-            # Is set command - default to 'is valid'
-            # TODO: what are valid responses...
             if (response == '(ACK9 \r'):
                 log.debug('Response valid as setter with ACK resp')
                 return True
@@ -202,17 +197,10 @@ class mppCommand(object):
             # eg. ['keyed', 'Machine type', {'00': 'Grid tie', '01': 'Off Grid', '10': 'Hybrid'}],
             elif (resp_format[0] == 'keyed'):
                 msgs[key] = [resp_format[2][result], '']
-            # eg. ['flags', 'Device status', [ ['Add SBU - No', 'Add SBU - ...
             # eg. ['flags', 'Device status', [ 'is_load_on', 'is_charging_on' ...
             elif (resp_format[0] == 'flags'):
                 for j, flag in enumerate(result):
                     msgs[resp_format[2][j]] = [int(flag), 'True - 1/False - 0']
-            # elif (resp_format[0] == 'flags'):
-                # output = ''
-                # for j, flag in enumerate(result):
-                    # output = '{}\n\t- {}'.format(output,
-                    #                             resp_format[2][j][int(flag)])
-                # msgs[key] = [output, '']
             # eg. ['stat_flags', 'Warning status', ['Reserved', 'Inver...
             elif (resp_format[0] == 'stat_flags'):
                 output = ''
