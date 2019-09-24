@@ -11,9 +11,7 @@ import logging
 import json
 import glob
 import os
-# from pprint import pprint
 from os import path
-from argparse import ArgumentParser
 
 from .mppcommand import mppCommand
 
