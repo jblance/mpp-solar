@@ -18,6 +18,27 @@ class test_mpputils(unittest.TestCase):
     def test_serial_number(self):
         """ test serial number response from mppUtils """
         utils = mpputils.mppUtils('TEST')
-        serial = utils.getSerialNumber()
-        print(serial)
-        self.assertEqual(serial, '9293333010501')
+        response = utils.getSerialNumber()
+        print(response)
+        self.assertEqual(response, '9293333010501')
+
+    def test_all_commands(self):
+        """ test known commands response from mppUtils """
+        utils = mpputils.mppUtils('TEST')
+        response = utils.getKnownCommands()
+        print(response)
+        self.assertIsInstance(response, list)
+
+    def test_full_status(self):
+        """ test full status response from mppUtils """
+        utils = mpputils.mppUtils('TEST')
+        response = utils.getFullStatus()
+        print(response)
+        self.assertIsInstance(response, list)
+
+    def test_settings(self):
+        """ test getSettings response from mppUtils """
+        utils = mpputils.mppUtils('TEST')
+        response = utils.getSettings()
+        print(response)
+        self.assertIsInstance(response, list)
