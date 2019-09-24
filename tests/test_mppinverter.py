@@ -126,3 +126,10 @@ class test_mppinverter(unittest.TestCase):
         command = inverter.execute('Q1')
         print(command)
         self.assertIsInstance(command, mppcommand.mppCommand)
+
+    def test_execute_qid_cmd(self):
+        """ test execute of QID command (Direct USB connection)"""
+        inverter = mppinverter.mppInverter('/dev/hidraw1')
+        command = inverter.execute('Q1')
+        print(command)
+        self.assertIsInstance(command, mppcommand.mppCommand)
