@@ -85,5 +85,6 @@ class mppUtils:
                              "default": getVal(default_settings, key, 0)}
         for key in flag_settings:
             _key = '{}'.format(key).replace(" ", "_")
+            print(key, _key)
             settings[_key]['value'] = getVal(flag_settings, key, 0)
         return settings
