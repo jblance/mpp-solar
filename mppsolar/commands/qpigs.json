@@ -20,14 +20,14 @@
             ["float", "Battery Voltage from SCC", "V"],
             ["int", "Battery Discharge Current", "A"],
             ["flags", "Device Status", [
-                ["Add SBU priority version - No", "Add SBU priority version - Yes"],
-                ["Configuration unchanged", "Configuration changed"],
-                ["SCC firmware version unchanged", "SCC firmware version updated"],
-                ["Load off", "Load on"],
-                ["Battery voltage not to steady while charging", "Battery voltage to steady while charging"],
-                ["Charging off", "Charging on"],
-                ["SCC charging off", "SCC charging on"],
-                ["AC charging off", "AC charging on"]
+		"is_sbu_priority_version_added",
+                "is_configuration_changed",
+                "is_scc_firmware_updated",
+                "is_load_on",
+                "is_battery_voltage_to_steady_while_charging",
+                "is_charging_on",
+                "is_scc_charging_on",
+                "is_ac_charging_on"
                 ]
             ]
         ],
