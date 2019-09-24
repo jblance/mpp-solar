@@ -70,11 +70,11 @@ class mppCommand(object):
 
     def __str__(self):
         """ String representation of the command (including response) """
-        if(self.response is None):
+        if(self.response is None or len(self.response) < 3):
             response = ""
             response_dict = ""
         else:
-            response = self.response.encode('utf-8')
+            response = self.response[:-3]
             response_dict = self.response_dict
         result = "{}\n{}\n{}\n{}\n{}".format(self.name, self.description, self.help, response, response_dict)
         return result
