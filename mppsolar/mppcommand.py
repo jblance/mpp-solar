@@ -111,6 +111,9 @@ class mppCommand(object):
         if self.valid_response:
             self.response_dict = self.getResponseDict()
 
+    def getResponse(self):
+        return self.responses
+
     def getTestResponse(self):
         """
         Return a random one of the test_responses
