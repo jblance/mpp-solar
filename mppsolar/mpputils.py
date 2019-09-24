@@ -88,5 +88,5 @@ class mppUtils:
             if _key in settings:
                 settings[_key]['value'] = getVal(flag_settings, key, 0)
             else:
-                settings[_key] = {'value': getVal(flag_settings, key, 0)}
+                settings[_key] = {'value': getVal(flag_settings, key, 0), "unit":"", "default":""}
         return settings
