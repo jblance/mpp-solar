@@ -198,24 +198,23 @@ class mppInverter:
         """
         command.clearResponse()
         response_line = ""
-        usb0 = os.open(self._serial_device, os.O_RDWR | os.O_NONBLOCK)
-        # for x in (1, 2, 3, 4):
-        # TODO: investigate write/read timings and chunking
-        # make generic if possible
-        command_crc = command.full_command
-        if len(command_crc) < 9:
+        try:
+            usb0 = os.open(self._serial_device, os.O_RDWR | os.O_NONBLOCK)
+        except Exception as e:
+            log.debug('USB open error', e.strerror)
+            print('Serial read error', e.strerror)
+            return command
+        # Send the command to the open usb connection
+        to_send = command.full_command
+        while (len(to_send) > 0):
+            # Split the full command into smaller chucks
+            send, to_send = to_send[:4], to_send[4:]
             time.sleep(0.35)
-            os.write(usb0, command_crc)
-        else:
-            cmd1 = command_crc[:8]
-            cmd2 = command_crc[8:]
-            time.sleep(0.35)
-            os.write(usb0, cmd1)
-            time.sleep(0.35)
-            os.write(usb0, cmd2)
-            time.sleep(0.25)
-
-        while True:
+            os.write(usb0, send)
+        time.sleep(0.25)
+        # Read from the usb connection
+        # try to a max of 100 times
+        for x in range(100):
             # attempt to deal with resource busy and other failures to read
             try:
                 time.sleep(0.15)
