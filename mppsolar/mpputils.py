@@ -28,23 +28,19 @@ class mppUtils:
     def __init__(self, serial_device=None, baud_rate=2400):
         if (serial_device is None):
             raise NoDeviceError("A serial device must be supplied, e.g. /dev/ttyUSB0")
-        self.mp = mppInverter(serial_device, baud_rate)
-        self._serial_number = None
+        self.inverter = mppInverter(serial_device, baud_rate)
 
     def getKnownCommands(self):
-        return self.mp.getAllCommands()
+        return self.inverter.getAllCommands()
 
     def getResponseDict(self, cmd):
-        return self.mp.execute(cmd).response_dict
+        return self.inverter.execute(cmd).getResponseDict()
 
     def getResponse(self, cmd):
-        return self.mp.execute(cmd).response
+        return self.inverter.execute(cmd).getResponse()
 
     def getSerialNumber(self):
-        if self._serial_number is None:
-            response = self.mp.execute("QID").response_dict
-            self._serial_number = response["serial_number"][0]
-        return self._serial_number
+        return self.inverter.getSerialNumber()
 
     def getFullStatus(self):
         """
