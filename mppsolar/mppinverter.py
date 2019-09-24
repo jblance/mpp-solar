@@ -146,7 +146,7 @@ class mppInverter:
                 if match:
                     log.debug(command.name, command.regex)
                     log.debug("Matched: {} Value: {}".format(command.name, match.group(1)))
-                    command.set_value(match.group(1))
+                    command.setValue(match.group(1))
                     return command
         return None
 
