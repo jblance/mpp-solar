@@ -110,7 +110,7 @@ class mppInverter:
             inverter = "Inverter connected as a TEST"
         else:
             inverter = "Inverter connected via serial port on {}".format(self._serial_device)
-        inverter += "\n-------- List of supported commands --------"
+        inverter += "\n-------- List of supported commands --------\n"
         if self._commands:
             for cmd in self._commands:
                 inverter += '{}: {}\n\t{}\n'.format(cmd.name, cmd.description, cmd.help)
