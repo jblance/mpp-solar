@@ -193,6 +193,7 @@ class mppInverter:
         """
         command.clearResponse()
         response_line = ""
+        usb0 = None
         try:
             usb0 = os.open(self._serial_device, os.O_RDWR | os.O_NONBLOCK)
         except Exception as e:
