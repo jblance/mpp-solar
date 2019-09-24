@@ -71,24 +71,10 @@ class test_mppinverter(unittest.TestCase):
         print(inverter)
         self.assertIsInstance(inverter.__str__(), str)
 
-    def test_execute_query_cmd(self):
-        """ test execute of QUERY command (TEST connection)"""
-        inverter = mppinverter.mppInverter('TEST')
-        command = inverter.execute('QPIGS')
-        print(command)
-        self.assertIsInstance(command, mppcommand.mppCommand)
-
     def test_execute_setter_cmd(self):
         """ test execute of SETTER command (TEST connection)"""
         inverter = mppinverter.mppInverter('TEST')
         command = inverter.execute('PSDV56.4')
-        print(command)
-        self.assertIsInstance(command, mppcommand.mppCommand)
-
-    def test_execute_regex_cmd(self):
-        """ test execute of regex command (TEST connection)"""
-        inverter = mppinverter.mppInverter('TEST')
-        command = inverter.execute('QPGS0')
         print(command)
         self.assertIsInstance(command, mppcommand.mppCommand)
 
@@ -98,27 +84,6 @@ class test_mppinverter(unittest.TestCase):
         command = inverter.execute('INVALID99')
         print(command)
         self.assertIsNone(command)
-
-    def test_execute_enflags_cmd(self):
-        """ test execute of enflags command (TEST connection)"""
-        inverter = mppinverter.mppInverter('TEST')
-        command = inverter.execute('QFLAG')
-        print(command)
-        self.assertIsInstance(command, mppcommand.mppCommand)
-
-    def test_execute_statflags_cmd(self):
-        """ test execute of statflags command (TEST connection)"""
-        inverter = mppinverter.mppInverter('TEST')
-        command = inverter.execute('QPIWS')
-        print(command)
-        self.assertIsInstance(command, mppcommand.mppCommand)
-
-    def test_execute_q1_cmd(self):
-        """ test execute of Q1 command (TEST connection)"""
-        inverter = mppinverter.mppInverter('TEST')
-        command = inverter.execute('Q1')
-        print(command)
-        self.assertIsInstance(command, mppcommand.mppCommand)
 
     def test_execute_qid_serial_cmd(self):
         """ test execute of QID command (Serial connection)"""
@@ -133,3 +98,13 @@ class test_mppinverter(unittest.TestCase):
         command = inverter.execute('Q1')
         print(command)
         self.assertIsInstance(command, mppcommand.mppCommand)
+
+    def test_bulk_commands(self):
+        """ Test all query commands """
+        inverter = mppinverter.mppInverter('TEST')
+        commands = ['QPIGS', 'Q1', 'QPIWS', 'QFLAG', 'QPGS0']
+        for cmd in commands:
+            command = inverter.execute(cmd)
+            print("Testing: ", cmd)
+            print(command)
+            self.assertIsInstance(command, mppcommand.mppCommand)
