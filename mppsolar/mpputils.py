@@ -48,8 +48,8 @@ class mppUtils:
         """
         status = {}
         # serial_number = self.getSerialNumber()
-        data = self.mp.execute("Q1").response_dict
-        data.update(self.mp.execute("QPIGS").response_dict)  # TODO: check if this actually works...
+        data = self.getResponseDict("Q1")
+        data.update(self.getResponseDict("QPIGS"))
 
         # Need to get 'Parallel' info, but dont know what the parallel number for the correct inverter is...
         # parallel_data = self.mp.getResponseDict("QPGS0")
@@ -58,18 +58,8 @@ class mppUtils:
         #    parallel_data = self.mp.getResponseDict("QPGS1")
         # status_data.update(parallel_data)
 
-        items = ['SCC Flag', 'AllowSccOnFlag', 'ChargeAverageCurrent', 'SCC PWM temperature',
-                 'Inverter temperature', 'Battery temperature', 'Transformer temperature',
-                 'Fan lock status', 'Fan PWM speed', 'SCC charge power', 'Sync frequency',
-                 'Inverter charge status', 'AC Input Voltage', 'AC Input Frequency',
-                 'AC Output Voltage', 'AC Output Frequency', 'AC Output Apparent Power',
-                 'AC Output Active Power', 'AC Output Load', 'BUS Voltage', 'Battery Voltage',
-                 'Battery Charging Current', 'Battery Capacity', 'Inverter Heat Sink Temperature',
-                 'PV Input Current for Battery', 'PV Input Voltage', 'Battery Voltage from SCC',
-                 'Battery Discharge Current']
-
-        for item in items:
-            key = '{}'.format(item).lower().replace(" ", "_")
+        for item in data.keys():
+            key = '{}'.format(item).replace(" ", "_")
             status[key] = {"value": data[key][0], "unit": data[key][1]}
         # Still have 'Device Status' from QPIGS
         # Still have QPGSn
@@ -80,28 +70,20 @@ class mppUtils:
         Query inverter for all current settings
         """
         # serial_number = self.getSerialNumber()
-        default_settings = self.mp.execute("QDI").response_dict
-        current_settings = self.mp.execute("QPIRI").response_dict
-        flag_settings = self.mp.execute("QFLAG").response_dict
+        default_settings = self.getResponseDict("QDI")
+        current_settings = self.getResponseDict("QPIRI").
+        flag_settings = self.getResponseDict("QFLAG")
         # current_settings.update(flag_settings)  # Combine current and flag settings dicts
 
         settings = {}
         # {"Battery Bulk Charge Voltage": {"unit": "V", "default": 56.4, "value": 57.4}}
 
-        items = ["Battery Type", "Output Mode", "Battery Bulk Charge Voltage", "Battery Float Charge Voltage",
-                 "Battery Under Voltage", "Battery Redischarge Voltage", "Battery Recharge Voltage", "Input Voltage Range",
-                 "Charger Source Priority", "Max AC Charging Current", "Max Charging Current", "Output Source Priority",
-                 "AC Output Voltage", "AC Output Frequency", "PV OK Condition", "PV Power Balance",
-                 "Buzzer", "Power Saving", "Overload Restart", "Over Temperature Restart", "LCD Backlight", "Primary Source Interrupt Alarm",
-                 "Record Fault Code", "Overload Bypass", "LCD Reset to Default", "Machine Type", "AC Input Voltage", "AC Input Current",
-                 "AC Output Current", "AC Output Apparent Power", "AC Output Active Power", "Battery Voltage", "Max Parallel Units"]
-
-        for item in items:
-            key = '{}'.format(item).lower().replace(" ", "_")
+        for item in current_settings.keys():
+            key = '{}'.format(item).replace(" ", "_")
             settings[key] = {"value": getVal(current_settings, key, 0),
                              "unit": getVal(current_settings, key, 1),
                              "default": getVal(default_settings, key, 0)}
         for key in flag_settings:
-            _key = '{}'.format(key).lower().replace(" ", "_")
+            _key = '{}'.format(key).replace(" ", "_")
             settings[_key]['value'] = getVal(flag_settings, key, 0)
         return settings
