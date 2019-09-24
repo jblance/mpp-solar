@@ -98,26 +98,26 @@ class mppCommand(object):
         self.full_command = get_full_command(cmd_str)
         self.valid_response = False
 
-    def set_value(self, value):
+    def setValue(self, value):
         self.value = value
         self.full_command = get_full_command("{}{}".format(self.name, self.value))
 
     def clearResponse(self):
         self.response = None
 
-    def set_response(self, response):
+    def setResponse(self, response):
         self.response = response
-        self.valid_response = self.is_response_valid(response)
+        self.valid_response = self.isResponseValid(response)
         if self.valid_response:
-            self.response_dict = self.get_response_dict()
+            self.response_dict = self.getResponseDict()
 
-    def get_test_response(self):
+    def getTestResponse(self):
         """
         Return a random one of the test_responses
         """
         return self.test_responses[random.randrange(len(self.test_responses))]
 
-    def is_response_valid(self, response):
+    def isResponseValid(self, response):
         """
         Checks the response is valid
         - if command is not a query then valid responses are (NAK and (ACK
@@ -168,7 +168,7 @@ class mppCommand(object):
         log.debug('Response valid as no invalid situations found')
         return True
 
-    def get_response_dict(self):
+    def getResponseDict(self):
         """
         Returns the response in a dict (with value, unit array)
         """
