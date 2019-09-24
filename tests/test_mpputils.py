@@ -34,11 +34,11 @@ class test_mpputils(unittest.TestCase):
         utils = mpputils.mppUtils('TEST')
         response = utils.getFullStatus()
         print(response)
-        self.assertIsInstance(response, list)
+        self.assertIsInstance(response, dict)
 
     def test_settings(self):
         """ test getSettings response from mppUtils """
         utils = mpputils.mppUtils('TEST')
         response = utils.getSettings()
         print(response)
-        self.assertIsInstance(response, list)
+        self.assertIsInstance(response, dict)
