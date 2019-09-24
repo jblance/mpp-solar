@@ -71,7 +71,7 @@ class mppUtils:
         """
         # serial_number = self.getSerialNumber()
         default_settings = self.getResponseDict("QDI")
-        current_settings = self.getResponseDict("QPIRI").
+        current_settings = self.getResponseDict("QPIRI")
         flag_settings = self.getResponseDict("QFLAG")
         # current_settings.update(flag_settings)  # Combine current and flag settings dicts
 
