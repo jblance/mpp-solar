@@ -102,7 +102,7 @@ class test_mppinverter(unittest.TestCase):
     def test_bulk_commands(self):
         """ Test all query commands """
         inverter = mppinverter.mppInverter('TEST')
-        commands = ['QPIGS', 'Q1', 'QPIWS', 'QFLAG', 'QPGS0']
+        commands = ['Q1', 'QBOOT', 'QDI', 'QFLAG', 'QID', 'QMCHGCR', 'QMOD', 'QMUCHGCR', 'QOPM', 'QPGS', 'QPI', 'QPIGS', 'QPIRI', 'QPIWS', 'QVFW', 'QVFW2']
         for cmd in commands:
             command = inverter.execute(cmd)
             print("Testing: ", cmd)
