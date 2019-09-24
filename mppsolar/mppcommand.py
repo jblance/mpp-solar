@@ -64,12 +64,12 @@ def get_full_command(cmd):
 
 class mppCommand(object):
     """
-   Base Class for MPP Inverter Commands
-   Each command (as stored in a <command>.json file) will be an instance of this class
+    Base Class for MPP Inverter Commands
+    Each command (as stored in a <command>.json file) will be an instance of this class
     """
 
     def __str__(self):
-        """ String representation of the command (including response)
+        """ String representation of the command (including response) """
         if(self.response is None):
             response = ""
             response_dict = ""
