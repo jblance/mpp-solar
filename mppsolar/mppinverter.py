@@ -120,7 +120,7 @@ class mppInverter:
 
     def getSerialNumber(self):
         if self._serial_number is None:
-            response = self.execute("QID").response_dict
+            response = self.execute("QID").getResponseDict()
             if response:
                 self._serial_number = response["serial_number"][0]
         return self._serial_number
@@ -158,7 +158,7 @@ class mppInverter:
         """
         command.clearResponse()
         log.debug('Performing test command with %s', command)
-        command.set_response(command.get_test_response())
+        command.setResponse(command.getTestResponse())
         return command
 
     def _doSerialCommand(self, command):
@@ -182,7 +182,7 @@ class mppInverter:
                     time.sleep(0.5 * x)  # give serial port time to receive the data
                     response_line = s.readline()
                     log.debug('serial response was: %s', response_line)
-                    command.set_response(response_line)
+                    command.setResponse(response_line)
                     return command
         except Exception as e:
             log.debug('Serial read error', e.strerror)
@@ -228,7 +228,7 @@ class mppInverter:
                 response_line = response_line[:response_line.find('\r') + 1]
                 break
         log.debug('usb response was: %s', response_line)
-        command.set_response(response_line)
+        command.setResponse(response_line)
         return command
 
     def execute(self, cmd):
@@ -248,18 +248,3 @@ class mppInverter:
         else:
             log.debug('SERIAL connection: executing %s', command)
             return self._doSerialCommand(command)
-
-
-if __name__ == '__main__':
-    parser = ArgumentParser(description='MPP Solar Command Utility')
-    parser.add_argument('-c', '--command', help='Command to run', default='QID')
-    args = parser.parse_args()
-
-    mp = mppInverter(serial_device="TEST")
-    cmd = mp.execute(args.command)
-    print("response: ", cmd.response)
-    # print len(cmd.response_definition)
-    print("valid? ", cmd.valid_response)
-    print("response_dict: ", cmd.response_dict)
-    # for line in getKnownCommands():
-    #    print line
