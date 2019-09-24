@@ -102,7 +102,7 @@ class mppInverter:
     def __str__(self):
         """
         """
-        inverter = ""
+        inverter = "\n"
         if self._direct_usb:
             inverter = "Inverter connected via USB on {}".format(self._serial_device)
         elif self._test_device:
@@ -112,7 +112,7 @@ class mppInverter:
         inverter += "\n-------- List of supported commands --------\n"
         if self._commands:
             for cmd in self._commands:
-                inverter += '{}: {}\n\t{}\n'.format(cmd.name, cmd.description, cmd.help)
+                inverter += str(cmd)
         return inverter
 
     def getSerialNumber(self):
