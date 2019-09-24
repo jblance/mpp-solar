@@ -44,10 +44,9 @@ def getCommandsFromJson():
             try:
                 data = json.load(f)
             except Exception as e:
-                print("Error processing JSON in {}".format(file))
-                print(e)
+                log.debug("Error processing JSON in {}".format(file))
+                log.debug(e)
                 continue
-            # print("Command: {} ({}) - expects {} response(s) [regex: {}]".format(data['name'], data['description'], len(data['response']), data['regex']))
             if data['regex']:
                 regex = re.compile(data['regex'])
             else:
@@ -184,9 +183,7 @@ class mppInverter:
                     return command
         except Exception as e:
             log.debug('Serial read error', e.strerror)
-            print('Serial read error', e.strerror)
         log.info('Command execution failed')
-        print('Command execution failed')
         return command
 
     def _doDirectUsbCommand(self, command):
@@ -200,7 +197,6 @@ class mppInverter:
             usb0 = os.open(self._serial_device, os.O_RDWR | os.O_NONBLOCK)
         except Exception as e:
             log.debug('USB open error', e.strerror)
-            print('Serial read error', e.strerror)
             return command
         # Send the command to the open usb connection
         to_send = command.full_command
