@@ -99,6 +99,13 @@ class test_mppinverter(unittest.TestCase):
         print(command)
         self.assertIsInstance(command, mppcommand.mppCommand)
 
+    def test_set_command(self):
+        """ Test a setting command """
+        inverter = mppinverter.mppInverter('TEST')
+        command = inverter.execute('PCVV48.0')
+        print(command)
+        self.assertIsInstance(command, mppcommand.mppCommand)
+
     def test_bulk_commands(self):
         """ Test all query commands """
         inverter = mppinverter.mppInverter('TEST')

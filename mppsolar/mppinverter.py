@@ -59,8 +59,7 @@ def getCommandsFromJson():
             try:
                 data = json.load(f)
             except Exception as e:
-                log.debug("Error processing JSON in {}".format(file))
-                log.debug(e)
+                log.debug("Error processing JSON in {}".format(file), exc_info=True)
                 continue
             COMMANDS.append(mppCommand(getDataValue(data, 'name'), getDataValue(data, 'description'),
                                        getDataValue(data, 'type'), getDataValue(data, 'response'),
