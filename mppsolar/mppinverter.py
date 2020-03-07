@@ -44,6 +44,7 @@ def getDataValue(data, key):
     else:
         return ""
 
+
 def getCommandsFromJson():
     """
     Read in all the json files in the commands subdirectory
