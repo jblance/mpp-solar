@@ -30,6 +30,20 @@ class NoTestResponseDefined(MppSolarError):
     pass
 
 
+def getDataValue(data, key):
+    """
+    Get value from data dict (loaded from JSON) or return empty String
+    """
+    if key == 'regex':
+        if 'regex' in data and data['regex']:
+            return re.compile(data['regex'])
+        else:
+            return None
+    if key in data:
+        return data[key]
+    else:
+        return ""
+
 def getCommandsFromJson():
     """
     Read in all the json files in the commands subdirectory
@@ -47,15 +61,10 @@ def getCommandsFromJson():
                 log.debug("Error processing JSON in {}".format(file))
                 log.debug(e)
                 continue
-            if data['regex']:
-                regex = re.compile(data['regex'])
-            else:
-                regex = None
-            if 'help' in data:
-                help = data['help']
-            else:
-                help = ""
-            COMMANDS.append(mppCommand(data['name'], data['description'], data['type'], data['response'], data['test_responses'], regex, help=help))
+            COMMANDS.append(mppCommand(getDataValue(data, 'name'), getDataValue(data, 'description'),
+                                       getDataValue(data, 'type'), getDataValue(data, 'response'),
+                                       getDataValue(data, 'test_responses'), getDataValue(data, 'regex'),
+                                       help=getDataValue(data, 'help')))
     return COMMANDS
 
 
