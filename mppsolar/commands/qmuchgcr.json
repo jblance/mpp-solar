@@ -1,9 +1,10 @@
 {
     "name": "QMUCHGCR",
     "description": "Max Utility Charging Current Options inquiry",
+    "help": " -- queries the maximum utility charging current setting of the Inverter",
     "type": "QUERY",
     "response": [
-            ["string", "Response", ""]
+            ["string", "Max Utility Charging Current", "A"]
         ],
     "test_responses": [
            ""

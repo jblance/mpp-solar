@@ -1,7 +1,7 @@
 {
     "name": "QID",
     "description": "Device Serial Number inquiry",
-    "help": "  Requests the device serial number",
+    "help": " -- queries the device serial number",
     "type": "QUERY",
     "response": [
             ["string", "Serial Number", ""]

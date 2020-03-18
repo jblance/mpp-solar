@@ -1,7 +1,7 @@
 {
   "name": "MCHGC",
   "description": "Set Max Charging Current (for parallel units)",
-  "help": "MCHGC040 (set unit 0 to max charging current of 40A)",
+  "help": " -- examples: MCHGC040 (set unit 0 to max charging current of 40A), MCHGC160 (set unit 1 to max charging current of 60A)",
   "type": "SETTER",
   "response": [
           ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]

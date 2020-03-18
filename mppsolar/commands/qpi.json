@@ -1,7 +1,7 @@
 {
     "name": "QPI",
-    "description": "Device Protocol ID inquiry",
-    "help": "  Requests the device protocol ID. e.g. 30 for HS series",
+    "description": "Protocol ID inquiry",
+    "help": " -- queries the device protocol ID. e.g. 30 for HS series",
     "type": "QUERY",
     "response": [
             ["string", "Protocol ID", ""]

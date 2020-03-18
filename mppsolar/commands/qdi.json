@@ -1,6 +1,7 @@
 {
     "name": "QDI",
-    "description": "Device Default Settings inquiry",
+    "description": "Default Settings inquiry",
+    "help": " -- queries the default settings from the Inverter",
     "type": "QUERY",
     "response": [
             ["float", "AC Output Voltage", "V"],

@@ -1,0 +1,14 @@
+{
+  "name": "PPVOKC",
+  "description": "Set PV OK Condition",
+  "help": " -- examples: PPVOKC0 (as long as one unit has connected PV, parallel system will consider PV OK), PPVOKC1 (only if all inverters have connected PV, parallel system will consider PV OK)",
+  "type": "SETTER",
+  "response": [
+          ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+      ],
+  "test_responses": [
+         "(NAKss\r",
+         "(ACK9 \r"
+      ],
+	"regex": "PPVOKC([01])$"
+}

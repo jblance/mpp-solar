@@ -1,6 +1,7 @@
 {
     "name": "QPIWS",
-    "description": "Device warning status inquiry",
+    "description": "Warning status inquiry",
+    "help": " -- queries any active warnings flags from the Inverter",
     "type": "QUERY",
     "response": [
         ["stat_flags", "Warning status", [

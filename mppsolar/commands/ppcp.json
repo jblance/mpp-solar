@@ -1,0 +1,14 @@
+{
+  "name": "PPCP",
+  "description": "Set Parallel Device Charger Priority (for 4000/5000)",
+  "help": " -- examples: PPCP000 (set unit 1 to 00 - utility first), PPCP101 (set unit 1 to 01 - solar first), PPCP202 (set unit 2 to 02 - solar and utility), PPCP003 (set unit 0 to 03 - solar only charging)",
+  "type": "SETTER",
+  "response": [
+          ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+      ],
+  "test_responses": [
+         "(NAKss\r",
+         "(ACK9 \r"
+      ],
+	"regex": "PPCP(\\d0[0123])$"
+}

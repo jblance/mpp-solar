@@ -1,7 +1,7 @@
 {
   "name": "POP",
   "description": "Set Device Output Source Priority",
-  "help": "examples: POP00 (set utility first), POP01 (set solar first), POP02 (set SBU priority)",
+  "help": " -- examples: POP00 (set utility first), POP01 (set solar first), POP02 (set SBU priority)",
   "type": "SETTER",
   "response": [
           ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
@@ -11,4 +11,4 @@
          "(ACK9 \r"
       ],
 	"regex": "POP(0[012])$"
-} 
+}

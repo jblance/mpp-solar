@@ -1,9 +1,10 @@
 {
     "name": "QMCHGCR",
     "description": "Max Charging Current Options inquiry",
+    "help": " -- queries the maximum charging current setting of the Inverter",
     "type": "QUERY",
     "response": [
-            ["string", "Response", ""]
+            ["string", "Max Charging Current", "A"]
         ],
     "test_responses": [
            ""

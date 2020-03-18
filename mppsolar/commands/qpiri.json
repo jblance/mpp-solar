@@ -1,6 +1,7 @@
 {
     "name": "QPIRI",
-    "description": "Device Current Settings inquiry",
+    "description": "Current Settings inquiry",
+    "help": " -- queries the current settings from the Inverter",
     "type": "QUERY",
     "response": [
             ["float", "AC Input Voltage", "V"],

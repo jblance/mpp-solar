@@ -1,7 +1,7 @@
 {
   "name": "QMOD",
-  "description": "Device Mode inquiry",
-  "help": "",
+  "description": "Mode inquiry",
+  "help": " -- queries the Inverter mode",
   "type": "QUERY",
   "response": [
         ["keyed", "Device Mode", {"P": "Power on", "S": "Standby", "L": "Line", "B": "Battery", "F": "Fault", "H": "Power saving"}]

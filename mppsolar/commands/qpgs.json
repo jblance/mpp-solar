@@ -1,6 +1,7 @@
 {
     "name": "QPGSn",
     "description": "Parallel Information inquiry",
+    "help": " -- example: QPGS1 queries the values of various metrics from instance 1 of parallel setup Inverters (numbers from 0)",
     "type": "QUERY",
     "response": [
             ["option", "Parallel instance number", ["Not valid", "valid"]],

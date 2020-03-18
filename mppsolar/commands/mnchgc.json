@@ -1,0 +1,14 @@
+{
+  "name": "MNCHGC",
+  "description": "Set Utility Max Charging Current (more than 100A) (for 4000/5000)",
+  "help": " -- example: MNCHGC1120 (set unit 1 utility max charging current to 120A)",
+  "type": "SETTER",
+  "response": [
+          ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+      ],
+  "test_responses": [
+         "(NAKss\r",
+         "(ACK9 \r"
+      ],
+  "regex": "MNCHGC(\\d\\d\\d\\d)$"
+}

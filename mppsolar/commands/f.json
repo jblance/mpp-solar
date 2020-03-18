@@ -1,7 +1,7 @@
 {
-  "name": "PBT",
-  "description": "Set Battery Type",
-  "help": " -- examples: PBT00 (set battery as AGM), PBT01 (set battery as FLOODED), PBT02 (set battery as USER)",
+  "name": "F",
+  "description": "Set Device Output Frequency",
+  "help": " -- examples: F50 (set output frequency to 50Hz) or F60 (set output frequency to 60Hz)",
   "type": "SETTER",
   "response": [
           ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
@@ -10,5 +10,5 @@
          "(NAKss\r",
          "(ACK9 \r"
       ],
-	"regex": "PBT(0[012])$"
+	"regex": "F([56]0)$"
 }

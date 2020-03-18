@@ -1,7 +1,7 @@
 {
     "name": "PCVV",
     "description": "Set Battery C.V. (constant voltage) charging voltage",
-    "help": "example PCVV48.0 - set charging voltage to 48V (48.0 - 58.4V for 48V unit)",
+    "help": " -- example PCVV48.0 - set charging voltage to 48V (48.0 - 58.4V for 48V unit)",
     "type": "SETTER",
     "response": [
             ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]

@@ -1,0 +1,14 @@
+{
+    "name": "PBFT",
+    "description": "Set Battery Float Charging Voltage",
+    "help": " -- example PBFT58.0 - set battery float charging voltage to 58V (48.0 - 58.4V for 48V unit)",
+    "type": "SETTER",
+    "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
+    "test_responses": [
+           "(NAKss\r",
+           "(ACK9 \r"
+        ],
+	"regex": "PBFT(\\d\\d\\.\\d)$"
+}

@@ -1,6 +1,7 @@
 {
     "name": "QOPM",
     "description": "Output Mode inquiry",
+    "help": " -- queries the output mode of the Inverter (e.g. single, parallel, phase 1 of 3 etc)",
     "type": "QUERY",
     "response": [
         ["option", "Output mode", ["single machine output",

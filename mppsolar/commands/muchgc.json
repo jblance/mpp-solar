@@ -1,7 +1,7 @@
 {
   "name": "MUCHGC",
   "description": "Set Utility Max Charging Current",
-  "help": "MUCHGC130 (set unit 1 utility max charging current to 30A)",
+  "help": " -- example: MUCHGC130 (set unit 1 utility max charging current to 30A)",
   "type": "SETTER",
   "response": [
           ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
