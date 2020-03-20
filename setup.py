@@ -18,9 +18,6 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-with open(path.join(here, 'mppsolar/version.py'), encoding='utf-8') as f2:
-    f2.read()
-
 exec(path.join(here, 'mppsolar/version.py'), encoding='utf-8').read())
 
 setup(
