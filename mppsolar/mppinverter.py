@@ -191,7 +191,7 @@ class mppInverter:
                     command.setResponse(response_line)
                     return command
         except Exception as e:
-            log.debug('Serial read error', e.strerror)
+            log.debug('Serial read error', e.message)
         log.info('Command execution failed')
         return command
 
@@ -206,7 +206,7 @@ class mppInverter:
         try:
             usb0 = os.open(self._serial_device, os.O_RDWR | os.O_NONBLOCK)
         except Exception as e:
-            log.debug('USB open error', e.strerror)
+            log.debug('USB open error', e.message)
             return command
         # Send the command to the open usb connection
         to_send = command.full_command
@@ -225,7 +225,7 @@ class mppInverter:
                 r = os.read(usb0, 256)
                 response_line += r
             except Exception as e:
-                log.debug('USB read error', e.strerror)
+                log.debug('USB read error', e.message)
             # Finished is \r is in response
             if ('\r' in response_line):
                 # remove anything after the \r
