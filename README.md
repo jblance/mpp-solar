@@ -26,12 +26,11 @@ Also
 `sudo python ./setup.py install`
 
 ## Usage
-The commands default to using `/dev/ttyUSB0` if you are using direct USB connection try adding `-d /dev/hidraw0` to the commands,
-if you have other USB devices connected the inverter might show up as `/dev/hidraw1` or `/dev/hidraw2`
-If uncertain, remove and re-connect the connection to the inverter and look at the end of the `dmesg` response to see what was reconnected
-Also in some instances only root has access to the device that the inverter is connected to - if you are getting no response try using `sudo`
-If you are getting no/unexpected results add `-D` to the command to get a heap of extra information
-
+- The commands default to using `/dev/ttyUSB0` if you are using direct USB connection try adding `-d /dev/hidraw0` to the commands
+- if you have other USB devices connected the inverter might show up as `/dev/hidraw1` or `/dev/hidraw2`
+- if uncertain, remove and re-connect the connection to the inverter and look at the end of the `dmesg` response to see what was reconnected
+- also in some instances only root has access to the device that the inverter is connected to - if you are getting no response try using `sudo`
+- if you are getting no/unexpected results add `-D` to the command to get a heap of extra information
 
 `$ mpp-solar -h`
 ```
