@@ -32,8 +32,8 @@ def main():
         log.setLevel(logging.DEBUG)
         ch.setLevel(logging.DEBUG)
     elif(args.enableInfo):
-            log.setLevel(logging.INFO)
-            ch.setLevel(logging.INFO)
+        log.setLevel(logging.INFO)
+        ch.setLevel(logging.INFO)
     else:
         log.setLevel(logging.WARNING)
         ch.setLevel(logging.WARNING)
