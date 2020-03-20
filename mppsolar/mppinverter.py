@@ -59,7 +59,7 @@ def getCommandsFromJson():
             try:
                 data = json.load(f)
             except Exception:
-                log.debug("Error processing JSON in {}".format(file), exc_info=True)
+                log.debug("Error processing JSON in {}".format(file))
                 continue
             COMMANDS.append(mppCommand(getDataValue(data, 'name'), getDataValue(data, 'description'),
                                        getDataValue(data, 'type'), getDataValue(data, 'response'),
@@ -206,7 +206,7 @@ class mppInverter:
         try:
             usb0 = os.open(self._serial_device, os.O_RDWR | os.O_NONBLOCK)
         except Exception as e:
-            log.debug('USB open error', e.message)
+            log.debug("USB open error: {}".format(e))
             return command
         # Send the command to the open usb connection
         to_send = command.full_command
@@ -225,7 +225,7 @@ class mppInverter:
                 r = os.read(usb0, 256)
                 response_line += r
             except Exception as e:
-                log.debug('USB read error', e.message)
+                log.debug("USB read error: {}".format(e))
             # Finished is \r is in response
             if ('\r' in response_line):
                 # remove anything after the \r
