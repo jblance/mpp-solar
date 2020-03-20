@@ -20,7 +20,8 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 with open(path.join(here, 'mppsolar/version.py'), encoding='utf-8') as f2:
     f2.read()
-    _version=__version__
+
+exec(path.join(here, 'mppsolar/version.py'), encoding='utf-8').read())
 
 setup(
     name='mpp-solar',
@@ -28,7 +29,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version=_version,
+    version=__version__,
 
     description='Package to communicate with MPP Solar PIP-4048MS inverter',
     long_description=long_description,
