@@ -34,8 +34,8 @@ Also
 
 `$ mpp-solar -h`
 ```
-usage: mpp-solar [-h] [-c COMMAND] [-D] [-d DEVICE] [-b BAUD] [-l] [-s] [-t]
-                 [-R]
+usage: mpp-solar [-h] [-c COMMAND] [-D] [-I] [-d DEVICE] [-b BAUD] [-l] [-s]
+                 [-t] [-R]
 
 MPP Solar Command Utility
 
@@ -43,7 +43,8 @@ optional arguments:
   -h, --help            show this help message and exit
   -c COMMAND, --command COMMAND
                         Command to run
-  -D, --enableDebug     Enable Debug
+  -D, --enableDebug     Enable Debug and above (i.e. all) messages
+  -I, --enableInfo      Enable Info and above level messages
   -d DEVICE, --device DEVICE
                         Serial device to communicate with
   -b BAUD, --baud BAUD  Baud rate for serial communications
