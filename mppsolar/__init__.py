@@ -2,7 +2,7 @@
 import logging
 from argparse import ArgumentParser
 
-from .version import __version__
+from .version import __version__  # noqa: F401
 # import mppcommands
 from .mpputils import mppUtils
 

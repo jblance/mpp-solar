@@ -26,7 +26,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version=__version__,
+    version=__version__,  # noqa: F821
 
     description='Package to communicate with MPP Solar PIP-4048MS inverter',
     long_description=long_description,
