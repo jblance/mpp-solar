@@ -46,8 +46,8 @@ optional arguments:
   -D, --enableDebug     Enable Debug and above (i.e. all) messages
   -I, --enableInfo      Enable Info and above level messages
   -d DEVICE, --device DEVICE
-                        Serial device to communicate with
-  -b BAUD, --baud BAUD  Baud rate for serial communications
+                        Serial device to communicate with, defaults to /dev/ttyUSB0
+  -b BAUD, --baud BAUD  Baud rate for serial communications, defaults to 2400
   -l, --listknown       List known commands
   -s, --getStatus       Get Inverter Status
   -t, --getSettings     Get Inverter Settings
