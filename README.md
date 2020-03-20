@@ -4,10 +4,10 @@
 [![Coverage Status](https://coveralls.io/repos/github/jblance/mpp-solar/badge.svg?branch=master)](https://coveralls.io/github/jblance/mpp-solar?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/08c51e13554d4f77836c6cc7b010df2c)](https://www.codacy.com/app/jblance/mpp-solar?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jblance/mpp-solar&amp;utm_campaign=Badge_Grade)
 
-Python package with reference library of serial commands (and responses) 
+Python package with reference library of serial commands (and responses)
 for PIP-4048MS inverters - aka:
-- PIP-4048MS 
-- IPS-4000WM 
+- PIP-4048MS
+- IPS-4000WM
 - Voltronic Axpert MKS 5KVA Off-grid Inverter-Chargers
 
 Good overview and technical discussion here
@@ -23,9 +23,16 @@ Also
 - USB cable to USB port of PIP-4048MS (connected to Pi as /dev/hidraw0)
 
 ## Install
-`python ./setup.py install`
+`sudo python ./setup.py install`
 
 ## Usage
+The commands default to using `/dev/ttyUSB0` if you are using direct USB connection try adding `-d /dev/hidraw0` to the commands,
+if you have other USB devices connected the inverter might show up as `/dev/hidraw1` or `/dev/hidraw2`
+If uncertain, remove and re-connect the connection to the inverter and look at the end of the `dmesg` response to see what was reconnected
+Also in some instances only root has access to the device that the inverter is connected to - if you are getting no response try using `sudo`
+If you are getting no/unexpected results add `-D` to the command to get a heap of extra information
+
+
 `$ mpp-solar -h`
 ```
 usage: mpp-solar [-h] [-c COMMAND] [-D] [-d DEVICE] [-b BAUD] [-l] [-s] [-t]
@@ -49,7 +56,7 @@ optional arguments:
 ```
 
 ## Available Commands
-`$ mpp-solar -l`
+`$ mpp-solar -l` or `$ mpp-solar -l -d /dev/hidraw0`
 ```
 -------- List of known commands --------
 MCHGC: Set Max Charging Current (for parallel units)
@@ -68,7 +75,10 @@ QMCHGCR: Max Charging Current Options inquiry
 QMOD: Device Mode inquiry
 QMUCHGCR: Max Utility Charging Current Options inquiry
 QOPM: Output Mode inquiry
-QPGSn: Parallel Information inquiry
+QPGSn: Parallel Information inquirypi
+
+
+
 QPI: Device Protocol ID inquiry
 QPIGS: Device General Status Parameters inquiry
 QPIRI: Device Current Settings inquiry
