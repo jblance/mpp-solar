@@ -1,6 +1,0 @@
-{
-  "name": "INVALID",
-  'description": "Test for invalid json"
-  "help": "MCHGC040 (set unit 0 to max charging current of 40A)",
-
-}

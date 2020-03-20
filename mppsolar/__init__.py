@@ -2,6 +2,7 @@
 import logging
 from argparse import ArgumentParser
 
+from .version import __version__
 # import mppcommands
 from .mpputils import mppUtils
 
