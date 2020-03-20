@@ -190,8 +190,8 @@ class mppInverter:
                     log.debug('serial response was: %s', response_line)
                     command.setResponse(response_line)
                     return command
-        except Exception as e:
-            log.debug('Serial read error', e.message)
+        except Exception:
+            log.warning("Serial read error", exc_info=True)
         log.info('Command execution failed')
         return command
 
@@ -244,11 +244,11 @@ class mppInverter:
             log.critical("Command not found")
             return None
         elif (self._test_device):
-            log.debug('TEST connection: executing %s', command)
+            log.info('TEST connection: executing %s', command)
             return self._doTestCommand(command)
         elif (self._direct_usb):
-            log.debug('DIRECT USB connection: executing %s', command)
+            log.info('DIRECT USB connection: executing %s', command)
             return self._doDirectUsbCommand(command)
         else:
-            log.debug('SERIAL connection: executing %s', command)
+            log.info('SERIAL connection: executing %s', command)
             return self._doSerialCommand(command)

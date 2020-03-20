@@ -14,7 +14,7 @@ def crc(cmd):
     """
     Calculates CRC for supplied text
     """
-    log.info('Calculating CRC for %s', cmd)
+    log.debug('Calculating CRC for %s', cmd)
 
     crc = 0
     da = 0
