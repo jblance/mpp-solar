@@ -6,6 +6,7 @@ from .version import __version__  # noqa: F401
 # import mppcommands
 from .mpputils import mppUtils
 
+logging.basicConfig()
 log = logging.getLogger('MPP-Solar')
 
 
