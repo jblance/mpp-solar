@@ -51,8 +51,9 @@ def isInverterSupported(inverter_model, json):
     if json == "":
         return False
     # JSON commands support 'standard' if not specified
-    if getDataValue(json, 'supports') == "":
-
+    if getDataValue(json, 'supports') == "" and inverter_model == 'standard':
+        return True
+    return True  # todo sort filtering of models
 
 def getCommandsFromJson(inverter_model):
     """
