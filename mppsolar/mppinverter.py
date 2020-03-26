@@ -44,12 +44,22 @@ def getDataValue(data, key):
     else:
         return ""
 
+def isInverterSupported(inverter_model, json):
+    """
+    Determine if the command loaded from json supports the supplied inverter
+    """
+    if json == "":
+        return False
+    # JSON commands support 'standard' if not specified
+    if getDataValue(json, 'supports') == "":
 
-def getCommandsFromJson():
+
+def getCommandsFromJson(inverter_model):
     """
     Read in all the json files in the commands subdirectory
     this builds a list of all valid commands
     """
+    log.debug("Loading commands for inverter model: {}".format(inverter_model))
     COMMANDS = []
     here = path.abspath(path.dirname(__file__))
     files = glob.glob(here + '/commands/*.json')
@@ -61,10 +71,12 @@ def getCommandsFromJson():
             except Exception:
                 log.debug("Error processing JSON in {}".format(file))
                 continue
-            COMMANDS.append(mppCommand(getDataValue(data, 'name'), getDataValue(data, 'description'),
-                                       getDataValue(data, 'type'), getDataValue(data, 'response'),
-                                       getDataValue(data, 'test_responses'), getDataValue(data, 'regex'),
-                                       help=getDataValue(data, 'help')))
+            # Does this json support the supplied inverter model?
+            if isInverterSupported(inverter_model, data):
+                COMMANDS.append(mppCommand(getDataValue(data, 'name'), getDataValue(data, 'description'),
+                                           getDataValue(data, 'type'), getDataValue(data, 'response'),
+                                           getDataValue(data, 'test_responses'), getDataValue(data, 'regex'),
+                                           help=getDataValue(data, 'help')))
     return COMMANDS
 
 
@@ -97,15 +109,16 @@ class mppInverter:
     - represents an inverter (and the commands the inverter supports)
     """
 
-    def __init__(self, serial_device=None, baud_rate=2400):
+    def __init__(self, serial_device=None, baud_rate=2400, inverter_model='standard'):
         if not serial_device:
             raise NoDeviceError("A device to communicate by must be supplied, e.g. /dev/ttyUSB0")
         self._baud_rate = baud_rate
         self._serial_device = serial_device
+        self._inverter_model = inverter_model
         self._serial_number = None
         self._test_device = isTestDevice(serial_device)
         self._direct_usb = isDirectUsbDevice(serial_device)
-        self._commands = getCommandsFromJson()
+        self._commands = getCommandsFromJson(inverter_model)
         # TODO: text descrption of inverter? version numbers?
 
     def __str__(self):

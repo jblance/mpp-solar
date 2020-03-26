@@ -17,6 +17,7 @@ def main():
     parser.add_argument('-I', '--enableInfo', action='store_true', help='Enable Info and above level messages')
     parser.add_argument('-d', '--device', type=str, help='Serial (or USB) device to communicate with, defaults to /dev/ttyUSB0', default='/dev/ttyUSB0')
     parser.add_argument('-b', '--baud', type=int, help='Baud rate for serial communications, defaults to 2400', default=2400)
+    parser.add_argument('-M', '--model', type=str, help='Specifies the inverter model to select commands for, defaults to "standard"', default='standard')
     parser.add_argument('-l', '--listknown', action='store_true', help='List known commands')
     parser.add_argument('-s', '--getStatus', action='store_true', help='Get Inverter Status')
     parser.add_argument('-t', '--getSettings', action='store_true', help='Get Inverter Settings')
@@ -45,7 +46,7 @@ def main():
     log.info('Serial device used: %s, baud rate: %d', args.device, args.baud)
 
     # mp = mppcommands.mppCommands(args.device, args.baud)
-    mp = mppUtils(args.device, args.baud)
+    mp = mppUtils(args.device, args.baud, args.model)
 
     if(args.listknown):
         for line in mp.getKnownCommands():
