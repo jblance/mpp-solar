@@ -48,13 +48,16 @@ def isInverterSupported(inverter_model, json):
     """
     Determine if the command loaded from json supports the supplied inverter
     """
-    if json == "":
-        return False
-    # JSON commands support 'standard' if not specified
-    if getDataValue(json, 'supports') == "" and inverter_model == 'standard':
+    supports = getDataValue(json, 'supports')
+    # JSON command support all inverters unless specified
+    if supports == "":
+        log.debug("Command {} supported all inverters".format(getDataValue(json, 'name')))
+        return True
+    elif inverter_model in supports:
         log.debug("Command {} supported by model {}".format(getDataValue(json, 'name'), inverter_model))
         return True
-    return True  # todo sort filtering of models
+    else:
+        return False
 
 def getCommandsFromJson(inverter_model):
     """
