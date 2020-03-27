@@ -155,6 +155,26 @@ class mppInverter:
         """
         return self._commands
 
+    def getResponse(self, cmd):
+        """
+        Execute command and return the response
+        """
+        result = self.execute(cmd)
+        if not result:
+            return ""
+        else:
+            return result.getResponse()
+
+    def getResponseDict(self, cmd):
+        """
+        Execute command and return the reponse as a dict
+        """
+        result = self.execute(cmd)
+        if not result:
+            return ""
+        else:
+            return result.getResponseDict()
+
     def _getCommand(self, cmd):
         """
         Returns the mppcommand object of the supplied cmd string

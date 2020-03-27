@@ -34,10 +34,10 @@ class mppUtils:
         return self.inverter.getAllCommands()
 
     def getResponseDict(self, cmd):
-        return self.inverter.execute(cmd).getResponseDict()
+        return self.inverter.getResponseDict(cmd)
 
     def getResponse(self, cmd):
-        return self.inverter.execute(cmd).getResponse()
+        return self.inverter.getResponse(cmd)
 
     def getSerialNumber(self):
         return self.inverter.getSerialNumber()
