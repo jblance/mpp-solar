@@ -6,9 +6,18 @@ from .version import __version__  # noqa: F401
 # import mppcommands
 from .mpputils import mppUtils
 
-logging.basicConfig()
 log = logging.getLogger('MPP-Solar')
-
+# setup logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+ch = logging.StreamHandler()
+# create formatter and add it to the handlers
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(filename)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+# add the handlers to logger
+log.addHandler(ch)
+# set default log levels
+#log.setLevel(logging.WARNING)
+ch.setLevel(logging.WARNING)
+logging.basicConfig()
 
 def main():
     parser = ArgumentParser(description='MPP Solar Command Utility')
@@ -24,23 +33,14 @@ def main():
     parser.add_argument('-R', '--showraw', action='store_true', help='Display the raw results')
     args = parser.parse_args()
 
-    # setup logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-    ch = logging.StreamHandler()
-    # create formatter and add it to the handlers
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(filename)s - %(levelname)s - %(message)s')
-    ch.setFormatter(formatter)
+
     # Turn on debug if needed
     if(args.enableDebug):
-        log.setLevel(logging.DEBUG)
+        #log.setLevel(logging.DEBUG)
         ch.setLevel(logging.DEBUG)
     elif(args.enableInfo):
-        log.setLevel(logging.INFO)
+        #log.setLevel(logging.INFO)
         ch.setLevel(logging.INFO)
-    else:
-        log.setLevel(logging.WARNING)
-        ch.setLevel(logging.WARNING)
-    # add the handlers to logger
-    log.addHandler(ch)
 
     log.info('command %s', args.command)
     log.info('Serial device used: %s, baud rate: %d', args.device, args.baud)
