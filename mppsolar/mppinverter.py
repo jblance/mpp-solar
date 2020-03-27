@@ -52,6 +52,7 @@ def isInverterSupported(inverter_model, json):
         return False
     # JSON commands support 'standard' if not specified
     if getDataValue(json, 'supports') == "" and inverter_model == 'standard':
+        log.debug("Command {} supported by model {}".format(getDataValue(json, 'name'), inverter_model)
         return True
     return True  # todo sort filtering of models
 
@@ -60,7 +61,7 @@ def getCommandsFromJson(inverter_model):
     Read in all the json files in the commands subdirectory
     this builds a list of all valid commands
     """
-    log.debug("Loading commands for inverter model: {}".format(inverter_model))
+    log.info("Loading commands for inverter model: {}".format(inverter_model))
     COMMANDS = []
     here = path.abspath(path.dirname(__file__))
     files = glob.glob(here + '/commands/*.json')
