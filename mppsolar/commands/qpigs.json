@@ -3,6 +3,7 @@
     "description": "General Status Parameters inquiry",
     "help": " -- queries the value of various metrics from the Inverter",
     "type": "QUERY",
+    "nosupports": ["LV5048"],
     "response": [
             ["float", "AC Input Voltage", "V"],
             ["float", "AC Input Frequency", "Hz"],
