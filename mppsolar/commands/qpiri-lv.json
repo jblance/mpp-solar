@@ -1,9 +1,9 @@
 {
     "name": "QPIRI",
-    "description": "Current Settings inquiry",
+    "description": "Current Settings inquiry for LV5048",
     "help": " -- queries the current settings from the Inverter",
     "type": "QUERY",
-    "nosupports": ["LV5048"],
+    "supports": ["LV5048"],
     "response": [
             ["float", "AC Input Voltage", "V"],
             ["float", "AC Input Current", "A"],
@@ -26,18 +26,20 @@
             ["int", "Max Parallel Units", "units"],
             ["keyed", "Machine Type", {"00": "Grid tie", "01": "Off Grid", "10": "Hybrid"}],
             ["option", "Topology", ["transformerless", "transformer"]],
-            ["option", "Output Mode", ["single machine output",
-                                       "parallel output",
+            ["option", "Output Mode", ["Parallel output 0 degrees",
                                        "Phase 1 of 3 Phase output",
                                        "Phase 2 of 3 Phase output",
-                                       "Phase 3 of 3 Phase output"]
+                                       "Phase 3 of 3 Phase output",
+                                       "Parallel output 120 degrees",
+                                       "Parallel output 180 degrees"]
                                        ],
             ["float", "Battery Redischarge Voltage", "V"],
             ["option", "PV OK Condition", ["As long as one unit of inverters has connect PV, parallel system will consider PV OK",
                                            "Only All of inverters have connect PV, parallel system will consider PV OK"]
                                            ],
             ["option", "PV Power Balance", ["PV input max current will be the max charged current",
-                                            "PV input max power will be the sum of the max charged power and loads power"]]
+                                            "PV input max power will be the sum of the max charged power and loads power"]],
+            ["int", "Max Charging Time at CV Stage", "min"]
         ],
     "test_responses": [
             "(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1o~\r"
