@@ -1,0 +1,33 @@
+{
+    "name": "QPIGS2",
+    "description": "General Status Parameters inquiry",
+    "help": " -- queries the value of various metrics from the Inverter",
+    "type": "QUERY",
+    "supports": ["LV5048"],
+    "response": [
+            ["float", "L2 AC Input Voltage", "V"],
+            ["float", "L2 AC Input Frequency", "Hz"],
+            ["float", "L2 AC Output Voltage", "V"],
+            ["float", "L2 AC Output Frequency", "Hz"],
+            ["int", "L2 AC Output Apparent Power", "VA"],
+            ["int", "L2 AC Output Active Power", "W"],
+            ["int", "L2 AC Output Load", "%"],
+            ["int", "PV2 Battery Charging Current", "A"],
+            ["float", "PV2 Input Voltage", "V"],
+            ["float", "L2 Battery Voltage", "V"],
+            ["flags", "Device Status", [
+		            "is_l2_scc_ok",
+                "is_l2_ac_charging_on",
+                "is_l2_scc_charging_on",
+                "reserved",
+                "is_l2_line_not_ok",
+                "is_load_on",
+                "reserved"
+                ]
+            ]
+        ],
+    "test_responses": [
+            ""
+        ],
+	"regex": ""
+}
