@@ -78,7 +78,7 @@ def getCommandsFromJson(inverter_model):
                 continue
             # Does this json support the supplied inverter model?
             if isInverterSupported(inverter_model, data):
-                log.info("... command loaded for inverter model: {}".format(getDataValue(data, 'name'), inverter_model))
+                log.info("... command {} loaded for inverter model: {}".format(getDataValue(data, 'name'), inverter_model))
                 COMMANDS.append(mppCommand(getDataValue(data, 'name'), getDataValue(data, 'description'),
                                            getDataValue(data, 'type'), getDataValue(data, 'response'),
                                            getDataValue(data, 'test_responses'), getDataValue(data, 'regex'),
