@@ -1,5 +1,5 @@
 {
-    "name": "QPGSn",
+    "name": "QP2GSn",
     "description": "Parallel Information inquiry",
     "help": " -- example: QP2GS1 queries the values of various metrics from instance 1 of parallel setup Inverters (numbers from 0)",
     "type": "QUERY",
@@ -61,7 +61,7 @@
                                           ["Line ok", "Line loss"],
                                           ["Load off", "Load on"],
                                           ["Configuration unchanged", "Configuration changed"]
-                                          ]],
+                                          ]]
         ],
     "test_responses": [
            ""
