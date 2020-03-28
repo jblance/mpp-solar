@@ -121,6 +121,7 @@ class mppCommand(object):
     def isResponseValid(self, response):
         """
         Checks the response is valid
+        +
         - if command is not a query then valid responses are (NAK and (ACK
         - for queries
             - check that the response if the correct length
@@ -158,7 +159,7 @@ class mppCommand(object):
         # Check we got the expected number of responses
         responses = response.split(" ")
         if (len(responses) < len(self.response_definition)):
-            log.error("Response invalid as insufficient number of elements in response. Got %d, expected as least %d", len(responses), len(self.response_definition))
+            log.debug("Response invalid as insufficient number of elements in response. Got %d, expected as least %d", len(responses), len(self.response_definition))
             return False
         log.debug('Response valid as no invalid situations found')
         return True
