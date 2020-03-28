@@ -34,8 +34,8 @@ Also
 
 `$ mpp-solar -h`
 ```
-usage: mpp-solar [-h] [-c COMMAND] [-D] [-I] [-d DEVICE] [-b BAUD] [-l] [-s]
-                 [-t] [-R]
+usage: mpp-solar [-h] [-c COMMAND] [-D] [-I] [-d DEVICE] [-b BAUD] [-M MODEL]
+                 [-l] [-s] [-t] [-R]
 
 MPP Solar Command Utility
 
@@ -46,13 +46,16 @@ optional arguments:
   -D, --enableDebug     Enable Debug and above (i.e. all) messages
   -I, --enableInfo      Enable Info and above level messages
   -d DEVICE, --device DEVICE
-                        Serial device to communicate with, defaults to /dev/ttyUSB0
+                        Serial (or USB) device to communicate with, defaults
+                        to /dev/ttyUSB0
   -b BAUD, --baud BAUD  Baud rate for serial communications, defaults to 2400
+  -M MODEL, --model MODEL
+                        Specifies the inverter model to select commands for,
+                        defaults to "standard", currently supports LV5048
   -l, --listknown       List known commands
   -s, --getStatus       Get Inverter Status
   -t, --getSettings     Get Inverter Settings
   -R, --showraw         Display the raw results
-
 ```
 
 ## Available Commands
@@ -206,30 +209,44 @@ Secondary CPU firmware version inquiry
 Parameter                       Value           Unit
 ac_input_frequency              00.0            Hz
 ac_input_voltage                000.0           V
-ac_output_active_power          0152            W
-ac_output_apparent_power        0207            VA
-ac_output_frequency             50.0            Hz
-ac_output_load                  004             %
-ac_output_voltage               230.2           V
+ac_output_active_power          0119            W
+ac_output_apparent_power        0161            VA
+ac_output_frequency             49.9            Hz
+ac_output_load                  003             %
+ac_output_voltage               230.0           V
 allowscconflag                  01
 battery_capacity                100             %
-battery_charging_current        018             A
+battery_charging_current        012             A
 battery_discharge_current       00000           A
-battery_temperature             046             Deg_C
-battery_voltage                 57.40           V
+battery_temperature             053             Deg_C
+battery_voltage                 57.50           V
 battery_voltage_from_scc        57.45           V
-bus_voltage                     459             V
+bus_voltage                     460             V
 chargeaveragecurrent            00
 fan_lock_status                 Not locked
-fan_pwm_speed                   0030            Percent
-inverter_charge_status          bulk stage
-inverter_heat_sink_temperature  0057            Deg_C
-inverter_temperature            034             Deg_C
-pv_input_current_for_battery    0021            A
-pv_input_voltage                069.9           V
-scc_charge_power                1258            W
+fan_pwm_speed                   0040            Percent
+gpio13                          00
+inverter_charge_status          float
+inverter_heat_sink_temperature  0069            Deg_C
+inverter_temperature            045             Deg_C
+is_ac_charging_on               0               True - 1/False - 0
+is_battery_voltage_to_steady_while_charging     0               True - 1/False - 0
+is_charging_on                  1               True - 1/False - 0
+is_configuration_changed        0               True - 1/False - 0
+is_load_on                      1               True - 1/False - 0
+is_sbu_priority_version_added   0               True - 1/False - 0
+is_scc_charging_on              1               True - 1/False - 0
+is_scc_firmware_updated         1               True - 1/False - 0
+not_used                        000
+parallel_warning??              0000
+pv_input_current_for_battery    0014            A
+pv_input_voltage                103.8           V
+scc_charge_power                0580            W
 scc_flag                        SCC is powered and communicating
-scc_pwm_temperature             051             Deg_C
+scc_pwm_temperature             059             Deg_C
 sync_frequency                  50.00
-transformer_temperature         057             Deg_C
+time_until_the_end_of_absorb_charging   00000           sec
+time_until_the_end_of_float_charging    00000           sec
+transformer_temperature         068             Deg_C
+unknown_value_in_response       010
 ```
