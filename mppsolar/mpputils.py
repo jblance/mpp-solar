@@ -48,8 +48,8 @@ class mppUtils:
         """
         status = {}
         # serial_number = self.getSerialNumber()
-        data = self.getResponseDict("Q1")
-        data.update(self.getResponseDict("QPIGS"))
+        data = self.getResponseDict("QPIGS")
+        # data.update(self.getResponseDict("Q1"))
 
         # Need to get 'Parallel' info, but dont know what the parallel number for the correct inverter is...
         # parallel_data = self.mp.getResponseDict("QPGS0")
