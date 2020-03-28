@@ -176,13 +176,13 @@ class mppCommand(object):
             return msgs
         if (not self.valid_response):
             log.info('Invalid response')
-            mgs['error'] = "Invalid response"
-            mgs['response'] = self.response
+            msgs['error'] = "Invalid response"
+            msgs['response'] = self.response
             return msgs
         if (self.response_definition is None):
             log.info('No response definition')
-            mgs['error'] = "No response definition"
-            mgs['response'] = self.response
+            msgs['error'] = "No response definition"
+            msgs['response'] = self.response
             return msgs
 
         responses = self.response[1:-3].split(" ")
