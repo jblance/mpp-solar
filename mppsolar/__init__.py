@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from .version import __version__  # noqa: F401
 # import mppcommands
 from .mpputils import mppUtils
-import .mppcommand
+from .mppcommand import mppCommand
 
 log = logging.getLogger('MPP-Solar')
 # setup logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
