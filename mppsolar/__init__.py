@@ -51,7 +51,9 @@ def main():
     mp = mppUtils(args.device, args.baud, args.model)
 
     if(args.printcrc):
-        print(mppcommand.crc(args.command))
+        #print("{0:#x}".format(100))
+        [crc1, crc2] = mppcommand.crc(args.command)
+        print("{} {0:#x} {0:#x}".format(args.command, crc1, crc2)
     elif(args.listknown):
         for line in mp.getKnownCommands():
             print(line)
