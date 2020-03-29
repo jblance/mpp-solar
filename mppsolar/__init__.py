@@ -52,8 +52,10 @@ def main():
 
     if(args.printcrc):
         #print("{0:#x}".format(100))
-        [crc1, crc2] = mppcommand.crc(args.command)
-        print("{0} {1:#x} {2:#x}".format(args.command, crc1, crc2))
+        [crca, crcb] = mppcommand.crc(args.command)
+        [crc2a, crc2b] = mppcommand.crc2(args.command)
+        print("{0} {1:#x} {2:#x}".format(args.command, crca, crcb))
+        print("{0} {1:#x} {2:#x}".format(args.command, crc2a, crc2b))
     elif(args.listknown):
         for line in mp.getKnownCommands():
             print(line)
