@@ -46,7 +46,7 @@ def crc2(cmd):
         crc <<= 4                                   # CRC Orig
         # crc ^= CRCUtil.crc_tb[0xFF & (da ^ pByte[i] >> 4)];   # java
         # index = da ^ (ord(c) >> 4)                # CRC Orig
-        index = ctypes.c_uint8(da ^ ord(c) >> 4)
+        index = (da ^ ord(c) >> 4)
         crc ^= crc_tb[index]
         # da = (0xFF & (0xFF & crc >> 8) >> 4);                 # java
         t_da = ctypes.c_uint8(crc >> 8)           # CRC Orig
@@ -55,7 +55,7 @@ def crc2(cmd):
         # crc <<= 4;                                            # java
         crc <<= 4                                   # CRC Orig
         # final int temp = 0xFF & (da ^ (pByte[i] & 0xF));      # java
-        index = ctypes.c_uint8(da ^ (ord(c) & 0x0f))              # CRC Orig
+        index = (da ^ (ord(c) & 0x0f))              # CRC Orig
         #index = 0xFF & (da ^ (ord(c) & 0x0f))
         # crc ^= CRCUtil.crc_tb[temp];                          # java
         # crc ^= crc_ta[index]                      # CRC Orig
