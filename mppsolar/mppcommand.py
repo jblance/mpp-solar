@@ -11,32 +11,10 @@ log = logging.getLogger('MPP-Solar')
 
 
 def crc2(cmd):
-    crc_tb =  ['\0', '\u1021', '\u2042', '\u3063', '\u4084', '\u50a5', '\u60c6', '\u70e7', '\u8108', '\u9129', '\ua14a', '\ub16b', '\uc18c', '\ud1ad', '\ue1ce', '\uf1ef', '\u1231', '\u0210', '\u3273', '\u2252', '\u52b5', '\u4294', '\u72f7', '\u62d6', '\u9339', '\u8318', '\ub37b', '\ua35a', '\ud3bd', '\uc39c', '\uf3ff', '\ue3de', '\u2462', '\u3443', '\u0420', '\u1401', '\u64e6', '\u74c7', '\u44a4', '\u5485', '\ua56a', '\ub54b', '\u8528', '\u9509', '\ue5ee', '\uf5cf', '\uc5ac', '\ud58d', '\u3653', '\u2672', '\u1611', '\u0630', '\u76d7', '\u66f6', '\u5695', '\u46b4', '\ub75b', '\ua77a', '\u9719', '\u8738', '\uf7df', '\ue7fe', '\ud79d', '\uc7bc', '\u48c4', '\u58e5', '\u6886', '\u78a7', '\u0840', '\u1861', '\u2802', '\u3823', '\uc9cc', '\ud9ed', '\ue98e', '\uf9af', '\u8948', '\u9969', '\ua90a', '\ub92b', '\u5af5', '\u4ad4', '\u7ab7', '\u6a96', '\u1a71', '\u0a50', '\u3a33', '\u2a12', '\udbfd', '\ucbdc', '\ufbbf', '\ueb9e', '\u9b79', '\u8b58', '\ubb3b', '\uab1a', '\u6ca6', '\u7c87', '\u4ce4', '\u5cc5', '\u2c22', '\u3c03', '\u0c60', '\u1c41', '\uedae', '\ufd8f', '\ucdec', '\uddcd', '\uad2a', '\ubd0b', '\u8d68', '\u9d49', '\u7e97', '\u6eb6', '\u5ed5', '\u4ef4', '\u3e13', '\u2e32', '\u1e51', '\u0e70', '\uff9f', '\uefbe', '\udfdd', '\ucffc', '\ubf1b', '\uaf3a', '\u9f59', '\u8f78', '\u9188', '\u81a9', '\ub1ca', '\ua1eb', '\ud10c', '\uc12d', '\uf14e', '\ue16f', '\u1080', 'ยก', '\u30c2', '\u20e3', '\u5004', '\u4025', '\u7046', '\u6067', '\u83b9', '\u9398', '\ua3fb', '\ub3da', '\uc33d', '\ud31c', '\ue37f', '\uf35e', '\u02b1', '\u1290', '\u22f3', '\u32d2', '\u4235', '\u5214', '\u6277', '\u7256', '\ub5ea', '\ua5cb', '\u95a8', '\u8589', '\uf56e', '\ue54f', '\ud52c', '\uc50d', '\u34e2', '\u24c3', '\u14a0', '\u0481', '\u7466', '\u6447', '\u5424', '\u4405', '\ua7db', '\ub7fa', '\u8799', '\u97b8', '\ue75f', '\uf77e', '\uc71d', '\ud73c', '\u26d3', '\u36f2', '\u0691', '\u16b0', '\u6657', '\u7676', '\u4615', '\u5634', '\ud94c', '\uc96d', '\uf90e', '\ue92f', '\u99c8', '\u89e9', '\ub98a', '\ua9ab', '\u5844', '\u4865', '\u7806', '\u6827', '\u18c0', '\u08e1', '\u3882', '\u28a3', '\ucb7d', '\udb5c', '\ueb3f', '\ufb1e', '\u8bf9', '\u9bd8', '\uabbb', '\ubb9a', '\u4a75', '\u5a54', '\u6a37', '\u7a16', '\u0af1', '\u1ad0', '\u2ab3', '\u3a92', '\ufd2e', '\ued0f', '\udd6c', '\ucd4d', '\ubdaa', '\uad8b', '\u9de8', '\u8dc9', '\u7c26', '\u6c07', '\u5c64', '\u4c45', '\u3ca2', '\u2c83', '\u1ce0', '\u0cc1', '\uef1f', '\uff3e', '\ucf5d', '\udf7c', '\uaf9b', '\ubfba', '\u8fd9', '\u9ff8', '\u6e17', '\u7e36', '\u4e55', '\u5e74', '\u2e93', '\u3eb2', '\u0ed1', '\u1ef0' ]
-    hexString = "0123456789ABCDEF"
+    crc_tb =  [0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7, 0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef, 0x1231, 0x0210, 0x3273, 0x2252, 0x52b5, 0x4294, 0x72f7, 0x62d6, 0x9339, 0x8318, 0xb37b, 0xa35a, 0xd3bd, 0xc39c, 0xf3ff, 0xe3de, 0x2462, 0x3443, 0x0420, 0x1401, 0x64e6, 0x74c7, 0x44a4, 0x5485, 0xa56a, 0xb54b, 0x8528, 0x9509, 0xe5ee, 0xf5cf, 0xc5ac, 0xd58d, 0x3653, 0x2672, 0x1611, 0x0630, 0x76d7, 0x66f6, 0x5695, 0x46b4, 0xb75b, 0xa77a, 0x9719, 0x8738, 0xf7df, 0xe7fe, 0xd79d, 0xc7bc, 0x48c4, 0x58e5, 0x6886, 0x78a7, 0x0840, 0x1861, 0x2802, 0x3823, 0xc9cc, 0xd9ed, 0xe98e, 0xf9af, 0x8948, 0x9969, 0xa90a, 0xb92b, 0x5af5, 0x4ad4, 0x7ab7, 0x6a96, 0x1a71, 0x0a50, 0x3a33, 0x2a12, 0xdbfd, 0xcbdc, 0xfbbf, 0xeb9e, 0x9b79, 0x8b58, 0xbb3b, 0xab1a, 0x6ca6, 0x7c87, 0x4ce4, 0x5cc5, 0x2c22, 0x3c03, 0x0c60, 0x1c41, 0xedae, 0xfd8f, 0xcdec, 0xddcd, 0xad2a, 0xbd0b, 0x8d68, 0x9d49, 0x7e97, 0x6eb6, 0x5ed5, 0x4ef4, 0x3e13, 0x2e32, 0x1e51, 0x0e70, 0xff9f, 0xefbe, 0xdfdd, 0xcffc, 0xbf1b, 0xaf3a, 0x9f59, 0x8f78, 0x9188, 0x81a9, 0xb1ca, 0xa1eb, 0xd10c, 0xc12d, 0xf14e, 0xe16f, 0x1080, ยก, 0x30c2, 0x20e3, 0x5004, 0x4025, 0x7046, 0x6067, 0x83b9, 0x9398, 0xa3fb, 0xb3da, 0xc33d, 0xd31c, 0xe37f, 0xf35e, 0x02b1, 0x1290, 0x22f3, 0x32d2, 0x4235, 0x5214, 0x6277, 0x7256, 0xb5ea, 0xa5cb, 0x95a8, 0x8589, 0xf56e, 0xe54f, 0xd52c, 0xc50d, 0x34e2, 0x24c3, 0x14a0, 0x0481, 0x7466, 0x6447, 0x5424, 0x4405, 0xa7db, 0xb7fa, 0x8799, 0x97b8, 0xe75f, 0xf77e, 0xc71d, 0xd73c, 0x26d3, 0x36f2, 0x0691, 0x16b0, 0x6657, 0x7676, 0x4615, 0x5634, 0xd94c, 0xc96d, 0xf90e, 0xe92f, 0x99c8, 0x89e9, 0xb98a, 0xa9ab, 0x5844, 0x4865, 0x7806, 0x6827, 0x18c0, 0x08e1, 0x3882, 0x28a3, 0xcb7d, 0xdb5c, 0xeb3f, 0xfb1e, 0x8bf9, 0x9bd8, 0xabbb, 0xbb9a, 0x4a75, 0x5a54, 0x6a37, 0x7a16, 0x0af1, 0x1ad0, 0x2ab3, 0x3a92, 0xfd2e, 0xed0f, 0xdd6c, 0xcd4d, 0xbdaa, 0xad8b, 0x9de8, 0x8dc9, 0x7c26, 0x6c07, 0x5c64, 0x4c45, 0x3ca2, 0x2c83, 0x1ce0, 0x0cc1, 0xef1f, 0xff3e, 0xcf5d, 0xdf7c, 0xaf9b, 0xbfba, 0x8fd9, 0x9ff8, 0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0 ]
 
-    # ord(c)¶
-    # Given a string representing one Unicode character, return an integer representing the Unicode code point of that character.
-    # For example, ord('a') returns the integer 97 and ord('\u2020') returns 8224. This is the inverse of chr().
-
-
-    # CRCutil.java
-    # public static String getCRC(final String command) {
-    #     final int crcint = caluCRC(command.getBytes());                   # turns string in ascii ints
-    #     final int crclow = crcint & 0xFF;                                 # get last 8 bits(2 bytes) of command
-    #     final int crchigh = crcint >> 8 & 0xFF;
-    #     return new String(new byte[] { (byte)crchigh, (byte)crclow });
-    # }
-
-    #
-    # private static int caluCRC(final byte[] pByte) {
-    #     try {
-    #         int len = pByte.length;
-    i = 0
     crc = 0
     da = 0
-    # int i = 0;                                                # java
-    # int crc = 0;                                              # java
-    # while (len-- != 0) {                                      # java
     for c in cmd:
         log.debug('Encoding %s', c)
         # int da = 0xFF & (0xFF & crc >> 8) >> 4;               # java
