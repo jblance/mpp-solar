@@ -21,13 +21,14 @@ def main():
     parser = ArgumentParser(description='MPP Solar Inverter Info Utility')
     parser.add_argument('-s', '--grabsettings', action='store_true', help='Also get the inverter settings')
     parser.add_argument('-d', '--device', type=str, help='Serial device(s) to communicate with [comma separated]', default='/dev/ttyUSB0')
+    parser.add_argument('-M', '--model', type=str, help='Specifies the inverter model to select commands for, defaults to "standard", currently supports LV5048', default='standard')
     parser.add_argument('-b', '--baud', type=int, help='Baud rate for serial communications', default=2400)
     parser.add_argument('-q', '--broker', type=str, help='MQTT Broker hostname', default='mqtt_broker')
     args = parser.parse_args()
 
     # Process / loop through all supplied devices
     for usb_port in args.device.split(','):
-        mp = mppUtils(usb_port, args.baud)
+        mp = mppUtils(usb_port, args.baud, args.model)
         serial_number = mp.getSerialNumber()
 
         # Collect Inverter Settings and publish
