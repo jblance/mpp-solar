@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 from .version import __version__  # noqa: F401
 # import mppcommands
 from .mpputils import mppUtils
+import .mppcommand
 
 log = logging.getLogger('MPP-Solar')
 # setup logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
@@ -31,6 +32,7 @@ def main():
     parser.add_argument('-s', '--getStatus', action='store_true', help='Get Inverter Status')
     parser.add_argument('-t', '--getSettings', action='store_true', help='Get Inverter Settings')
     parser.add_argument('-R', '--showraw', action='store_true', help='Display the raw results')
+    parser.add_argument('-p', '--printcrc', action='store_true', help='Display the command and crc and nothing else')
     args = parser.parse_args()
 
 
@@ -48,7 +50,9 @@ def main():
     # mp = mppcommands.mppCommands(args.device, args.baud)
     mp = mppUtils(args.device, args.baud, args.model)
 
-    if(args.listknown):
+    if(args.printcrc):
+        print(mppcommand.crc(args.command))
+    elif(args.listknown):
         for line in mp.getKnownCommands():
             print(line)
     elif(args.getStatus):
