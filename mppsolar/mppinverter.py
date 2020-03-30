@@ -44,6 +44,7 @@ def getDataValue(data, key):
     else:
         return ""
 
+
 def isInverterSupported(inverter_model, json):
     """
     Determine if the command loaded from json supports the supplied inverter
@@ -63,6 +64,7 @@ def isInverterSupported(inverter_model, json):
         return True
     else:
         return False
+
 
 def getCommandsFromJson(inverter_model):
     """

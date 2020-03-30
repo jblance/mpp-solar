@@ -5,7 +5,6 @@ from argparse import ArgumentParser
 from .version import __version__  # noqa: F401
 # import mppcommands
 from .mpputils import mppUtils
-from .mppcommand import mppCommand
 
 log = logging.getLogger('MPP-Solar')
 # setup logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
@@ -19,6 +18,7 @@ log = logging.getLogger('MPP-Solar')
 log.setLevel(logging.WARNING)
 # ch.setLevel(logging.WARNING)
 logging.basicConfig()
+
 
 def main():
     parser = ArgumentParser(description='MPP Solar Command Utility')
@@ -35,7 +35,6 @@ def main():
     parser.add_argument('-p', '--printcrc', action='store_true', help='Display the command and crc and nothing else')
     args = parser.parse_args()
 
-
     # Turn on debug if needed
     if(args.enableDebug):
         log.setLevel(logging.DEBUG)
@@ -51,9 +50,9 @@ def main():
     mp = mppUtils(args.device, args.baud, args.model)
 
     if(args.printcrc):
-        #print("{0:#x}".format(100))
-        [crca, crcb] = mppcommand.crc(args.command)
-        [crc2a, crc2b] = mppcommand.crc2(args.command)
+        # print("{0:#x}".format(100))
+        [crca, crcb] = mppcommand.crc(args.command)  # noqa: F821
+        [crc2a, crc2b] = mppcommand.crc2(args.command)  # noqa: F821
         print("{0} {1:#x} {2:#x}".format(args.command, crca, crcb))
         print("{0} {1:#x} {2:#x}".format(args.command, crc2a, crc2b))
     elif(args.listknown):
