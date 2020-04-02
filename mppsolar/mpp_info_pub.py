@@ -55,7 +55,7 @@ def main():
                     # 92931509101901/status/total_output_active_power/value 1250
                     # 92931509101901/status/total_output_active_power/unit W
                     topic = '{}/status/{}/{}'.format(serial_number, _line, i)
-                    msg = {'topic': topic, 'payload': '{}'.format(_data[_line][i])}
+                    msg = {'topic': topic, 'payload': '{}'.format(_line])}
                     msgs.append(msg)
             publish.multiple(msgs, hostname=args.broker)
         # Collect Inverter Status data and publish
