@@ -20,6 +20,8 @@ def main():
     from argparse import ArgumentParser
     parser = ArgumentParser(description='MPP Solar Inverter Info Utility')
     parser.add_argument('-s', '--grabsettings', action='store_true', help='Also get the inverter settings')
+    parser.add_argument('-t', '--getstatus', action='store_true', help='Use the getstatus "helper"')
+    parser.add_argument('-c', '--command', type=str, help='Command to execute', default=None)
     parser.add_argument('-d', '--device', type=str, help='Serial device(s) to communicate with [comma separated]', default='/dev/ttyUSB0')
     parser.add_argument('-M', '--model', type=str, help='Specifies the inverter model to select commands for, defaults to "standard", currently supports LV5048', default='standard')
     parser.add_argument('-b', '--baud', type=int, help='Baud rate for serial communications', default=2400)
@@ -45,20 +47,32 @@ def main():
             print(msgs)
             print(args.broker)
 
+        if args.command:
+            msgs = []
+            _data = mp.getResponseDict(args.command)
+            for _line in _data:
+                for i in ['value', 'unit']:
+                    # 92931509101901/status/total_output_active_power/value 1250
+                    # 92931509101901/status/total_output_active_power/unit W
+                    topic = '{}/status/{}/{}'.format(serial_number, _line, i)
+                    msg = {'topic': topic, 'payload': '{}'.format(_data[_line][i])}
+                    msgs.append(msg)
+            publish.multiple(msgs, hostname=args.broker)
         # Collect Inverter Status data and publish
-        msgs = []
-        status_data = mp.getFullStatus()
-        for status_line in status_data:
-            for i in ['value', 'unit']:
-                # 92931509101901/status/total_output_active_power/value 1250
-                # 92931509101901/status/total_output_active_power/unit W
-                topic = '{}/status/{}/{}'.format(serial_number, status_line, i)
-                msg = {'topic': topic, 'payload': '{}'.format(status_data[status_line][i])}
-                msgs.append(msg)
-        publish.multiple(msgs, hostname=args.broker)
-        # print(msgs)
-        # print(args.broker)
-        # print(status_data)
+        if args.getstatus:
+            msgs = []
+            status_data = mp.getFullStatus()
+            for status_line in status_data:
+                for i in ['value', 'unit']:
+                    # 92931509101901/status/total_output_active_power/value 1250
+                    # 92931509101901/status/total_output_active_power/unit W
+                    topic = '{}/status/{}/{}'.format(serial_number, status_line, i)
+                    msg = {'topic': topic, 'payload': '{}'.format(status_data[status_line][i])}
+                    msgs.append(msg)
+            publish.multiple(msgs, hostname=args.broker)
+            # print(msgs)
+            # print(args.broker)
+            # print(status_data)
 
 # Adafruit IO has:
 #    Battery Capacity (as %)         inverter-one-battery-capacity-percent
