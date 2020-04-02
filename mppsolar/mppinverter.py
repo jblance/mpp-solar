@@ -51,6 +51,7 @@ def isInverterSupported(inverter_model, json):
     """
     supports = getDataValue(json, 'supports')
     nosupports = getDataValue(json, 'nosupports')
+    log.debug("-----No supports {}".format(nosupports))
     # Some commands are specifically not supported by some models
     if inverter_model in nosupports:
         log.debug("Command {} not supported on inverter {}".format(getDataValue(json, 'name'), inverter_model))
