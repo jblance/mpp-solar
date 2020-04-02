@@ -50,6 +50,7 @@ def main():
         if args.command:
             msgs = []
             _data = mp.getResponseDict(args.command)
+            print(_data)
             for _line in _data:
                 for i in ['value', 'unit']:
                     # 92931509101901/status/total_output_active_power/value 1250
