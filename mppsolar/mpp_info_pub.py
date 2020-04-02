@@ -21,7 +21,7 @@ def main():
     parser = ArgumentParser(description='MPP Solar Inverter Info Utility')
     parser.add_argument('-s', '--grabsettings', action='store_true', help='Also get the inverter settings')
     parser.add_argument('-t', '--getstatus', action='store_true', help='Use the getstatus "helper"')
-    parser.add_argument('-c', '--command', type=str, help='Command to execute', default=None)
+    parser.add_argument('-c', '--command', type=str, help='Command to execute [comma separated]', default=None)
     parser.add_argument('-d', '--device', type=str, help='Serial device(s) to communicate with [comma separated]', default='/dev/ttyUSB0')
     parser.add_argument('-M', '--model', type=str, help='Specifies the inverter model to select commands for, defaults to "standard", currently supports LV5048', default='standard')
     parser.add_argument('-b', '--baud', type=int, help='Baud rate for serial communications', default=2400)
@@ -48,19 +48,20 @@ def main():
             print(args.broker)
 
         if args.command:
-            msgs = []
-            _data = mp.getResponseDict(args.command)
-            # {'serial_number': [u'9293333010501', u'']}
-            for _item in _data:
-                    # 92931509101901/status/total_output_active_power/value 1250
-                    # 92931509101901/status/total_output_active_power/unit W
-                    topic = '{}/status/{}/value'.format(serial_number, _item)
-                    msg = {'topic': topic, 'payload': '{}'.format(_data[_item][0])}
-                    msgs.append(msg)
-                    topic = '{}/status/{}/unit'.format(serial_number, _item)
-                    msg = {'topic': topic, 'payload': '{}'.format(_data[_item][1])}
-                    msgs.append(msg)
-            publish.multiple(msgs, hostname=args.broker)
+            for _command in args.command.split(','):
+                msgs = []
+                _data = mp.getResponseDict(_command)
+                # {'serial_number': [u'9293333010501', u'']}
+                for _item in _data:
+                        # 92931509101901/status/total_output_active_power/value 1250
+                        # 92931509101901/status/total_output_active_power/unit W
+                        topic = '{}/status/{}/value'.format(serial_number, _item)
+                        msg = {'topic': topic, 'payload': '{}'.format(_data[_item][0])}
+                        msgs.append(msg)
+                        topic = '{}/status/{}/unit'.format(serial_number, _item)
+                        msg = {'topic': topic, 'payload': '{}'.format(_data[_item][1])}
+                        msgs.append(msg)
+                publish.multiple(msgs, hostname=args.broker)
         # Collect Inverter Status data and publish
         if args.getstatus:
             msgs = []
