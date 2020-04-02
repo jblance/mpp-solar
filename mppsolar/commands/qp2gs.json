@@ -5,7 +5,7 @@
     "type": "QUERY",
     "supports": ["LV5048"],
     "response": [
-            ["option", "Parallel instance number", ["Not valid", "valid"]],
+            ["int", "Parallel instance number??", ""],
             ["int", "Serial number", ""],
             ["keyed", "Work mode", {"P": "Power On Mode",
                                     "S": "Standby Mode",
