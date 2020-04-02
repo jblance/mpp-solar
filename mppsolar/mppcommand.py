@@ -266,8 +266,9 @@ class mppCommand(object):
                 msgs[key] = [resp_format[2][result], '']
             # eg. ['flags', 'Device status', [ 'is_load_on', 'is_charging_on' ...
             elif (resp_format[0] == 'flags'):
-                for j, flag in enumerate(result):
-                    msgs[resp_format[2][j]] = [int(flag), 'True - 1/False - 0']
+                msgs[key] = [result, resp_format[2]]
+                #for j, flag in enumerate(result):
+                #    msgs[resp_format[2][j]] = [int(flag), 'True - 1/False - 0']
             # eg. ['stat_flags', 'Warning status', ['Reserved', 'Inver...
             elif (resp_format[0] == 'stat_flags'):
                 output = ''
