@@ -284,6 +284,16 @@ This should display something in CMD1 similar to (the numbers will be different 
 9293333010501/status/serial_number/unit (null)
 ```
 
+Now you can change the `QID` to any command (or multiple commands separated by commas but no spaces) that you wish to use
+
+### Schedule Regular Queries (and MQTT message posts) ###
+Use cron or similar to schedule the command to run on a regular basis
+e.g. for cron
+`crontab -e` to edit
+and add a line like
+`* * * * * /usr/local/bin/mpp-info-pub -q localhost -c QPIGS` to run the QPIGS command every minute
+
+
 ### Troubleshooting ###
 If you get an error `ImportError: No module named paho.mqtt.publish`
 Make sure paho-mqtt is installed

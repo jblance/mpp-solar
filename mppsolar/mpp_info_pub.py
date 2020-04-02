@@ -55,7 +55,8 @@ def main():
                 for _item in _data:
                         # 92931509101901/status/total_output_active_power/value 1250
                         # 92931509101901/status/total_output_active_power/unit W
-                        topic = '{}/status/{}/value'.format(serial_number, _item)
+                        #topic = '{}/status/{}/value'.format(serial_number, _item)
+                        topic = '{}/{}/value'.format(_command, _item)
                         msg = {'topic': topic, 'payload': '{}'.format(_data[_item][0])}
                         msgs.append(msg)
                         topic = '{}/status/{}/unit'.format(serial_number, _item)
