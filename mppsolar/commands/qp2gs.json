@@ -53,7 +53,7 @@
             ["int", "L2 Battery charging current", "A"],
             ["int", "L2 Battery capacity", "%"],
             ["float", "PV2 Input Voltage", "V"],
-            ["int", "PV2 charging current ", "A"],
+            ["int", "PV2 charging current", "A"],
             ["flags", "Inverter Status", [
               "is_l2_scc_ok",
               "is_l2_ac_charging",

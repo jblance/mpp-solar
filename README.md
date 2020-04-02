@@ -275,6 +275,15 @@ basetopic/subtopic this is the message
 ```
 If the message displayed in CMD1 window the test has passed. yay!
 
+Test from mpp-solar, in CMD2
+`mpp-info-pub -q localhost -c QID`
+
+This should display something in CMD1 similar to (the numbers will be different and should match your inverter serial number):
+```
+9293333010501/status/serial_number/value 9293333010501
+9293333010501/status/serial_number/unit (null)
+```
+
 ### Troubleshooting ###
 If you get an error `ImportError: No module named paho.mqtt.publish`
 Make sure paho-mqtt is installed
