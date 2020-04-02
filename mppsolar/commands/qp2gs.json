@@ -54,15 +54,15 @@
             ["int", "Battery capacity (L2)", "%"],
             ["float", "PV Input Voltage 2", "V"],
             ["int", "Total charging current (PV2)", "A"],
-            ["flags", "Inverter Status", [["SCC Loss", "SCC OK"],
-                                          ["AC not charging", "AC charging"],
-                                          ["SCC not charging", "SCC charging"],
-                                          ["Battery not over", "Battery over?"],
-                                          ["Battery normal", "Battery under"],
-                                          ["Line ok", "Line loss"],
-                                          ["Load off", "Load on"],
-                                          ["Configuration unchanged", "Configuration changed"]
-                                          ]]
+            ["flags", "Inverter Status", [
+              "is_l2_scc_ok",
+              "is_l2_ac_charging",
+              "is_l2_scc_charging",
+              "is_battery_over_voltage",
+              "is_battery_under_voltage",
+              "is_l2_line_lost",
+              "is_l2_load_on",
+              "is_configuration_changed" ]]
         ],
     "test_responses": [
            "(11 92911906100045 L 00 124.2 59.98 124.2 59.98 0149 0130 005 56.1 000 100 000.0 00 01000010 \u00a9\u00a8\r"

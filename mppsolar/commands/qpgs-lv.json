@@ -63,7 +63,7 @@
                 "is_l1_scc_charging_on",
                 "is_battery_over_voltage",
                 "is_battery_under_voltage",
-                "is_l1_line_ok",
+                "is_l1_line_off",
                 "is_l1_load_on",
                 "is_configuration_changed"]],
             ["option", "Output mode", ["Standalone?",
