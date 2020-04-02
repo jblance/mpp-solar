@@ -59,7 +59,7 @@ def main():
                         topic = '{}/{}/value'.format(_command, _item)
                         msg = {'topic': topic, 'payload': '{}'.format(_data[_item][0])}
                         msgs.append(msg)
-                        topic = '{}/status/{}/unit'.format(serial_number, _item)
+                        topic = '{}/{}/unit'.format(_command, _item)
                         msg = {'topic': topic, 'payload': '{}'.format(_data[_item][1])}
                         msgs.append(msg)
                 publish.multiple(msgs, hostname=args.broker)

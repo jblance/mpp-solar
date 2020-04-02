@@ -280,8 +280,8 @@ Test from mpp-solar, in CMD2
 
 This should display something in CMD1 similar to (the numbers will be different and should match your inverter serial number):
 ```
-9293333010501/status/serial_number/value 9293333010501
-9293333010501/status/serial_number/unit (null)
+QID/serial_number/value 9293333010501
+QID/serial_number/unit (null)
 ```
 
 Now you can change the `QID` to any command (or multiple commands separated by commas but no spaces) that you wish to use
@@ -292,6 +292,11 @@ e.g. for cron
 `crontab -e` to edit
 and add a line like
 `* * * * * /usr/local/bin/mpp-info-pub -q localhost -c QPIGS` to run the QPIGS command every minute
+
+## Install Influx and Grafana ##
+Follow details here: https://simonhearne.com/2020/pi-influx-grafana/
+
+## Configure MQTT to Influx
 
 
 ### Troubleshooting ###
