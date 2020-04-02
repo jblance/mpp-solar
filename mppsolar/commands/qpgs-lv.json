@@ -77,7 +77,7 @@
             ["int", "Max charger current", "A"],
             ["int", "Max charger range", "A"],
             ["int", "Max AC charger current", "A"],
-            ["int", "PV1 input current", "A"],
+            ["int", "PV1 charging current", "A"],
             ["int", "Battery discharge current", "A"]
         ],
     "test_responses": [
