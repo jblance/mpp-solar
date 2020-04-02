@@ -274,3 +274,8 @@ $ mosquitto_sub -h localhost -v -t "#"
 basetopic/subtopic this is the message
 ```
 If the message displayed in CMD1 window the test has passed. yay!
+
+### Troubleshooting ###
+If you get an error `ImportError: No module named paho.mqtt.publish`
+Make sure paho-mqtt is installed
+`sudo pip install paho-mqtt`
