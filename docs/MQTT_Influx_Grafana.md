@@ -104,13 +104,6 @@ sudo systemctl enable grafana-server.service
 ## Install Telegraf ##
 `sudo apt-get install telegraf`
 
-* Start grafana and set to run at boot
-```
-sudo systemctl unmask telegraf.service
-sudo systemctl start telegraf
-sudo systemctl enable telegraf.service
-```
-
 ## Configure Telegraf ##
 
 * Configure Telegraf
@@ -134,9 +127,24 @@ sudo systemctl enable telegraf.service
   password = "<put your password here>"
 ```
 
-
+* Start telegraf and set to run at boot
+```
+sudo systemctl unmask telegraf.service
+sudo systemctl start telegraf
+sudo systemctl enable telegraf.service
+```
 
 ### Troubleshooting ###
 If you get an error `ImportError: No module named paho.mqtt.publish`
-Make sure paho-mqtt is installed
+* Make sure paho-mqtt is installed
 `sudo pip install paho-mqtt`
+
+* Check what is stored in influx
+* log in to influx `influx`
+* at influx prompt use the DB created `use home`
+* show all the 'tables' `show measurements`
+* show entries in one table `select * from <table name goes here>` e.g. `select * from QPGS0`
+
+* Show telegraf errors `sudo systemctl status telegraf`
+
+* Show cron errors `cat /home/pi/cron.out`
