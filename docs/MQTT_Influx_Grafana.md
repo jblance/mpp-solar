@@ -104,7 +104,29 @@ sudo systemctl enable grafana-server.service
 ## Install Telegraf ##
 `sudo apt-get install telegraf`
 
-## Configure MQTT to Influx
+## Configure Telegraf ##
+
+* Configure Telegraf
+* Open `/etc/telegraf/telegraf.conf`
+* Look for section `[[inputs.mqtt_consumer]]` section and add these lines:
+```
+[[inputs.mqtt_consumer]]
+  servers = ["tcp://127.0.0.1:1883"]
+  topics = [
+    "#",
+  ]
+  data_format = "influx"
+```
+* Look for section `[[outputs.influxdb]]` and add/modify these lines
+```
+[[outputs.influxdb]]
+  urls = ["http://127.0.0.1:8086"]
+  database = "home"
+  skip_database_creation = true
+  username = "grafana"
+  password = "<put your password here>"
+```
+
 
 
 ### Troubleshooting ###
