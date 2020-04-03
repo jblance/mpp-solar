@@ -104,6 +104,13 @@ sudo systemctl enable grafana-server.service
 ## Install Telegraf ##
 `sudo apt-get install telegraf`
 
+* Start grafana and set to run at boot
+```
+sudo systemctl unmask telegraf.service
+sudo systemctl start telegraf
+sudo systemctl enable telegraf.service
+```
+
 ## Configure Telegraf ##
 
 * Configure Telegraf

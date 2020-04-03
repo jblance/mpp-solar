@@ -64,7 +64,7 @@ def main():
                         value = _data[_item][0]
                         #topic = '{}/{}/value'.format(_command, _item)
                         topic = table
-                        payload = '{},setting={} value="{}"'.format(table,setting,value)
+                        payload = '{},setting={} value="{}"'.format(_command,setting,value)
                         msg = {'topic': topic, 'payload': payload}
                         msgs.append(msg)
                         #topic = '{}/{}/unit'.format(_command, _item)
