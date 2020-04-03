@@ -252,6 +252,7 @@ unknown_value_in_response       010
 ```
 
 ## Setting up a MQTT Broker on the Raspberry Pi ##
+Note: while the below shows setting up the MQTT broker on the same device as is connected to the inverter, this is not needed, as long as the inverter connected Pi can communication with the MQTT broker the broker can be anywhere (including on the Inter-tubes). Just change the `-h localhost`. Password secured brokers are not currently supported
 
 * Install Mosquitto `sudo apt install -y mosquitto mosquitto-clients`
 * Set MQTT service to start on boot `sudo systemctl enable mosquitto.service`
@@ -282,13 +283,76 @@ Use cron or similar to schedule the command to run on a regular basis
 e.g. for cron
 `crontab -e` to edit
 and add a line like
-`* * * * * /usr/local/bin/mpp-info-pub -q localhost -c QPIGS > /home/pi/cron.out 2>&1`
-will run the QPIGS command every minute and log errors to /home/pi/cron.out
+```
+* * * * * /usr/local/bin/mpp-info-pub -q localhost -c QPIGS > /home/pi/cron.out 2>&1
+```
+which will run the QPIGS command every minute and log errors to /home/pi/cron.out
 
-## Install Influx and Grafana ##
-Follow details here: https://simonhearne.com/2020/pi-influx-grafana/
+## Install Influx ##
+Source: https://simonhearne.com/2020/pi-influx-grafana/
+Thanks SIMON HEARNE!!
 
-## Install Telegraf
+* Add the influx repos
+```
+wget -qO- https://repos.influxdata.com/influxdb.key | sudo apt-key add -
+source /etc/os-release
+echo "deb https://repos.influxdata.com/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+```
+* Update apt and install influx
+```
+sudo apt update
+sudo apt-get install influxdb
+```
+* Start influx and set to run at boot
+```
+sudo systemctl unmask influxdb.service
+sudo systemctl start influxdb
+sudo systemctl enable influxdb.service
+```
+* Run influx
+```
+influx
+```
+* add users etc
+```
+create database home
+use home
+
+create user grafana with password '<passwordhere>' with all privileges
+grant all privileges on home to grafana
+
+show users
+```
+* should display
+```
+user admin
+---- -----
+grafana true
+```
+* then exit
+```
+exit
+```
+
+## Install Grafana ##
+* Add grafana repos
+```
+wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
+```
+* Update apt and install grafana
+```
+sudo apt update
+sudo apt-get install grafana
+```
+* Start grafana and set to run at boot
+```
+sudo systemctl unmask grafana-server.service
+sudo systemctl start grafana-server
+sudo systemctl enable grafana-server.service
+```
+
+## Install Telegraf ##
 `sudo apt-get install telegraf`
 
 ## Configure MQTT to Influx
