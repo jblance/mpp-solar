@@ -253,32 +253,32 @@ unknown_value_in_response       010
 
 ## Setting up a MQTT Broker on the Raspberry Pi ##
 
-Install Mosquitto
-`sudo apt install -y mosquitto mosquitto-clients`
-Set MQTT service to start on boot
-`sudo systemctl enable mosquitto.service`
-Start MQTT service now
-`sudo systemctl start mosquitto.service`
+* Install Mosquitto
+* `sudo apt install -y mosquitto mosquitto-clients`
+* Set MQTT service to start on boot
+* `sudo systemctl enable mosquitto.service`
+* Start MQTT service now
+* `sudo systemctl start mosquitto.service`
 
 ### Testing MQTT ###
-You will need two command windows open (called CMD1 and CMD2 below)
-In CMD1: start (verbosely) listening to all MQTT topics on the local broker
-`mosquitto_sub -h localhost -v -t "#"``
+* You will need two command windows open (called CMD1 and CMD2 below)
+* In CMD1: start (verbosely) listening to all MQTT topics on the local broker
+* `mosquitto_sub -h localhost -v -t "#"``
 
-In CMD2: send a test message
-`mosquitto_pub -h localhost -t "basetopic/subtopic" -m "this is the message"`
+* In CMD2: send a test message
+* `mosquitto_pub -h localhost -t "basetopic/subtopic" -m "this is the message"`
 
-The topic and message should display in CMD1
+* The topic and message should display in CMD1
 ```
 $ mosquitto_sub -h localhost -v -t "#"
 basetopic/subtopic this is the message
 ```
-If the message displayed in CMD1 window the test has passed. yay!
+* If the message displayed in CMD1 window the test has passed. yay!
 
-Test from mpp-solar, in CMD2
-`mpp-info-pub -q localhost -c QID`
+* Test from mpp-solar, in CMD2
+* `mpp-info-pub -q localhost -c QID`
 
-This should display something in CMD1 similar to (the numbers will be different and should match your inverter serial number):
+* This should display something in CMD1 similar to (the numbers will be different and should match your inverter serial number):
 ```
 QID/serial_number/value 9293333010501
 QID/serial_number/unit (null)
@@ -291,10 +291,14 @@ Use cron or similar to schedule the command to run on a regular basis
 e.g. for cron
 `crontab -e` to edit
 and add a line like
-`* * * * * /usr/local/bin/mpp-info-pub -q localhost -c QPIGS` to run the QPIGS command every minute
+`* * * * * /usr/local/bin/mpp-info-pub -q localhost -c QPIGS > /home/pi/cron.out 2>&1`
+will run the QPIGS command every minute and log errors to /home/pi/cron.out
 
 ## Install Influx and Grafana ##
 Follow details here: https://simonhearne.com/2020/pi-influx-grafana/
+
+## Install Telegraf
+`sudo apt-get install telegraf`
 
 ## Configure MQTT to Influx
 
