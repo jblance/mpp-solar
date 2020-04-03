@@ -59,12 +59,12 @@ def main():
                         # message should be
                         # temp,site=room1 value=28
                         # will store in table temp
-                        table = 'mppinverter'
+                        table = _command
                         setting = _item
                         value = _data[_item][0]
                         #topic = '{}/{}/value'.format(_command, _item)
                         topic = table
-                        payload = '{},command={} setting={} value="{}"'.format(topic, _command, setting, value)
+                        payload = '{},setting={} value="{}"'.format(topic, setting, value)
                         msg = {'topic': topic, 'payload': payload}
                         msgs.append(msg)
                         #topic = '{}/{}/unit'.format(_command, _item)
