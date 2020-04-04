@@ -139,7 +139,7 @@ If you get an error `ImportError: No module named paho.mqtt.publish`
 * Make sure paho-mqtt is installed
 `sudo pip install paho-mqtt`
 
-* Check what is stored in influx
+To check what is stored in influx
 * log in to influx `influx`
 * at influx prompt use the DB created `use home`
 * show all the 'tables' `show measurements`
