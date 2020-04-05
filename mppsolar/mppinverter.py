@@ -174,6 +174,16 @@ class mppInverter:
         else:
             return result.getResponse()
 
+    def getInfluxLineProtocol(self, cmd):
+        """
+        Execute command and return the reponse as a Influx Line Protocol messages
+        """
+        result = self.execute(cmd)
+        if not result:
+            return ""
+        else:
+            return result.getInfluxLineProtocol()
+
     def getResponseDict(self, cmd):
         """
         Execute command and return the reponse as a dict

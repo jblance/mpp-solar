@@ -26,6 +26,7 @@ def main():
     parser.add_argument('-M', '--model', type=str, help='Specifies the inverter model to select commands for, defaults to "standard", currently supports LV5048', default='standard')
     parser.add_argument('-b', '--baud', type=int, help='Baud rate for serial communications', default=2400)
     parser.add_argument('-q', '--broker', type=str, help='MQTT Broker hostname', default='mqtt_broker')
+    parser.add_argument('-i', '--influx', action='store_true', help='Use Influx Line Protocol for the messgae format')
     args = parser.parse_args()
 
     # Process / loop through all supplied devices
@@ -47,30 +48,39 @@ def main():
             print(msgs)
             print(args.broker)
 
+getInfluxLineProtocol
         if args.command:
-            for _command in args.command.split(','):
-                msgs = []
-                _data = mp.getResponseDict(_command)
-                # {'serial_number': [u'9293333010501', u'']}
-                for _item in _data:
-                        # 92931509101901/status/total_output_active_power/value 1250
-                        # 92931509101901/status/total_output_active_power/unit W
-                        #topic = '{}/status/{}/value'.format(serial_number, _item)
-                        # message should be
-                        # temp,site=room1 value=28
-                        # will store in table temp
-                        table = _command
-                        setting = _item
-                        value = _data[_item][0]
-                        #topic = '{}/{}/value'.format(_command, _item)
-                        topic = table
-                        payload = '{},setting={} value="{}"'.format(topic, setting, value)
-                        msg = {'topic': topic, 'payload': payload}
-                        msgs.append(msg)
-                        #topic = '{}/{}/unit'.format(_command, _item)
-                        #msg = {'topic': topic, 'payload': '{}'.format(_data[_item][1])}
-                        #msgs.append(msg)
-                publish.multiple(msgs, hostname=args.broker)
+            if args.influx:
+                for _command in args.command.split(','):
+                    msgs = []
+                    _data = mp.getInfluxLineProtocol(_command)
+                    for _item in _data:
+                        print(_item)
+                    
+            else:
+                for _command in args.command.split(','):
+                    msgs = []
+                    _data = mp.getResponseDict(_command)
+                    # {'serial_number': [u'9293333010501', u'']}
+                    for _item in _data:
+                            # 92931509101901/status/total_output_active_power/value 1250
+                            # 92931509101901/status/total_output_active_power/unit W
+                            #topic = '{}/status/{}/value'.format(serial_number, _item)
+                            # message should be
+                            # temp,site=room1 value=28
+                            # will store in table temp
+                            table = _command
+                            setting = _item
+                            value = _data[_item][0]
+                            #topic = '{}/{}/value'.format(_command, _item)
+                            topic = table
+                            payload = '{},setting={} value="{}"'.format(topic, setting, value)
+                            msg = {'topic': topic, 'payload': payload}
+                            msgs.append(msg)
+                            #topic = '{}/{}/unit'.format(_command, _item)
+                            #msg = {'topic': topic, 'payload': '{}'.format(_data[_item][1])}
+                            #msgs.append(msg)
+                    publish.multiple(msgs, hostname=args.broker)
         # Collect Inverter Status data and publish
         if args.getstatus:
             msgs = []

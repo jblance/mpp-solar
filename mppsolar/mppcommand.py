@@ -225,6 +225,93 @@ class mppCommand(object):
         log.debug('Response valid as no invalid situations found')
         return True
 
+    def getInfluxLineProtocol(self):
+        """
+        Returns the response in InfluxDB line protocol format
+        """
+        msgs = []
+
+        # Deal with non-valid responses
+        if (self.response is None):
+            log.info('No response')
+            return msgs
+        if (not self.valid_response):
+            log.info('Invalid response')
+            return msgs
+        if (self.response_definition is None):
+            log.info('No response definition')
+            return msgs
+        # weather,location=us-midwest temperature=82 1465839830100400200
+        # |    -------------------- --------------  |
+        # |             |             |             |
+        # |             |             |             |
+        # +-----------+--------+-+---------+-+---------+
+        # |measurement|,tag_set| |field_set| |timestamp|
+        # +-----------+--------+-+---------+-+---------+
+        # measurement not included
+        # setting=<setting> value=<value>,unit=<unit>
+
+        # Build array of Influx Line Protocol messages
+        responses = self.response[1:-3].split(" ")
+        for i, result in enumerate(responses):
+            # Check if we are past the 'known' responses
+            if (i >= len(self.response_definition)):
+                # If we dont know what this value is, we'll ignore it
+                log.info('No response definition - ignoring')
+            else:
+                resp_format = self.response_definition[i]
+
+            key = '{}'.format(resp_format[1]).lower().replace(" ", "_")
+            # Process results
+            if (resp_format[0] == 'float') or (resp_format[0] == 'int') :
+                msgs.append('setting={} value={},unit="{}"'.format(key, float(result), resp_format[2]))
+            elif (resp_format[0] == 'string'):
+                msgs.append('setting={} value="{}",unit="{}"'.format(key, result, resp_format[2]))
+            # eg. ['option', 'Output source priority', ['Utility first', 'Solar first', 'SBU first']],
+            elif (resp_format[0] == 'option'):
+                value = resp_format[2][int(result)]
+                msgs.append('setting={} value="{}",unit="{}"'.format(key, value, ''))
+            # eg. ['keyed', 'Machine type', {'00': 'Grid tie', '01': 'Off Grid', '10': 'Hybrid'}],
+            elif (resp_format[0] == 'keyed'):
+                value = resp_format[2][result]
+                msgs.append('setting={} value="{}",unit="{}"'.format(key, value, ''))
+            # eg. ['flags', 'Device status', [ 'is_load_on', 'is_charging_on' ...
+            elif (resp_format[0] == 'flags'):
+                for j, flag in enumerate(result):
+                    key = resp_format[2][j]
+                    value = int(flag)
+                    msgs.append('setting={} value={},unit="{}"'.format(key, value, ''))
+            # eg. ['stat_flags', 'Warning status', ['Reserved', 'Inver...
+            elif (resp_format[0] == 'stat_flags'):
+                output = ''
+                # TODO
+                log.warning("StatFlags not implemented in Influx Line Protocol yet")
+                # for j, flag in enumerate(result):
+                #    if (flag == '1'):
+                #        output = ('{}\n\t- {}'.format(output,
+                #                                      resp_format[2][j]))
+                # msgs[key] = [output, '']
+            # eg. ['enflags', 'Device Status', {'a': {'name': 'Buzzer', 'state': 'disabled'},
+            elif (resp_format[0] == 'enflags'):
+                # output = {}
+                status = 'unknown'
+                for item in result:
+                    if (item == 'E'):
+                        status = 'enabled'
+                    elif (item == 'D'):
+                        status = 'disabled'
+                    else:
+                        key = resp_format[2][item]['name']
+                        msgs.append('setting={} value={},unit="{}"'.format(key, status, ''))
+                # msgs[key] = [output, '']
+            elif self.command_type == 'SETTER':
+                return msgs
+            else:
+                pass
+                #msgs[i] = [result, '']
+        return msgs
+
+
     def getResponseDict(self):
         """
         Returns the response in a dict (with value, unit array)
