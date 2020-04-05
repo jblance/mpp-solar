@@ -54,7 +54,19 @@ def main():
                     msgs = []
                     _data = mp.getInfluxLineProtocol(_command)
                     for _item in _data:
-                        print(_item)
+                        # print(_item)
+                        # _item = setting=total_ac_output_apparent_power value=1577.0,unit="VA"
+                        # weather,location=us-midwest temperature=82 1465839830100400200
+                        # |    -------------------- --------------  |
+                        # |             |             |             |
+                        # |             |             |             |
+                        # +-----------+--------+-+---------+-+---------+
+                        # |measurement|,tag_set| |field_set| |timestamp|
+                        # +-----------+--------+-+---------+-+---------+
+                        payload = '{},{}'.format(_command, _item)
+                        msg = {'topic': _command, 'payload': payload}
+                        msgs.append(msg)
+                    publish.multiple(msgs, hostname=args.broker)
 
             else:
                 for _command in args.command.split(','):
@@ -62,23 +74,23 @@ def main():
                     _data = mp.getResponseDict(_command)
                     # {'serial_number': [u'9293333010501', u'']}
                     for _item in _data:
-                            # 92931509101901/status/total_output_active_power/value 1250
-                            # 92931509101901/status/total_output_active_power/unit W
-                            #topic = '{}/status/{}/value'.format(serial_number, _item)
-                            # message should be
-                            # temp,site=room1 value=28
-                            # will store in table temp
-                            table = _command
-                            setting = _item
-                            value = _data[_item][0]
-                            #topic = '{}/{}/value'.format(_command, _item)
-                            topic = table
-                            payload = '{},setting={} value="{}"'.format(topic, setting, value)
-                            msg = {'topic': topic, 'payload': payload}
-                            msgs.append(msg)
-                            #topic = '{}/{}/unit'.format(_command, _item)
-                            #msg = {'topic': topic, 'payload': '{}'.format(_data[_item][1])}
-                            #msgs.append(msg)
+                        # 92931509101901/status/total_output_active_power/value 1250
+                        # 92931509101901/status/total_output_active_power/unit W
+                        #topic = '{}/status/{}/value'.format(serial_number, _item)
+                        # message should be
+                        # temp,site=room1 value=28
+                        # will store in table temp
+                        table = _command
+                        setting = _item
+                        value = _data[_item][0]
+                        #topic = '{}/{}/value'.format(_command, _item)
+                        topic = table
+                        payload = '{},setting={} value="{}"'.format(topic, setting, value)
+                        msg = {'topic': topic, 'payload': payload}
+                        msgs.append(msg)
+                        #topic = '{}/{}/unit'.format(_command, _item)
+                        #msg = {'topic': topic, 'payload': '{}'.format(_data[_item][1])}
+                        #msgs.append(msg)
                     publish.multiple(msgs, hostname=args.broker)
         # Collect Inverter Status data and publish
         if args.getstatus:
@@ -92,17 +104,3 @@ def main():
                     msg = {'topic': topic, 'payload': '{}'.format(status_data[status_line][i])}
                     msgs.append(msg)
             publish.multiple(msgs, hostname=args.broker)
-            # print(msgs)
-            # print(args.broker)
-            # print(status_data)
-
-# Adafruit IO has:
-#    Battery Capacity (as %)         inverter-one-battery-capacity-percent
-#    Output Power (W)                inverter-one-total-output-active-power-w
-#    Fault Code (text text)          fault-code
-#    Battery Voltage                 inverter-one-battery-voltage-v
-#    Inverter Charge Status (text)   inverter-charge-status
-#    Total Charging Current (A)      inverter-one-total-charging-current-a
-#    Inverter 1 charging current (A) inverter-one-battery-charging-current-a
-#    Inverter 2 charging current (A) inverter-two-battery-charging-current-a
-#    Load (as %)                     inverter-one-load-percentage-percent
