@@ -33,7 +33,7 @@ e.g. for cron
 `crontab -e` to edit
 and add a line like
 ```
-* * * * * /usr/local/bin/mpp-info-pub -q localhost -c QPIGS > /home/pi/cron.out 2>&1
+* * * * * /usr/local/bin/mpp-info-pub -q localhost -c QPIGS -i > /home/pi/cron.out 2>&1
 ```
 which will run the QPIGS command every minute and log errors to /home/pi/cron.out
 
@@ -96,9 +96,9 @@ sudo apt-get install grafana
 ```
 * Start grafana and set to run at boot
 ```
-sudo systemctl unmask grafana-server.service
-sudo systemctl start grafana-server
-sudo systemctl enable grafana-server.service
+sudo systemctl unmask grafana
+sudo systemctl start grafana
+sudo systemctl enable grafana
 ```
 
 ## Install Telegraf ##
@@ -133,6 +133,9 @@ sudo systemctl unmask telegraf.service
 sudo systemctl start telegraf
 sudo systemctl enable telegraf.service
 ```
+
+## Log in to Grafana and Add Influx as a source ##
+
 
 ### Troubleshooting ###
 If you get an error `ImportError: No module named paho.mqtt.publish`
