@@ -249,7 +249,7 @@ class mppCommand(object):
         # |measurement|,tag_set| |field_set| |timestamp|
         # +-----------+--------+-+---------+-+---------+
         # measurement not included
-        # setting=<setting> value=<value>,unit=<unit>
+        # setting=<setting> unit=<value>>
 
         # Build array of Influx Line Protocol messages
         responses = self.response[1:-3].split(" ")
@@ -264,7 +264,7 @@ class mppCommand(object):
             key = '{}'.format(resp_format[1]).lower().replace(" ", "_")
             # Process results
             if (resp_format[0] == 'float') or (resp_format[0] == 'int') :
-                msgs.append('setting={} value={},unit="{}"'.format(key, float(result), resp_format[2]))
+                msgs.append('setting={} nvalue={},unit="{}"'.format(key, float(result), resp_format[2]))
             elif (resp_format[0] == 'string'):
                 msgs.append('setting={} value="{}",unit="{}"'.format(key, result, resp_format[2]))
             # eg. ['option', 'Output source priority', ['Utility first', 'Solar first', 'SBU first']],
@@ -280,7 +280,7 @@ class mppCommand(object):
                 for j, flag in enumerate(result):
                     key = resp_format[2][j]
                     value = int(flag)
-                    msgs.append('setting={} value={},unit="{}"'.format(key, value, ''))
+                    msgs.append('setting={} nvalue={},unit="{}"'.format(key, value, ''))
             # eg. ['stat_flags', 'Warning status', ['Reserved', 'Inver...
             elif (resp_format[0] == 'stat_flags'):
                 output = ''
