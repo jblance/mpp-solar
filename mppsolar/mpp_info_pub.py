@@ -48,7 +48,6 @@ def main():
             print(msgs)
             print(args.broker)
 
-getInfluxLineProtocol
         if args.command:
             if args.influx:
                 for _command in args.command.split(','):
@@ -56,7 +55,7 @@ getInfluxLineProtocol
                     _data = mp.getInfluxLineProtocol(_command)
                     for _item in _data:
                         print(_item)
-                    
+
             else:
                 for _command in args.command.split(','):
                     msgs = []
