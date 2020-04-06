@@ -263,7 +263,7 @@ class mppCommand(object):
 
             key = '{}'.format(resp_format[1]).lower().replace(" ", "_")
             # Process results
-            if (resp_format[0] == 'float') or (resp_format[0] == 'int') :
+            if (resp_format[0] == 'float') or (resp_format[0] == 'int'):
                 msgs.append('setting={} nvalue={},unit="{}"'.format(key, float(result), resp_format[2]))
             elif (resp_format[0] == 'string'):
                 msgs.append('setting={} value="{}",unit="{}"'.format(key, result, resp_format[2]))
@@ -283,7 +283,7 @@ class mppCommand(object):
                     msgs.append('setting={} nvalue={},unit="{}"'.format(key, value, ''))
             # eg. ['stat_flags', 'Warning status', ['Reserved', 'Inver...
             elif (resp_format[0] == 'stat_flags'):
-                output = ''
+                # output = ''
                 # TODO
                 log.warning("StatFlags not implemented in Influx Line Protocol yet")
                 # for j, flag in enumerate(result):
@@ -308,9 +308,8 @@ class mppCommand(object):
                 return msgs
             else:
                 pass
-                #msgs[i] = [result, '']
+                # msgs[i] = [result, '']
         return msgs
-
 
     def getResponseDict(self):
         """
