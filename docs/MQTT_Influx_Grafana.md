@@ -136,6 +136,9 @@ sudo systemctl enable telegraf.service
 
 ## Log in to Grafana and Add Influx as a source ##
 
+* Connect to Grafana by going to `http://<ipaddress>:3000` in a browser
+* Log in with the username and password = admin and set a new admin password
+
 
 ### Troubleshooting ###
 If you get an error `ImportError: No module named paho.mqtt.publish`

@@ -74,12 +74,14 @@ def main():
                     _data = mp.getResponseDict(_command)
                     # {'serial_number': [u'9293333010501', u'']}
                     for _item in _data:
-                        table = _command
-                        setting = _item
-                        value = _data[_item][0]
+                        # 92931509101901/status/total_output_active_power/value 1250
+                        # 92931509101901/status/total_output_active_power/unit W
+                        #topic = '{}/status/{}/value'.format(serial_number, _item)
                         topic = '{}/{}/value'.format(_command, _item)
-                        payload = '{}'.format(_data[_item][1])
-                        msg = {'topic': topic, 'payload': payload}
+                        msg = {'topic': topic, 'payload': '{}'.format(_data[_item][0])}
+                        msgs.append(msg)
+                        topic = '{}/{}/unit'.format(_command, _item)
+                        msg = {'topic': topic, 'payload': '{}'.format(_data[_item][1])}
                         msgs.append(msg)
                     publish.multiple(msgs, hostname=args.broker)
         # Collect Inverter Status data and publish
