@@ -151,10 +151,10 @@ class mppCommand(object):
         self.regex = regex
         self.value = value
         if value is None:
-            cmd_str = self.name
+            self.cmd_str = self.name
         else:
-            cmd_str = "{}{}".format(self.name, self.value)
-        self.full_command = get_full_command(cmd_str)
+            self.cmd_str = "{}{}".format(self.name, self.value)
+        self.full_command = get_full_command(self.cmd_str)
         self.valid_response = False
 
     def setValue(self, value):
@@ -264,23 +264,23 @@ class mppCommand(object):
             key = '{}'.format(resp_format[1]).lower().replace(" ", "_")
             # Process results
             if (resp_format[0] == 'float') or (resp_format[0] == 'int'):
-                msgs.append('{}={}'.format(key, float(result)))
+                msgs.append('command={} {}={}'.format(self.cmd_str, key, float(result)))
             elif (resp_format[0] == 'string'):
-                msgs.append('{}="{}",unit="{}"'.format(key, result))
+                msgs.append('command={} {}="{}",unit="{}"'.format(self.cmd_str, key, result))
             # eg. ['option', 'Output source priority', ['Utility first', 'Solar first', 'SBU first']],
             elif (resp_format[0] == 'option'):
                 value = resp_format[2][int(result)]
-                msgs.append('{}="{}"'.format(key, value))
+                msgs.append('command={} {}="{}"'.format(self.cmd_str, key, value))
             # eg. ['keyed', 'Machine type', {'00': 'Grid tie', '01': 'Off Grid', '10': 'Hybrid'}],
             elif (resp_format[0] == 'keyed'):
                 value = resp_format[2][result]
-                msgs.append('{}="{}"'.format(key, value))
+                msgs.append('command={} {}="{}"'.format(self.cmd_str, key, value))
             # eg. ['flags', 'Device status', [ 'is_load_on', 'is_charging_on' ...
             elif (resp_format[0] == 'flags'):
                 for j, flag in enumerate(result):
                     key = resp_format[2][j]
                     value = int(flag)
-                    msgs.append('{}={}'.format(key, value))
+                    msgs.append('command={} {}={}'.format(self.cmd_str, key, value))
             # eg. ['stat_flags', 'Warning status', ['Reserved', 'Inver...
             elif (resp_format[0] == 'stat_flags'):
                 # output = ''
@@ -302,7 +302,7 @@ class mppCommand(object):
                         status = 'disabled'
                     else:
                         key = resp_format[2][item]['name']
-                        msgs.append('{}={}'.format(key, status))
+                        msgs.append('command={} {}={}'.format(self.cmd_str, key, status))
                 # msgs[key] = [output, '']
             elif self.command_type == 'SETTER':
                 return msgs
