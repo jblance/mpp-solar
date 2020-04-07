@@ -27,6 +27,7 @@ def main():
     parser.add_argument('-b', '--baud', type=int, help='Baud rate for serial communications', default=2400)
     parser.add_argument('-q', '--broker', type=str, help='MQTT Broker hostname', default='mqtt_broker')
     parser.add_argument('-i', '--influx', action='store_true', help='Use Influx Line Protocol for the messgae format')
+    parser.add_argument('-I', '--influx2', action='store_true', help='Use Influx Line Protocol II for the messgae format')
     args = parser.parse_args()
 
     # Process / loop through all supplied devices
@@ -67,7 +68,24 @@ def main():
                         msg = {'topic': _command, 'payload': payload}
                         msgs.append(msg)
                     publish.multiple(msgs, hostname=args.broker)
-
+            elif args.influx2:
+                for _command in args.command.split(','):
+                    msgs = []
+                    _data = mp.getInfluxLineProtocol2(_command)
+                    for _item in _data:
+                        # print(_item)
+                        # _item = setting=total_ac_output_apparent_power value=1577.0,unit="VA"
+                        # weather,location=us-midwest temperature=82 1465839830100400200
+                        # |    -------------------- --------------  |
+                        # |             |             |             |
+                        # |             |             |             |
+                        # +-----------+--------+-+---------+-+---------+
+                        # |measurement|,tag_set| |field_set| |timestamp|
+                        # +-----------+--------+-+---------+-+---------+
+                        payload = '{},{}'.format(_command, _item)
+                        msg = {'topic': '_{}'.format(_command), 'payload': payload}
+                        msgs.append(msg)
+                    publish.multiple(msgs, hostname=args.broker)
             else:
                 for _command in args.command.split(','):
                     msgs = []

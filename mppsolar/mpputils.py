@@ -36,6 +36,9 @@ class mppUtils:
     def getResponseDict(self, cmd):
         return self.inverter.getResponseDict(cmd)
 
+    def getInfluxLineProtocol2(self, cmd):
+        return self.inverter.getInfluxLineProtocol2(cmd)
+
     def getInfluxLineProtocol(self, cmd):
         return self.inverter.getInfluxLineProtocol(cmd)
 
