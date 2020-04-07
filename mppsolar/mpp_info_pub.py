@@ -28,6 +28,7 @@ def main():
     parser.add_argument('-q', '--broker', type=str, help='MQTT Broker hostname', default='mqtt_broker')
     parser.add_argument('-i', '--influx', action='store_true', help='Use Influx Line Protocol for the messgae format')
     parser.add_argument('-I', '--influx2', action='store_true', help='Use Influx Line Protocol II for the messgae format')
+    parser.add_argument('--tag', type=str, help='Influx tag to use for all commands in this execution', default=None)
     args = parser.parse_args()
 
     # Process / loop through all supplied devices
@@ -64,14 +65,22 @@ def main():
                         # +-----------+--------+-+---------+-+---------+
                         # |measurement|,tag_set| |field_set| |timestamp|
                         # +-----------+--------+-+---------+-+---------+
-                        payload = '{},{}'.format(_command, _item)
-                        msg = {'topic': _command, 'payload': payload}
+                        if args.tag:
+                            tag = args.tag
+                        else:
+                            tag = _command
+                        payload = '{},{}'.format(tag, _item)
+                        msg = {'topic': tag, 'payload': payload}
                         msgs.append(msg)
                     publish.multiple(msgs, hostname=args.broker)
             elif args.influx2:
                 for _command in args.command.split(','):
                     msgs = []
                     _data = mp.getInfluxLineProtocol2(_command)
+                    if args.tag:
+                        tag = args.tag
+                    else:
+                        tag = _command
                     for _item in _data:
                         # print(_item)
                         # _item = setting=total_ac_output_apparent_power value=1577.0,unit="VA"
@@ -82,8 +91,8 @@ def main():
                         # +-----------+--------+-+---------+-+---------+
                         # |measurement|,tag_set| |field_set| |timestamp|
                         # +-----------+--------+-+---------+-+---------+
-                        payload = 'mpp-solar,{}'.format(_item)
-                        msg = {'topic': 'mpp-solar'.format(_command), 'payload': payload}
+                        payload = 'mpp-solar,command={} {}'.format(tag, _item)
+                        msg = {'topic': 'mpp-solar', 'payload': payload}
                         msgs.append(msg)
                     publish.multiple(msgs, hostname=args.broker)
             else:
