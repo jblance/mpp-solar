@@ -91,7 +91,7 @@ def main():
                         # +-----------+--------+-+---------+-+---------+
                         # |measurement|,tag_set| |field_set| |timestamp|
                         # +-----------+--------+-+---------+-+---------+
-                        payload = 'mpp-solar,command={} {}'.format(tag, _item)
+                        payload = 'mpp-solar,command="{}" {}'.format(tag, _item)
                         msg = {'topic': 'mpp-solar', 'payload': payload}
                         msgs.append(msg)
                     publish.multiple(msgs, hostname=args.broker)
