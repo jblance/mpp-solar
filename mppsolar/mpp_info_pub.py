@@ -82,8 +82,8 @@ def main():
                         # +-----------+--------+-+---------+-+---------+
                         # |measurement|,tag_set| |field_set| |timestamp|
                         # +-----------+--------+-+---------+-+---------+
-                        payload = '_{},{}'.format(_command, _item)
-                        msg = {'topic': '_{}'.format(_command), 'payload': payload}
+                        payload = 'mpp-solar,{}'.format(_item)
+                        msg = {'topic': 'mpp-solar'.format(_command), 'payload': payload}
                         msgs.append(msg)
                     publish.multiple(msgs, hostname=args.broker)
             else:
