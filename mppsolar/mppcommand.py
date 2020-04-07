@@ -159,6 +159,7 @@ class mppCommand(object):
 
     def setValue(self, value):
         self.value = value
+        self.cmd_str = "{}{}".format(self.name, self.value)
         self.full_command = get_full_command("{}{}".format(self.name, self.value))
 
     def clearResponse(self):

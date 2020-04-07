@@ -82,7 +82,7 @@ def main():
                         # +-----------+--------+-+---------+-+---------+
                         # |measurement|,tag_set| |field_set| |timestamp|
                         # +-----------+--------+-+---------+-+---------+
-                        payload = '{},{}'.format(_command, _item)
+                        payload = '_{},{}'.format(_command, _item)
                         msg = {'topic': '_{}'.format(_command), 'payload': payload}
                         msgs.append(msg)
                     publish.multiple(msgs, hostname=args.broker)
