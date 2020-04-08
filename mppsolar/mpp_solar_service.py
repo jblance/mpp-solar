@@ -51,9 +51,10 @@ def main():
     systemd.daemon.notify('READY=1')
 
     while True:
-        #print('MPP-Solar-Service: while loop')
-        #    serial_number = mp.getSerialNumber()
+        # Loop through the configured commands
         for item in mppUtilArray:
+            # Tell systemd watchdog we are still alive
+            systemd.daemon.notify('WATCHDOG=1')
             print('MPP-Solar-Service: item {}'.format(item))
             if item['format'] == 'influx':
                 print('MPP-Solar-Service: format influx not supported')
@@ -69,4 +70,6 @@ def main():
             else:
                 print('MPP-Solar-Service: format {} not supported'.format(item['format']))
         print('MPP-Solar-Service: sleeping for {}sec'.format(pause))
+        # Tell systemd watchdog we are still alive
+        systemd.daemon.notify('WATCHDOG=1')
         time.sleep(pause)

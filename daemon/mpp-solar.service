@@ -16,7 +16,8 @@ ExecStart=/usr/bin/python /usr/local/bin/mpp-solar-service -c /etc/mpp-solar/mpp
 Environment=PYTHONUNBUFFERED=1
 
 # Automatically restart the service if it crashes
-Restart=on-failure
+Restart=always
+WatchdogSec=60
 
 # Our service will notify systemd once it is up and running
 Type=notify

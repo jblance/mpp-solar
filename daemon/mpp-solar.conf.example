@@ -1,5 +1,6 @@
 [SETUP]
 # Number of seconds to pause between command execution loop
+# 0 is no pause, greater than 60 will cause service restarts
 pause=5
 mqtt_broker=mqtthost
 
