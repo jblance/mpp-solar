@@ -5,7 +5,7 @@ import time
 import systemd.daemon
 from argparse import ArgumentParser
 
-if __name__ == '__main__':
+def main():
     parser = ArgumentParser(description='MPP Solar Inverter Helper Service')
     parser.add_argument('-c', '--configfile', type=str, help='Full location of config file', default='/etc/mpp-solar/mpp-solar.conf')
     args = parser.parse_args()
