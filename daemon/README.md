@@ -10,25 +10,24 @@ Need to create a config file `/etc/mpp-solar/mpp-solar.conf`
 
 ### Config Items ###
 [SETUP]                 # Required section
-pause=5                 # Number of seconds to pause at the end of each loop
+pause=5                 # Number of seconds to pause at the end of each loop (0 is no pause)
 mqtt_broker=mqtthost    # Hostname / IP address of the MQTT broker
 
 # The following sections define each command execution
-[Inverter_1]      # The section heading for information only - must be unique
-model=standard    # Model of inverter, currently only standard and LV5048 defined
-port=/dev/ttyUSB0 # Port that mpp-solar connects to the inverter
-baud=2400         # Speed of the connection
-command=QPGS0     # Command to send to the inverter
-tag = QPGS0
-format=influx2    # Format of MQTT message to post - valid (so far) influx2
-                  # for MQTT to Grafana via telegraf (as documented)
-                  # To combine 2 commands for Influx math define multiple sections with the same tag
+[Inverter1_L1]      # The section heading for information only - must be unique
+model=LV5048        # Model of inverter, currently only standard and LV5048 defined
+port=/dev/ttyUSB0   # Port that mpp-solar connects to the inverter
+baud=2400           # Speed of the connection
+command=QPGS0       # Command to send to the inverter
+tag = Inverter1
+format=influx2      # Format of MQTT message to post - valid (so far) influx2
+                    # for MQTT to Grafana via telegraf (as documented)
 
-[Inverter_2]
-model=standard
+[Inverter1_L2]      # To combine 2 commands for Influx math define multiple sections with the same tag
+model=LV5048
 port=/dev/ttyUSB0
-command=QPGS1
-tag=QPGS1
+command=QP2GS0
+tag=Inverter1
 format=influx2
 
 ## Add mpp-solar service ##
