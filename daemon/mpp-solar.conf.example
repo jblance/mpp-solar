@@ -1,5 +1,5 @@
 [SETUP]
-## Number of seconds to pause between command executions
+# Number of seconds to pause between command execution loop
 pause=5
 mqtt_broker=mqtthost
 
@@ -8,10 +8,12 @@ model=standard
 port=/dev/ttyUSB0
 baud=2400
 command=QPGS0
+tag=QPGS1
 format=influx2
 
 [Inverter_2]
 model=standard
 port=/dev/ttyUSB0
 command=QPGS1
+tag=QPGS1
 format=influx2

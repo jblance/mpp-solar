@@ -42,9 +42,10 @@ def main():
         port=config[section].get('port')
         baud=config[section].get('baud', fallback=2400)
         command=config[section].get('command')
+        tag=config[section].get('tag')
         format=config[section].get('format')
         mp = mppUtils(port, baud, model)
-        mppUtilArray.append({'mp': mp, 'command': command, 'format': format, 'tag': section})
+        mppUtilArray.append({'mp': mp, 'command': command, 'format': format, 'tag': tag})
 
     # Tell systemd that our service is ready
     systemd.daemon.notify('READY=1')
