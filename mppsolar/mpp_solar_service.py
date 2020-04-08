@@ -38,14 +38,13 @@ def main():
     mppUtilArray = []
     for section in sections:
         #print('MPP-Solar-Service: Execute - {}'.format(config[section]))
-        tag=section
         model=config[section].get('model')
         port=config[section].get('port')
         baud=config[section].get('baud', fallback=2400)
         command=config[section].get('command')
         format=config[section].get('format')
         mp = mppUtils(port, baud, model)
-        mppUtilArray.append({'mp': mp, 'command': command, 'format': format})
+        mppUtilArray.append({'mp': mp, 'command': command, 'format': format, 'tag': section})
 
     # Tell systemd that our service is ready
     systemd.daemon.notify('READY=1')
@@ -58,7 +57,15 @@ def main():
             if item['format'] == 'influx':
                 print('MPP-Solar-Service: format influx not supported')
             elif item['format'] == 'influx2':
-                print('MPP-Solar-Service: format influx2 yet to be supported')
+                # print('MPP-Solar-Service: format influx2 yet to be supported')
+                msgs = []
+                _data = item['mp'].getInfluxLineProtocol2(item['command'])
+                for _item in _data:
+                    payload = 'mpp-solar,command={} {}'.format(item['tag'], _item)
+                    msg = {'topic': 'mpp-solar', 'payload': payload}
+                    msgs.append(msg)
+                publish.multiple(msgs, hostname=mqtt_broker)
             else:
                 print('MPP-Solar-Service: format {} not supported'.format(item['format']))
+        print('MPP-Solar-Service: sleeping for {}sec'.format(pause))
         time.sleep(pause)
