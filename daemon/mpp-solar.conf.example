@@ -3,17 +3,36 @@
 pause=5
 mqtt_broker=mqtthost
 
+# This example would work on 2x PIP4048 installed in parallel
 [Inverter_1]
 model=standard
 port=/dev/ttyUSB0
 baud=2400
 command=QPGS0
-tag=QPGS1
+tag=QPGS0
 format=influx2
 
 [Inverter_2]
 model=standard
 port=/dev/ttyUSB0
+baud=2400
 command=QPGS1
 tag=QPGS1
+format=influx2
+
+# This example would work on a single LV5048
+[Inverter1_L1]
+model=LV5048
+port=/dev/ttyUSB0
+baud=2400
+command=QPGS0
+tag=Inverter1
+format=influx2
+
+[Inverter1_L2]
+model=standard
+port=/dev/ttyUSB0
+baud=2400
+command=QP2GS0
+tag=Inverter1
 format=influx2
