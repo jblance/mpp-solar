@@ -8,7 +8,8 @@ Need python-systemd package
 Need to create a config file `/etc/mpp-solar/mpp-solar.conf`
 * Use the example `/etc/mpp-solar/mpp-solar.conf.example` as a start
 
-### Config Items ###
+### Config File Description ###
+```
 [SETUP]                 # Required section
 pause=5                 # Number of seconds to pause at the end of each loop (0 is no pause)
 mqtt_broker=mqtthost    # Hostname / IP address of the MQTT broker
@@ -29,7 +30,7 @@ port=/dev/ttyUSB0
 command=QP2GS0
 tag=Inverter1
 format=influx2
-
+```
 ## Add mpp-solar service ##
 
 * Check the service exists
