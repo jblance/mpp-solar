@@ -1,0 +1,3 @@
+[setup]
+## Number of seconds to pause between command executions
+pause=1
