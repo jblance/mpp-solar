@@ -107,8 +107,7 @@ sudo systemctl enable grafana
 ## Configure Telegraf ##
 
 * Configure Telegraf
-* Open `/etc/telegraf/telegraf.conf`
-* Look for section `[[inputs.mqtt_consumer]]` section and add these lines:
+* In an new file `/etc/telegraf/telegraf.d/mqtt-input.conf` add these lines:
 ```
 [[inputs.mqtt_consumer]]
   servers = ["tcp://127.0.0.1:1883"]
@@ -117,7 +116,7 @@ sudo systemctl enable grafana
   ]
   data_format = "influx"
 ```
-* Look for section `[[outputs.influxdb]]` and add/modify these lines
+* In a new file `/etc/telegraf/telegraf.d/influx-output.conf` add these lines
 ```
 [[outputs.influxdb]]
   urls = ["http://127.0.0.1:8086"]
