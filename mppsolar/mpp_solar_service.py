@@ -17,7 +17,7 @@ def main():
     print('MPP-Solar-Service: Config file: {}'.format(args.configfile))
     config = configparser.ConfigParser()
     config.read(args.configfile)
-    pause = config[setup].getint('pause', fallback=60)
+    pause = config['setup'].getint('pause', fallback=60)
     print('MPP-Solar-Service: Config setting - pause: {}'.format(pause))
 
 
