@@ -1,3 +1,6 @@
+#!/usr/bin/python
+#
+#
 # MPP-Solar-Service
 #
 import configparser
