@@ -30,12 +30,12 @@ def main():
         sections.remove('SETUP')
     print('MPP-Solar-Service: Config setting - pause: {}'.format(pause))
     print('MPP-Solar-Service: Config setting - mqtt_broker: {}'.format(mqtt_broker))
-    print(len(sections))
-
-
+    print('MPP-Solar-Service: Config setting - command sections found: {}'.format(len(sections)))
     # Tell systemd that our service is ready
     systemd.daemon.notify('READY=1')
 
     while True:
-        print('MPP-Solar-Service: while loop')
-        time.sleep(5)
+        #print('MPP-Solar-Service: while loop')
+        for section in sections:
+            print('MPP-Solar-Service: Execute - {}'.format(config[section]))
+        time.sleep(pause)
