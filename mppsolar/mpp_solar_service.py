@@ -11,7 +11,7 @@ from argparse import ArgumentParser
 def main():
     # Some default defaults
     pause = 60
-    mqtt_broker = localhost
+    mqtt_broker = 'localhost'
 
     # Process arguments
     parser = ArgumentParser(description='MPP Solar Inverter Helper Service')
