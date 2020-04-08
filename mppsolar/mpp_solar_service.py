@@ -34,30 +34,25 @@ def main():
     print('MPP-Solar-Service: Config setting - pause: {}'.format(pause))
     print('MPP-Solar-Service: Config setting - mqtt_broker: {}'.format(mqtt_broker))
     print('MPP-Solar-Service: Config setting - command sections found: {}'.format(len(sections)))
+    # Build array of commands to run
+    mppUtilArray = []
+    for section in sections:
+        #print('MPP-Solar-Service: Execute - {}'.format(config[section]))
+        tag=section
+        model=config[section].get('model')
+        port=config[section].get('port')
+        baud=config[section].get('baud', fallback=2400)
+        command=config[section].get('command')
+        format=config[section].get('format')
+        mp = mppUtils(port, baud, model)
+        mppUtilArray.append({'mp': mp, 'command': command, 'format': format})
+
     # Tell systemd that our service is ready
     systemd.daemon.notify('READY=1')
 
     while True:
         #print('MPP-Solar-Service: while loop')
-        for section in sections:
-            print('MPP-Solar-Service: Execute - {}'.format(config[section]))
-            tag=section
-            model=config[section].get('model')
-            port=config[section].get('port')
-            baud=config[section].get('baud', fallback=2400)
-            command=config[section].get('command')
-            format=config[section].get('format')
-            print('MPP-Solar-Service: Section: {} Setting - model: {}'.format(section, model))
-            print('MPP-Solar-Service: Section: {} Setting - port: {}'.format(section, port))
-            print('MPP-Solar-Service: Section: {} Setting - baud: {}'.format(section, baud))
-            print('MPP-Solar-Service: Section: {} Setting - command: {}'.format(section, command))
-            print('MPP-Solar-Service: Section: {} Setting - format: {}'.format(section, format))
-            # [Inverter_1]
-            # model=standard
-            # port=/dev/ttyUSB0
-            # baud=2400
-            # command=QPGS0
-            # format=influx2
-            #mp = mppUtils(usb_port, args.baud, args.model)
-            #    serial_number = mp.getSerialNumber()
+        #    serial_number = mp.getSerialNumber()
+        for item in mppUtilArray:
+            print('MPP-Solar-Service: item {}'.format(item))
         time.sleep(pause)
