@@ -1,11 +1,12 @@
 [SETUP]
 ## Number of seconds to pause between command executions
 pause=5
-mqtt_broker=<mqtthostname>
+mqtt_broker=mqtthost
 
 [Inverter_1]
 model=standard
 port=/dev/ttyUSB0
+baud=2400
 command=QPGS0
 format=influx2
 
