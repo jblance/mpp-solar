@@ -1,6 +1,12 @@
 # Installing as a Service #
 source: https://github.com/torfsen/python-systemd-tutorial
 
+Note need python-systemd package
+* `sudo apt-get install python-systemd`
+
+Will need to create a config file `/etc/mpp-solar/mpp-solar.conf`
+
+
 ## Creating a User Service
 
 ### Unit Files

@@ -73,6 +73,8 @@ setup(
 
     include_package_data=True,
 
+    data_files=[('/etc/systemd/user/mpp-solar.service', ['daemon/mpp-solar.service'])],
+
     # List run-time dependencies here.  These will be installed by pip when
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:

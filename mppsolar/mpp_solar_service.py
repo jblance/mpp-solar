@@ -15,8 +15,8 @@ def main():
 
     print('MPP-Solar-Service initializing ...')
     print('MPP-Solar-Service config file: {}'.format(args.configfile))
-    #config = configparser.ConfigParser()
-    #config.read('example.ini')
+    config = configparser.ConfigParser()
+    config.read(args.configfile)
     #time.sleep(10)
     print('Startup complete')
     # Tell systemd that our service is ready
