@@ -86,8 +86,10 @@ Apr  8 16:23:32 batteryshed python[21724]: MPP-Solar-Service: sleeping for 1sec
 `journalctl --user-unit mpp-solar`
 
 ## Automatically Starting the Service during Boot ##
-`systemctl --user enable mpp-solar`
-`sudo loginctl enable-linger $USER`
+```
+systemctl --user enable mpp-solar
+sudo loginctl enable-linger $USER
+```
 
 * To disable autostart, simply disable your service:
 `systemctl --user disable python_demo_service`
