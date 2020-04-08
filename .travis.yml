@@ -1,11 +1,11 @@
 language: python
-sudo: false
+sudo: true
 python:
     - "2.7"
     - "3.6"
     - "3.8"
 
-install: 
+install:
   - "pip install python-coveralls"
   - "pip install coverage"
   - "pip install flake8"
@@ -14,12 +14,12 @@ install:
 before_script:
   - "flake8 setup.py mppsolar tests"
 
-script: 
+script:
   - "coverage run ./setup.py test"
-  
+
 after_success:
   - "coverage report"
   - "coveralls"
-    
+
 notifications:
   email: false
