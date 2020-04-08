@@ -55,10 +55,10 @@ def main():
         #    serial_number = mp.getSerialNumber()
         for item in mppUtilArray:
             print('MPP-Solar-Service: item {}'.format(item))
-            if item.format == 'influx':
+            if item['format'] == 'influx':
                 print('MPP-Solar-Service: format influx not supported')
-            elif item.format == 'influx2':
+            elif item['format'] == 'influx2':
                 print('MPP-Solar-Service: format influx2 yet to be supported')
             else:
-                print('MPP-Solar-Service: format {} not supported'.format(item.format))
+                print('MPP-Solar-Service: format {} not supported'.format(item['format']))
         time.sleep(pause)
