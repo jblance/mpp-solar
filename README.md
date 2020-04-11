@@ -10,6 +10,8 @@ for PIP-4048MS inverters - aka:
 - IPS-4000WM
 - Voltronic Axpert MKS 5KVA Off-grid Inverter-Chargers
 
+Now also supports LV5048 inverter commands
+
 Good overview and technical discussion here
 http://forums.aeva.asn.au/viewtopic.php?f=31&t=4332
 
