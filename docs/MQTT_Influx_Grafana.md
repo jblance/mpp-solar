@@ -1,5 +1,8 @@
 # MPP Solar Inverter - Connecting to local MQTT / Influx / Grafana #
 
+Connecting to Grafana, as documented below uses a number of components / steps.
+![mpp-solar to Grafana components](mpp-solar.png)
+
 ## Setting up a MQTT Broker on the Raspberry Pi ##
 Note: while the below shows setting up the MQTT broker on the same device as is connected to the inverter, this is not needed, as long as the inverter connected Pi can communication with the MQTT broker the broker can be anywhere (including on the Inter-tubes). Just change the `-h localhost`. Password secured brokers are not currently supported
 
