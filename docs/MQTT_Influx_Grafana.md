@@ -69,11 +69,11 @@ influx
 ```
 * add users etc
 ```
-create database home
-use home
+create database mppsolar
+use mppsolar
 
 create user grafana with password '<passwordhere>' with all privileges
-grant all privileges on home to grafana
+grant all privileges on mppsolar to grafana
 
 show users
 ```
@@ -112,6 +112,7 @@ sudo systemctl enable grafana
 ## Configure Telegraf ##
 
 * Configure Telegraf
+* Edit `/etc/telegraf/telegraf.conf`, find the line with `[[outputs.influxdb]]` and put a `#` at the start (i.e. comment out that line)
 * In an new file `/etc/telegraf/telegraf.d/mqtt-input.conf` add these lines:
 ```
 [[inputs.mqtt_consumer]]
@@ -125,7 +126,7 @@ sudo systemctl enable grafana
 ```
 [[outputs.influxdb]]
   urls = ["http://127.0.0.1:8086"]
-  database = "home"
+  database = "mppsolar"
   skip_database_creation = true
   username = "grafana"
   password = "<put your password here>"
@@ -151,13 +152,13 @@ If you get an error `ImportError: No module named paho.mqtt.publish`
 
 To check what is stored in influx
 * log in to influx `influx`
-* at influx prompt use the DB created `use home`
+* at influx prompt use the DB created `use mppsolar`
 * show all the 'tables' `show measurements`
 * show entries in one table `select * from <table name goes here>` e.g. `select * from QPGS0`
 
 * Show telegraf errors `sudo systemctl status telegraf`
-* if telegraf is trying (and failing) to write to a database `grafana`
-  * find the line with `[[outputs.influxdb]]` in `/etc/telegraf/telegraf.conf`and put a # at the start (i.e. comment out that line), then restart telegraf
+* if telegraf is trying (and failing) to write to a database `telegraf`
+  * find the line with `[[outputs.influxdb]]` in `/etc/telegraf/telegraf.conf`and put a `#` at the start (i.e. comment out that line), then restart telegraf
 
 * Show cron errors (if using cron and not the service)`cat /home/pi/cron.out`
 * Show mpp-solar service errors `systemctl --user status mpp-solar`
