@@ -11,6 +11,7 @@ from argparse import ArgumentParser
 import paho.mqtt.publish as publish
 from .mpputils import mppUtils
 
+
 def main():
     # Some default defaults
     pause = 60
@@ -37,13 +38,13 @@ def main():
     # Build array of commands to run
     mppUtilArray = []
     for section in sections:
-        #print('MPP-Solar-Service: Execute - {}'.format(config[section]))
-        model=config[section].get('model')
-        port=config[section].get('port')
-        baud=config[section].get('baud', fallback=2400)
-        command=config[section].get('command')
-        tag=config[section].get('tag')
-        format=config[section].get('format')
+        # print('MPP-Solar-Service: Execute - {}'.format(config[section]))
+        model = config[section].get('model')
+        port = config[section].get('port')
+        baud = config[section].get('baud', fallback=2400)
+        command = config[section].get('command')
+        tag = config[section].get('tag')
+        format = config[section].get('format')
         mp = mppUtils(port, baud, model)
         mppUtilArray.append({'mp': mp, 'command': command, 'format': format, 'tag': tag})
 
