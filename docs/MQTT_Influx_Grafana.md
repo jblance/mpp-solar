@@ -155,4 +155,5 @@ To check what is stored in influx
 
 * Show telegraf errors `sudo systemctl status telegraf`
 
-* Show cron errors `cat /home/pi/cron.out`
+* Show cron errors (if using cron and not the service)`cat /home/pi/cron.out`
+* Show mpp-solar service errors `systemctl --user status mpp-solar`
