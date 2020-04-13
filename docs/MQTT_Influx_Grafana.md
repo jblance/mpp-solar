@@ -157,8 +157,6 @@ To check what is stored in influx
 * show entries in one table `select * from <table name goes here>` e.g. `select * from QPGS0`
 
 * Show telegraf errors `sudo systemctl status telegraf`
-* if telegraf is trying (and failing) to write to a database `telegraf`
-  * find the line with `[[outputs.influxdb]]` in `/etc/telegraf/telegraf.conf`and put a `#` at the start (i.e. comment out that line), then restart telegraf
 
 * Show cron errors (if using cron and not the service)`cat /home/pi/cron.out`
 * Show mpp-solar service errors `systemctl --user status mpp-solar`
