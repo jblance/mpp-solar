@@ -40,6 +40,8 @@ and add a line like
 ```
 which will run the QPIGS command every minute and log errors to /home/pi/cron.out
 
+or use the mpp-solar service [as detailed here](daemon/README.md)
+
 ## Install Influx ##
 Source: https://simonhearne.com/2020/pi-influx-grafana/
 Thanks SIMON HEARNE!!
