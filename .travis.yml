@@ -9,13 +9,13 @@ install:
   - "pip install python-coveralls"
   - "pip install coverage"
   - "pip install flake8"
-  - "python ./setup.py install"
+  - "sudo python ./setup.py install"
 
 before_script:
   - "flake8 setup.py mppsolar tests"
 
 script:
-  - "coverage run ./setup.py test"
+  - "coverage run sudo ./setup.py test"
 
 after_success:
   - "coverage report"
