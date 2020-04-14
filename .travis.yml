@@ -9,7 +9,7 @@ install:
   - "pip install python-coveralls"
   - "pip install coverage"
   - "pip install flake8"
-  - "sudo python ./setup.py install"
+  - "python ./setup.py install"
 
 before_script:
   - "flake8 setup.py mppsolar tests"
