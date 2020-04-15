@@ -279,15 +279,16 @@ class mppInverter:
             return command
         # Send the command to the open usb connection
         to_send = command.full_command
-        # while (len(to_send) > 0):
+        while (len(to_send) > 0):
+            log.debug("length of to_send: {}".format(len(to_send)))
             # Split the full command into smaller chucks
-        #    send, to_send = to_send[:8], to_send[8:]
-        #    log.debug("send: {}, to_send: {}".format(send, to_send))
-        #    time.sleep(0.35)
-        #    os.write(usb0, send)
+            send, to_send = to_send[:8], to_send[8:]
+            log.debug("send: {}, to_send: {}".format(send, to_send))
+            time.sleep(0.35)
+            os.write(usb0, send)
         # Send all at once
-        time.sleep(0.35)
-        os.write(usb0, to_send)
+        # time.sleep(0.35)
+        # os.write(usb0, to_send)
         time.sleep(0.25)
         # Read from the usb connection
         # try to a max of 100 times
