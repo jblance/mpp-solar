@@ -15,7 +15,7 @@ before_script:
   - "flake8 setup.py mppsolar tests"
 
 script:
-  - "coverage run ./setup.py test"
+  - "sudo coverage run ./setup.py test"
 
 after_success:
   - "coverage report"
