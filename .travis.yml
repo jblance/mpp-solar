@@ -15,7 +15,7 @@ before_script:
   - "flake8 setup.py mppsolar tests"
 
 script:
-  - "coverage_exe = `which coverage`"
+  - "coverage_exe=`which coverage`"
   - "sudo $coverage_exe run ./setup.py test"
 
 after_success:
