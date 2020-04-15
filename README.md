@@ -16,13 +16,19 @@ Good overview and technical discussion here
 http://forums.aeva.asn.au/viewtopic.php?f=31&t=4332
 
 ## Tested On
-- a Raspberry Pi 3
-- using 2x USB to serial adapters (like https://www.adafruit.com/product/18)
-- to connect to 2x PIP-4048MS inverters connected in parallel
+- Raspberry Pi 3
+- 2x USB to serial adapters (like https://www.adafruit.com/product/18)
+- connected to 2x PIP-4048MS inverters connected in parallel
 
 Also
-- a Raspberry Pi 3
-- USB cable to USB port of PIP-4048MS (connected to Pi as /dev/hidraw0)
+- Raspberry Pi 3
+- USB cable to USB port of inverter
+- connected to 1x PIP-4048MS (/dev/hidraw0 on Pi)
+
+Also
+- Raspberry Pi
+- 3x USB to serial adapters
+- connected to 3x LV5048 inverters
 
 ## Install
 `sudo python ./setup.py install`
