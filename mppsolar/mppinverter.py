@@ -282,6 +282,7 @@ class mppInverter:
         while (len(to_send) > 0):
             # Split the full command into smaller chucks
             send, to_send = to_send[:8], to_send[8:]
+            log.debug("send: {}, to_send: {}".format(send, to_send))
             time.sleep(0.35)
             os.write(usb0, send)
         time.sleep(0.25)
