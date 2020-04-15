@@ -285,7 +285,7 @@ class mppInverter:
             log.debug("1 chunk send")
             time.sleep(0.35)
             os.write(usb0, send)
-        elif len(to_send) > 8 and len(to_send < 11):
+        elif len(to_send) > 8 and len(to_send) < 11:
             log.debug("2 chunk send")
             time.sleep(0.35)
             os.write(usb0, to_send[:5])
@@ -293,7 +293,7 @@ class mppInverter:
             os.write(usb0, to_send[5:])
         else:
             while (len(to_send) > 0):
-                log.debug("multiple chunk send")                
+                log.debug("multiple chunk send")
                 # Split the full command into smaller chucks
                 send, to_send = to_send[:8], to_send[8:]
                 log.debug("send: {}, to_send: {}".format(send, to_send))
