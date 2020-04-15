@@ -267,7 +267,7 @@ class mppCommand(object):
             if (resp_format[0] == 'float') or (resp_format[0] == 'int'):
                 msgs.append('{}={}'.format(key, float(result)))
             elif (resp_format[0] == 'string'):
-                msgs.append('{}="{}",unit="{}"'.format(key, result))
+                msgs.append('{}="{}"'.format(key, result))
             # eg. ['option', 'Output source priority', ['Utility first', 'Solar first', 'SBU first']],
             elif (resp_format[0] == 'option'):
                 value = resp_format[2][int(result)]
