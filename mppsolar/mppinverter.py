@@ -284,7 +284,7 @@ class mppInverter:
             # Send all at once
             log.debug("1 chunk send")
             time.sleep(0.35)
-            os.write(usb0, send)
+            os.write(usb0, to_send)
         elif len(to_send) > 8 and len(to_send) < 11:
             log.debug("2 chunk send")
             time.sleep(0.35)
