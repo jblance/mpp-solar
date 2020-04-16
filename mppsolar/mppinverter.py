@@ -154,10 +154,10 @@ class mppInverter:
     def getSerialNumber(self):
         if self._serial_number is None:
             result = self.execute("QID")
-            print (result)
+            # print (result)
             if result:
                 response = result.getResponseDict()
-                print (response)
+                # print (response)
                 if response:
                     self._serial_number = response["serial_number"][0]
         return self._serial_number
