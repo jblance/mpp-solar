@@ -52,9 +52,7 @@ def main():
     if(args.printcrc):
         # print("{0:#x}".format(100))
         [crca, crcb] = mppcommand.crc(args.command)  # noqa: F821
-        [crc2a, crc2b] = mppcommand.crc2(args.command)  # noqa: F821
         print("{0} {1:#x} {2:#x}".format(args.command, crca, crcb))
-        print("{0} {1:#x} {2:#x}".format(args.command, crc2a, crc2b))
     elif(args.listknown):
         for line in mp.getKnownCommands():
             print(line)
