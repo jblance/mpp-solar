@@ -3,6 +3,10 @@ MPP Solar Inverter Command Library
 reference library of serial commands (and responses) for PIP-4048MS inverters
 mppcommand.py
 """
+
+# Backward compatibility to python2
+from builtins import bytes, str
+
 import ctypes
 import logging
 import random
@@ -10,11 +14,12 @@ import random
 log = logging.getLogger('MPP-Solar')
 
 
-def crc(cmd):
+def crc(byte_cmd):
     """
-    Calculates CRC for supplied text
+    Calculates CRC for supplied byte_cmd
     """
-    log.debug('Calculating CRC for %s', cmd)
+    assert type(byte_cmd) == bytes
+    log.debug('Calculating CRC for %s', byte_cmd)
 
     crc = 0
     da = 0
@@ -23,17 +28,17 @@ def crc(cmd):
               0x8108, 0x9129, 0xa14a, 0xb16b,
               0xc18c, 0xd1ad, 0xe1ce, 0xf1ef]
 
-    for c in cmd:
+    for c in byte_cmd:
         # log.debug('Encoding %s', c)
         t_da = ctypes.c_uint8(crc >> 8)
         da = t_da.value >> 4
         crc <<= 4
-        index = da ^ (ord(c) >> 4)
+        index = da ^ (c >> 4)
         crc ^= crc_ta[index]
         t_da = ctypes.c_uint8(crc >> 8)
         da = t_da.value >> 4
         crc <<= 4
-        index = da ^ (ord(c) & 0x0f)
+        index = da ^ (c & 0x0f)
         crc ^= crc_ta[index]
 
     crc_low = ctypes.c_uint8(crc).value
@@ -51,15 +56,21 @@ def crc(cmd):
     return [crc_high, crc_low]
 
 
-def get_full_command(cmd):
+def get_byte_command(cmd):
     """
-    Generates a full command including CRC and CR
+    Generates a byte command including CRC and CR
     """
-    log.debug('Generate full command for %s', cmd)
-    crc_high, crc_low = crc(cmd)
-    full_command = '{}{}{}\x0d'.format(cmd, chr(crc_high), chr(crc_low))
-    log.debug('Full command: %s', full_command)
-    return full_command
+    if type(cmd) != str and type(cmd) != unicode:
+        import pdb; pdb.set_trace()
+    log.debug('Generate full byte command for %s', cmd)
+    # Encode ASCII string to bytes
+    byte_cmd = bytes(cmd, 'utf-8')
+    # calculate the CRC
+    crc_high, crc_low = crc(byte_cmd)
+    # combine byte_cmd, CRC , return
+    full_byte_command = byte_cmd + bytes([crc_high, crc_low, 13 ])
+    log.debug('Full byte command: %s', full_byte_command)
+    return full_byte_command
 
 
 class mppCommand(object):
@@ -93,13 +104,13 @@ class mppCommand(object):
             self.cmd_str = self.name
         else:
             self.cmd_str = "{}{}".format(self.name, self.value)
-        self.full_command = get_full_command(self.cmd_str)
+        self.byte_command = get_byte_command(self.cmd_str)
         self.valid_response = False
 
     def setValue(self, value):
         self.value = value
         self.cmd_str = "{}{}".format(self.name, self.value)
-        self.full_command = get_full_command("{}{}".format(self.name, self.value))
+        self.byte_command = get_byte_command("{}{}".format(self.name, self.value))
 
     def clearResponse(self):
         self.response = None
@@ -119,9 +130,9 @@ class mppCommand(object):
         """
         return self.test_responses[random.randrange(len(self.test_responses))]
 
-    def isResponseValid(self, response):
+    def isResponseValid(self, byte_response):
         """
-        Checks the response is valid
+        Checks the byte response is valid
         +
         - if command is not a query then valid responses are (NAK and (ACK
         - for queries
@@ -129,27 +140,28 @@ class mppCommand(object):
             - check CRC is correct
         """
         # Check length of response
-        log.debug('Response length: %d', len(response))
-        if len(response) < 3:
-            log.debug('Response invalid as too short')
+        log.debug('Byte_Response length: %d', len(byte_response))
+        if len(byte_response) < 3:
+            log.debug('Byte Response invalid as too short')
             return False
         # Check we got a CRC response that matches the data
-        resp = response[:-3]
-        resp_crc = response[-3:-1]
-        log.debug('CRC resp\t%x %x', ord(resp_crc[0]), ord(resp_crc[1]))
+        resp = byte_response[:-3]
+        resp_crc = byte_response[-3:-1]
+        log.debug('CRC resp\t%x %x', resp_crc[0], resp_crc[1])
         calc_crc_h, calc_crc_l = crc(resp)
         log.debug('CRC calc\t%x %x', calc_crc_h, calc_crc_l)
-        if ((ord(resp_crc[0]) == calc_crc_h) and (ord(resp_crc[1]) == calc_crc_l)):
+        if ((resp_crc[0] == calc_crc_h) and (resp_crc[1] == calc_crc_l)):
             log.debug('CRCs match')
         else:
             log.debug('Response invalid as calculated CRC does not match response CRC')
             return False
+    
         # Check if this is a query or set command
         if (self.command_type == 'SETTER'):
-            if (response == '(ACK9 \r'):
+            if (byte_response == bytes('(ACK9 \r')):
                 log.debug('Response valid as setter with ACK resp')
                 return True
-            if (response == '(NAKss\r'):
+            if (response == bytes('(NAKss\r')):
                 log.debug('Response valid as setter with NAK resp')
                 return True
             return False
@@ -157,6 +169,8 @@ class mppCommand(object):
         if (self.response_definition is None):
             log.debug('Response invalid as no RESPONSE defined for %s', self.name)
             return False
+        # Omit the CRC checksum and convert back to a string
+        response = resp.decode()
         # Check we got the expected number of responses
         responses = response.split(" ")
         if (len(responses) < len(self.response_definition)):
@@ -358,7 +372,11 @@ class mppCommand(object):
             msgs['response'] = [self.response.replace('\r', ''), '']
             return msgs
 
-        responses = self.response[1:-3].split(" ")
+        # Omit the CRC and convert to string
+        
+        response = self.response[1:-3].decode()
+        
+        responses = response.split(" ")
         for i, result in enumerate(responses):
             # Check if we are past the 'known' responses
             if (i >= len(self.response_definition)):
