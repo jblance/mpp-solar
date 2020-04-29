@@ -7,8 +7,8 @@
           ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
       ],
   "test_responses": [
-         "(NAKss\r",
-         "(ACK9 \r"
+         ["(NAK","7373"],
+         ["(ACK","3920"]
       ],
 	"regex": "PPVOKC([01])$"
 }

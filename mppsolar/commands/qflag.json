@@ -15,7 +15,7 @@
                                     "z": {"name": "Record Fault Code", "state": "disabled"}}]
       ],
   "test_responses": [
-         "(EakxyDbjuvz/)\r"
+         ["(EakxyDbjuvz", "2F29"]
       ],
 	"regex": ""
 }
