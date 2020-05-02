@@ -3,6 +3,7 @@ from mppsolar import mppcommand
 
 from builtins import bytes
 
+
 class test_mppcommand(unittest.TestCase):
     def test_crc(self):
         """ Test crc function generates correct crc """
