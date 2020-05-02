@@ -13,7 +13,7 @@ import glob
 import os
 from os import path
 
-from builtins import bytes, chr
+from builtins import bytes
 
 from .mppcommand import mppCommand
 
@@ -286,8 +286,9 @@ class mppInverter:
         to_send = command.byte_command
         try:
             log.debug("length of to_send: {}".format(len(to_send)))
-        except:
-            import pdb; pdb.set_trace()
+        except:  # noqa: E722
+            import pdb
+            pdb.set_trace()
         if len(to_send) <= 8:
             # Send all at once
             log.debug("1 chunk send")

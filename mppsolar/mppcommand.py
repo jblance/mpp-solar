@@ -5,7 +5,7 @@ mppcommand.py
 """
 
 # Backward compatibility to python2
-from builtins import bytes, str
+from builtins import bytes
 
 import ctypes
 import logging
@@ -66,7 +66,7 @@ def get_byte_command(cmd):
     # calculate the CRC
     crc_high, crc_low = crc(byte_cmd)
     # combine byte_cmd, CRC , return
-    full_byte_command = byte_cmd + bytes([crc_high, crc_low, 13 ])
+    full_byte_command = byte_cmd + bytes([crc_high, crc_low, 13])
     log.debug('Full byte command: %s', full_byte_command)
     return full_byte_command
 
@@ -137,12 +137,12 @@ class mppCommand(object):
         """
         response = self.test_responses[random.randrange(len(self.test_responses))]
         if not response:
-            return ""
+            return ''
         resp_data, crc_hex = response
         try:
             result = bytes(resp_data, 'utf-8') + bytes(bytearray.fromhex(crc_hex)) + bytes('\r', 'utf-8')
         except:
-            pass
+            result - ''
         return result
 
     def isByteResponseValid(self, byte_response):
