@@ -127,9 +127,8 @@ class mppCommand(object):
     def getResponse(self):
         try:
             return self.byte_response[1:-3].decode('utf-8')
-        except:
+        except:  # noqa: E722
             pass
-
 
     def getTestByteResponse(self):
         """
@@ -141,7 +140,7 @@ class mppCommand(object):
         resp_data, crc_hex = response
         try:
             result = bytes(resp_data, 'utf-8') + bytes(bytearray.fromhex(crc_hex)) + bytes('\r', 'utf-8')
-        except:
+        except:  # noqa: E722
             result - ''
         return result
 
