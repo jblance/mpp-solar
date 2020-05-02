@@ -7,7 +7,7 @@
             ["string", "Protocol ID", ""]
         ],
     "test_responses": [
-           "(PI30\u009a\u000b\r"
+           ["(PI30", "9A0B"]
         ],
 	"regex": ""
 }

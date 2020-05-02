@@ -38,7 +38,7 @@
                                             "PV input max power will be the sum of the max charged power and loads power"]]
         ],
     "test_responses": [
-           "(230.0 50.0 0030 42.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 0 0 1 0 54.0 0 1 000\u009e\u0060\r"
+           ["(230.0 50.0 0030 42.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 0 0 1 0 54.0 0 1 000", "9E60"]
         ],
 	"regex": ""
 }

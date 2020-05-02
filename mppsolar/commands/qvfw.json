@@ -7,7 +7,7 @@
             ["string", "Main CPU firmware version", ""]
         ],
     "test_responses": [
-           "(VERFW:00072.70S§\r"
+           ["(VERFW:00072.70", "53A7"]
         ],
 	"regex": ""
 }

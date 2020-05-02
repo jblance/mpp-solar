@@ -3,6 +3,10 @@ MPP Solar Inverter Command Library
 reference library of serial commands (and responses) for PIP-4048MS inverters
 mppcommand.py
 """
+
+# Backward compatibility to python2
+from builtins import bytes, str
+
 import ctypes
 import logging
 import random
@@ -10,11 +14,12 @@ import random
 log = logging.getLogger('MPP-Solar')
 
 
-def crc(cmd):
+def crc(byte_cmd):
     """
-    Calculates CRC for supplied text
+    Calculates CRC for supplied byte_cmd
     """
-    log.debug('Calculating CRC for %s', cmd)
+    assert type(byte_cmd) == bytes
+    log.debug('Calculating CRC for %s', byte_cmd)
 
     crc = 0
     da = 0
@@ -23,17 +28,17 @@ def crc(cmd):
               0x8108, 0x9129, 0xa14a, 0xb16b,
               0xc18c, 0xd1ad, 0xe1ce, 0xf1ef]
 
-    for c in cmd:
+    for c in byte_cmd:
         # log.debug('Encoding %s', c)
         t_da = ctypes.c_uint8(crc >> 8)
         da = t_da.value >> 4
         crc <<= 4
-        index = da ^ (ord(c) >> 4)
+        index = da ^ (c >> 4)
         crc ^= crc_ta[index]
         t_da = ctypes.c_uint8(crc >> 8)
         da = t_da.value >> 4
         crc <<= 4
-        index = da ^ (ord(c) & 0x0f)
+        index = da ^ (c & 0x0f)
         crc ^= crc_ta[index]
 
     crc_low = ctypes.c_uint8(crc).value
@@ -51,15 +56,19 @@ def crc(cmd):
     return [crc_high, crc_low]
 
 
-def get_full_command(cmd):
+def get_byte_command(cmd):
     """
-    Generates a full command including CRC and CR
+    Generates a byte command including CRC and CR
     """
-    log.debug('Generate full command for %s', cmd)
-    crc_high, crc_low = crc(cmd)
-    full_command = '{}{}{}\x0d'.format(cmd, chr(crc_high), chr(crc_low))
-    log.debug('Full command: %s', full_command)
-    return full_command
+    log.debug('Generate full byte command for %s', cmd)
+    # Encode ASCII string to bytes
+    byte_cmd = bytes(cmd, 'utf-8')
+    # calculate the CRC
+    crc_high, crc_low = crc(byte_cmd)
+    # combine byte_cmd, CRC , return
+    full_byte_command = byte_cmd + bytes([crc_high, crc_low, 13 ])
+    log.debug('Full byte command: %s', full_byte_command)
+    return full_byte_command
 
 
 class mppCommand(object):
@@ -69,22 +78,23 @@ class mppCommand(object):
     """
 
     def __str__(self):
-        """ String representation of the command (including response) """
-        if(self.response is None or len(self.response) < 3):
+        """ String representation of the command (including byte_response) """
+        if(self.byte_response is None or len(self.byte_response) < 3):
             return "{}\n{}\n{}\n".format(self.name, self.description, self.help)
         else:
-            response = self.response[:-3]
+            response = self.byte_response[:-3]
             response_dict = self.response_dict
         return "{}\n{}\n{}\n{}\n{}".format(self.name, self.description, self.help, response, response_dict)
 
     def __init__(self, name, description, command_type, response_definition, test_responses=[], regex="", value=None, help=""):
         """ Return a command object """
+
         self.name = name
         self.description = description
         self.help = help
         self.command_type = command_type
         self.response_definition = response_definition
-        self.response = None
+        self.byte_response = None
         self.response_dict = None
         self.test_responses = test_responses
         self.regex = regex
@@ -93,93 +103,112 @@ class mppCommand(object):
             self.cmd_str = self.name
         else:
             self.cmd_str = "{}{}".format(self.name, self.value)
-        self.full_command = get_full_command(self.cmd_str)
+        self.byte_command = get_byte_command(self.cmd_str)
         self.valid_response = False
 
     def setValue(self, value):
         self.value = value
         self.cmd_str = "{}{}".format(self.name, self.value)
-        self.full_command = get_full_command("{}{}".format(self.name, self.value))
+        self.byte_command = get_byte_command("{}{}".format(self.name, self.value))
 
-    def clearResponse(self):
-        self.response = None
+    def clearByteResponse(self):
+        self.byte_response = None
 
-    def setResponse(self, response):
-        self.response = response
-        self.valid_response = self.isResponseValid(response)
+    def setByteResponse(self, byte_response):
+        self.byte_response = byte_response
+
+        self.valid_response = self.isByteResponseValid(byte_response)
         if self.valid_response:
             self.response_dict = self.getResponseDict()
 
-    def getResponse(self):
-        return self.response
+    def getByteResponse(self):
+        return self.byte_response
 
-    def getTestResponse(self):
+    def getResponse(self):
+        try:
+            return self.byte_response[1:-3].decode('utf-8')
+        except:
+            pass
+
+
+    def getTestByteResponse(self):
         """
         Return a random one of the test_responses
         """
-        return self.test_responses[random.randrange(len(self.test_responses))]
+        response = self.test_responses[random.randrange(len(self.test_responses))]
+        if not response:
+            return ""
+        resp_data, crc_hex = response
+        try:
+            result = bytes(resp_data, 'utf-8') + bytes(bytearray.fromhex(crc_hex)) + bytes('\r', 'utf-8')
+        except:
+            pass
+        return result
 
-    def isResponseValid(self, response):
+    def isByteResponseValid(self, byte_response):
         """
-        Checks the response is valid
+        Checks the byte byte_response is valid
         +
         - if command is not a query then valid responses are (NAK and (ACK
         - for queries
-            - check that the response if the correct length
+            - check that the byte_response if the correct length
             - check CRC is correct
         """
-        # Check length of response
-        log.debug('Response length: %d', len(response))
-        if len(response) < 3:
-            log.debug('Response invalid as too short')
+        # Check length of byte_response
+        log.debug('Byte_Response length: %d', len(byte_response))
+        if len(byte_response) < 3:
+            log.debug('Byte Response invalid as too short')
             return False
-        # Check we got a CRC response that matches the data
-        resp = response[:-3]
-        resp_crc = response[-3:-1]
-        log.debug('CRC resp\t%x %x', ord(resp_crc[0]), ord(resp_crc[1]))
+        # Check we got a CRC byte_response that matches the data
+        resp = byte_response[:-3]
+        resp_crc = byte_response[-3:-1]
+        log.debug('CRC resp\t%x %x', resp_crc[0], resp_crc[1])
         calc_crc_h, calc_crc_l = crc(resp)
         log.debug('CRC calc\t%x %x', calc_crc_h, calc_crc_l)
-        if ((ord(resp_crc[0]) == calc_crc_h) and (ord(resp_crc[1]) == calc_crc_l)):
+        if ((resp_crc[0] == calc_crc_h) and (resp_crc[1] == calc_crc_l)):
             log.debug('CRCs match')
         else:
-            log.debug('Response invalid as calculated CRC does not match response CRC')
+            log.debug('Response invalid as calculated CRC does not match byte_response CRC')
             return False
+
         # Check if this is a query or set command
         if (self.command_type == 'SETTER'):
-            if (response == '(ACK9 \r'):
+            if (byte_response == bytes('(ACK9 \r', 'utf-8')):
                 log.debug('Response valid as setter with ACK resp')
                 return True
-            if (response == '(NAKss\r'):
+            if (byte_response == bytes('(NAKss\r', 'utf-8')):
                 log.debug('Response valid as setter with NAK resp')
                 return True
             return False
-        # Check if valid response is defined for this command
+        # Check if valid byte_response is defined for this command
         if (self.response_definition is None):
             log.debug('Response invalid as no RESPONSE defined for %s', self.name)
             return False
+        # Omit the CRC checksum and convert back to a string
+        response = resp.decode()
         # Check we got the expected number of responses
         responses = response.split(" ")
         if (len(responses) < len(self.response_definition)):
-            log.debug("Response invalid as insufficient number of elements in response. Got %d, expected as least %d", len(responses), len(self.response_definition))
+            log.debug("Response invalid as insufficient number of elements in byte_response. Got %d, expected as least %d", len(responses), len(self.response_definition))
             return False
         log.debug('Response valid as no invalid situations found')
         return True
 
     def getInfluxLineProtocol2(self):
         """
-        Returns the response in InfluxDB line protocol format
+        Returns the byte_response in InfluxDB line protocol format
         """
         msgs = []
 
         # Deal with non-valid responses
-        if (self.response is None):
-            log.info('No response')
+        if (self.byte_response is None):
+            log.info('No byte_response')
             return msgs
         if (not self.valid_response):
-            log.info('Invalid response')
+            log.info('Invalid byte_response')
             return msgs
         if (self.response_definition is None):
-            log.info('No response definition')
+            log.info('No byte_response definition')
             return msgs
         # weather,location=us-midwest temperature=82 1465839830100400200
         # |    -------------------- --------------  |
@@ -192,12 +221,12 @@ class mppCommand(object):
         # setting=<setting> unit=<value>>
 
         # Build array of Influx Line Protocol messages
-        responses = self.response[1:-3].split(" ")
+        responses = self.byte_response[1:-3].split(" ")
         for i, result in enumerate(responses):
             # Check if we are past the 'known' responses
             if (i >= len(self.response_definition)):
                 # If we dont know what this value is, we'll ignore it
-                log.info('No response definition - ignoring')
+                log.info('No byte_response definition - ignoring')
             else:
                 resp_format = self.response_definition[i]
 
@@ -253,19 +282,19 @@ class mppCommand(object):
 
     def getInfluxLineProtocol(self):
         """
-        Returns the response in InfluxDB line protocol format
+        Returns the byte_response in InfluxDB line protocol format
         """
         msgs = []
 
         # Deal with non-valid responses
-        if (self.response is None):
-            log.info('No response')
+        if (self.byte_response is None):
+            log.info('No byte_response')
             return msgs
         if (not self.valid_response):
-            log.info('Invalid response')
+            log.info('Invalid byte_response')
             return msgs
         if (self.response_definition is None):
-            log.info('No response definition')
+            log.info('No byte_response definition')
             return msgs
         # weather,location=us-midwest temperature=82 1465839830100400200
         # |    -------------------- --------------  |
@@ -278,12 +307,12 @@ class mppCommand(object):
         # setting=<setting> unit=<value>>
 
         # Build array of Influx Line Protocol messages
-        responses = self.response[1:-3].split(" ")
+        responses = self.byte_response[1:-3].split(" ")
         for i, result in enumerate(responses):
             # Check if we are past the 'known' responses
             if (i >= len(self.response_definition)):
                 # If we dont know what this value is, we'll ignore it
-                log.info('No response definition - ignoring')
+                log.info('No byte_response definition - ignoring')
             else:
                 resp_format = self.response_definition[i]
 
@@ -339,30 +368,34 @@ class mppCommand(object):
 
     def getResponseDict(self):
         """
-        Returns the response in a dict (with value, unit array)
+        Returns the byte_response in a dict (with value, unit array)
         """
         msgs = {}
 
-        if (self.response is None):
-            log.info('No response')
-            msgs['error'] = ['No response', '']
+        if (self.byte_response is None):
+            log.info('No byte_response')
+            msgs['error'] = ['No byte_response', '']
             return msgs
         if (not self.valid_response):
-            log.info('Invalid response')
-            msgs['error'] = ['Invalid response', '']
-            msgs['response'] = [self.response.replace('\r', ''), '']
+            log.info('Invalid byte_response')
+            msgs['error'] = ['Invalid byte_response', '']
+            msgs['response'] = [self.getResponse().replace('\r', ''), '']
             return msgs
         if (self.response_definition is None):
-            log.info('No response definition')
-            msgs['error'] = ['No response definition', '']
-            msgs['response'] = [self.response.replace('\r', ''), '']
+            log.info('No byte_response definition')
+            msgs['error'] = ['No byte_response definition', '']
+            msgs['response'] = [self.getResponse().replace('\r', ''), '']
             return msgs
 
-        responses = self.response[1:-3].split(" ")
+        # Omit the CRC and convert to string
+
+        response = self.getResponse()
+
+        responses = response.split(" ")
         for i, result in enumerate(responses):
             # Check if we are past the 'known' responses
             if (i >= len(self.response_definition)):
-                resp_format = ['string', 'Unknown value in response', '']
+                resp_format = ['string', 'Unknown value in byte_response', '']
             else:
                 resp_format = self.response_definition[i]
 

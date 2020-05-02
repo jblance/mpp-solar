@@ -13,6 +13,8 @@ import glob
 import os
 from os import path
 
+from builtins import bytes, chr
+
 from .mppcommand import mppCommand
 
 log = logging.getLogger('MPP-Solar')
@@ -76,6 +78,7 @@ def getCommandsFromJson(inverter_model):
     COMMANDS = []
     here = path.abspath(path.dirname(__file__))
     files = glob.glob(here + '/commands/*.json')
+
     for file in sorted(files):
         log.debug("Loading command information from {}".format(file))
         with open(file) as f:
@@ -157,7 +160,7 @@ class mppInverter:
             # print (result)
             if result:
                 response = result.getResponseDict()
-                # print (response)
+                # print (byte_response)
                 if response:
                     self._serial_number = response["serial_number"][0]
         return self._serial_number
@@ -170,7 +173,7 @@ class mppInverter:
 
     def getResponse(self, cmd):
         """
-        Execute command and return the response
+        Execute command and return the byte_response
         """
         result = self.execute(cmd)
         if not result:
@@ -233,17 +236,17 @@ class mppInverter:
         """
         Performs a test command execution
         """
-        command.clearResponse()
+        command.clearByteResponse()
         log.debug('Performing test command with %s', command)
-        command.setResponse(command.getTestResponse())
+        command.setByteResponse(command.getTestByteResponse())
         return command
 
     def _doSerialCommand(self, command):
         """
         Opens serial connection, sends command (multiple times if needed)
-        and returns the response
+        and returns the byte_response
         """
-        command.clearResponse()
+        command.clearByteResponse()
         response_line = None
         log.debug('port %s, baudrate %s', self._serial_device, self._baud_rate)
         try:
@@ -255,11 +258,11 @@ class mppInverter:
                     s.write_timeout = 1 + x
                     s.flushInput()
                     s.flushOutput()
-                    s.write(command.full_command)
+                    s.write(command.byte_command)
                     time.sleep(0.5 * x)  # give serial port time to receive the data
                     response_line = s.readline()
-                    log.debug('serial response was: %s', response_line)
-                    command.setResponse(response_line)
+                    log.debug('serial byte_response was: %s', response_line)
+                    command.setByteResponse(response_line)
                     return command
         except Exception as e:
             log.warning("Serial read error: {}".format(e))
@@ -269,10 +272,10 @@ class mppInverter:
     def _doDirectUsbCommand(self, command):
         """
         Opens direct USB connection, sends command (multiple times if needed)
-        and returns the response
+        and returns the byte_response
         """
-        command.clearResponse()
-        response_line = ""
+        command.clearByteResponse()
+        response_line = bytes()
         usb0 = None
         try:
             usb0 = os.open(self._serial_device, os.O_RDWR | os.O_NONBLOCK)
@@ -280,8 +283,11 @@ class mppInverter:
             log.debug("USB open error: {}".format(e))
             return command
         # Send the command to the open usb connection
-        to_send = command.full_command
-        log.debug("length of to_send: {}".format(len(to_send)))
+        to_send = command.byte_command
+        try:
+            log.debug("length of to_send: {}".format(len(to_send)))
+        except:
+            import pdb; pdb.set_trace()
         if len(to_send) <= 8:
             # Send all at once
             log.debug("1 chunk send")
@@ -296,7 +302,7 @@ class mppInverter:
         else:
             while (len(to_send) > 0):
                 log.debug("multiple chunk send")
-                # Split the full command into smaller chucks
+                # Split the byte command into smaller chucks
                 send, to_send = to_send[:8], to_send[8:]
                 log.debug("send: {}, to_send: {}".format(send, to_send))
                 time.sleep(0.35)
@@ -312,18 +318,18 @@ class mppInverter:
                 response_line += r
             except Exception as e:
                 log.debug("USB read error: {}".format(e))
-            # Finished is \r is in response
-            if ('\r' in response_line):
+            # Finished is \r is in byte_response
+            if (bytes([13]) in response_line):
                 # remove anything after the \r
-                response_line = response_line[:response_line.find('\r') + 1]
+                response_line = response_line[:response_line.find(bytes([13])) + 1]
                 break
-        log.debug('usb response was: %s', response_line)
-        command.setResponse(response_line)
+        log.debug('usb byte_response was: %s', response_line)
+        command.setByteResponse(response_line)
         return command
 
     def execute(self, cmd):
         """
-        Sends a command (as supplied) to inverter and returns the raw response
+        Sends a command (as supplied) to inverter and returns the raw byte_response
         """
         command = self._getCommand(cmd)
         if command is None:
