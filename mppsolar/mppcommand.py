@@ -30,6 +30,8 @@ def crc(byte_cmd):
 
     for c in byte_cmd:
         log.debug('Encoding %s', c)
+        if type(c) != bytes:
+            c = ord(c)
         t_da = ctypes.c_uint8(crc >> 8)
         da = t_da.value >> 4
         crc <<= 4
@@ -115,11 +117,7 @@ class mppCommand(object):
         self.byte_response = None
 
     def setByteResponse(self, byte_response):
-        if type(byte_response) == bytes:
-            self.byte_response = byte_response
-        else:
-            log.debug('setByteResponse: converting response to bytes')
-            self.byte_response = bytes(byte_response.replace(' ',''), 'utf-8')
+        self.byte_response = byte_response
         self.valid_response = self.isByteResponseValid(self.byte_response)
         if self.valid_response:
             self.response_dict = self.getResponseDict()
