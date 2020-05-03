@@ -19,7 +19,7 @@ def crc(byte_cmd):
     Calculates CRC for supplied byte_cmd
     """
     #assert type(byte_cmd) == bytes
-    log.debug('Calculating CRC for %s', byte_cmd)
+    log.debug('Calculating CRC for %x', byte_cmd)
 
     crc = 0
     da = 0
