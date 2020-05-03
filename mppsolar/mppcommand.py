@@ -161,9 +161,9 @@ class mppCommand(object):
         # Check we got a CRC byte_response that matches the data
         resp = byte_response[:-3]
         resp_crc = byte_response[-3:-1]
-        log.debug('CRC resp\t', resp_crc)
+        #log.debug('CRC resp\t', resp_crc)
         calc_crc_h, calc_crc_l = crc(resp)
-        log.debug('CRC calc\t%x %x', calc_crc_h, calc_crc_l)
+        #log.debug('CRC calc\t%x %x', calc_crc_h, calc_crc_l)
         #if ((resp_crc[0] == calc_crc_h) and (resp_crc[1] == calc_crc_l)):
         #    log.debug('CRCs match')
         #else:
