@@ -168,8 +168,7 @@ class mppCommand(object):
         resp_crc = byte_response[-3:-1]
         if type(resp_crc) == str:
             resp_crc = bytes()
-            resp_crc[0] = ord(resp_crc[0])
-            resp_crc[1] = ord(resp_crc[1])
+            resp_crc = (ord(byte_response[-3:-2]), ord(byte_response[-2:-1]))
         log.debug('CRC resp\t {}, {}'.format(resp_crc[0], resp_crc[1]))
         calc_crc_h, calc_crc_l = crc(resp)
         log.debug('CRC calc\t {} {}'.format(calc_crc_h, calc_crc_l))
