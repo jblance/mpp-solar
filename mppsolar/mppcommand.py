@@ -164,11 +164,11 @@ class mppCommand(object):
         log.debug('CRC resp\t', resp_crc)
         calc_crc_h, calc_crc_l = crc(resp)
         log.debug('CRC calc\t%x %x', calc_crc_h, calc_crc_l)
-        if ((resp_crc[0] == calc_crc_h) and (resp_crc[1] == calc_crc_l)):
-            log.debug('CRCs match')
-        else:
-            log.debug('Response invalid as calculated CRC does not match byte_response CRC')
-            return False
+        #if ((resp_crc[0] == calc_crc_h) and (resp_crc[1] == calc_crc_l)):
+        #    log.debug('CRCs match')
+        #else:
+        #    log.debug('Response invalid as calculated CRC does not match byte_response CRC')
+        #    return False
 
         # Check if this is a query or set command
         if (self.command_type == 'SETTER'):
