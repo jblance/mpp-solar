@@ -154,6 +154,7 @@ class mppCommand(object):
             - check CRC is correct
         """
         # Check length of byte_response
+        return True
         log.debug('Byte_Response length: %d', len(byte_response))
         if len(byte_response) < 3:
             log.debug('Byte Response invalid as too short')
