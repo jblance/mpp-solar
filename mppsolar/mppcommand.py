@@ -33,7 +33,7 @@ def crc(byte_cmd):
             pass
         log.debug('Encoding %s', c)
         # todo fix response for older python
-        elif type(c) == str:
+        if type(c) == str:
             c = ord(c)
         t_da = ctypes.c_uint8(crc >> 8)
         da = t_da.value >> 4
