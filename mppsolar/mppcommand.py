@@ -30,7 +30,7 @@ def crc(byte_cmd):
 
     for c in byte_cmd:
         log.debug('Encoding %s', c)
-        if type(c) != bytes:
+        if type(c) == str:
             c = ord(c)
         t_da = ctypes.c_uint8(crc >> 8)
         da = t_da.value >> 4
