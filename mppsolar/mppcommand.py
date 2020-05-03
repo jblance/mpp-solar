@@ -154,7 +154,6 @@ class mppCommand(object):
             - check CRC is correct
         """
         # Check length of byte_response
-        return True
         log.debug('Byte_Response length: %d', len(byte_response))
         if len(byte_response) < 3:
             log.debug('Byte Response invalid as too short')
@@ -162,14 +161,14 @@ class mppCommand(object):
         # Check we got a CRC byte_response that matches the data
         resp = byte_response[:-3]
         resp_crc = byte_response[-3:-1]
-        #log.debug('CRC resp\t', resp_crc)
+        log.debug('CRC resp\t', resp_crc)
         calc_crc_h, calc_crc_l = crc(resp)
-        #log.debug('CRC calc\t%x %x', calc_crc_h, calc_crc_l)
-        #if ((resp_crc[0] == calc_crc_h) and (resp_crc[1] == calc_crc_l)):
-        #    log.debug('CRCs match')
-        #else:
-        #    log.debug('Response invalid as calculated CRC does not match byte_response CRC')
-        #    return False
+        log.debug('CRC calc\t', calc_crc_h, calc_crc_l)
+        if ((resp_crc[0] == calc_crc_h) and (resp_crc[1] == calc_crc_l)):
+            log.debug('CRCs match')
+        else:
+            log.debug('Response invalid as calculated CRC does not match byte_response CRC')
+            return False
 
         # Check if this is a query or set command
         if (self.command_type == 'SETTER'):
@@ -388,7 +387,6 @@ class mppCommand(object):
             return msgs
 
         # Omit the CRC and convert to string
-
         response = self.getResponse()
 
         responses = response.split(" ")
