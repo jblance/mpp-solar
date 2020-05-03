@@ -166,7 +166,8 @@ class mppCommand(object):
         # Check we got a CRC byte_response that matches the data
         resp = byte_response[1:-3]
         resp_crc = byte_response[-3:-1]
-        if type(resp_crc[0]) == str:
+        if type(resp_crc) == str:
+            resp_crc = bytes()
             resp_crc[0] = ord(resp_crc[0])
             resp_crc[1] = ord(resp_crc[1])
         log.debug('CRC resp\t {}, {}'.format(resp_crc[0], resp_crc[1]))
