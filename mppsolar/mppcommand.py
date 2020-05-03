@@ -115,7 +115,7 @@ class mppCommand(object):
         self.byte_response = None
 
     def setByteResponse(self, byte_response):
-        if type(byte_response) == byte:
+        if type(byte_response) == bytes:
             self.byte_response = byte_response
         else:
             log.debug('setByteResponse: converting response to bytes')
