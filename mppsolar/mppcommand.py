@@ -167,7 +167,7 @@ class mppCommand(object):
         resp_crc = byte_response[-3:-1]
         log.debug('CRC resp\t {}, {}'.format(resp_crc[0], resp_crc[1]))
         calc_crc_h, calc_crc_l = crc(resp)
-        log.debug('CRC calc\t', calc_crc_h, calc_crc_l)
+        log.debug('CRC calc\t {} {}'.format(calc_crc_h, calc_crc_l))
         if ((resp_crc[0] == calc_crc_h) and (resp_crc[1] == calc_crc_l)):
             log.debug('CRCs match')
         else:
