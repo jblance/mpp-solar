@@ -29,9 +29,10 @@ def crc(byte_cmd):
               0xc18c, 0xd1ad, 0xe1ce, 0xf1ef]
 
     for c in byte_cmd:
+        # todo fix spaces
         if c == ' ':
             continue
-        log.debug('Encoding %s', c)
+        #log.debug('Encoding %s', c)
         # todo fix response for older python
         if type(c) == str:
             c = ord(c)
@@ -165,6 +166,9 @@ class mppCommand(object):
         # Check we got a CRC byte_response that matches the data
         resp = byte_response[1:-3]
         resp_crc = byte_response[-3:-1]
+        if type(resp_crc[0]) == str:
+            resp_crc[0] = ord(resp_crc[0])
+            resp_crc[1] = ord(resp_crc[1])
         log.debug('CRC resp\t {}, {}'.format(resp_crc[0], resp_crc[1]))
         calc_crc_h, calc_crc_l = crc(resp)
         log.debug('CRC calc\t {} {}'.format(calc_crc_h, calc_crc_l))
