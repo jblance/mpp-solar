@@ -30,7 +30,7 @@ def crc(byte_cmd):
 
     for c in byte_cmd:
         if c == ' ':
-            pass
+            continue
         log.debug('Encoding %s', c)
         # todo fix response for older python
         if type(c) == str:
