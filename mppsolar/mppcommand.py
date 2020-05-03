@@ -29,7 +29,7 @@ def crc(byte_cmd):
               0xc18c, 0xd1ad, 0xe1ce, 0xf1ef]
 
     for c in byte_cmd:
-        # log.debug('Encoding %s', c)
+        log.debug('Encoding %s', c)
         t_da = ctypes.c_uint8(crc >> 8)
         da = t_da.value >> 4
         crc <<= 4
