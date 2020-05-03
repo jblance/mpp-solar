@@ -29,11 +29,11 @@ def crc(byte_cmd):
               0xc18c, 0xd1ad, 0xe1ce, 0xf1ef]
 
     for c in byte_cmd:
+        if c == ' ':
+            pass
         log.debug('Encoding %s', c)
         # todo fix response for older python
-        if c == ' ':
-            continue
-        if type(c) == str:
+        elif type(c) == str:
             c = ord(c)
         t_da = ctypes.c_uint8(crc >> 8)
         da = t_da.value >> 4
