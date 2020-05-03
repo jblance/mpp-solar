@@ -19,7 +19,7 @@ def crc(byte_cmd):
     Calculates CRC for supplied byte_cmd
     """
     #assert type(byte_cmd) == bytes
-    log.debug('Calculating CRC for %x', byte_cmd)
+    log.debug('Calculating CRC for %s', byte_cmd)
 
     crc = 0
     da = 0
@@ -120,7 +120,7 @@ class mppCommand(object):
         else:
             log.debug('setByteResponse: converting response to bytes')
             self.byte_response = bytes(byte_response, 'utf-8')
-        self.valid_response = self.isByteResponseValid(byte_response)
+        self.valid_response = self.isByteResponseValid(self.byte_response)
         if self.valid_response:
             self.response_dict = self.getResponseDict()
 
