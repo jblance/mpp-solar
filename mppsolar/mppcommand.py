@@ -119,7 +119,7 @@ class mppCommand(object):
             self.byte_response = byte_response
         else:
             log.debug('setByteResponse: converting response to bytes')
-            self.byte_response = bytes(byte_response, 'utf-8')
+            self.byte_response = bytes(byte_response.split(), 'utf-8')
         self.valid_response = self.isByteResponseValid(self.byte_response)
         if self.valid_response:
             self.response_dict = self.getResponseDict()
