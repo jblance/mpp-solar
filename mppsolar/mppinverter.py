@@ -93,7 +93,7 @@ def getCommandsFromJson(inverter_model):
                 COMMANDS.append(mppCommand(getDataValue(data, 'name'), getDataValue(data, 'description'),
                                            getDataValue(data, 'type'), getDataValue(data, 'response'),
                                            getDataValue(data, 'test_responses'), getDataValue(data, 'regex'),
-                                           help=getDataValue(data, 'help')))
+                                           help=getDataValue(data, 'help'), crc_function=getDataValue(data, 'crc')))
     return COMMANDS
 
 
