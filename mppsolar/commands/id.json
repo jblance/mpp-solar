@@ -1,5 +1,5 @@
 {
-    "name": "ID",
+    "name": "^P003ID",
     "description": "Device Serial Number inquiry",
     "help": " -- queries the device serial number",
     "type": "QUERY",
