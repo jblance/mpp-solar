@@ -17,7 +17,7 @@ def nocrc(byte_cmd):
     """
     CRC function to provide no crc
     """
-    return ''
+    return ['', '']
 
 
 def crc(byte_cmd):
@@ -68,7 +68,7 @@ def crc(byte_cmd):
     return [crc_high, crc_low]
 
 
-def get_byte_command(cmd):
+def get_byte_command(cmd, crc_function):
     """
     Generates a byte command including CRC and CR
     """
@@ -76,9 +76,12 @@ def get_byte_command(cmd):
     # Encode ASCII string to bytes
     byte_cmd = bytes(cmd, 'utf-8')
     # calculate the CRC
-    crc_high, crc_low = crc(byte_cmd)
-    # combine byte_cmd, CRC , return
-    full_byte_command = byte_cmd + bytes([crc_high, crc_low, 13])
+    crc_high, crc_low = crc_function(byte_cmd)
+    if crc_high:
+        # combine byte_cmd, CRC , return
+        full_byte_command = byte_cmd + bytes([crc_high, crc_low, 13])
+    else:
+        full_byte_command = byte_cmd + bytes([13])
     log.debug('Full byte command: %s', full_byte_command)
     return full_byte_command
 
@@ -114,19 +117,17 @@ class mppCommand(object):
             self.cmd_str = self.name
         else:
             self.cmd_str = "{}{}".format(self.name, self.value)
-        self.byte_command = get_byte_command(self.cmd_str)
-        self.valid_response = False
-
         if crc_function == 'nocrc':
             self.crc_function = nocrc
         else:
             self.crc_function = crc
-        print self.crc_function
+        self.byte_command = get_byte_command(self.cmd_str, self.crc_function)
+        self.valid_response = False
 
     def setValue(self, value):
         self.value = value
         self.cmd_str = "{}{}".format(self.name, self.value)
-        self.byte_command = get_byte_command("{}{}".format(self.name, self.value))
+        self.byte_command = get_byte_command("{}{}".format(self.name, self.value), self.crc_function)
 
     def clearByteResponse(self):
         self.byte_response = None
