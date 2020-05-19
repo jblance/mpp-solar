@@ -117,10 +117,10 @@ class mppCommand(object):
         self.byte_command = get_byte_command(self.cmd_str)
         self.valid_response = False
 
-        if crc_function == '':
-            self.crc_function = crc
+        if crc_function == 'nocrc':
+            self.crc_function = nocrc
         else:
-            self.crc_function = crc_function
+            self.crc_function = crc
         print self.crc_function
 
     def setValue(self, value):
