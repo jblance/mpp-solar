@@ -18,7 +18,7 @@ def crc(byte_cmd):
     """
     Calculates CRC for supplied byte_cmd
     """
-    #assert type(byte_cmd) == bytes
+    # assert type(byte_cmd) == bytes
     log.debug('Calculating CRC for %s', byte_cmd)
 
     crc = 0
@@ -32,7 +32,7 @@ def crc(byte_cmd):
         # todo fix spaces
         if c == ' ':
             continue
-        #log.debug('Encoding %s', c)
+        # log.debug('Encoding %s', c)
         # todo fix response for older python
         if type(c) == str:
             c = ord(c)
@@ -92,9 +92,8 @@ class mppCommand(object):
             response_dict = self.response_dict
         return "{}\n{}\n{}\n{}\n{}".format(self.name, self.description, self.help, response, response_dict)
 
-    def __init__(self, name, description, command_type, response_definition, test_responses=[], regex="", value=None, help=""):
+    def __init__(self, name, description, command_type, response_definition, test_responses=[], regex='', value=None, help='', crc_function=''):
         """ Return a command object """
-
         self.name = name
         self.description = description
         self.help = help
@@ -111,6 +110,12 @@ class mppCommand(object):
             self.cmd_str = "{}{}".format(self.name, self.value)
         self.byte_command = get_byte_command(self.cmd_str)
         self.valid_response = False
+
+        if crc_function == '':
+            self.crc_function = crc
+        else:
+            self.crc_function = crc_function
+        print self.crc_function
 
     def setValue(self, value):
         self.value = value
@@ -280,7 +285,7 @@ class mppCommand(object):
                         status = 'disabled'
                     else:
                         key = resp_format[2][item]['name']
-                        msgs.append('{}={}'.format(self.cmd_str, key, status))
+                        msgs.append('{}={}'.format(self.cmd_str, key))
                 # msgs[key] = [output, '']
             elif self.command_type == 'SETTER':
                 return msgs
