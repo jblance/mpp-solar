@@ -4,6 +4,7 @@
     "help": " -- queries the device serial number",
     "type": "QUERY",
     "supports": ["V2"],
+    "crc": "nocrc",
     "response": [
             ["string", "Serial Number", ""]
         ],

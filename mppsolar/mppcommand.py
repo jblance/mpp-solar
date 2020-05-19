@@ -13,6 +13,12 @@ import random
 
 log = logging.getLogger('MPP-Solar')
 
+def nocrc(byte_cmd):
+    """
+    CRC function to provide no crc
+    """
+    return ''
+
 
 def crc(byte_cmd):
     """
