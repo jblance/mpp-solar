@@ -1,10 +1,9 @@
 {
-    "name": "^P003ID",
+    "name": "^P005ID",
     "description": "Device Serial Number inquiry",
     "help": " -- queries the device serial number",
     "type": "QUERY",
     "supports": ["V2"],
-    "crc": "nocrc",
     "response": [
             ["string", "Serial Number", ""]
         ],
