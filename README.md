@@ -1,5 +1,7 @@
 # MPP Solar Inverter Python Package
 
+_sNote: python2 no longer supported_
+
 [![Build Status](https://travis-ci.org/jblance/mpp-solar.svg?branch=master)](https://travis-ci.org/jblance/mpp-solar)
 [![Coverage Status](https://coveralls.io/repos/github/jblance/mpp-solar/badge.svg?branch=master)](https://coveralls.io/github/jblance/mpp-solar?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/08c51e13554d4f77836c6cc7b010df2c)](https://www.codacy.com/app/jblance/mpp-solar?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jblance/mpp-solar&amp;utm_campaign=Badge_Grade)
@@ -29,6 +31,10 @@ Also
 - Raspberry Pi
 - 3x USB to serial adapters
 - connected to 3x LV5048 inverters
+
+Also
+- Ubuntu 2020.04
+- Direct USB connection to Inverter (LV5048)
 
 ## Install
 `sudo python ./setup.py install`
