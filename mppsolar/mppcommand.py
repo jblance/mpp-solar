@@ -242,9 +242,7 @@ class mppCommand(object):
         # setting=<setting> unit=<value>>
 
         # Build array of Influx Line Protocol messages
-        responses = bytes(self.byte_response)
-        print (responses)
-        #responses = self.byte_response[1:-3].split(" ")
+        responses = self.byte_response[1:-3].split(b" ")
         for i, result in enumerate(responses):
             # Check if we are past the 'known' responses
             if (i >= len(self.response_definition)):
@@ -253,7 +251,7 @@ class mppCommand(object):
             else:
                 resp_format = self.response_definition[i]
 
-            key = '{}'.format(resp_format[1]).lower().replace(" ", "_")
+            key = '{}'.format(resp_format[1]).lower().replace(b" ", b"_")
             # Process results
             if (resp_format[0] == 'float') or (resp_format[0] == 'int'):
                 msgs.append('{}={}'.format(key, float(result)))
@@ -330,7 +328,7 @@ class mppCommand(object):
         # setting=<setting> unit=<value>>
 
         # Build array of Influx Line Protocol messages
-        responses = self.byte_response[1:-3].split(" ")
+        responses = self.byte_response[1:-3].split(b" ")
         for i, result in enumerate(responses):
             # Check if we are past the 'known' responses
             if (i >= len(self.response_definition)):
@@ -339,7 +337,7 @@ class mppCommand(object):
             else:
                 resp_format = self.response_definition[i]
 
-            key = '{}'.format(resp_format[1]).lower().replace(" ", "_")
+            key = '{}'.format(resp_format[1]).lower().replace(b" ", b"_")
             # Process results
             if (resp_format[0] == 'float') or (resp_format[0] == 'int'):
                 msgs.append('setting={} nvalue={},unit="{}"'.format(key, float(result), resp_format[2]))
