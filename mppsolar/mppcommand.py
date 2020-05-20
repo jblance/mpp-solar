@@ -244,6 +244,7 @@ class mppCommand(object):
         # Build array of Influx Line Protocol messages
         responses = self.byte_response[1:-3].split(b" ")
         for i, result in enumerate(responses):
+            result = result.decode('utf-8')
             # Check if we are past the 'known' responses
             if (i >= len(self.response_definition)):
                 # If we dont know what this value is, we'll ignore it
@@ -256,7 +257,7 @@ class mppCommand(object):
             if (resp_format[0] == 'float') or (resp_format[0] == 'int'):
                 msgs.append('{}={}'.format(key, float(result)))
             elif (resp_format[0] == 'string'):
-                msgs.append('{}="{}"'.format(key, result.decode('utf-8')))
+                msgs.append('{}="{}"'.format(key, result))
             # eg. ['option', 'Output source priority', ['Utility first', 'Solar first', 'SBU first']],
             elif (resp_format[0] == 'option'):
                 value = resp_format[2][int(result)]
