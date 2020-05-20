@@ -3,7 +3,7 @@
 #
 # MPP-Solar-Service
 #
-import backports.configparser as configparser
+import configparser
 import time
 import systemd.daemon
 from argparse import ArgumentParser
