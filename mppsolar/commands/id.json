@@ -1,11 +1,11 @@
 {
-    "name": "^P005ID",
-    "description": "Device Serial Number inquiry",
-    "help": " -- queries the device serial number",
+    "name": "^P005PI",
+    "description": "TESTING Device Protocol Version inquiry",
+    "help": " -- queries the device protocol version",
     "type": "QUERY",
     "supports": ["V2"],
     "response": [
-            ["string", "Serial Number", ""]
+            ["string", "Protocol Version", ""]
         ],
     "test_responses": [
            ""
