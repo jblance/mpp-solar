@@ -13,7 +13,7 @@ import glob
 import os
 from os import path
 
-from builtins import bytes
+# from builtins import bytes
 
 from .mppcommand import mppCommand
 

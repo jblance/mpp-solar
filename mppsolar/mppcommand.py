@@ -5,7 +5,7 @@ mppcommand.py
 """
 
 # Backward compatibility to python2
-from builtins import bytes
+# from builtins import bytes
 
 import ctypes
 import logging
