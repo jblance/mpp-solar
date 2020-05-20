@@ -251,7 +251,7 @@ class mppCommand(object):
             else:
                 resp_format = self.response_definition[i]
 
-            key = '{}'.format(resp_format[1]).lower().replace(b" ", b"_")
+            key = '{}'.format(resp_format[1]).lower().replace(" ", "_")
             # Process results
             if (resp_format[0] == 'float') or (resp_format[0] == 'int'):
                 msgs.append('{}={}'.format(key, float(result)))
@@ -337,7 +337,7 @@ class mppCommand(object):
             else:
                 resp_format = self.response_definition[i]
 
-            key = '{}'.format(resp_format[1]).lower().replace(b" ", b"_")
+            key = '{}'.format(resp_format[1]).lower().replace(" ", "_")
             # Process results
             if (resp_format[0] == 'float') or (resp_format[0] == 'int'):
                 msgs.append('setting={} nvalue={},unit="{}"'.format(key, float(result), resp_format[2]))
