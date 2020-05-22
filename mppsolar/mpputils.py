@@ -30,6 +30,9 @@ class mppUtils:
             raise NoDeviceError("A serial device must be supplied, e.g. /dev/ttyUSB0")
         self.inverter = mppInverter(serial_device, baud_rate, inverter_model)
 
+    def getFullCommand(self, cmd):
+        return self.inverter._getCommand(cmd)
+
     def getKnownCommands(self):
         return self.inverter.getAllCommands()
 
