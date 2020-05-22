@@ -13,6 +13,7 @@ import random
 
 log = logging.getLogger('MPP-Solar')
 
+
 def nocrc(byte_cmd):
     """
     CRC function to provide no crc
@@ -293,7 +294,7 @@ class mppCommand(object):
                         status = 'disabled'
                     else:
                         key = resp_format[2][item]['name']
-                        msgs.append('{}={}'.format(self.cmd_str, key))
+                        msgs.append('{}={}'.format(key, status))
                 # msgs[key] = [output, '']
             elif self.command_type == 'SETTER':
                 return msgs
