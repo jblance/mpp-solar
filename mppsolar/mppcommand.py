@@ -102,11 +102,12 @@ class mppCommand(object):
             response_dict = self.response_dict
         return "{}\n{}\n{}\n{}\n{}".format(self.name, self.description, self.help, response, response_dict)
 
-    def __init__(self, name, description, command_type, response_definition, test_responses=[], regex='', value=None, help='', crc_function=''):
+    def __init__(self, name, description, command_type, response_definition, test_responses=[], regex='', value='', help='', crc_function='', prefix=''):
         """ Return a command object """
         self.name = name
         self.description = description
         self.help = help
+        self.prefix = prefix
         self.command_type = command_type
         self.response_definition = response_definition
         self.byte_response = None
@@ -114,10 +115,7 @@ class mppCommand(object):
         self.test_responses = test_responses
         self.regex = regex
         self.value = value
-        if value is None:
-            self.cmd_str = self.name
-        else:
-            self.cmd_str = "{}{}".format(self.name, self.value)
+        self.cmd_str = '{}{}{}'.format(self.prefix, self.name, self.value)
         if crc_function == 'nocrc':
             self.crc_function = nocrc
         else:

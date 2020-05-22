@@ -1,9 +1,10 @@
 {
-    "name": "^P005PI",
-    "description": "TESTING Device Protocol Version inquiry",
+    "name": "PI",
+    "prefix": "^P005",
+    "description": "Device Protocol Version inquiry",
     "help": " -- queries the device protocol version",
     "type": "QUERY",
-    "supports": ["V2"],
+    "supports": ["PI18"],
     "response": [
             ["string", "Protocol Version", ""]
         ],
