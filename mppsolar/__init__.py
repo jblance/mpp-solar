@@ -54,8 +54,6 @@ def main():
         _command = mp.getFullCommand(args.command)
         if _command:
             print ('{}'.format(_command.byte_command))
-            [crca, crcb] = _command.crc(args.command)  # noqa: F821
-            print(" {1:#x} {2:#x}".format(crca, crcb))
         else:
             [crca, crcb] = mppcommand.crc(args.command)  # noqa: F821
             print("{0} {1:#x} {2:#x}".format(args.command, crca, crcb))
