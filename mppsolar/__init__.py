@@ -21,7 +21,7 @@ logging.basicConfig()
 
 
 def main():
-    parser = ArgumentParser(description='MPP Solar Command Utility')
+    parser = ArgumentParser(description='MPP Solar Command Utility, version: {}'.format(__version__))
     parser.add_argument('-c', '--command', help='Command to run', default='QID')
     parser.add_argument('-D', '--enableDebug', action='store_true', help='Enable Debug and above (i.e. all) messages')
     parser.add_argument('-I', '--enableInfo', action='store_true', help='Enable Info and above level messages')
