@@ -152,7 +152,7 @@ class mppCommand(object):
                 result = result.split(' ')
         except:  # noqa: E722
             pass
-        return ''
+        return result
 
     def getTestByteResponse(self):
         """
