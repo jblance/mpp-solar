@@ -78,6 +78,10 @@ def getCommandsFromJson(inverter_model):
     COMMANDS = []
     here = path.abspath(path.dirname(__file__))
     files = glob.glob(here + '/commands/*.json')
+    if inverter_model == 'PI18':
+        protocol = 'PI18'
+    else:
+        protocol = None
 
     for file in sorted(files):
         log.debug("Loading command information from {}".format(file))
@@ -93,7 +97,7 @@ def getCommandsFromJson(inverter_model):
                 COMMANDS.append(mppCommand(getDataValue(data, 'name'), getDataValue(data, 'description'),
                                            getDataValue(data, 'type'), getDataValue(data, 'response'),
                                            getDataValue(data, 'test_responses'), getDataValue(data, 'regex'),
-                                           help=getDataValue(data, 'help'), crc_function=getDataValue(data, 'crc'), prefix=getDataValue(data, 'prefix')))
+                                           help=getDataValue(data, 'help'), crc_function=getDataValue(data, 'crc'), prefix=getDataValue(data, 'prefix'), protocol=protocol))
     return COMMANDS
 
 
