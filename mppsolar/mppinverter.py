@@ -136,7 +136,6 @@ class mppInverter:
         self._test_device = isTestDevice(serial_device)
         self._direct_usb = isDirectUsbDevice(serial_device)
         self._commands = getCommandsFromJson(inverter_model)
-        # TODO: text descrption of inverter? version numbers?
 
     def __str__(self):
         """

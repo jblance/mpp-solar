@@ -51,7 +51,7 @@ def main():
 
     if(args.printcrc):
         # print("{0:#x}".format(100))
-        _command = mp.getFullCommand()
+        _command = mp.getFullCommand(args.command)
         if _command:
             print ('{}'.format(_command.byte_command))
         else:
