@@ -102,12 +102,13 @@ class mppCommand(object):
             response_dict = self.response_dict
         return "{}\n{}\n{}\n{}\n{}".format(self.name, self.description, self.help, response, response_dict)
 
-    def __init__(self, name, description, command_type, response_definition, test_responses=[], regex='', value='', help='', crc_function='', prefix=''):
+    def __init__(self, name, description, command_type, response_definition, test_responses=[], regex='', value='', help='', crc_function='', prefix='', protocol=None):
         """ Return a command object """
         self.name = name
         self.description = description
         self.help = help
         self.prefix = prefix
+        self.protocol = protocol
         self.command_type = command_type
         self.response_definition = response_definition
         self.byte_response = None
@@ -141,10 +142,17 @@ class mppCommand(object):
         return self.byte_response
 
     def getResponse(self):
+        result = ''
         try:
-            return self.byte_response[1:-3].decode('utf-8')
+            if self.protocol is 'PI18':
+                result = self.byte_response[5:-3].decode('utf-8')
+                result = result.split(',')
+            else:
+                result = self.byte_response[1:-3].decode('utf-8')
+                result = result.split(' ')
         except:  # noqa: E722
             pass
+        return ''
 
     def getTestByteResponse(self):
         """
@@ -409,9 +417,9 @@ class mppCommand(object):
             return msgs
 
         # Omit the CRC and convert to string
-        response = self.getResponse()
-
-        responses = response.split(" ")
+        # response = self.getResponse()
+        # responses = response.split(" ")
+        responses = self.getResponse()
         for i, result in enumerate(responses):
             # Check if we are past the 'known' responses
             if (i >= len(self.response_definition)):
