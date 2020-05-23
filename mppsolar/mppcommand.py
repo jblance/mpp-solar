@@ -263,6 +263,8 @@ class mppCommand(object):
             # Process results
             if (resp_format[0] == 'float') or (resp_format[0] == 'int'):
                 msgs.append('{}={}'.format(key, float(result)))
+            elif (resp_format[0] == '10int'):
+                msgs.append('{}={}'.format(key, float(result)/10))
             elif (resp_format[0] == 'string'):
                 msgs.append('{}="{}"'.format(key, result))
             # eg. ['option', 'Output source priority', ['Utility first', 'Solar first', 'SBU first']],
@@ -349,6 +351,8 @@ class mppCommand(object):
             # Process results
             if (resp_format[0] == 'float') or (resp_format[0] == 'int'):
                 msgs.append('setting={} nvalue={},unit="{}"'.format(key, float(result), resp_format[2]))
+            elif (resp_format[0] == '10int'):
+                msgs.append('setting={} nvalue={},unit="{}"'.format(key, float(result)/10, resp_format[2]))
             elif (resp_format[0] == 'string'):
                 msgs.append('setting={} value="{}",unit="{}"'.format(key, result, resp_format[2]))
             # eg. ['option', 'Output source priority', ['Utility first', 'Solar first', 'SBU first']],
@@ -431,6 +435,8 @@ class mppCommand(object):
             # Process results
             if (resp_format[0] == 'float') or (resp_format[0] == 'int') or (resp_format[0] == 'string'):
                 msgs[key] = [result, resp_format[2]]
+            elif (resp_format[0] == '10int'):
+                msgs[key] = [float(result)/10, resp_format[2]]
             # eg. ['option', 'Output source priority', ['Utility first', 'Solar first', 'SBU first']],
             elif (resp_format[0] == 'option'):
                 msgs[key] = [resp_format[2][int(result)], '']
