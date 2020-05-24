@@ -92,7 +92,7 @@ sudo loginctl enable-linger $USER
 ```
 
 * To disable autostart, simply disable your service:
-`systemctl --user disable python_demo_service`
+`systemctl --user disable mpp-solar`
 
 Note that simply enabling a service does not start it, but only activates autostart during boot-up. Similarly, disabling a service doesn't stop it, but only deactivates autostart during boot-up. If you want to start/stop the service immediately then you still need to do that manually
 
