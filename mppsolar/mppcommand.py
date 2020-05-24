@@ -247,7 +247,7 @@ class mppCommand(object):
         # Build array of Influx Line Protocol messages
         responses = self.getResponse()
         for i, result in enumerate(responses):
-            result = result.decode('utf-8')
+            #result = result.decode('utf-8')
             # Check if we are past the 'known' responses
             if (i >= len(self.response_definition)):
                 # If we dont know what this value is, we'll ignore it
