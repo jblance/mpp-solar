@@ -238,18 +238,14 @@ class mppCommand(object):
         if (self.response_definition is None):
             log.info('No byte_response definition')
             return msgs
-        # weather,location=us-midwest temperature=82 1465839830100400200
-        # |    -------------------- --------------  |
-        # |             |             |             |
-        # |             |             |             |
+        # mpp-solar,command=QPGS0 max_charger_range=120.0
         # +-----------+--------+-+---------+-+---------+
-        # |measurement|,tag_set| |field_set| |timestamp|
+        # |measurement,tag_set field_set
         # +-----------+--------+-+---------+-+---------+
-        # measurement not included
-        # setting=<setting> unit=<value>>
+        # msgs.append('{}={}'.format(key, float(result)))
 
         # Build array of Influx Line Protocol messages
-        responses = self.byte_response[1:-3].split(b" ")
+        responses = self.getResponse()
         for i, result in enumerate(responses):
             result = result.decode('utf-8')
             # Check if we are past the 'known' responses
@@ -338,7 +334,8 @@ class mppCommand(object):
         # setting=<setting> unit=<value>>
 
         # Build array of Influx Line Protocol messages
-        responses = self.byte_response[1:-3].split(b" ")
+        # responses = self.byte_response[1:-3].split(b" ")
+        responses = self.getResponse()
         for i, result in enumerate(responses):
             # Check if we are past the 'known' responses
             if (i >= len(self.response_definition)):
