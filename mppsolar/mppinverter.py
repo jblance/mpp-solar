@@ -121,6 +121,10 @@ def isDirectUsbDevice(serial_device):
     if match:
         log.debug("Device matches hidraw regex")
         return True
+    match = re.search("^.*mppsolar\\d$", serial_device)
+    if match:
+        log.debug("Device matches mppsolar regex")
+        return True
     return False
 
 
