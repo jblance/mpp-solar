@@ -6,7 +6,7 @@
     "nosupports": ["LV5048"],
     "response": [
             ["option", "Parallel instance number", ["Not valid", "valid"]],
-            ["int", "Serial number", ""],
+            ["string", "Serial number", ""],
             ["keyed", "Work mode", {"P": "Power On Mode",
                                     "S": "Standby Mode",
                                     "L": "Line Mode",
