@@ -73,10 +73,17 @@ def main():
                 msgs = []
                 _data = item['mp'].getResponseDict(item['command'])
                 for _item in _data:
+                    #Value
                     topic = 'mpp-solar/{}/{}/value'.format(item['tag'], _item)
-                    payload = '{}'.format(_data[_item])
+                    payload = '{}'.format(_data[_item][0])
                     msg = {'topic': topic, 'payload': payload}
-                    #msgs.append(msg)
+                    msgs.append(msg)
+                    print (msg)
+                    #Unit
+                    topic = 'mpp-solar/{}/{}/unit'.format(item['tag'], _item)
+                    payload = '{}'.format(_data[_item][1])
+                    msg = {'topic': topic, 'payload': payload}
+                    msgs.append(msg)
                     print (msg)
                 #publish.multiple(msgs, hostname=mqtt_broker)
             else:
