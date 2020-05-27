@@ -75,7 +75,7 @@ def main():
                 for _item in _data:
                     #Value
                     topic = 'mpp-solar/{}/{}/value'.format(item['tag'], _item)
-                    payload = '{}'.format(_data[_item][0])
+                    payload = _data[_item][0]
                     msg = {'topic': topic, 'payload': payload}
                     msgs.append(msg)
                     print (msg)
