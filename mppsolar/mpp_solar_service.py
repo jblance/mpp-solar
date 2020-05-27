@@ -78,14 +78,14 @@ def main():
                     payload = _data[_item][0]
                     msg = {'topic': topic, 'payload': payload}
                     msgs.append(msg)
-                    print (msg)
+                    #print (msg)
                     #Unit
                     topic = 'mpp-solar/{}/{}/unit'.format(item['tag'], _item)
                     payload = '{}'.format(_data[_item][1])
                     msg = {'topic': topic, 'payload': payload}
                     msgs.append(msg)
-                    print (msg)
-                #publish.multiple(msgs, hostname=mqtt_broker)
+                    #print (msg)
+                publish.multiple(msgs, hostname=mqtt_broker)
             else:
                 print('MPP-Solar-Service: format {} not supported'.format(item['format']))
         print('MPP-Solar-Service: sleeping for {}sec'.format(pause))
