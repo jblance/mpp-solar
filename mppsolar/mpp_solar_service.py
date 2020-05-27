@@ -68,6 +68,16 @@ def main():
                     msg = {'topic': 'mpp-solar', 'payload': payload}
                     msgs.append(msg)
                 publish.multiple(msgs, hostname=mqtt_broker)
+            elif item['format'] == 'mqtt1':
+                # print('MPP-Solar-Service: format influx2 yet to be supported')
+                msgs = []
+                _data = item['mp'].getResponseDict(item['command'])
+                for _item in _data:
+                    payload = 'mpp-solar,command={} {}'.format(item['tag'], _item)
+                    msg = {'topic': 'mpp-solar', 'payload': payload}
+                    #msgs.append(msg)
+                    print (msg)
+                #publish.multiple(msgs, hostname=mqtt_broker)
             else:
                 print('MPP-Solar-Service: format {} not supported'.format(item['format']))
         print('MPP-Solar-Service: sleeping for {}sec'.format(pause))
