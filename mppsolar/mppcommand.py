@@ -430,7 +430,11 @@ class mppCommand(object):
 
             key = '{}'.format(resp_format[1]).lower().replace(" ", "_")
             # Process results
-            if (resp_format[0] == 'float') or (resp_format[0] == 'int') or (resp_format[0] == 'string'):
+            if (resp_format[0] == 'float'):
+                msgs[key] = [float(result), resp_format[2]]
+            elif (resp_format[0] == 'int'):
+                msgs[key] = [int(result), resp_format[2]]
+            elif (resp_format[0] == 'string'):
                 msgs[key] = [result, resp_format[2]]
             elif (resp_format[0] == '10int'):
                 msgs[key] = [float(result)/10, resp_format[2]]
