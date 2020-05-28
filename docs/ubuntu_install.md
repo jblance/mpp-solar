@@ -1,5 +1,5 @@
 # Install on Ubuntu 20.04 #
-## created / tested by Dalibor Majksner ##
+__created / tested by Dalibor Majksner__
 
 1. Install OS
 2. Install updates
