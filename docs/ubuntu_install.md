@@ -16,6 +16,6 @@
 13. Most likely will have to disable power saving features for USB ports to
 avoid issues in picture below. Does not have easy workaround or menu
 settings.
-![USB power saving issues](usb-pwersave.jpg)
+![USB power saving issues](usb-powersave.jpg)
 14. Install mpp-solar from jblance github page. Follow instructions
 15. Install jkbms from jblance github page. Follow instructions.
