@@ -1,6 +1,7 @@
 import unittest
-from mppsolar import mppinverter
-from mppsolar import mppcommand
+
+from mppsolar import mppcommand, mppinverter
+from mppsolar.mppinverter import SERIAL_TYPE_ESP32, SERIAL_TYPE_SERIAL, SERIAL_TYPE_TEST, SERIAL_TYPE_USB
 
 
 class test_mppinverter(unittest.TestCase):
@@ -14,8 +15,7 @@ class test_mppinverter(unittest.TestCase):
         self.assertEqual(inverter._baud_rate, 2400)
         self.assertEqual(inverter._serial_device, '/dev/ttyUSB0')
         self.assertIsNone(inverter._serial_number)
-        self.assertFalse(inverter._test_device)
-        self.assertFalse(inverter._direct_usb)
+        self.assertTrue(inverter._serial_type == SERIAL_TYPE_SERIAL)
         self.assertIsInstance(inverter.getAllCommands(), list)
 
     def test_init_hidraw0(self):
@@ -24,8 +24,7 @@ class test_mppinverter(unittest.TestCase):
         self.assertEqual(inverter._baud_rate, 2400)
         self.assertEqual(inverter._serial_device, '/dev/hidraw0')
         self.assertIsNone(inverter._serial_number)
-        self.assertFalse(inverter._test_device)
-        self.assertTrue(inverter._direct_usb)
+        self.assertTrue(inverter._serial_type == SERIAL_TYPE_USB)
         self.assertIsInstance(inverter.getAllCommands(), list)
 
     def test_init_hidraw9(self):
@@ -34,9 +33,19 @@ class test_mppinverter(unittest.TestCase):
         self.assertEqual(inverter._baud_rate, 2400)
         self.assertEqual(inverter._serial_device, '/dev/hidraw9')
         self.assertIsNone(inverter._serial_number)
-        self.assertFalse(inverter._test_device)
-        self.assertTrue(inverter._direct_usb)
+        self.assertTrue(inverter._serial_type == SERIAL_TYPE_USB)
         self.assertIsInstance(inverter.getAllCommands(), list)
+
+    def test_init_esp32(self):
+        """ test initialisation as usb direct device (high numbered device) """
+        inverter = mppinverter.mppInverter('ESP1')
+        self.assertEqual(inverter._baud_rate, 2400)
+        self.assertEqual(inverter._serial_device, 'ESP1')
+        self.assertIsNone(inverter._serial_number)
+        self.assertTrue(inverter._serial_type == SERIAL_TYPE_ESP32)
+        self.assertIsInstance(inverter.getAllCommands(), list)
+
+
 
     def test_init_test(self):
         """ test initialisation as a test device """
@@ -44,8 +53,7 @@ class test_mppinverter(unittest.TestCase):
         self.assertEqual(inverter._baud_rate, 2400)
         self.assertEqual(inverter._serial_device, 'TEST')
         self.assertIsNone(inverter._serial_number)
-        self.assertTrue(inverter._test_device)
-        self.assertFalse(inverter._direct_usb)
+        self.assertTrue(inverter._serial_type == SERIAL_TYPE_TEST)
         self.assertIsInstance(inverter.getAllCommands(), list)
 
     def test_serial_number(self):

@@ -4,13 +4,18 @@ reference library of serial commands (and responses) for PIP-4048MS inverters
 mppinverter.py
 """
 
-import serial
+import sys
+if not sys.platform == 'esp32':
+    import serial
+    import os
+else:
+    from machine import UART
+
 import time
 import re
 import logging
 import json
 import glob
-import os
 from os import path
 
 # from builtins import bytes
@@ -100,6 +105,11 @@ def getCommandsFromJson(inverter_model):
                                            help=getDataValue(data, 'help'), crc_function=getDataValue(data, 'crc'), prefix=getDataValue(data, 'prefix'), protocol=protocol))
     return COMMANDS
 
+SERIAL_TYPE_TEST = 'serial_type_test'
+SERIAL_TYPE_USB = 'serial_type_usb'
+SERIAL_TYPE_ESP32 = 'serial_type_ESP32'
+SERIAL_TYPE_SERIAL = 'serial_type_serial'
+
 
 def isTestDevice(serial_device):
     """
@@ -127,6 +137,21 @@ def isDirectUsbDevice(serial_device):
         return True
     return False
 
+def isESP32Device(serial_device):
+    return 'esp' in serial_device.lower()
+
+def get_serial_type(serial_device):
+    result = None
+    if isTestDevice(serial_device):
+        result = SERIAL_TYPE_TEST
+    elif isDirectUsbDevice(serial_device):
+        result = SERIAL_TYPE_USB
+    elif isESP32Device(serial_device):
+        result = SERIAL_TYPE_ESP32
+    else:
+        result = SERIAL_TYPE_SERIAL
+    return result
+
 
 class mppInverter:
     """
@@ -141,20 +166,14 @@ class mppInverter:
         self._serial_device = serial_device
         self._inverter_model = inverter_model
         self._serial_number = None
-        self._test_device = isTestDevice(serial_device)
-        self._direct_usb = isDirectUsbDevice(serial_device)
+        self._serial_type = get_serial_type(serial_device)
         self._commands = getCommandsFromJson(inverter_model)
 
     def __str__(self):
         """
         """
         inverter = "\n"
-        if self._direct_usb:
-            inverter = "Inverter connected via USB on {}".format(self._serial_device)
-        elif self._test_device:
-            inverter = "Inverter connected as a TEST"
-        else:
-            inverter = "Inverter connected via serial port on {}".format(self._serial_device)
+        inverter = SERIAL_TYPE_MESSAGE[self._serial_type].format(self._serial_device)
         inverter += "\n-------- List of supported commands --------\n"
         if self._commands:
             for cmd in self._commands:
@@ -243,6 +262,7 @@ class mppInverter:
         """
         Performs a test command execution
         """
+        log.info('TEST connection: executing %s', command)
         command.clearByteResponse()
         log.debug('Performing test command with %s', command)
         command.setByteResponse(command.getTestByteResponse())
@@ -253,6 +273,7 @@ class mppInverter:
         Opens serial connection, sends command (multiple times if needed)
         and returns the byte_response
         """
+        log.info('SERIAL connection: executing %s', command)
         command.clearByteResponse()
         response_line = None
         log.debug('port %s, baudrate %s', self._serial_device, self._baud_rate)
@@ -276,11 +297,37 @@ class mppInverter:
         log.info('Command execution failed')
         return command
 
+    def _doESP32Command(self, command):
+        """
+        Uses ESP32 ESP32 for  serial connection, sends command (multiple times if needed)
+        and returns the byte_response
+        """
+        log.info('ESP32 SERIAL connection: executing %s', command)
+        command.clearByteResponse()
+        uart_no = self._serial_device.lower().split('esp')[1]
+        response_line = None
+        log.debug('ESP32 UART #%s, baudrate %s', uart_no, self._baud_rate)
+        uart = UART(uart_no, self._baud_rate)
+
+        try:
+            log.debug('Command execution attempt %d...', x)
+            uart.init(self._baud_rate, timeout=(1 + x)*1000)
+            uart.write(command.byte_command)
+            time.sleep(500 * x )  # give serial port time to receive the data
+            response_line = s.readline()
+            log.debug('serial byte_response was: %s', response_line)
+            command.setByteResponse(response_line)
+        except Exception as e:
+            log.warning("Serial read error: {}".format(e))
+        log.info('Command execution failed')
+        return command
+
     def _doDirectUsbCommand(self, command):
         """
         Opens direct USB connection, sends command (multiple times if needed)
         and returns the byte_response
         """
+        log.info('DIRECT USB connection: executing %s', command)
         command.clearByteResponse()
         response_line = bytes()
         usb0 = None
@@ -343,12 +390,19 @@ class mppInverter:
         if command is None:
             log.critical("Command not found")
             return None
-        elif (self._test_device):
-            log.info('TEST connection: executing %s', command)
-            return self._doTestCommand(command)
-        elif (self._direct_usb):
-            log.info('DIRECT USB connection: executing %s', command)
-            return self._doDirectUsbCommand(command)
-        else:
-            log.info('SERIAL connection: executing %s', command)
-            return self._doSerialCommand(command)
+        return SERIAL_TYPE_DRIVER[self._serial_type](self, command)
+
+
+SERIAL_TYPE_DRIVER = {
+    SERIAL_TYPE_TEST : mppInverter._doTestCommand,
+    SERIAL_TYPE_USB : mppInverter._doDirectUsbCommand,
+    SERIAL_TYPE_ESP32 : mppInverter._doESP32Command,
+    SERIAL_TYPE_SERIAL : mppInverter._doSerialCommand,
+}
+
+SERIAL_TYPE_MESSAGE = {
+    SERIAL_TYPE_TEST : "Inverter connected as a {}",
+    SERIAL_TYPE_USB : "Inverter connected via USB on {}",
+    SERIAL_TYPE_ESP32 : "Inverter connected via UART on {}",
+    SERIAL_TYPE_SERIAL : "Inverter connected via serial port on {}",
+}
