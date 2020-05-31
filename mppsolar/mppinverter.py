@@ -18,6 +18,8 @@ import json
 import glob
 from os import path
 
+from .all_commands import commands
+
 # from builtins import bytes
 
 from .mppcommand import mppCommand
@@ -74,35 +76,39 @@ def isInverterSupported(inverter_model, json):
         return False
 
 
-def getCommandsFromJson(inverter_model):
+def getCommands(inverter_model):
     """
     Read in all the json files in the commands subdirectory
     this builds a list of all valid commands
     """
     log.info("Loading commands for inverter model: {}".format(inverter_model))
     COMMANDS = []
-    here = path.abspath(path.dirname(__file__))
-    files = glob.glob(here + '/commands/*.json')
+#    here = path.abspath(path.dirname(__file__))
+#    files = glob.glob(here + '/commands/*.json')
     if inverter_model == 'PI18':
         protocol = 'PI18'
     else:
         protocol = None
 
-    for file in sorted(files):
-        log.debug("Loading command information from {}".format(file))
-        with open(file) as f:
-            try:
-                data = json.load(f)
-            except Exception:
-                log.debug("Error processing JSON in {}".format(file))
-                continue
-            # Does this json support the supplied inverter model?
-            if isInverterSupported(inverter_model, data):
-                log.info("... command {} loaded for inverter model: {}".format(getDataValue(data, 'name'), inverter_model))
-                COMMANDS.append(mppCommand(getDataValue(data, 'name'), getDataValue(data, 'description'),
-                                           getDataValue(data, 'type'), getDataValue(data, 'response'),
-                                           getDataValue(data, 'test_responses'), getDataValue(data, 'regex'),
-                                           help=getDataValue(data, 'help'), crc_function=getDataValue(data, 'crc'), prefix=getDataValue(data, 'prefix'), protocol=protocol))
+
+    for name, data in commands.items():
+        log.debug("Loading command information from {}".format(name))
+        # Does this config data support the supplied inverter model?
+        if isInverterSupported(inverter_model, data):
+            log.info("... command {} loaded for inverter model: {}".format(getDataValue(data, 'name'), inverter_model))
+            mpp_command = mppCommand(
+                    getDataValue(data, 'name'),
+                    getDataValue(data, 'description'),
+                    getDataValue(data, 'type'),
+                    getDataValue(data, 'response'),
+                    getDataValue(data, 'test_responses'),
+                    getDataValue(data, 'regex'),
+                    help=getDataValue(data, 'help'),
+                    crc_function=getDataValue(data, 'crc'),
+                    prefix=getDataValue(data, 'prefix'),
+                    protocol=protocol
+            )
+            COMMANDS.append(mpp_command)
     return COMMANDS
 
 SERIAL_TYPE_TEST = 'serial_type_test'
@@ -167,7 +173,7 @@ class mppInverter:
         self._inverter_model = inverter_model
         self._serial_number = None
         self._serial_type = get_serial_type(serial_device)
-        self._commands = getCommandsFromJson(inverter_model)
+        self._commands = getCommands(inverter_model)
 
     def __str__(self):
         """
@@ -310,11 +316,10 @@ class mppInverter:
         uart = UART(uart_no, self._baud_rate)
 
         try:
-            log.debug('Command execution attempt %d...', x)
-            uart.init(self._baud_rate, timeout=(1 + x)*1000)
+            uart.init(self._baud_rate, timeout=1000)
             uart.write(command.byte_command)
-            time.sleep(500 * x )  # give serial port time to receive the data
-            response_line = s.readline()
+            time.sleep(0.5 )  # give serial port time to receive the data
+            response_line = uart.readline()
             log.debug('serial byte_response was: %s', response_line)
             command.setByteResponse(response_line)
         except Exception as e:
