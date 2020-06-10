@@ -7,7 +7,7 @@
         ["keyed", "Device Mode", {"P": "Power on", "S": "Standby", "L": "Line", "B": "Battery", "F": "Fault", "H": "Power saving"}]
       ],
   "test_responses": [
-         ["(Se5","6439"]
+         ["(S","6439"]
       ],
   "regex": ""
 }
