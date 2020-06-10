@@ -15,7 +15,7 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+with open(path.join(here, 'pypi_README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 exec(open(path.join(here, 'mppsolar/version.py')).read())
@@ -81,7 +81,7 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['pyserial', 'future'],
+    install_requires=['pyserial'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
