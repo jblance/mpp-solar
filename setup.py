@@ -30,6 +30,7 @@ setup(
 
     description='Package to communicate with MPP Solar PIP-4048MS inverter',
     long_description=long_description,
+    long_description_content_type='text/markdown',
 
     # The project's main homepage.
     url='https://github.com/jblance/mpp-solar',
