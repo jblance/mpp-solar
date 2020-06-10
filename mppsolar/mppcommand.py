@@ -177,8 +177,6 @@ class mppCommand(object):
             - check that the byte_response if the correct length
             - check CRC is correct
         """
-        return True
-        # TODO: fix this for response checking on python2
         # Check length of byte_response
         log.debug('Byte_Response length: %d', len(byte_response))
         if len(byte_response) < 3:
@@ -208,6 +206,10 @@ class mppCommand(object):
                 log.debug('Response valid as setter with NAK resp')
                 return True
             return False
+        else:
+            if (byte_response == bytes('(NAKss\r', 'utf-8')):
+                log.debug('Response invalid as query with NAK resp')
+                return False
         # Check if valid byte_response is defined for this command
         if (self.response_definition is None):
             log.debug('Response invalid as no RESPONSE defined for %s', self.name)
