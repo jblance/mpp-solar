@@ -411,12 +411,12 @@ class mppCommand(object):
         if (not self.valid_response):
             log.info('Invalid byte_response')
             msgs['error'] = ['Invalid byte_response', '']
-            msgs['response'] = [self.getResponse().replace('\r', ''), '']
+            msgs['response'] = [' '.join(self.getResponse()), '']
             return msgs
         if (self.response_definition is None):
             log.info('No byte_response definition')
             msgs['error'] = ['No byte_response definition', '']
-            msgs['response'] = [self.getResponse().replace('\r', ''), '']
+            msgs['response'] = [' '.join(self.getResponse()), '']
             return msgs
 
         # Omit the CRC and convert to string
