@@ -1,0 +1,13 @@
+{
+    "name": "QGMN",
+    "description": "Device Model Name Number inquiry",
+    "help": " -- queries the device model name number",
+    "type": "QUERY",
+    "response": [
+            ["string", "Model Name", ""]
+        ],
+    "test_responses": [
+           ""
+        ],
+	"regex": ""
+}
