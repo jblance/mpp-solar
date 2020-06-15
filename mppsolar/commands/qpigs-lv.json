@@ -17,7 +17,7 @@
             ["int", "Battery Charging Current", "A"],
             ["int", "Battery Capacity", "%"],
             ["int", "Inverter Heat Sink Temperature", "Deg_C"],
-            ["int", "PV Input Current for Battery", "A"],
+            ["float", "PV Input Current for Battery", "A"],
             ["float", "PV Input Voltage", "V"],
             ["float", "Battery Voltage from SCC", "V"],
             ["int", "Battery Discharge Current", "A"],
