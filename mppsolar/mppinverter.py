@@ -14,9 +14,6 @@ else:
 import time
 import re
 import logging
-import json
-import glob
-from os import path
 
 from .all_commands import commands
 
