@@ -151,10 +151,10 @@ If you get an error `ImportError: No module named paho.mqtt.publish`
 `sudo pip install paho-mqtt`
 
 Check if influx is listening on right port
-* ss -lnapt |grep influx
-if there isn't a LISTEN on 127.0.0.1 port 8086 - edit /etc/influxdb/influxdb.conf
-  in session [http] 
-      bind-address = "127.0.0.1:8086"
+* `ss -lnapt |grep influx`
+if there isn't a LISTEN on 127.0.0.1 port 8086 - edit ``/etc/influxdb/influxdb.conf`
+```  in session [http]
+      bind-address = "127.0.0.1:8086"```
 
 To check what is stored in influx
 * log in to influx `influx`
