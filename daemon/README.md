@@ -4,6 +4,7 @@ source: https://github.com/torfsen/python-systemd-tutorial
 ## Pre-reqs ##
 Need python-systemd package
 * `sudo apt-get install python3-systemd`
+* or `pip install systemd-python`
 
 Need to create a config file `/etc/mpp-solar/mpp-solar.conf`
 * Use the example `/etc/mpp-solar/mpp-solar.conf.example` as a start

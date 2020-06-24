@@ -145,9 +145,11 @@ class mppCommand(object):
         result = ''
         try:
             if self.protocol == 'PI18':
+                log.debug('getResponse with protocol = PI18')
                 result = self.byte_response[5:-3].decode('utf-8')
                 result = result.split(',')
             else:
+                log.debug('getResponse with protocol not PI18')
                 result = self.byte_response[1:-3].decode('utf-8')
                 result = result.split(' ')
         except:  # noqa: E722
