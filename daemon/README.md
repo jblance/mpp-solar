@@ -11,30 +11,42 @@ Need to create a config file `/etc/mpp-solar/mpp-solar.conf`
 
 ### Config File Description ###
 ```
-[SETUP]                 # Required section
-pause=5                 # Number of seconds to pause at the end of each loop (0 is no pause)
-mqtt_broker=mqtthost    # Hostname / IP address of the MQTT broker
+# Required section
+[SETUP]
+# Number of seconds to pause at the end of each loop (0 is no pause)
+pause=5
+# Hostname / IP address of the MQTT broker
+mqtt_broker=mqtthost
 
 # The following sections define each command execution
 # example 1
-[Inverter1]         # The section heading for information only - must be unique
-model=standard      # Model of inverter, currently only standard and LV5048 defined
-port=/dev/ttyUSB0   # Port that mpp-solar connects to the inverter
-baud=2400           # Speed of the connection
-command=QPGS0       # Command to send to the inverter
+# The section heading for information only - must be unique
+[Inverter1]
+# Model of inverter, currently only standard and LV5048 defined       
+model=standard      
+# Port that mpp-solar connects to the inverter
+port=/dev/ttyUSB0
+# Speed of the connection
+baud=2400
+# Command to send to the inverter
+command=QPGS0       
 tag = Inverter1
-format=influx2      # Format of MQTT message to post - valid (so far) influx2
-                    # for MQTT to Grafana via telegraf (as documented)
+# Format of MQTT message to post - valid (so far) influx2
+# for MQTT to Grafana via telegraf (as documented)
+format=influx2
+
 
 # example 2
-[Inverter1_L1]      # To combine 2 commands for Influx math define multiple sections with the same tag
+# To combine 2 commands for Influx math define multiple sections with the same tag
+[Inverter1_L1]      
 model=LV5048
 port=/dev/ttyUSB0
 command=QPGS0
 tag=Inverter1
 format=influx2
 
-[Inverter1_L2]      # To combine 2 commands for Influx math define multiple sections with the same tag
+# To combine 2 commands for Influx math define multiple sections with the same tag
+[Inverter1_L2]      
 model=LV5048
 port=/dev/ttyUSB0
 command=QP2GS0
