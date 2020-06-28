@@ -46,7 +46,7 @@ def main():
                     topic = '{}/settings/{}/{}'.format(serial_number, setting, i)
                     msg = {'topic': topic, 'payload': '{}'.format(settings[setting][i])}
                     msgs.append(msg)
-            # publish.multiple(msgs, hostname=args.broker)
+            publish.multiple(msgs, hostname=args.broker)
             print(msgs)
             print(args.broker)
 
