@@ -428,7 +428,7 @@ class mppCommand(object):
         for i, result in enumerate(responses):
             # Check if we are past the 'known' responses
             if (i >= len(self.response_definition)):
-                resp_format = ['string', 'Unknown value in byte_response', '']
+                resp_format = ['string', f'Unknown value in byte_response {i}', '']
             else:
                 resp_format = self.response_definition[i]
 
