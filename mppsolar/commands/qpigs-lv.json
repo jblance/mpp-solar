@@ -31,6 +31,15 @@
                 "is_load_on",
                 "is_configuration_changed"
                 ]
+            ],
+            ["int", "RSV1", "A"],
+            ["int", "RSV2", "A"],
+            ["int", "PV Input Power", "W"],
+            ["flags", "Device Status2", [
+                "is_charging_to_float",
+                "is_switched_on",
+                "is_reserved"
+              ]
             ]
         ],
     "test_responses": [
