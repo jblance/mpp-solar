@@ -37,4 +37,4 @@ class SerialIO(BaseIO):
         except Exception as e:
             log.warning(f"Serial read error: {e}")
         log.info('Command execution failed')
-        return {'error': 'Serial command execution failed'}
+        return {'ERROR': ['Serial command execution failed', '']}

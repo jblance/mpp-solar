@@ -38,4 +38,4 @@ class ESP32IO(BaseIO):
         except Exception as e:
             log.warning("ESP32 Serial read error: {}".format(e))
         log.info('Command execution failed')
-        return {'error': 'Serial command execution failed'}
+        return {'ERROR': ['Serial command execution failed', '']}
