@@ -6,7 +6,7 @@ from sys import exit
 
 from .version import __version__  # noqa: F401
 # import mppcommands
-from .mpputils import mppUtils
+# from .mpputils import mppUtils
 
 log = logging.getLogger('MPP-Solar')
 # setup logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
@@ -24,10 +24,10 @@ logging.basicConfig()
 
 def main():
     parser = ArgumentParser(description='MPP Solar Command Utility, version: {}'.format(__version__))
-    parser.add_argument('-n', '--name', type=str, help='Specifies the device name - used to differentiate different devices', default='mppsolarname')
+    parser.add_argument('-n', '--name', type=str, help='Specifies the device name - used to differentiate different devices', default='unnamed')
     parser.add_argument('-t', '--type', type=str, help='Specifies the device type (default: mppsolar)', default='mppsolar')
     parser.add_argument('-p', '--port', type=str, help='Specifies the device communications port (/dev/ttyUSB0 [default], /dev/hidraw, test, ...)', default='/dev/ttyUSB0')
-    parser.add_argument('-d', '--device', type=str, help='DEPRICATED, use -p')
+    parser.add_argument('-d', '--device', type=str, help='DEPRECATED, use -p')
     parser.add_argument('-P', '--protocol', type=str, help='Specifies the device command and response protocol, (default: PI30)', default='PI30', choices=['PI18', 'PI30', 'PI41'])
     parser.add_argument('-T', '--tag', type=str, help='Override the command name and use this instead (for mqtt and influx type output processors)')
     parser.add_argument('-b', '--baud', type=int, help='Baud rate for serial communications (default: 2400)', default=2400)
@@ -36,12 +36,11 @@ def main():
     parser.add_argument('-c', '--command', help='Command to run', default='QID')
     # parser.add_argument('-c', '--command', help='Raw command to run')
 
-    parser.add_argument('-o', '--output', type=str, help='Specifies the output processor(s) to use [comma separated if multiple] (default: screen)', choices=['screen', 'influx_mqtt', 'mqtt', 'hass_config', 'hass_mqtt'], default='screen')
-    parser.add_argument('-q', '--mqtt_broker', type=str, help='Specifies the mqtt broker to publish to if using a mqtt output (localhost [default], hostname, ip.add.re.ss ...)', default='localhost')
+    parser.add_argument('-o', '--output', type=str, help='Specifies the output processor(s) to use [comma separated if multiple] (screen [default], influx_mqtt, mqtt, hass_config, hass_mqtt)', default='screen')
+    parser.add_argument('-q', '--mqttbroker', type=str, help='Specifies the mqtt broker to publish to if using a mqtt output (localhost [default], hostname, ip.add.re.ss ...)', default='localhost')
 
-    parser.add_argument('-l', '--listknown', action='store_true', help='List known commands')
-    parser.add_argument('-s', '--getStatus', action='store_true', help='Get Inverter Status')
-    # '-t' now changed from getSettings to type
+    parser.add_argument('--listknown', action='store_true', help='List known commands')
+    parser.add_argument('--getStatus', action='store_true', help='Get Inverter Status')
     parser.add_argument('--getSettings', action='store_true', help='Get Inverter Settings')
 
     parser.add_argument('-R', '--showraw', action='store_true', help='Display the raw results')
@@ -65,12 +64,18 @@ def main():
         tag = args.tag
     else:
         tag = args.command
-    if args.mqtt_broker:
-        mqtt_broker = args.mqtt_broker
-    else:
-        mqtt_broker = 'localhost'
+    if args.model == 'LV5048':
+        log.info('Modle LV5048 specified, setting protocol to PI41')
+        args.protocol = 'PI41'
+    if args.model == 'PI18':
+        log.info('Modle PI18 specified, setting protocol to PI48')
+        args.protocol = 'PI18'
+    if not args.showraw:
+        args.showraw = False
+    if not args.mqttbroker:
+        args.mqttbroker = 'localhost'
     if args.listknown:
-        log.error('-l --listknown option is deprecated, please update your scripts')
+        log.error('listknown option is deprecated, please update your scripts')
         exit(1)
     if args.device:
         log.error('-d --device option is deprecated, please update your scripts to use -p instead')
@@ -99,7 +104,7 @@ def main():
     # The device class __init__ will instantiate the port communications and protocol classes
     device = device_class(name=args.name, port=args.port, protocol=args.protocol)
     # run command or call helper function
-    results = device.run_command(command=args.command, show_raw=args.show_raw)
+    results = device.run_command(command=args.command, show_raw=args.showraw)
 
     #
     # mp = mppcommands.mppCommands(args.device, args.baud)
@@ -143,4 +148,4 @@ def main():
         output_class = getattr(output_module, output)
 
         # init function will do the processing
-        output_class(results=results, tag=tag, mqtt_broker=mqtt_broker)
+        output_class(results=results, tag=tag, mqtt_broker=args.mqttbroker)
