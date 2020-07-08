@@ -4,7 +4,7 @@ import random
 
 from .baseio import BaseIO
 
-log = logging.getLogger('powermon')
+log = logging.getLogger('MPP-Solar')
 
 
 class TestIO(BaseIO):

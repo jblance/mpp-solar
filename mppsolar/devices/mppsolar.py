@@ -2,7 +2,7 @@ import logging
 
 from .device import AbstractDevice
 
-log = logging.getLogger('powermon')
+log = logging.getLogger('MPP-Solar')
 
 
 class mppsolar(AbstractDevice):

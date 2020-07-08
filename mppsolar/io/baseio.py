@@ -2,7 +2,7 @@
 import abc
 import logging
 # from time import sleep
-log = logging.getLogger('powermon')
+log = logging.getLogger('MPP-Solar')
 
 
 class BaseIO(metaclass=abc.ABCMeta):

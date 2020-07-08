@@ -1,6 +1,6 @@
 import logging
 
-log = logging.getLogger('powermon')
+log = logging.getLogger('MPP-Solar')
 
 
 class screen():

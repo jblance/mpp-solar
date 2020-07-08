@@ -3,7 +3,7 @@ import logging
 from .protocol import AbstractProtocol
 # from .pi30 import COMMANDS
 
-log = logging.getLogger('powermon')
+log = logging.getLogger('MPP-Solar')
 
 COMMANDS = {
     'ET': {

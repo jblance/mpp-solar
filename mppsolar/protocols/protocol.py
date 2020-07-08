@@ -3,7 +3,7 @@ import ctypes
 import logging
 import re
 
-log = logging.getLogger('powermon')
+log = logging.getLogger('MPP-Solar')
 
 
 class AbstractProtocol(metaclass=abc.ABCMeta):

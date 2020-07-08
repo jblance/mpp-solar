@@ -1,7 +1,7 @@
 import logging
 import paho.mqtt.publish as publish
 
-log = logging.getLogger('powermon')
+log = logging.getLogger('MPP-Solar')
 
 
 class influx_mqtt():

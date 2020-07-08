@@ -2,7 +2,7 @@ import logging
 
 from .pi30 import pi30
 
-log = logging.getLogger('powermon')
+log = logging.getLogger('MPP-Solar')
 
 # New / overriden commands
 NEW_COMMANDS = {

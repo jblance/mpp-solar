@@ -2,7 +2,7 @@ import logging
 
 from .protocol import AbstractProtocol
 
-log = logging.getLogger('powermon')
+log = logging.getLogger('MPP-Solar')
 
 COMMANDS = {
     'F': {

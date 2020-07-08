@@ -2,7 +2,7 @@ import abc
 import importlib
 import logging
 
-log = logging.getLogger('powermon')
+log = logging.getLogger('MPP-Solar')
 
 SERIAL_TYPE_TEST = 1
 SERIAL_TYPE_USB = 2

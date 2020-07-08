@@ -4,7 +4,7 @@ import time
 
 from .baseio import BaseIO
 
-log = logging.getLogger('powermon')
+log = logging.getLogger('MPP-Solar')
 
 
 class SerialIO(BaseIO):
