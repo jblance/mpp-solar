@@ -23,7 +23,7 @@ logging.basicConfig()
 
 
 def main():
-    parser = ArgumentParser(description='MPP Solar Command Utility, version: {}'.format(__version__))
+    parser = ArgumentParser(description=f'MPP Solar Command Utility, version: {__version__}')
     parser.add_argument('-n', '--name', type=str, help='Specifies the device name - used to differentiate different devices', default='unnamed')
     parser.add_argument('-t', '--type', type=str, help='Specifies the device type (default: mppsolar)', default='mppsolar')
     parser.add_argument('-p', '--port', type=str, help='Specifies the device communications port (/dev/ttyUSB0 [default], /dev/hidraw, test, ...)', default='/dev/ttyUSB0')
@@ -33,7 +33,7 @@ def main():
     parser.add_argument('-b', '--baud', type=int, help='Baud rate for serial communications (default: 2400)', default=2400)
     parser.add_argument('-M', '--model', type=str, help='Specifies the inverter model to select commands for, defaults to "standard", currently supports LV5048', default='standard')
 
-    parser.add_argument('-c', '--command', help='Command to run', default='QID')
+    parser.add_argument('-c', '--command', help='Command to run')
     # parser.add_argument('-c', '--command', help='Raw command to run')
 
     parser.add_argument('-o', '--output', type=str, help='Specifies the output processor(s) to use [comma separated if multiple] (screen [default], influx_mqtt, mqtt, hass_config, hass_mqtt)', default='screen')
@@ -103,38 +103,22 @@ def main():
     log.debug(f'device_class {device_class}')
     # The device class __init__ will instantiate the port communications and protocol classes
     device = device_class(name=args.name, port=args.port, protocol=args.protocol)
-    # run command or call helper function
-    results = device.run_command(command=args.command, show_raw=args.showraw)
 
-    #
-    # mp = mppcommands.mppCommands(args.device, args.baud)
-    #
-    #
-    # mp = mppUtils(args.device, args.baud, args.model)
-
-    # elif(args.getStatus):
-    #     fullStatus = mp.getFullStatus()
-    #     print("================ Status ==================")
-    #     print("{:<30}\t{:<15} {}".format('Parameter', 'Value', 'Unit'))
-    #     for key in sorted(fullStatus):
-    #         print("{:<30}\t{:<15} {}".format(key, fullStatus[key]['value'], fullStatus[key]['unit']))
-    # elif(args.getSettings):
-    #     settings = mp.getSettings()
-    #     print("================ Settings ==================")
-    #     print("{:<30}\t{:<10}\t{:<10} {}".format('Parameter', 'Default', 'Current', 'Unit'))
-    #     for key in sorted(settings):
-    #         print("{:<30}\t{:<10}\t{:<10} {}".format(key, settings[key]['default'],
-    #                                                  settings[key]['value'],
-    #                                                  settings[key]['unit']))
-    # else:
-    #     # TODO: check if command is valid
-    #     # maybe check if query or setter and ...
-    #     if(args.showraw):
-    #         print(mp.getResponse(args.command))
-    #     else:
-    #         results = mp.getResponseDict(args.command)
-    #         for key in sorted(results):
-    #             print("{:<30}\t{:<15} {}".format(key, results[key][0], results[key][1]))
+    # determine whether to run command or call helper function
+    if args.getStatus:
+        # use get_status helper
+        results = device.get_status(show_raw=args.showraw)
+        # TODO: implement get_status
+    elif args.getSettings:
+        # use get_settings helper
+        results = device.get_settings(show_raw=args.showraw)
+        # TODO: implement get_settings
+    elif args.command:
+        # run the command
+        results = device.run_command(command=args.command, show_raw=args.showraw)
+    else:
+        # run the default command
+        results = device.run_default_command(show_raw=args.showraw)
 
     # send to output processor(s)
     outputs = args.output.split(',')
@@ -151,20 +135,115 @@ def main():
         output_class(results=results, tag=tag, mqtt_broker=args.mqttbroker)
 
 
-def mpp_info_pub(*args, **kwargs):
+def mpp_info_pub():
     from argparse import ArgumentParser
-    parser = ArgumentParser(description='MPP Solar Inverter Info Utility')
-    parser.add_argument('-s', '--grabsettings', action='store_true', help='Also get the inverter settings')
+    parser = ArgumentParser(description=f'MPP Solar Info Publish Utility, version: {__version__}')
+    parser.add_argument('-s', '--getsettings', action='store_true', help='Also get the inverter settings')
     parser.add_argument('-t', '--getstatus', action='store_true', help='Use the getstatus "helper"')
     parser.add_argument('-c', '--command', type=str, help='Command to execute [comma separated]', default=None)
     parser.add_argument('-d', '--device', type=str, help='Serial device(s) to communicate with [comma separated]', default='/dev/ttyUSB0')
     parser.add_argument('-M', '--model', type=str, help='Specifies the inverter model to select commands for, defaults to "standard", currently supports LV5048', default='standard')
     parser.add_argument('-b', '--baud', type=int, help='Baud rate for serial communications', default=2400)
-    parser.add_argument('-q', '--broker', type=str, help='MQTT Broker hostname', default='mqtt_broker')
+    parser.add_argument('-q', '--mqttbroker', type=str, help='MQTT Broker hostname', default='localhost')
     parser.add_argument('-i', '--influx', action='store_true', help='Use Influx Line Protocol for the messgae format')
     parser.add_argument('-I', '--influx2', action='store_true', help='Use Influx Line Protocol II for the messgae format')
-    parser.add_argument('--tag', type=str, help='Influx tag to use for all commands in this execution', default=None)
-    _args = parser.parse_args()
-    print(_args)
-    print(args)
-    print(kwargs)
+    parser.add_argument('-T', '--tag', type=str, help='Influx tag to use for all commands in this execution', default=None)
+    args = parser.parse_args()
+
+    # Process / loop through all supplied devices
+    for usb_port in args.device.split(','):
+        # mp = mppUtils(usb_port, args.baud, args.model)
+        # serial_number = mp.getSerialNumber()
+
+        # Collect Inverter Settings and publish
+        if args.grabsettings:
+            # msgs = []
+            # settings = mp.getSettings()
+
+            # for setting in settings:
+            #    for i in ['value', 'default', 'unit']:
+            #        topic = '{}/settings/{}/{}'.format(serial_number, setting, i)
+            #        msg = {'topic': topic, 'payload': '{}'.format(settings[setting][i])}
+            #        msgs.append(msg)
+            # publish.multiple(msgs, hostname=args.broker)
+            # print(msgs)
+            # print(args.broker)
+            pass
+
+        if args.command:
+            if args.influx:
+                # for _command in args.command.split(','):
+                #     msgs = []
+                #     _data = mp.getInfluxLineProtocol(_command)
+                #     for _item in _data:
+                #         # print(_item)
+                #         # _item = setting=total_ac_output_apparent_power value=1577.0,unit="VA"
+                #         # weather,location=us-midwest temperature=82 1465839830100400200
+                #         # |    -------------------- --------------  |
+                #         # |             |             |             |
+                #         # |             |             |             |
+                #         # +-----------+--------+-+---------+-+---------+
+                #         # |measurement|,tag_set| |field_set| |timestamp|
+                #         # +-----------+--------+-+---------+-+---------+
+                #         if args.tag:
+                #             tag = args.tag
+                #         else:
+                #             tag = _command
+                #         payload = '{},{}'.format(tag, _item)
+                #         msg = {'topic': tag, 'payload': payload}
+                #         msgs.append(msg)
+                #     publish.multiple(msgs, hostname=args.broker)
+                pass
+            elif args.influx2:
+                # for _command in args.command.split(','):
+                #     msgs = []
+                #     _data = mp.getInfluxLineProtocol2(_command)
+                #     if args.tag:
+                #         tag = args.tag
+                #     else:
+                #         tag = _command
+                #     for _item in _data:
+                #         # print(_item)
+                #         # _item = setting=total_ac_output_apparent_power value=1577.0,unit="VA"
+                #         # weather,location=us-midwest temperature=82 1465839830100400200
+                #         # |    -------------------- --------------  |
+                #         # |             |             |             |
+                #         # |             |             |             |
+                #         # +-----------+--------+-+---------+-+---------+
+                #         # |measurement|,tag_set| |field_set| |timestamp|
+                #         # +-----------+--------+-+---------+-+---------+
+                #         payload = 'mpp-solar,command={} {}'.format(tag, _item)
+                #         msg = {'topic': 'mpp-solar', 'payload': payload}
+                #         msgs.append(msg)
+                #     publish.multiple(msgs, hostname=args.broker)
+                pass
+            else:
+                # for _command in args.command.split(','):
+                #     msgs = []
+                #     _data = mp.getResponseDict(_command)
+                #     # {'serial_number': [u'9293333010501', u'']}
+                #     for _item in _data:
+                #         # 92931509101901/status/total_output_active_power/value 1250
+                #         # 92931509101901/status/total_output_active_power/unit W
+                #         # topic = '{}/status/{}/value'.format(serial_number, _item)
+                #         topic = '{}/{}/value'.format(_command, _item)
+                #         msg = {'topic': topic, 'payload': '{}'.format(_data[_item][0])}
+                #         msgs.append(msg)
+                #         topic = '{}/{}/unit'.format(_command, _item)
+                #         msg = {'topic': topic, 'payload': '{}'.format(_data[_item][1])}
+                #         msgs.append(msg)
+                #     publish.multiple(msgs, hostname=args.broker)
+                pass
+        # Collect Inverter Status data and publish
+        if args.getstatus:
+            # msgs = []
+            # status_data = mp.getFullStatus()
+            # for status_line in status_data:
+            #     for i in ['value', 'unit']:
+            #         # 92931509101901/status/total_output_active_power/value 1250
+            #         # 92931509101901/status/total_output_active_power/unit W
+            #         topic = '{}/status/{}/{}'.format(serial_number, status_line, i)
+            #         msg = {'topic': topic, 'payload': '{}'.format(status_data[status_line][i])}
+            #         msgs.append(msg)
+            # publish.multiple(msgs, hostname=args.broker)
+            pass
