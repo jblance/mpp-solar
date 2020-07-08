@@ -62,7 +62,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         protocol_id = protocol.lower()
         # Try to import the protocol module with the supplied name (may not exist)
         try:
-            proto_module = importlib.import_module('powermon.protocols.' + protocol_id, '.')
+            proto_module = importlib.import_module('mppsolar.protocols.' + protocol_id, '.')
         except ModuleNotFoundError:
             log.error(f'No module found for protocol {protocol_id}')
             self._protocol = None
@@ -83,19 +83,19 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         port_type = self.get_port_type(port)
         if port_type == SERIAL_TYPE_TEST:
             log.info('Using testio for communications')
-            from powermon.io.testio import TestIO
+            from mppsolar.io.testio import TestIO
             self._port = TestIO()
         elif port_type == SERIAL_TYPE_USB:
             log.info('Using hidrawio for communications')
-            from powermon.io.hidrawio import HIDRawIO
+            from mppsolar.io.hidrawio import HIDRawIO
             self._port = HIDRawIO(device_path=port)
         elif port_type == SERIAL_TYPE_ESP32:
             log.info('Using esp32io for communications')
-            from powermon.io.esp32io import ESP32IO
+            from mppsolar.io.esp32io import ESP32IO
             self._port = ESP32IO(device_path=port)
         elif port_type == SERIAL_TYPE_SERIAL:
             log.info('Using serialio for communications')
-            from powermon.io.serialio import SerialIO
+            from mppsolar.io.serialio import SerialIO
             self._port = SerialIO(serial_port=port, serial_baud=2400)
         else:
             self._port = None

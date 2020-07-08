@@ -21,6 +21,6 @@ class influx_mqtt():
             value = data[key][0]
             # unit = _data[key][1]
             # Message format is: mpp-solar,command=QPGS0 max_charger_range=120.0
-            msg = {'topic': 'powermon', 'payload': f'powermon,command={tag} {key}={value}'}
+            msg = {'topic': 'mppsolar', 'payload': f'mppsolar,command={tag} {key}={value}'}
             msgs.append(msg)
         publish.multiple(msgs, hostname=mqtt_broker)
