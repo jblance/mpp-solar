@@ -12,6 +12,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         self._command_dict = None
         self._show_raw = None
         self.COMMANDS = {}
+        self.DEFAULT_COMMAND = None
         self._protocol_id = None
 
     def get_protocol_id(self) -> bytes:
