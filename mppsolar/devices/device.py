@@ -77,6 +77,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             self._protocol_class = None
             return
         # Instantiate the class
+        # TODO: fix protocol instantiate
         self._protocol = self._protocol_class('init_var', proto_keyword='value', second_keyword=123)
 
     def set_port(self, port=None):
@@ -103,3 +104,14 @@ class AbstractDevice(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def run_command(self, command=None, show_raw=False):
         raise NotImplementedError
+
+    @abc.abstractmethod
+    def get_status(self, show_raw):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def get_settings(self, show_raw):
+        raise NotImplementedError
+
+    def run_default_command(self, show_raw):
+        return self.run_command(command=self._protocol.DEFAULT_COMMAND, show_raw=show_raw)

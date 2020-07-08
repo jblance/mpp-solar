@@ -5,6 +5,15 @@ from .device import AbstractDevice
 log = logging.getLogger('MPP-Solar')
 
 
+def getVal(_dict, key, ind=None):
+    if key not in _dict:
+        return ""
+    if ind is None:
+        return _dict[key]
+    else:
+        return _dict[key][ind]
+
+
 class mppsolar(AbstractDevice):
     def __init__(self, *args, **kwargs) -> None:
         self._name = kwargs['name']
@@ -27,6 +36,35 @@ class mppsolar(AbstractDevice):
             log.error(f'No communications port defined - unable to run command {command}')
             return {'ERROR': [f'No communications port defined - unable to run command {command}', '']}
 
+        # TODO: implement
         response = self._port.send_and_receive(command, show_raw, self._protocol)
         log.debug(f'Send and Receive Response {response}')
         return response
+
+    def get_status(self, show_raw):
+        pass
+
+    def get_settings(self, show_raw):
+        """
+        Query inverter for all current settings
+        """
+        # serial_number = self.getSerialNumber()
+        default_settings = self.run_command("QDI")
+        current_settings = self.run_commmand("QPIRI")
+        flag_settings = self.run_command("QFLAG")
+
+        settings = {}
+        # {"Battery Bulk Charge Voltage": {"unit": "V", "default": 56.4, "value": 57.4}}
+
+        for item in current_settings.keys():
+            key = '{}'.format(item).replace(" ", "_")
+            settings[key] = {"value": getVal(current_settings, key, 0),
+                             "unit": getVal(current_settings, key, 1),
+                             "default": getVal(default_settings, key, 0)}
+        for key in flag_settings:
+            _key = '{}'.format(key).replace(" ", "_")
+            if _key in settings:
+                settings[_key]['value'] = getVal(flag_settings, key, 0)
+            else:
+                settings[_key] = {'value': getVal(flag_settings, key, 0), "unit": "", "default": ""}
+        return settings
