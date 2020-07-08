@@ -152,19 +152,19 @@ def main():
 
 
 def mpp_info_pub(*args, **kwargs):
-    # from argparse import ArgumentParser
-    # parser = ArgumentParser(description='MPP Solar Inverter Info Utility')
-    # parser.add_argument('-s', '--grabsettings', action='store_true', help='Also get the inverter settings')
-    # parser.add_argument('-t', '--getstatus', action='store_true', help='Use the getstatus "helper"')
-    # parser.add_argument('-c', '--command', type=str, help='Command to execute [comma separated]', default=None)
-    # parser.add_argument('-d', '--device', type=str, help='Serial device(s) to communicate with [comma separated]', default='/dev/ttyUSB0')
-    # parser.add_argument('-M', '--model', type=str, help='Specifies the inverter model to select commands for, defaults to "standard", currently supports LV5048', default='standard')
-    # parser.add_argument('-b', '--baud', type=int, help='Baud rate for serial communications', default=2400)
-    # parser.add_argument('-q', '--broker', type=str, help='MQTT Broker hostname', default='mqtt_broker')
-    # parser.add_argument('-i', '--influx', action='store_true', help='Use Influx Line Protocol for the messgae format')
-    # parser.add_argument('-I', '--influx2', action='store_true', help='Use Influx Line Protocol II for the messgae format')
-    # parser.add_argument('--tag', type=str, help='Influx tag to use for all commands in this execution', default=None)
-    # _args = parser.parse_args()
-    # print(_args)
+    from argparse import ArgumentParser
+    parser = ArgumentParser(description='MPP Solar Inverter Info Utility')
+    parser.add_argument('-s', '--grabsettings', action='store_true', help='Also get the inverter settings')
+    parser.add_argument('-t', '--getstatus', action='store_true', help='Use the getstatus "helper"')
+    parser.add_argument('-c', '--command', type=str, help='Command to execute [comma separated]', default=None)
+    parser.add_argument('-d', '--device', type=str, help='Serial device(s) to communicate with [comma separated]', default='/dev/ttyUSB0')
+    parser.add_argument('-M', '--model', type=str, help='Specifies the inverter model to select commands for, defaults to "standard", currently supports LV5048', default='standard')
+    parser.add_argument('-b', '--baud', type=int, help='Baud rate for serial communications', default=2400)
+    parser.add_argument('-q', '--broker', type=str, help='MQTT Broker hostname', default='mqtt_broker')
+    parser.add_argument('-i', '--influx', action='store_true', help='Use Influx Line Protocol for the messgae format')
+    parser.add_argument('-I', '--influx2', action='store_true', help='Use Influx Line Protocol II for the messgae format')
+    parser.add_argument('--tag', type=str, help='Influx tag to use for all commands in this execution', default=None)
+    _args = parser.parse_args()
+    print(_args)
     print(args)
     print(kwargs)
