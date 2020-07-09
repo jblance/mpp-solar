@@ -150,10 +150,12 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         status = 'disabled'
                     else:
                         # output[resp_format[2][item]['name']] = status
-                        msgs[resp_format[2][item]['name']] = [status, '']
+                        _key = '{}'.format(resp_format[2][item]['name']).lower().replace(" ", "_")
+                        msgs[_key] = [status, '']
                 # msgs[key] = [output, '']
             elif self._command_defn['type'] == 'SETTER':
-                msgs[self._command_defn['name']] = [result, '']
+                _key = '{}'.format(self._command_defn['name']).lower().replace(" ", "_")
+                msgs[_key] = [result, '']
             else:
                 msgs[i] = [result, '']
         return msgs
