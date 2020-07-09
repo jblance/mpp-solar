@@ -77,8 +77,8 @@ def main():
     parser.add_argument('-q', '--mqttbroker', type=str, help='Specifies the mqtt broker to publish to if using a mqtt output (localhost [default], hostname, ip.add.re.ss ...)', default='localhost')
 
     parser.add_argument('--listknown', action='store_true', help='List known commands')
-    parser.add_argument('--getStatus', action='store_true', help='Get Inverter Status')
-    parser.add_argument('--getSettings', action='store_true', help='Get Inverter Settings')
+    parser.add_argument('--getstatus', action='store_true', help='Get Inverter Status')
+    parser.add_argument('--getsettings', action='store_true', help='Get Inverter Settings')
     parser.add_argument('--printcrc', action='store_true', help='Display the command and crc and nothing else')
 
     parser.add_argument('-R', '--showraw', action='store_true', help='Display the raw results')
@@ -132,11 +132,11 @@ def main():
     device = device_class(name=args.name, port=args.port, protocol=args.protocol)
 
     # determine whether to run command or call helper function
-    if args.getStatus:
+    if args.getstatus:
         # use get_status helper
         results = device.get_status(show_raw=args.showraw)
         # TODO: implement get_status
-    elif args.getSettings:
+    elif args.getsettings:
         # use get_settings helper
         results = device.get_settings(show_raw=args.showraw)
         # TODO: implement get_settings
