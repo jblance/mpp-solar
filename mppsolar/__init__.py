@@ -148,6 +148,7 @@ def main():
         results = device.run_default_command(show_raw=args.showraw)
 
     # send to output processor(s)
+    log.debug(f'results: {results}')
     outputs = get_outputs(args.output)
     for op in outputs:
         op.output(data=results, tag=tag, mqtt_broker=args.mqttbroker)
