@@ -54,17 +54,15 @@ class mppsolar(AbstractDevice):
         flag_settings = self.run_command("QFLAG")
 
         settings = {}
-        # {"Battery Bulk Charge Voltage": {"unit": "V", "default": 56.4, "value": 57.4}}
+        # {'serial_number': ['9293333010501', '']}
 
-        for item in current_settings.keys():
-            key = '{}'.format(item).replace(" ", "_")
+        for key in current_settings.keys():
             settings[key] = {"value": getVal(current_settings, key, 0),
                              "unit": getVal(current_settings, key, 1),
                              "default": getVal(default_settings, key, 0)}
         for key in flag_settings:
-            _key = '{}'.format(key).replace(" ", "_")
-            if _key in settings:
-                settings[_key]['value'] = getVal(flag_settings, key, 0)
+            if key in settings:
+                settings[key]['value'] = getVal(flag_settings, key, 0)
             else:
-                settings[_key] = {'value': getVal(flag_settings, key, 0), "unit": "", "default": ""}
+                settings[key] = {'value': getVal(flag_settings, key, 0), "unit": "", "default": ""}
         return settings
