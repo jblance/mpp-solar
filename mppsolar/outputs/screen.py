@@ -5,8 +5,8 @@ log = logging.getLogger('MPP-Solar')
 
 class screen():
     def __init__(self, *args, **kwargs) -> None:
-        log.info('Using output processor: print')
-        log.debug(f'processor.print __init__ kwargs {kwargs}')
+        log.info('Using output processor: screen')
+        log.debug(f'processor.screen __init__ kwargs {kwargs}')
         _data = kwargs['results']
         if _data is None:
             return
