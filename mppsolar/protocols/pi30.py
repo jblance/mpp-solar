@@ -709,5 +709,7 @@ class pi30(AbstractProtocol):
         super().__init__()
         self._protocol_id = b'PI30'
         self.COMMANDS = COMMANDS
+        self.STATUS_COMMANDS = ['QPIGS', 'Q1']
+        self.SETTINGS_COMMANDS = ['QDI', 'QPIRI', 'QFLAG']
         self.DEFAULT_COMMAND = 'QDI'
         # log.info(f'Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands')

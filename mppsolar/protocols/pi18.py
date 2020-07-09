@@ -121,6 +121,8 @@ class pi18(AbstractProtocol):
         super().__init__()
         self._protocol_id = b'PI18'
         self.COMMANDS = COMMANDS
+        self.STATUS_COMMANDS = ['MOD', 'GS', 'ET']
+        self.SETTINGS_COMMANDS = ['PI', ]
         self.DEFAULT_COMMAND = 'PI'
 
     def get_full_command(self, command, show_raw) -> bytes:

@@ -42,27 +42,15 @@ class mppsolar(AbstractDevice):
         return response
 
     def get_status(self, show_raw):
-        pass
+        # Run all the commands that are defined as status from the protocol definition
+        data = {}
+        for command in self._protocol.STATUS_COMMANDS:
+            data.update(self.run_command(command))
+        return data
 
     def get_settings(self, show_raw):
-        """
-        Query inverter for all current settings
-        """
-        # serial_number = self.getSerialNumber()
-        default_settings = self.run_command("QDI")
-        current_settings = self.run_commmand("QPIRI")
-        flag_settings = self.run_command("QFLAG")
-
-        settings = {}
-        # {'serial_number': ['9293333010501', '']}
-
-        for key in current_settings.keys():
-            settings[key] = {"value": getVal(current_settings, key, 0),
-                             "unit": getVal(current_settings, key, 1),
-                             "default": getVal(default_settings, key, 0)}
-        for key in flag_settings:
-            if key in settings:
-                settings[key]['value'] = getVal(flag_settings, key, 0)
-            else:
-                settings[key] = {'value': getVal(flag_settings, key, 0), "unit": "", "default": ""}
-        return settings
+        # Run all the commands that are defined as settings from the protocol definition
+        data = {}
+        for command in self._protocol.SETTINGS_COMMANDS:
+            data.update(self.run_command(command))
+        return data
