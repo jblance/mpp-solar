@@ -99,7 +99,7 @@ setup(
         'console_scripts': [
             'mpp-solar=mppsolar:main',
             'mpp-info-pub=mppsolar:mpp_info_pub',
-            'mpp-solar-service=mppsolar.mpp_solar_service:main',
+            'mpp-solar-service=mppsolar:mpp_solar_service',
         ],
     },
 
