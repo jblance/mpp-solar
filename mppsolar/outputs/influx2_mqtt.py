@@ -4,23 +4,23 @@ import paho.mqtt.publish as publish
 log = logging.getLogger('MPP-Solar')
 
 
-class influx_mqtt():
+class influx2_mqtt():
     def __init__(self, *args, **kwargs) -> None:
-        log.info('Using output processor: influx_mqtt')
-        log.debug(f'processor.influx_mqtt __init__ kwargs {kwargs}')
+        log.info('Using output processor: influx2_mqtt')
+        log.debug(f'processor.influx2_mqtt __init__ kwargs {kwargs}')
         data = kwargs['results']
         tag = kwargs['tag']
         mqtt_broker = kwargs['mqtt_broker']
         if data is None:
             return
 
-        # Build array of Influx Line Protocol messages
+        # Build array of Influx Line Protocol II messages
         msgs = []
         # Loop through responses
         for key in data:
             value = data[key][0]
-            unit = data[key][1]
-            # Message format is: tag, tag,setting=total_ac_output_apparent_power value=1577.0,unit="VA"
-            msg = {'topic': tag, 'payload': f'{tag},setting={key} value={value},unit={unit}'}
+            # unit = _data[key][1]
+            # Message format is: mpp-solar,command=QPGS0 max_charger_range=120.0
+            msg = {'topic': 'mppsolar', 'payload': f'mppsolar,command={tag} {key}={value}'}
             msgs.append(msg)
         publish.multiple(msgs, hostname=mqtt_broker)
