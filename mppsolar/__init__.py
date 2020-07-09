@@ -1,4 +1,4 @@
-# !/usr/bin/python3  # noqa: E902
+# !/usr/bin/python3
 from argparse import ArgumentParser
 import importlib
 import logging
@@ -37,7 +37,7 @@ def get_outputs(output_list):
 def get_device_class(device_type=None):
     if device_type is None:
         return None
-     device_type = device_type.lower()
+    device_type = device_type.lower()
     try:
         device_module = importlib.import_module('mppsolar.devices.' + device_type, '.')
     except ModuleNotFoundError:
@@ -103,7 +103,7 @@ def main():
     else:
         tag = args.command
     if args.model is not None and args.protocol is None:
-        args.protocol  = get_protocol_for_model(args.model)
+        args.protocol = get_protocol_for_model(args.model)
     if not args.showraw:
         args.showraw = False
     if not args.mqttbroker:
@@ -183,7 +183,7 @@ def mpp_info_pub():
     else:
         tag = args.command
     if args.model is not None and args.protocol is None:
-        args.protocol  = get_protocol_for_model(args.model)
+        args.protocol = get_protocol_for_model(args.model)
     if args.port is None and args.device is not None:
         args.port = args.device
     if args.influx:
@@ -235,6 +235,7 @@ def mpp_info_pub():
             for op in outputs:
                 op.output(data=results, tag=tag, mqtt_broker=args.mqttbroker)
 
+
 def mpp_solar_service():
     import configparser
     import time
@@ -275,7 +276,7 @@ def mpp_solar_service():
         command = config[section].get('command')
         tag = config[section].get('tag')
         _format = config[section].get('format')
-        mp = mppUtils(port, baud, model)  # TODO: fix here
+        mp = f'mppUtils({port}, {baud}, {model})'  # TODO: fix here
         mppUtilArray.append({'mp': mp, 'command': command, 'format': _format, 'tag': tag})
 
     # Tell systemd that our service is ready
@@ -292,12 +293,12 @@ def mpp_solar_service():
             elif item['format'] == 'influx2':
                 # print('MPP-Solar-Service: format influx2 yet to be supported')
                 msgs = []
-                _data = item['mp'].getInfluxLineProtocol2(item['command']) # TODO: fix here
+                _data = item['mp'].getInfluxLineProtocol2(item['command'])   # TODO: fix here
                 for _item in _data:
                     payload = 'mpp-solar,command={} {}'.format(item['tag'], _item)
                     msg = {'topic': 'mpp-solar', 'payload': payload}
                     msgs.append(msg)
-                publish.multiple(msgs, hostname=mqtt_broker)
+                # publish.multiple(msgs, hostname=mqtt_broker)
             elif item['format'] == 'mqtt1':
                 # print('MPP-Solar-Service: format mqtt1 yet to be supported')
                 msgs = []
@@ -315,7 +316,7 @@ def mpp_solar_service():
                     msg = {'topic': topic, 'payload': payload}
                     msgs.append(msg)
                     # print (msg)
-                publish.multiple(msgs, hostname=mqtt_broker)
+                # publish.multiple(msgs, hostname=mqtt_broker)
             else:
                 print('MPP-Solar-Service: format {} not supported'.format(item['format']))
         print('MPP-Solar-Service: sleeping for {}sec'.format(pause))
