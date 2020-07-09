@@ -8,7 +8,7 @@ class mqtt():
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f'processor.mqtt __init__ kwargs {kwargs}')
 
-    def output(data=None, tag=None, mqtt_broker='localhost'):
+    def output(self, data=None, tag=None, mqtt_broker='localhost'):
         log.info('Using output processor: mqtt')
         if data is None:
             return

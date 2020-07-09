@@ -8,7 +8,7 @@ class influx_mqtt():
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f'processor.influx_mqtt __init__ kwargs {kwargs}')
 
-    def output(data=None, tag=None, mqtt_broker='localhost'):
+    def output(self, data=None, tag=None, mqtt_broker='localhost'):
         log.info('Using output processor: influx_mqtt')
         if data is None:
             return
