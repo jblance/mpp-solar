@@ -6,14 +6,12 @@ log = logging.getLogger('MPP-Solar')
 
 class mqtt():
     def __init__(self, *args, **kwargs) -> None:
-        log.info('Using output processor: mqtt')
         log.debug(f'processor.mqtt __init__ kwargs {kwargs}')
-        data = kwargs['results']
-        tag = kwargs['tag']
-        mqtt_broker = kwargs['mqtt_broker']
+
+    def output(data=None, tag=None, mqtt_broker='localhost'):
+        log.info('Using output processor: mqtt')
         if data is None:
             return
-
         # Build array of mqtt messages
         msgs = []
         # Loop through responses

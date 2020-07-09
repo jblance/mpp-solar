@@ -5,9 +5,10 @@ log = logging.getLogger('MPP-Solar')
 
 class screen():
     def __init__(self, *args, **kwargs) -> None:
-        log.info('Using output processor: screen')
         log.debug(f'processor.screen __init__ kwargs {kwargs}')
-        _data = kwargs['results']
+
+    def output(_data=None):
+        log.info('Using output processor: screen')
         if _data is None:
             return
         print(f"{'Parameter':<30}\t{'Value':<15} Unit")

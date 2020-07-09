@@ -6,11 +6,10 @@ log = logging.getLogger('MPP-Solar')
 
 class hass_config():
     def __init__(self, *args, **kwargs) -> None:
-        log.info('Using output processor: hass_config')
         log.debug(f'processor.hass_config __init__ kwargs {kwargs}')
-        data = kwargs['results']
-        tag = kwargs['tag']
-        mqtt_broker = kwargs['mqtt_broker']
+
+    def output(data=None, tag=None, mqtt_broker='localhost'):
+        log.info('Using output processor: hass_config')
         if data is None:
             return
 
