@@ -114,12 +114,18 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             # log.debug(f'result {result}, key {key}, resp_format {resp_format}')
             # Process results
             if (resp_format[0] == 'float'):
+                if '--' in result:
+                    result = 0
                 msgs[key] = [float(result), resp_format[2]]
             elif (resp_format[0] == 'int'):
+                if '--' in result:
+                    result = 0
                 msgs[key] = [int(result), resp_format[2]]
             elif (resp_format[0] == 'string'):
                 msgs[key] = [result, resp_format[2]]
             elif (resp_format[0] == '10int'):
+                if '--' in result:
+                    result = 0
                 msgs[key] = [float(result) / 10, resp_format[2]]
             # eg. ['option', 'Output source priority', ['Utility first', 'Solar first', 'SBU first']],
             elif (resp_format[0] == 'option'):
