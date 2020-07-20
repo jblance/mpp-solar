@@ -292,6 +292,6 @@ class pi41(pi30):
         self._protocol_id = b'PI41'
         self.COMMANDS.update(NEW_COMMANDS)
         self.STATUS_COMMANDS = ['QPIGS', 'Q1']
-        self.SETTINGS_COMMANDS = ['QDI', 'QPIRI', 'QFLAG']
+        self.SETTINGS_COMMANDS = ['QPIRI', 'QFLAG']
         self.DEFAULT_COMMAND = 'QDI'
         # log.info(f'Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands')
