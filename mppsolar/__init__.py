@@ -65,7 +65,7 @@ def main():
     parser.add_argument('-t', '--type', type=str, help='Specifies the device type (default: mppsolar)', default='mppsolar')
     parser.add_argument('-p', '--port', type=str, help='Specifies the device communications port (/dev/ttyUSB0 [default], /dev/hidraw, test, ...)', default='/dev/ttyUSB0')
     parser.add_argument('-d', '--device', type=str, help='DEPRECATED, use -p')
-    parser.add_argument('-P', '--protocol', type=str, help='Specifies the device command and response protocol, (default: PI30)', default='PI30', choices=['PI18', 'PI30', 'PI41'])
+    parser.add_argument('-P', '--protocol', type=str, help='Specifies the device command and response protocol, (default: PI30)', default='PI30', choices=['PI16', 'PI18', 'PI30', 'PI41'])
     parser.add_argument('-T', '--tag', type=str, help='Override the command name and use this instead (for mqtt and influx type output processors)')
     parser.add_argument('-b', '--baud', type=int, help='Baud rate for serial communications (default: 2400)', default=2400)
     parser.add_argument('-M', '--model', type=str, help='Specifies the inverter model to select commands for, defaults to "standard", currently supports LV5048', default='standard')
