@@ -39,7 +39,7 @@ COMMANDS = {
                 ["string", "status TODO", ""],
         ],
         "test_responses": [
-            b'(226.1 000378 50.0 0001.7 226.8 00378 49.9 001.6 013 436.4 436.4 052.6 ---.- 077 00920 00292 ----- 196.1 ---.- ---.- 027.0 A---101001\r',
+            b'(224.6 000000 49.9 0006.8 232.4 01594 49.9 006.8 029 415.0 415.0 057.9 ---.- 100 00000 00000 ----- 000.0 000.0 ---.- 035.0 D---110001k\xdb\r',
         ],
         "regex": "",
     },
@@ -52,7 +52,7 @@ COMMANDS = {
                 ["string", "Protocol Version", ""]
         ],
         "test_responses": [
-            b"(PI16\r",
+            b'(PI16\x9c\xaf\r',
         ],
         "regex": "",
     },
@@ -83,14 +83,3 @@ class pi16(AbstractProtocol):
         full_command = cmd + bytes([13])
         log.debug(f'full command: {full_command}')
         return full_command
-
-    def get_responses(self, response):
-        '''
-        Override the default get_responses as its different for PI16
-        '''
-        responses = response.split(b' ')
-        # Trim leading '(' of first response
-        responses[0] = responses[0][1:]
-        # Remove \r of last response
-        responses[-1] = responses[-1][:-1]
-        return responses
