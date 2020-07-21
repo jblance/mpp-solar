@@ -14,6 +14,7 @@ COMMANDS = {
         "description": "Query energy produced for a specific day",
         "help": " -- Query device for energy produced in the specific day at date in YYYYMMDD format",
         "type": "QUERY",
+        "checksum_required": 'True',
         "response": [
                 ["int", "Energy produced", "Wh"],
         ],
@@ -130,6 +131,8 @@ class pi16(AbstractProtocol):
         self._command = command
         self._command_defn = self.get_command_defn(command)
         # End of required variables setting
+        if self._command_defn['checksum_required']:
+            print('CHECKSUM REQUIRED')
 
         cmd = bytes(self._command, 'utf-8')
         full_command = cmd + bytes([13])
