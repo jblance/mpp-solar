@@ -32,6 +32,8 @@ class ESP32IO(BaseIO):
                 time.sleep(0.5)  # give serial port time to receive the data
                 response_line = s.readline()
                 log.debug('esp32 serial response was: %s', response_line)
+                if show_raw:
+                    return {'raw response': [response_line, '']}
                 decoded_response = protocol.decode(response_line)
                 log.debug(f'Decoded response {decoded_response}')
                 return decoded_response

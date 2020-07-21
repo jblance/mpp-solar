@@ -22,6 +22,8 @@ class TestIO(BaseIO):
         response = self._test_data
         # response = b"(PI30\x9a\x0b\r"
         log.debug(f'Raw response {response}')
+        if show_raw:
+            return {'raw response': [response, '']}
         decoded_response = protocol.decode(response)
         # _response = response.decode('utf-8')
         log.debug(f'Decoded response {decoded_response}')
