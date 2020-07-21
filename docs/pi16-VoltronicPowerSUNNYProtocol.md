@@ -105,7 +105,7 @@ Where:
 ```
 
 ## *+QPIBI+* ##
-Query device for battery informations (<<protocol,P16>> only)
+Query device for battery information (<<protocol,P16>> only)
 Reply
 ```
 (AAA BBB CCC DDD EEE
@@ -124,11 +124,11 @@ Where:
 +EEE+::	Battery remaining time (minutes)
 ```
 
-*+QMOD+*::	Query device for actual operational mode
-+
---
-If <<protocol,P15>>, or if <<protocol,P16>> *and* <<mt,model type *is* ``Grid-tie''>>, possible replies are:
+## *+QMOD+* ##
+Query device for actual operational mode
 
+If <<protocol,P15>>, or if <<protocol,P16>> *and* <<mt,model type *is* Grid-tie''>>, possible replies are:
+```
 +(D+::			<<shutdown-mode,Shutdown Mode>>
 +(F+::			<<fault-mode,Fault Mode>>
 +(G+::			<<grid-mode,Grid Mode>>
@@ -141,7 +141,7 @@ If <<protocol,P15>>, or if <<protocol,P16>> *and* <<mt,model type *is* ``Grid-ti
 +(T+::
 all other cases::	<<standby-mode,Standby Mode>>
 
-If <<protocol,P16>> *and* <<mt,model type *is not* ``Grid-tie''>>, possible replies are:
+If <<protocol,P16>> *and* <<mt,model type *is not* Grid-tie''>>, possible replies are:
 
 +(B+::			<<inverter-mode,Inverter (Battery) Mode>>
 +(C+::			Depending on conditions, it means:
@@ -162,12 +162,10 @@ If <<protocol,P16>> *and* <<mt,model type *is not* ``Grid-tie''>>, possible repl
 +(Y+::			<<bypass-wo-chrg-mode,Bypass without charging Mode>>
 all other cases::	<<standby-mode,Standby Mode>>
 --
+```
 
-
-Error/Warning status
-~~~~~~~~~~~~~~~~~~~~
-
-[[warning-status]]*+QPIWS+*::	Query device for warning status
+```
+*+QPIWS+*::	Query device for warning status
 +
 --
 .Reply
@@ -184,6 +182,9 @@ Each bit corresponds to an error/warning (-> see <<warnings,'Warnings'>>) and it
 - +0+ -> no warning/error;
 - +-+ -> specific warning/error not supported.
 --
+```
+
+```
 *+QPIFS+*::			Query device for faults and their type.
 				Available only if <<fw,FW version>> is < in <<protocol,P15>>: 0.9; in <<protocol,P16>>: 0.3.
 				To be used only if the device <<warning-status,reports>> it <<device-fault,has faults>>.
@@ -227,6 +228,9 @@ Where:
 ----
 -> No fault
 --
+```
+
+```
 *+QPICF+*::			Query device for faults and their type.
 				Available only if <<fw,FW version>> is >= in <<protocol,P15>>: 0.9; in <<protocol,P16>>: 0.3.
 +
@@ -245,6 +249,9 @@ Where:
 +AA+::			Fault status
 [[fault-id]]+BB+::	Fault ID
 --
+```
+
+```
 *+QPIHF<n>+*::			Query device for fault *+<n>+* (2 digit integer, +NN+, <<fault-id,fault ID as reported by the device>>), and its type.
 				Available only if <<fw,FW version>> is >= in <<protocol,P15>>: 0.9; in <<protocol,P16>>: 0.3.
 +
@@ -281,14 +288,9 @@ Where:
 +SSS+::			Max temperature (°C)
 +TTT+::			Run status
 --
+```
 
-
-Options
-~~~~~~~
-
-Capability options
-^^^^^^^^^^^^^^^^^^
-
+```
 *+QFLAG+*::			Query device for capability flag; only those capabilities whom the device is capable of are reported as enabled or disabled
 +
 --
@@ -315,12 +317,10 @@ Where:
 *+B+*::				Alarm at <<inverter-mode,Inverter (Battery) Mode>> (-> the alarm will beep only if <<alarm-control,alarm control>>, if available, is enabled)
 *+G+*::				Green power function (energy saving -> auto off when there is no load)
 *+P+*::				Alarm at <<bypass-mode,Bypass Mode>> (-> the alarm will beep only if <<alarm-control,alarm control>>, if available, is enabled)
+```
 
-
-[[oops]]
 Operational options (<<protocol,P16>> only)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+```
 *+QENF+*::			Query device for operational options flag
 +
 --
@@ -374,7 +374,7 @@ NOTE:			This option will become ineffective during <<ct,AC charging time>> and t
 *+H+*::			*{sp}unknown *
 *+I+*::			*{sp}unknown *
 *+J+*::			*{sp}unknown *
-
+```
 
 Generator as AC source option (<<protocol,P16>> only)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

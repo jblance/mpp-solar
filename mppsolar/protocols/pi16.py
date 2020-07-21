@@ -9,6 +9,29 @@ log = logging.getLogger('MPP-Solar')
 # (000 001 002 003 004
 
 COMMANDS = {
+    'QMOD': {
+        "name": "QMOD",
+        "description": "Operational mode query",
+        "help": " -- Query device for actual operational mode",
+        "type": "QUERY",
+        "response": [
+                ["keyed", "Device Mode", {
+                    "B": "Inverter (Battery) Mode",
+                    "C": "PV charging Mode",
+                    "D": "Shutdown Mode",
+                    "F": "Fault Mode",
+                    "G": "Grid Mode",
+                    "L": "Line Mode",
+                    "P": "Power on Mode",
+                    "S": "Standby Mode",
+                    "Y": "Bypass Mode"
+                }]
+        ],
+        "test_responses": [
+            b'',
+        ],
+        "regex": "",
+    },
     'QPIBI': {
         "name": "QPIBI",
         "description": "Battery information query",
