@@ -150,7 +150,7 @@ class pi16(AbstractProtocol):
             checksum = self.checksum(self._command)
             log.debug(f'checksum {checksum}')
             # combine byte_cmd, CRC , return
-            full_command = f'{cmd}{checksum}\r')
+            full_command = f'{cmd}{checksum}\r'
         else:
             full_command = cmd + bytes([13])
         log.debug(f'full command: {full_command}')
