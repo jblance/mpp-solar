@@ -9,6 +9,19 @@ log = logging.getLogger('MPP-Solar')
 # (000 001 002 003 004
 
 COMMANDS = {
+    'QED': {
+        "name": "QED",
+        "description": "Query energy produced for a specific day",
+        "help": " -- Query device for energy produced in the specific day at date in YYYYMMDD format",
+        "type": "QUERY",
+        "response": [
+                ["int", "Energy produced", "Wh"],
+        ],
+        "test_responses": [
+            b'(012345\x9c\xaf\r',
+        ],
+        "regex": "QED(\\d\\d\\d\\d\\d\\d\\d\\d)$",
+    },
     'QMOD': {
         "name": "QMOD",
         "description": "Operational mode query",
