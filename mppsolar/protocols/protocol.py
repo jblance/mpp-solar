@@ -82,7 +82,6 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             for item in response:
                 _response += chr(item).encode()
             raw_response = _response.decode('utf-8')
-            print(raw_response)
             msgs['raw_response'] = [raw_response, '']
             return msgs
 
