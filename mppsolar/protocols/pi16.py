@@ -133,7 +133,9 @@ class pi16(AbstractProtocol):
             _len -= 1
             _sum += ord(data[_len])
         _sum &= 0xff
-        return str(_sum).encode
+        _sum = str(_sum)
+        _sum = _sum.encode()
+        return _sum
 
     def get_full_command(self, command) -> bytes:
         '''
@@ -147,10 +149,10 @@ class pi16(AbstractProtocol):
         cmd = bytes(self._command, 'utf-8')
         if self._command_defn and 'checksum_required' in self._command_defn and self._command_defn['checksum_required'] == 'True':
             # calculate the CRC
-            _checksum = self.checksum(self._command)
-            log.debug(f'checksum {_checksum}')
+            checksum = self.checksum(self._command)
+            log.debug(f'checksum {checksum}')
             # combine byte_cmd, CRC , return
-            full_command = cmd + _checksum + bytes([13])
+            full_command = cmd + checksum + bytes([13])
         else:
             full_command = cmd + bytes([13])
         log.debug(f'full command: {full_command}')
