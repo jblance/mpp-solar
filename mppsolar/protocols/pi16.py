@@ -131,7 +131,7 @@ class pi16(AbstractProtocol):
             _len = len(data)
         while _len > 0:
             _len -= 1
-            _sum += data[_len]
+            _sum += ord(data[_len])
         _sum &= 0xff
         return _sum
 
