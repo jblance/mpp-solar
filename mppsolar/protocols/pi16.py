@@ -133,7 +133,7 @@ class pi16(AbstractProtocol):
             _len -= 1
             _sum += ord(data[_len])
         _sum &= 0xff
-        _sum = str(_sum)
+        _sum = f'{_sum:03}'
         _sum = _sum.encode()
         return _sum
 
