@@ -133,7 +133,7 @@ class pi16(AbstractProtocol):
             _len -= 1
             _sum += ord(data[_len])
         _sum &= 0xff
-        return _sum
+        return str(_sum).encode
 
     def get_full_command(self, command) -> bytes:
         '''
