@@ -148,7 +148,7 @@ class pi16(AbstractProtocol):
         if self._command_defn and 'checksum_required' in self._command_defn and self._command_defn['checksum_required'] == 'True':
             # calculate the CRC
             _checksum = self.checksum(self._command)
-            log.debug(f'checksum {checksum}')
+            log.debug(f'checksum {_checksum}')
             # combine byte_cmd, CRC , return
             full_command = cmd + _checksum + bytes([13])
         else:
