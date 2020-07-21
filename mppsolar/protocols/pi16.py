@@ -136,7 +136,7 @@ class pi16(AbstractProtocol):
             # calculate the CRC
             crc_high, crc_low = self.crc(cmd)
             # combine byte_cmd, CRC , return
-            full_command = cmd + bytes([crc_high, crc_low, 13])
+            full_command = cmd + bytes([0, crc_high, crc_low, 13])
         else:
             full_command = cmd + bytes([13])
         log.debug(f'full command: {full_command}')
