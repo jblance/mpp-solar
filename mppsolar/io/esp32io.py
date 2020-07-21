@@ -18,7 +18,7 @@ class ESP32IO(BaseIO):
 
     def send_and_receive(self, command, show_raw, protocol) -> dict:
         log.info(f'ESP32 serial connection: executing {command}')
-        full_command = protocol.get_full_command(command, show_raw)
+        full_command = protocol.get_full_command(command)
         log.info(f'full command {full_command} for command {command}')
 
         response_line = None

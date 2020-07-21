@@ -9,7 +9,7 @@ class BaseIO(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def send_and_receive(self, command, show_raw, protocol) -> dict:
-        full_command = protocol.get_full_command(command, show_raw)
+        full_command = protocol.get_full_command(command)
         log.info(f'full command {full_command} for command {command}')
         # Send the full command via the communications port
         self.write(full_command)
