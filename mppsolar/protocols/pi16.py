@@ -122,6 +122,19 @@ class pi16(AbstractProtocol):
         self.SETTINGS_COMMANDS = ['QPI', ]
         self.DEFAULT_COMMAND = 'QPI'
 
+    def checksum(self, data):
+        # QED20150620106
+
+        _sum = 0
+        _len = data.find('%')
+        if _len == -1:
+            _len = len(data)
+        while _len > 0:
+            _len -= 1
+            _sum += data[len]
+        _sum &= 0xff
+        return _sum
+
     def get_full_command(self, command) -> bytes:
         '''
         Override the default get_full_command as its different for PI16
@@ -134,9 +147,10 @@ class pi16(AbstractProtocol):
         cmd = bytes(self._command, 'utf-8')
         if self._command_defn['checksum_required']:
             # calculate the CRC
-            crc_high, crc_low = self.crc(cmd)
+            checksum = self.crc(cmd)
+            print(f'CHECKSUM {checksum}')
             # combine byte_cmd, CRC , return
-            full_command = cmd + bytes([0, crc_high, crc_low, 13])
+            full_command = f'{cmd}{checksum}' + bytes([13])
         else:
             full_command = cmd + bytes([13])
         log.debug(f'full command: {full_command}')
