@@ -932,6 +932,7 @@ Where:
 [[bdl]]
 Battery-discharging limits (<<protocol,P16>> only)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```
 
 *+QBSDV+*::		Query device for battery-discharging limits
 +
