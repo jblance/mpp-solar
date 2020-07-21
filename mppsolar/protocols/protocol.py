@@ -81,8 +81,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             _response = b''
             for item in response:
                 _response += chr(item).encode()
-            print(_response)
-            msgs['raw_response'] = [_response, '']
+            raw_response = _response.decode()
+            print(raw_response)
+            msgs['raw_response'] = [raw_response, '']
             return msgs
 
         # Check for a stored command definition
