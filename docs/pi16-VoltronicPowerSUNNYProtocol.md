@@ -104,26 +104,26 @@ Where:
 |====
 ```
 
-*+QPIBI+*::	Query device for battery informations (<<protocol,P16>> only)
-+
---
-.Reply
-----
+## *+QPIBI+* ##
+Query device for battery informations (<<protocol,P16>> only)
+Reply
+```
 (AAA BBB CCC DDD EEE
-----
-.e.g.
-----
+```
+e.g.
+```
 (000 001 002 003 004
-----
+```
 
 Where:
-
+```
 +AAA+::	*{sp}unknown *
 +BBB+::	Number of batteries
 +CCC+::	Battery total capacity (Ah)
 +DDD+::	*{sp}unknown *
 +EEE+::	Battery remaining time (minutes)
---
+```
+
 *+QMOD+*::	Query device for actual operational mode
 +
 --

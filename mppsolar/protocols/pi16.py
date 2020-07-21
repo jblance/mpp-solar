@@ -5,10 +5,27 @@ from .protocol import AbstractProtocol
 
 log = logging.getLogger('MPP-Solar')
 
-# (AAA.A BBBBBB CC.C DDDD.D EEE.E FFFFF GG.G HHH.H III JJJ.J KKK.K LLL.L MMM.M NNN OOOOO PPPPP QQQQQ RRR.R SSS.S TTT.T UUU.U VWWWWWWWWW
-# (226.1 000378 50.0 0001.7 226.8 00378 49.9 001.6 013 436.4 436.4 052.6 ---.- 077 00920 00292 ----- 196.1 ---.- ---.- 027.0 A---101001
+# (AAA BBB CCC DDD EEE
+# (000 001 002 003 004
 
 COMMANDS = {
+    'QPIBI': {
+        "name": "QPIBI",
+        "description": "Battery information query",
+        "help": " -- Query device for battery information",
+        "type": "QUERY",
+        "response": [
+                ["int", "unknown", ""],
+                ["int", "Number of batteries", "#"],
+                ["int", "Battery total capacity", "Ah"],
+                ["int", "unknown_2", ""],
+                ["int", "Battery remaining time", "min"],
+        ],
+        "test_responses": [
+            b'',
+        ],
+        "regex": "",
+    },
     'QPIGS': {
         "name": "QPIGS",
         "description": "General status query",

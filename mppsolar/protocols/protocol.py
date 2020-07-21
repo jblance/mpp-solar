@@ -77,7 +77,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         # Raw response requested
         if show_raw:
             log.debug(f'Protocol "{self._protocol_id}" raw response requested')
-            # TODO: need to ensure that response is utf-8 encoded
+            # TODO: deal with \x09 type crc response items better
             _response = b''
             for item in response:
                 _response += chr(item).encode()
