@@ -131,17 +131,13 @@ class pi16(AbstractProtocol):
         self._command = command
         self._command_defn = self.get_command_defn(command)
         # End of required variables setting
-        if self._command_defn['checksum_required']:
-            print(self._command)
-            print('CHECKSUM REQUIRED')
-            byte_cmd = bytes(self._command, 'utf-8')
-            # calculate the CRC
-            crc_high, crc_low = self.crc(byte_cmd)
-            # combine byte_cmd, CRC , return
-            _full_command = byte_cmd + bytes([crc_high, crc_low, 13])
-            print(_full_command)
-
         cmd = bytes(self._command, 'utf-8')
-        full_command = cmd + bytes([13])
+        if self._command_defn['checksum_required']:
+            # calculate the CRC
+            crc_high, crc_low = self.crc(cmd)
+            # combine byte_cmd, CRC , return
+            full_command = cmd + bytes([crc_high, crc_low, 13])
+        else:
+            full_command = cmd + bytes([13])
         log.debug(f'full command: {full_command}')
         return full_command
