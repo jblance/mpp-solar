@@ -425,7 +425,7 @@ Where:
 
 
 Rated informations
-~~~~~~~~~~~~~~~~~~
+
 
 [[protocol]]*+QPI+*::	Query device for protocol
 +
@@ -521,7 +521,7 @@ For <<protocol,P16>> devices, model number, i.e. +AAA+, identifies <<mt,model ty
 |>=  +50+	|<<grid-tie-with-backup,Grid-tie with backup (/Hybrid)>>
 |====
 
-For grid-connected models (i.e. all but +150+ and +151+), once you remove that `signaling' number from the model number the remainder will identify the grid standard in use:
+For grid-connected models (i.e. all but +150+ and +151+), once you remove that signaling' number from the model number the remainder will identify the grid standard in use:
 
 [cols="35^m,65"]
 |====
@@ -1352,6 +1352,8 @@ Where:
 
 +AAAAA+::	Energy produced in the specific hour *+<hour>+* at date *+<date>+* (Wh)
 --
+```
+```
 *+QED<date><checksum>+*::		Query device for energy produced in the specific day at date *+<date>+* (in +YYYYMMDD+ format).
 					*+<checksum>+* is 0-padded to 3 bytes length.
 +
@@ -1536,11 +1538,11 @@ Operational modes
 [[bypass-w-acchrg-mode]]	*Bypass with AC charging Mode*::
 	If PV power is insufficient, AC power will charge the battery and provide power to load.
 [[fault-mode]]			*Fault Mode*::
-	The device is in ``Fault Mode'' when a fault is found.
+	The device is in Fault Mode'' when a fault is found.
 [[grid-mode]]			*Grid Mode*::
 	The device is successfully connected to the grid.
 [[grid-tie-w-backup-mode]]	*Grid-tie with backup Mode*::
-	There are three power sources in ``Grid-tie with backup Mode'': PV power, battery power and utility power.
+	There are three power sources in Grid-tie with backup Mode'': PV power, battery power and utility power.
 [[inverter-mode]]		*Inverter (Battery) Mode*::
 	Utility power is not available or not connected.
 	Possible power flows:
@@ -1587,8 +1589,8 @@ No priority setting is available (i.e. <<priority,priority: *+00+*>>).
 ====
 For the sake of coherence, when this type is chosen:
 
-- ``<<oops-c,Allow to feed-in to the grid>>'' option is always enabled, i.e. always feed-in to the grid;
-- ``<<oops-a,Allow PV to charge battery>>'', ``<<oops-b,Allow AC to charge battery>>'', ``<<oops-d,Allow battery to discharge when PV is available>>'', ``<<oops-e,Allow battery to discharge when PV is unavailable>>'', ``<<oops-f,Allow battery to feed-in to the grid when PV is available>>'' and ``<<oops-g,Allow battery to feed-in to the grid when PV is unavailable>>'' options are always disabled, i.e. ignore battery (if any).
+- <<oops-c,Allow to feed-in to the grid>>'' option is always enabled, i.e. always feed-in to the grid;
+- <<oops-a,Allow PV to charge battery>>'', <<oops-b,Allow AC to charge battery>>'', <<oops-d,Allow battery to discharge when PV is available>>'', <<oops-e,Allow battery to discharge when PV is unavailable>>'', <<oops-f,Allow battery to feed-in to the grid when PV is available>>'' and <<oops-g,Allow battery to feed-in to the grid when PV is unavailable>>'' options are always disabled, i.e. ignore battery (if any).
 ====
 
 
@@ -1609,7 +1611,7 @@ Feed-in to the grid is not allowed.
 	  Besides, it will avoid overload fault because grid can supply load when connected load is over 3KW.
 +
 --
-NOTE:	When this type and priority are chosen, for the sake of coherence, ``<<oops-d,Allow battery to discharge when PV is available>>'' option is always disabled, i.e. don't take from battery when PV is available.
+NOTE:	When this type and priority are chosen, for the sake of coherence, <<oops-d,Allow battery to discharge when PV is available>>'' option is always disabled, i.e. don't take from battery when PV is available.
 --
 <<priority,Priority: *+02+*>> *and* <<qdm,model>> is *+150+*::
 	*PV energy supply priority setting*: 1. Load, 2. Battery.
@@ -1625,13 +1627,13 @@ NOTE:	When this type and priority are chosen, for the sake of coherence, ``<<oop
 	  If connected load is over 3KW, this inverter will activate fault protection.
 +
 --
-NOTE:	When this type and priority are chosen, for the sake of coherence, ``<<oops-d,Allow battery to discharge when PV is available>>'' option is always enabled, i.e. take from battery when PV is available.
+NOTE:	When this type and priority are chosen, for the sake of coherence, <<oops-d,Allow battery to discharge when PV is available>>'' option is always enabled, i.e. take from battery when PV is available.
 --
 
 *Battery charging source* and *load supply source* can be personalized <<oops,setting the appropriate operational options>>.
 
 
-NOTE:	When this type is chosen, for the sake of coherence, ``<<oops-c,Allow to feed-in to the grid>>'', ``<<oops-f,Allow battery to feed-in to the grid when PV is available>>'' and ``<<oops-g,Allow battery to feed-in to the grid when PV is unavailable>>'' options are always disabled, i.e. don't feed-in to grid.
+NOTE:	When this type is chosen, for the sake of coherence, <<oops-c,Allow to feed-in to the grid>>'', <<oops-f,Allow battery to feed-in to the grid when PV is available>>'' and <<oops-g,Allow battery to feed-in to the grid when PV is unavailable>>'' options are always disabled, i.e. don't feed-in to grid.
 
 
 [[grid-tie-with-backup]]
@@ -1644,20 +1646,20 @@ PV power can feed-in back to grid, provide power to the load and charge battery.
 <<priority,Priority: *+01+*>>::
 	*PV energy supply priority setting*: 1. Battery, 2. Load, 3. Grid.
 	- PV power will charge battery first, then provide power to the load.
-	- If there is any remaining power left, it will feed-in to the grid (if ``<<oops-c,Allow to feed-in to the grid>>'' option is enabled).
+	- If there is any remaining power left, it will feed-in to the grid (if <<oops-c,Allow to feed-in to the grid>>'' option is enabled).
 +
 --
-NOTE:	When this type and priority are chosen, for the sake of coherence, ``<<oops-d,Allow battery to discharge when PV is available>>'' and ``<<oops-f,Allow battery to feed-in to the grid when PV is available>>'' options are always disabled, i.e. don't take from battery when PV is available.
+NOTE:	When this type and priority are chosen, for the sake of coherence, <<oops-d,Allow battery to discharge when PV is available>>'' and <<oops-f,Allow battery to feed-in to the grid when PV is available>>'' options are always disabled, i.e. don't take from battery when PV is available.
 --
 <<priority,Priority: *+02+*>>::
 	*PV energy supply priority setting*: 1. Load, 2. Battery, 3. Grid.
 	- PV power will provide power to the load first, then it will charge battery.
-	- If there is any remaining power left, it will feed-in to the grid (if ``<<oops-c,Allow to feed-in to the grid>>'' option is enabled).
+	- If there is any remaining power left, it will feed-in to the grid (if <<oops-c,Allow to feed-in to the grid>>'' option is enabled).
 <<priority,Priority: *+03+*>>::
 	*PV energy supply priority setting*: 1. Load, 2. Grid, 3. Battery.
 	- PV power will provide power to the load first.
-	- If there is more PV power available, it will feed-in to the grid (if ``<<oops-c,Allow to feed-in to the grid>>'' option is enabled).
-	- If feed-in power reaches <<mgp,``maximum power feeding grid'' setting>>, the remaining power will charge battery.
+	- If there is more PV power available, it will feed-in to the grid (if <<oops-c,Allow to feed-in to the grid>>'' option is enabled).
+	- If feed-in power reaches <<mgp,maximum power feeding grid'' setting>>, the remaining power will charge battery.
 
 *Battery charging source* and *load supply source* can be personalized <<oops,setting the appropriate operational options>>.
 
@@ -1677,7 +1679,7 @@ Working logic under peak time::
 
 - PV power will provide power to the load first.
 - If PV power is sufficient, it will charge battery next.
-- If there is remaining PV power left, it will feed-in to the grid (if ``<<oops-c,Allow to feed-in to the grid>>'' option is enabled).
+- If there is remaining PV power left, it will feed-in to the grid (if <<oops-c,Allow to feed-in to the grid>>'' option is enabled).
 
 *Battery charging source*: PV only.
 
@@ -1697,8 +1699,8 @@ Working logic under off-peak time::
 *PV energy supply priority*: 1. Load, 2. Grid, 3. Battery.
 
 - PV power will provide power to the load first.
-- If PV power is sufficient, it will feed-in to the grid (if ``<<oops-c,Allow to feed-in to the grid>>'' option is enabled).
-- Only after feed-in power reaches <<mgp,``maximum power feeding grid'' setting>>, the remaining PV power will charge battery.
+- If PV power is sufficient, it will feed-in to the grid (if <<oops-c,Allow to feed-in to the grid>>'' option is enabled).
+- Only after feed-in power reaches <<mgp,maximum power feeding grid'' setting>>, the remaining PV power will charge battery.
 
 *Battery charging source*: PV and grid charge battery.
 
@@ -1716,8 +1718,8 @@ Working logic under off-peak time::
 ====
 For the sake of coherence, when this type is chosen:
 
-- ``<<oops-a,Allow PV to charge battery>>'' and ``<<oops-b,Allow AC to charge battery>>'' options are always enabled, i.e. always allow to charge battery;
-- ``<<oops-d,Allow battery to discharge when PV is available>>'', ``<<oops-e,Allow battery to discharge when PV is unavailable>>'', ``<<oops-f,Allow battery to feed-in to the grid when PV is available>>'' and ``<<oops-g,Allow battery to feed-in to the grid when PV is unavailable>>'' options are always disabled.
+- <<oops-a,Allow PV to charge battery>>'' and <<oops-b,Allow AC to charge battery>>'' options are always enabled, i.e. always allow to charge battery;
+- <<oops-d,Allow battery to discharge when PV is available>>'', <<oops-e,Allow battery to discharge when PV is unavailable>>'', <<oops-f,Allow battery to feed-in to the grid when PV is available>>'' and <<oops-g,Allow battery to feed-in to the grid when PV is unavailable>>'' options are always disabled.
 ====
 
 
