@@ -68,9 +68,7 @@ class HIDRawIO(BaseIO):
                 break
         log.debug('usb response was: %s', response_line)
         os.close(usb0)
-        if show_raw:
-            return {'raw response': [response_line, '']}
-        decoded_response = protocol.decode(response_line)
+        decoded_response = protocol.decode(response_line, show_raw)
         # _response = response.decode('utf-8')
         log.debug(f'Decoded response {decoded_response}')
         return decoded_response

@@ -68,14 +68,13 @@ class pi16(AbstractProtocol):
         self.SETTINGS_COMMANDS = ['QPI', ]
         self.DEFAULT_COMMAND = 'QPI'
 
-    def get_full_command(self, command, show_raw) -> bytes:
+    def get_full_command(self, command) -> bytes:
         '''
         Override the default get_full_command as its different for PI16
         '''
         log.info(f'Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands')
         # These need to be set to allow other functions to work`
         self._command = command
-        self._show_raw = show_raw
         self._command_defn = self.get_command_defn(command)
         # End of required variables setting
 

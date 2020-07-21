@@ -16,9 +16,7 @@ class BaseIO(metaclass=abc.ABCMeta):
         # Get the response from the communications port
         response = self.read(10)
         log.debug(f'Raw response {response}')
-        if show_raw:
-            return {'raw response': [response, '']}
-        decoded_response = protocol.decode(response)
+        decoded_response = protocol.decode(response, show_raw)
         # _response = response.decode('utf-8')
         log.debug(f'Decoded response {decoded_response}')
         return decoded_response

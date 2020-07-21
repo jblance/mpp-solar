@@ -10,7 +10,6 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
     def __init__(self, *args, **kwargs) -> None:
         self._command = None
         self._command_dict = None
-        self._show_raw = None
         self.COMMANDS = {}
         self.STATUS_COMMANDS = None
         self.SETTINGS_COMMANDS = None
@@ -20,11 +19,10 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
     def get_protocol_id(self) -> bytes:
         return self._protocol_id
 
-    def get_full_command(self, command, show_raw=None) -> bytes:
+    def get_full_command(self, command) -> bytes:
         log.info(f'Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands')
         # These need to be set to allow other functions to work
         self._command = command
-        self._show_raw = show_raw
         self._command_defn = self.get_command_defn(command)
         # End of required variables setting
 
@@ -67,7 +65,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         responses[-1] = responses[-1][:-3]
         return responses
 
-    def decode(self, response) -> dict:
+    def decode(self, response, show_raw) -> dict:
         msgs = {}
         log.info(f'response passed to decode: {response}')
         # No response
@@ -77,9 +75,14 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             return msgs
 
         # Raw response requested
-        if self._show_raw:
+        if show_raw:
             log.debug(f'Protocol "{self._protocol_id}" raw response requested')
-            msgs['raw_response'] = [response, '']
+            # TODO: need to ensure that response is utf-8 encoded
+            _response = b''
+            for item in response:
+                _response += chr(item).encode()
+            print(_response)
+            msgs['raw_response'] = [_response, '']
             return msgs
 
         # Check for a stored command definition

@@ -12,7 +12,6 @@ class screen():
         if not data:
             return
         print(f"{'Parameter':<30}\t{'Value':<15} Unit")
-        print(data)
         for key in data:
             value = data[key][0]
             unit = data[key][1]
