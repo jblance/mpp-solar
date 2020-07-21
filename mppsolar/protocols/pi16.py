@@ -41,7 +41,7 @@ COMMANDS = {
                 }]
         ],
         "test_responses": [
-            b'',
+            b'(B\x9c\xaf\r',
         ],
         "regex": "",
     },
