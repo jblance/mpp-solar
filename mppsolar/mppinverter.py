@@ -332,6 +332,10 @@ class mppInverter:
                 response_line = response_line[:response_line.find(bytes([13])) + 1]
                 break
         log.debug('usb byte_response was: %s', response_line)
+        
+        # close file
+        os.close(usb0)
+        
         command.setByteResponse(response_line)
         return command
 
