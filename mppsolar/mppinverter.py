@@ -117,6 +117,12 @@ def isDirectUsbDevice(serial_device):
     """
     if not serial_device:
         return False
+    if "mpp-solar-serial" in serial_device:
+        log.debug("Device matches mpp-solar-serial")
+        return False
+    if "mpp-solar-direct" in serial_device:
+        log.debug("Device matches mpp-solar-direct")
+        return True
     match = re.search("^.*hidraw\\d$", serial_device)
     if match:
         log.debug("Device matches hidraw regex")
@@ -138,7 +144,7 @@ class mppInverter:
         if not serial_device:
             raise NoDeviceError("A device to communicate by must be supplied, e.g. /dev/ttyUSB0")
         self._baud_rate = baud_rate
-        self._serial_device = serial_device
+        self._serial_device = os.path.realpath(serial_device)
         self._inverter_model = inverter_model
         self._serial_number = None
         self._test_device = isTestDevice(serial_device)
