@@ -174,7 +174,7 @@ class mppInverter:
             if result:
                 response = result.getResponseDict()
                 # print (byte_response)
-                if response:
+                if "serial_number" in response:
                     self._serial_number = response["serial_number"][0]
         return self._serial_number
 
