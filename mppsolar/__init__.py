@@ -1,5 +1,6 @@
 # !/usr/bin/python3
 import logging
+import os
 from argparse import ArgumentParser
 
 from .version import __version__  # noqa: F401
@@ -44,6 +45,9 @@ def main():
         # ch.setLevel(logging.INFO)
 
     log.info('command %s', args.command)
+        
+    #Get real path of device, in case of udev symlink
+    args.device = os.path.realpath(args.device)
     log.info('Serial device used: %s, baud rate: %d', args.device, args.baud)
 
     # mp = mppcommands.mppCommands(args.device, args.baud)
