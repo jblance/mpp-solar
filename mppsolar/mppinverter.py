@@ -117,10 +117,10 @@ def isDirectUsbDevice(serial_device):
     """
     if not serial_device:
         return False
-    if "mpp-solar-serial" in serial_device:
+    if "mppsolar/serial" in serial_device:
         log.debug("Device matches mpp-solar-serial")
         return False
-    if "mpp-solar-direct" in serial_device:
+    if "mppsolar/direct" in serial_device:
         log.debug("Device matches mpp-solar-direct")
         return True
     match = re.search("^.*hidraw\\d$", serial_device)
