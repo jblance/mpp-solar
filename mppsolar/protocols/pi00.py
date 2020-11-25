@@ -65,4 +65,6 @@ class pi00(AbstractProtocol):
         responses = response.split(b" ")
         # Trim leading '(' of first response
         responses[0] = responses[0][1:]
+        # Remove \r of last response
+        responses[-1] = responses[-1][:-1]
         return responses
