@@ -57,3 +57,12 @@ class pi00(AbstractProtocol):
         full_command = cmd + bytes([13])
         log.debug(f"full command: {full_command}")
         return full_command
+
+    def get_responses(self, response):
+        """
+        Override the default get_responses as its different for PI00
+        """
+        responses = response.split(b" ")
+        # Trim leading '(' of first response
+        responses[0] = responses[0][1:]
+        return responses
