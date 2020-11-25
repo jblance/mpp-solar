@@ -17,7 +17,33 @@ COMMANDS = {
         "type": "QUERY",
         "response": [["string", "Protocol Version", ""]],
         "test_responses": [
-            b"(PI00\r",
+            b"(PI00\x42\x42\r",
+        ],
+        "regex": "",
+    },
+    "QPIRI": {
+        "name": "QPIRI",
+        "description": "Device rating inquiry",
+        "help": " -- queries the Inverter ratings",
+        "type": "QUERY",
+        "response": [
+            ["float", "Grid Input Voltage Rating", "V"],
+            ["float", "Grid Input Frequency Rating", "Hz"],
+            ["float", "Grid Input Current Rating", "A"],
+            ["float", "AC Output Voltage Rating", "V"],
+            ["float", "AC Output Current Rating", "A"],
+            ["float", "Per MPPT Current Rating", "A"],
+            ["float", "Battery Voltage Rating", "V"],
+            ["int", "MPPT Track Number", ""],
+            [
+                "keyed",
+                "Machine Type",
+                {"00": "Grid tie", "01": "Off Grid", "10": "Hybrid"},
+            ],
+            ["option", "Topology", ["transformerless", "transformer"]],
+        ],
+        "test_responses": [
+            b"(230.0 50.0 013.0 230.0 013.0 18.0 048.0 1 10 0\x86\x42\r",
         ],
         "regex": "",
     },
@@ -65,6 +91,6 @@ class pi00(AbstractProtocol):
         responses = response.split(b" ")
         # Trim leading '(' of first response
         responses[0] = responses[0][1:]
-        # Remove \r of last response
-        responses[-1] = responses[-1][:-1]
+        # Remove CRC and \r of last response
+        responses[-1] = responses[-1][:-3]
         return responses
