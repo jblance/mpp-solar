@@ -129,9 +129,6 @@ def main():
         default="standard",
     )
 
-    parser.add_argument("-c", "--command", help="Command to run")
-    # parser.add_argument('-c', '--command', help='Raw command to run')
-
     parser.add_argument(
         "-o",
         "--output",
@@ -146,7 +143,7 @@ def main():
         help="Specifies the mqtt broker to publish to if using a mqtt output (localhost [default], hostname, ip.add.re.ss ...)",
         default="localhost",
     )
-
+    parser.add_argument("-c", "--command", help="Command to run")
     parser.add_argument("--listknown", action="store_true", help="List known commands")
     parser.add_argument("--getstatus", action="store_true", help="Get Inverter Status")
     parser.add_argument(
