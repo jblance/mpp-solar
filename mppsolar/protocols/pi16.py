@@ -48,6 +48,7 @@ COMMANDS = {
         ],
         "test_responses": [
             b"(B\x9c\xaf\r",
+            b"(G\xb7\x6c\r",
         ],
         "regex": "",
     },
