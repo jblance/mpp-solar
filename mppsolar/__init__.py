@@ -96,7 +96,7 @@ def main():
         "-p",
         "--port",
         type=str,
-        help="Specifies the device communications port (/dev/ttyUSB0 [default], /dev/hidraw, test, ...)",
+        help="Specifies the device communications port (/dev/ttyUSB0 [default], /dev/hidraw0, test, ...)",
         default="/dev/ttyUSB0",
     )
     parser.add_argument("-d", "--device", type=str, help="DEPRECATED, use -p")
