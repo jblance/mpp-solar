@@ -8,6 +8,7 @@
 - if you are getting no/unexpected results add `-I` to the command to get some extra information
 - if you are getting no/unexpected results add `-D` to the command to get lots of extra information
 
+## mpp-solar arguments
 `$ mpp-solar -h`
 ```
 usage: mpp-solar [-h] [-n NAME] [-t TYPE] [-p PORT] [-d DEVICE]
