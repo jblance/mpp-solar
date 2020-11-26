@@ -75,4 +75,17 @@ serial_number                 	92000000000666
 make sure you have activated the virtual environment beforehand
 ```
 (mppsolar) pi@batteryshed:~ $ pip install -e "git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar"
+Obtaining mpp-solar from git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar
+  Updating ./venv/mppsolar/src/mpp-solar clone
+  Running command git fetch -q --tags
+  Running command git reset --hard -q 071ca0cd9feea458b1e36dc020aa704b2000e431
+Requirement already satisfied: pyserial in ./venv/mppsolar/lib/python3.8/site-packages (from mpp-solar) (3.5)
+Installing collected packages: mpp-solar
+  Attempting uninstall: mpp-solar
+    Found existing installation: mpp-solar 0.7.3
+    Uninstalling mpp-solar-0.7.3:
+      Successfully uninstalled mpp-solar-0.7.3
+  Running setup.py develop for mpp-solar
+Successfully installed mpp-solar
+
 ```
