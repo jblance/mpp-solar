@@ -17,6 +17,7 @@ class screen:
             del data["_command_description"]
         if "_command" in data:
             print(f"Command: {data['_command']} - {_desc}")
+            print("-" * 50)
             del data["_command"]
 
         print(f"{'Parameter':<30}\t{'Value':<15} Unit")
