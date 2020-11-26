@@ -58,6 +58,15 @@ Collecting pyserial (from mpp-solar)
 Installing collected packages: pyserial, mpp-solar
   Running setup.py develop for mpp-solar
 Successfully installed mpp-solar pyserial-3.5
+```
+
+### Run mpp-solar
+```
 (mppsolar) pi@batteryshed:~ $ mpp-solar -v
 MPP Solar Command Utility, version: 0.7.0, First refactor version - under development
+```
+```
+(mppsolar) pi@batteryshed:~ $ mpp-solar -c QID
+Parameter                     	Value           Unit
+serial_number                 	92000000000666
 ```
