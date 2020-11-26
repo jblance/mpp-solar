@@ -12,10 +12,10 @@ class screen:
         if not data:
             return
         if "_command" in data:
-            print(f"Results of command {data[_command]}")
+            print(f"Results of command {data['_command']}")
             del data["_command"]
         if "_command_description" in data:
-            print(f"Command description {data[_command_description]}")
+            print(f"Command description {data['_command_description']}")
             del data["_command_description"]
         print(f"{'Parameter':<30}\t{'Value':<15} Unit")
         for key in data:
