@@ -199,7 +199,7 @@ def main():
     if not args.mqttbroker:
         args.mqttbroker = "localhost"
     if args.listknown:
-        log.error("listknown option is deprecated, please update your scripts")
+        log.error("listknown option is still todo")
         exit(1)
     if args.printcrc:
         log.info(f"Calculating CRC using protocol {args.protocol}")
