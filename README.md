@@ -44,6 +44,12 @@ Also
 
 [Documented Ubuntu Install](docs/ubuntu_install.md)
 
+## venv Install
+for when you want to keep the install and dependencies separate from the rest of the environment
+* create venv `python3 -m venv ~/venv/mppsolar`
+* activate venv `source venv/mppsolar/bin/activate` (needed each time before using)
+* pip install from git `pip install -e "git+https://github.com/jblance/mpp-solar.git@refactor#egg=mpp-solar"` (only needed if the code is updated)
+
 ## MQTT / Influx / Grafana Setup ##
 Instruction of one way of connecting the inverter output to Grafana
 [Setup Instructions](docs/MQTT_Influx_Grafana.md)
