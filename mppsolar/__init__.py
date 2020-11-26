@@ -75,9 +75,10 @@ def get_protocol_for_model(model=None):
 
 
 def main():
-    parser = ArgumentParser(
-        description=f"MPP Solar Command Utility, version: {__version__}, {__version_comment__}"
+    description = (
+        f"MPP Solar Command Utility, version: {__version__}, {__version_comment__}"
     )
+    parser = ArgumentParser(description=description)
     parser.add_argument(
         "-n",
         "--name",
@@ -159,6 +160,9 @@ def main():
         "-R", "--showraw", action="store_true", help="Display the raw results"
     )
     parser.add_argument(
+        "-v", "--version", action="store_true", help="Display the version"
+    )
+    parser.add_argument(
         "-D",
         "--debug",
         action="store_true",
@@ -170,6 +174,10 @@ def main():
 
     args = parser.parse_args()
 
+    # Display verison if asked
+    if args.version:
+        print(description)
+        exit(0)
     # Turn on debug if needed
     if args.debug:
         log.setLevel(logging.DEBUG)
@@ -178,7 +186,7 @@ def main():
         log.setLevel(logging.INFO)
         # ch.setLevel(logging.INFO)
 
-    log.info(f"mpp-solar version {__version__}")
+    log.info(description)
 
     # process some arguments
     if args.tag:
