@@ -39,7 +39,7 @@ Failing command: ['/home/pi/venv/mppsolar/bin/python3', '-Im', 'ensurepip', '--u
 ### Create venv
 `pi@batteryshed:~ $ python3 -m venv ~/venv/mppsolar`
 
-### Active venv
+### Activate venv
 ```
 pi@batteryshed:~ $ source ~/venv/mppsolar/bin/activate
 (mppsolar) pi@batteryshed:~ $
@@ -48,7 +48,7 @@ pi@batteryshed:~ $ source ~/venv/mppsolar/bin/activate
 ### Install mpp-solar using PIP
 
 ```
-mppsolar) pi@batteryshed:~ $ pip install -e "git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar"
+(mppsolar) pi@batteryshed:~ $ pip install -e "git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar"
 Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
 Obtaining mpp-solar from git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar
   Updating ./venv/mppsolar/src/mpp-solar clone
@@ -69,4 +69,10 @@ MPP Solar Command Utility, version: 0.7.0, First refactor version - under develo
 (mppsolar) pi@batteryshed:~ $ mpp-solar -c QID
 Parameter                     	Value           Unit
 serial_number                 	92000000000666
+```
+
+### Update to latest from github
+make sure you have activated the virtual environment beforehand
+```
+(mppsolar) pi@batteryshed:~ $ pip install -e "git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar"
 ```
