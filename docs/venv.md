@@ -32,6 +32,7 @@ Failing command: ['/home/pi/venv/mppsolar/bin/python3', '-Im', 'ensurepip', '--u
 ### Install venv
 `pi@batteryshed:~ $ sudo apt-get install python3-venv`
 [output removed]
+
 `pi@batteryshed:~ $ sudo apt-get install python3.7-venv`
 [output removed]
 
