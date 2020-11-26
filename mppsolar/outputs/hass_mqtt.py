@@ -1,15 +1,15 @@
 import logging
 import paho.mqtt.publish as publish
 
-log = logging.getLogger('MPP-Solar')
+log = logging.getLogger("MPP-Solar")
 
 
-class hass_mqtt():
+class hass_mqtt:
     def __init__(self, *args, **kwargs) -> None:
-        log.debug(f'processor.hass_mqtt __init__ kwargs {kwargs}')
+        log.debug(f"processor.hass_mqtt __init__ kwargs {kwargs}")
 
-    def output(self, data=None, tag=None, mqtt_broker='localhost'):
-        log.info('Using output processor: hass_mqtt')
+    def output(self, data=None, tag=None, mqtt_broker="localhost"):
+        log.info("Using output processor: hass_mqtt")
         if data is None:
             return
 
@@ -17,6 +17,9 @@ class hass_mqtt():
         # assumes hass_config has been run
         # or hass updated manually
         msgs = []
+        # Remove command and _command_description
+        data.pop("_command", None)
+        data.pop("_command_description", None)
         # Loop through responses
         for key in data:
             value = data[key][0]
@@ -24,6 +27,6 @@ class hass_mqtt():
             # 'tag'/status/total_output_active_power/value 1250
             # 'tag'/status/total_output_active_power/unit W
             topic = f"homeassistant/sensor/pm_{tag}_{key}/state"
-            msg = {'topic': topic, 'payload': value}
+            msg = {"topic": topic, "payload": value}
             msgs.append(msg)
         publish.multiple(msgs, hostname=mqtt_broker)

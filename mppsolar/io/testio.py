@@ -4,7 +4,7 @@ import random
 
 from .baseio import BaseIO
 
-log = logging.getLogger('MPP-Solar')
+log = logging.getLogger("MPP-Solar")
 
 
 class TestIO(BaseIO):
@@ -14,15 +14,22 @@ class TestIO(BaseIO):
 
     def send_and_receive(self, command, show_raw, protocol) -> dict:
         full_command = protocol.get_full_command(command)
-        log.info(f'full command {full_command} for command {command}')
+        log.info(f"full command {full_command} for command {command}")
         # Send the full command via the communications port
         command_defn = protocol.get_command_defn(command)
         if command_defn is not None:
-            self._test_data = command_defn['test_responses'][random.randrange(len(command_defn['test_responses']))]
+            self._test_data = command_defn["test_responses"][
+                random.randrange(len(command_defn["test_responses"]))
+            ]
         response = self._test_data
         # response = b"(PI30\x9a\x0b\r"
-        log.debug(f'Raw response {response}')
+        log.debug(f"Raw response {response}")
         decoded_response = protocol.decode(response, show_raw)
         # _response = response.decode('utf-8')
-        log.debug(f'Decoded response {decoded_response}')
+        log.debug(f"Decoded response {decoded_response}")
+        # add command name and description to response
+        decoded_response["_command"] = command
+        if command_defn is not None:
+            decoded_response["_command_description"] = command_defn["description"]
+        log.info(f"Decoded response {decoded_response}")
         return decoded_response

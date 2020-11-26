@@ -240,6 +240,8 @@ def main():
     log.debug(f"results: {results}")
     outputs = get_outputs(args.output)
     for op in outputs:
+        # maybe include the command and what the command is im the output
+        # eg QDI run, Display Inverter Default Settings
         op.output(data=results, tag=tag, mqtt_broker=args.mqttbroker)
 
 

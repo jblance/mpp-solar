@@ -5,7 +5,7 @@ import time
 
 from .baseio import BaseIO
 
-log = logging.getLogger('MPP-Solar')
+log = logging.getLogger("MPP-Solar")
 
 
 class HIDRawIO(BaseIO):
@@ -15,7 +15,8 @@ class HIDRawIO(BaseIO):
 
     def send_and_receive(self, command, show_raw, protocol) -> dict:
         full_command = protocol.get_full_command(command)
-        log.info(f'full command {full_command} for command {command}')
+        log.info(f"full command {full_command} for command {command}")
+        command_defn = protocol.get_command_defn(command)
 
         response_line = bytes()
         usb0 = None
@@ -27,9 +28,10 @@ class HIDRawIO(BaseIO):
         # Send the command to the open usb connection
         to_send = full_command
         try:
-            log.debug(f'length of to_send: {len(to_send)}')
+            log.debug(f"length of to_send: {len(to_send)}")
         except:  # noqa: E722
             import pdb
+
             pdb.set_trace()
         if len(to_send) <= 8:
             # Send all at once
@@ -43,7 +45,7 @@ class HIDRawIO(BaseIO):
             time.sleep(0.35)
             os.write(usb0, to_send[5:])
         else:
-            while (len(to_send) > 0):
+            while len(to_send) > 0:
                 log.debug("multiple chunk send")
                 # Split the byte command into smaller chucks
                 send, to_send = to_send[:8], to_send[8:]
@@ -62,13 +64,18 @@ class HIDRawIO(BaseIO):
             except Exception as e:
                 log.debug("USB read error: {}".format(e))
             # Finished is \r is in byte_response
-            if (bytes([13]) in response_line):
+            if bytes([13]) in response_line:
                 # remove anything after the \r
-                response_line = response_line[:response_line.find(bytes([13])) + 1]
+                response_line = response_line[: response_line.find(bytes([13])) + 1]
                 break
-        log.debug('usb response was: %s', response_line)
+        log.debug("usb response was: %s", response_line)
         os.close(usb0)
         decoded_response = protocol.decode(response_line, show_raw)
         # _response = response.decode('utf-8')
-        log.debug(f'Decoded response {decoded_response}')
+        log.debug(f"Decoded response {decoded_response}")
+        # add command name and description to response
+        decoded_response["_command"] = command
+        if command_defn is not None:
+            decoded_response["_command_description"] = command_defn["description"]
+        log.info(f"Decoded response {decoded_response}")
         return decoded_response
