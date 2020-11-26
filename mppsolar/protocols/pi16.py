@@ -125,7 +125,7 @@ COMMANDS = {
             ["float", "Grid Input Current Rating", "A"],
             ["float", "AC Output Voltage Rating", "V"],
             ["float", "AC Output Current Rating", "A"],
-            ["float", "Maximum input current for each PV", "A"],
+            ["float", "Maximum input current per PV", "A"],
             ["float", "Battery Voltage Rating", "V"],
             ["int", "Number of MPP trackers", ""],
             [
