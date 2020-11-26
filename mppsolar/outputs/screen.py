@@ -11,12 +11,14 @@ class screen:
         log.info("Using output processor: screen")
         if not data:
             return
-        if "_command" in data:
-            print(f"Results of command {data['_command']}")
-            del data["_command"]
+        _desc = "No description found"
         if "_command_description" in data:
-            print(f"Command description {data['_command_description']}")
+            _desc = data["_command_description"]
             del data["_command_description"]
+        if "_command" in data:
+            print(f"Command: {data['_command']} - {_desc}")
+            del data["_command"]
+
         print(f"{'Parameter':<30}\t{'Value':<15} Unit")
         for key in data:
             value = data[key][0]
