@@ -728,6 +728,8 @@ COMMANDS = {
                     "Phase 1 of 3 Phase output",
                     "Phase 2 of 3 Phase output",
                     "Phase 3 of 3 Phase output",
+                    "Phase 1 of 2 phase output",
+                    "Phase 2 of 2 phase output",
                 ],
             ],
             ["float", "Battery Redischarge Voltage", "V"],
