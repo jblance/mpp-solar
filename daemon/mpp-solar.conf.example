@@ -20,7 +20,7 @@ port=/dev/ttyUSB0
 baud=2400
 command=QPGS1
 tag=QPGS1
-format=influx2
+outputs=influx2_mqtt
 
 # This example would work on a single LV5048
 [Inverter1_L1]
@@ -29,7 +29,7 @@ port=/dev/ttyUSB0
 baud=2400
 command=QPGS0
 tag=Inverter1
-format=influx2
+outputs=influx2_mqtt
 
 [Inverter1_L2]
 model=standard
@@ -37,4 +37,4 @@ port=/dev/ttyUSB0
 baud=2400
 command=QP2GS0
 tag=Inverter1
-format=influx2
+outputs=influx2_mqtt
