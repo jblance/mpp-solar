@@ -7,11 +7,12 @@ mqtt_broker=mqtthost
 # This example would work on 2x PIP4048 installed in parallel
 [Inverter_1]
 model=standard
+protocol=PI30
 port=/dev/ttyUSB0
 baud=2400
 command=QPGS0
 tag=QPGS0
-format=influx2
+outputs=influx2_mqtt
 
 [Inverter_2]
 model=standard

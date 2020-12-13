@@ -144,6 +144,14 @@ def main():
         default="localhost",
     )
     parser.add_argument("-c", "--command", help="Command to run")
+    parser.add_argument(
+        "-C",
+        "--configfile",
+        type=str,
+        help="Full location of config file",
+        default="/etc/mpp-solar/mpp-solar.conf",
+    )
+    parser.add_argument("--daemon", action="store_true", help="Run as daemon")
     parser.add_argument("--listknown", action="store_true", help="List known commands")
     parser.add_argument("--getstatus", action="store_true", help="Get Inverter Status")
     parser.add_argument(
@@ -187,78 +195,133 @@ def main():
 
     log.info(description)
 
-    # process some arguments
-    if args.tag:
-        tag = args.tag
-    else:
-        tag = args.command
-    if args.model is not None and args.protocol is None:
-        args.protocol = get_protocol_for_model(args.model)
-    if not args.showraw:
-        args.showraw = False
-    if not args.mqttbroker:
-        args.mqttbroker = "localhost"
-    if args.listknown:
-        log.error("listknown option is still todo")
-        exit(1)
-    if args.printcrc:
-        log.info(f"Calculating CRC using protocol {args.protocol}")
-        # TODO: calc CRC
-        # _command = mp.getFullCommand(args.command)
-        # if _command:
-        #     print('{}'.format(_command.byte_command))
-        # else:
-        #     [crca, crcb] = mppcommand.crc(args.command)  # noqa: F821
-        #     print("{0} {1:#x} {2:#x}".format(args.command, crca, crcb))
-        exit(1)
-    # create instance of device (supplying port + protocol types)
-    log.info(
-        f'Creating device "{args.name}" (type: "{args.type}") on port "{args.port}" using protocol "{args.protocol}" for command "{args.command}" (tag: {tag})'
-    )
-    device_class = get_device_class(args.type)
-    log.debug(f"device_class {device_class}")
-    # The device class __init__ will instantiate the port communications and protocol classes
-    device = device_class(name=args.name, port=args.port, protocol=args.protocol)
+    # Initialize Daemon
+    if args.daemon:
+        import time
+        import systemd.daemon
 
-    # determine whether to run command or call helper function
-    if args.getstatus:
-        # use get_status helper
-        results = device.get_status(show_raw=args.showraw)
-        # TODO: implement get_status
-    elif args.getsettings:
-        # use get_settings helper
-        results = device.get_settings(show_raw=args.showraw)
-        # TODO: implement get_settings
-    elif args.command:
-        # run the command
-        results = device.run_command(command=args.command, show_raw=args.showraw)
-    else:
-        # run the default command
-        results = device.run_default_command(show_raw=args.showraw)
+        print("MPP-Solar-Service: Initializing ...")
+        # set some default-defaults
+        pause = 60
+        mqtt_broker = "localhost"
 
-    # send to output processor(s)
-    log.debug(f"results: {results}")
-    outputs = get_outputs(args.output)
-    for op in outputs:
-        # maybe include the command and what the command is im the output
-        # eg QDI run, Display Inverter Default Settings
-        op.output(data=results, tag=tag, mqtt_broker=args.mqttbroker)
+    # If config file specified, process
+    if args.configfile:
+        import configparser
+
+        config = configparser.ConfigParser()
+        config.read(args.configfile)
+        sections = config.sections()
+        # Process setup section
+        if "SETUP" in config:
+            pause = config["SETUP"].getint("pause", fallback=60)
+            mqtt_broker = config["SETUP"].get("mqtt_broker", fallback="localhost")
+            sections.remove("SETUP")
+        # Process 'command' sections
+        for section in sections:
+            name = section
+            protocol = config[section].get("protocol", fallback=None)
+            model = config[section].get("model", fallback=None)
+            if model is not None and protocol is None:
+                protocol = get_protocol_for_model(model)
+            type = config[section].get("type")
+            port = config[section].get("port")
+            baud = config[section].get("baud", fallback=2400)
+            command = config[section].get("command")
+            tag = config[section].get("tag")
+            outputs = config[section].get("outputs").split(",")
+
+        if args.daemon:
+            print(f"MPP-Solar-Service: Config file: {args.configfile}")
+            print(f"MPP-Solar-Service: Config setting - pause: {pause}")
+            print(f"MPP-Solar-Service: Config setting - mqtt_broker: {mqtt_broker}")
+            print(
+                f"MPP-Solar-Service: Config setting - command sections found: {len(sections)}"
+            )
+        else:
+            # supplied a configfile, but running on command line
+            # this will run each section once
+            log.info(f"MPP-Solar-Service: Config file: {args.configfile}")
+            print("Command line using config file")
+            print(
+                f'Creating device "{name}" (type: "{type}") on port "{port}" using protocol "{protocol}" for command "{command}" (tag: {tag})'
+            )
+            exit(0)
+    else:
+        # No configfile specified
+        # process some arguments
+        if args.tag:
+            tag = args.tag
+        else:
+            tag = args.command
+        if args.model is not None and args.protocol is None:
+            args.protocol = get_protocol_for_model(args.model)
+        if not args.showraw:
+            args.showraw = False
+        if not args.mqttbroker:
+            args.mqttbroker = "localhost"
+        if args.listknown:
+            log.error("listknown option is still todo")
+            exit(1)
+        if args.printcrc:
+            log.info(f"Calculating CRC using protocol {args.protocol}")
+            # TODO: calc CRC
+            # _command = mp.getFullCommand(args.command)
+            # if _command:
+            #     print('{}'.format(_command.byte_command))
+            # else:
+            #     [crca, crcb] = mppcommand.crc(args.command)  # noqa: F821
+            #     print("{0} {1:#x} {2:#x}".format(args.command, crca, crcb))
+            exit(1)
+
+        #
+        # create instance of device (supplying port + protocol types)
+        log.info(
+            f'Creating device "{args.name}" (type: "{args.type}") on port "{args.port}" using protocol "{args.protocol}" for command "{args.command}" (tag: {tag})'
+        )
+        device_class = get_device_class(args.type)
+        log.debug(f"device_class {device_class}")
+        # The device class __init__ will instantiate the port communications and protocol classes
+        device = device_class(name=args.name, port=args.port, protocol=args.protocol)
+
+        # determine whether to run command or call helper function
+        if args.getstatus:
+            # use get_status helper
+            results = device.get_status(show_raw=args.showraw)
+            # TODO: implement get_status
+        elif args.getsettings:
+            # use get_settings helper
+            results = device.get_settings(show_raw=args.showraw)
+            # TODO: implement get_settings
+        elif args.command:
+            # run the command
+            results = device.run_command(command=args.command, show_raw=args.showraw)
+        else:
+            # run the default command
+            results = device.run_default_command(show_raw=args.showraw)
+
+        # send to output processor(s)
+        log.debug(f"results: {results}")
+        outputs = get_outputs(args.output)
+        for op in outputs:
+            # maybe include the command and what the command is im the output
+            # eg QDI run, Display Inverter Default Settings
+            op.output(data=results, tag=tag, mqtt_broker=args.mqttbroker)
 
 
 def mpp_solar_service():
+    """
+    Helper function for the daemon version on mpp-solar
+    """
     import configparser
     import time
     import systemd.daemon
 
-    # import paho.mqtt.publish as publish
-    # from .mpputils import mppUtils
-
-    # Some default defaults
-    pause = 60
-    mqtt_broker = "localhost"
+    description = f"MPP Solar Daemon Helper Service, version: {__version__}, {__version_comment__}"
 
     # Process arguments
-    parser = ArgumentParser(description="MPP Solar Inverter Helper Service")
+    parser = ArgumentParser(description=description)
+
     parser.add_argument(
         "-c",
         "--configfile",
@@ -268,23 +331,6 @@ def mpp_solar_service():
     )
     args = parser.parse_args()
 
-    print("MPP-Solar-Service: Initializing ...")
-    print("MPP-Solar-Service: Config file: {}".format(args.configfile))
-    config = configparser.ConfigParser()
-    config.read(args.configfile)
-    sections = config.sections()
-
-    if "SETUP" in config:
-        pause = config["SETUP"].getint("pause", fallback=60)
-        mqtt_broker = config["SETUP"].get("mqtt_broker", fallback="localhost")
-        sections.remove("SETUP")
-    print("MPP-Solar-Service: Config setting - pause: {}".format(pause))
-    print("MPP-Solar-Service: Config setting - mqtt_broker: {}".format(mqtt_broker))
-    print(
-        "MPP-Solar-Service: Config setting - command sections found: {}".format(
-            len(sections)
-        )
-    )
     # Build array of commands to run
     mppUtilArray = []
     for section in sections:
