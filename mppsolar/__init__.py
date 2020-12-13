@@ -207,6 +207,7 @@ def main():
 
     # If config file specified, process
     if args.configfile:
+        print("args.configfile is true")
         import configparser
 
         config = configparser.ConfigParser()
@@ -244,7 +245,7 @@ def main():
             log.info(f"MPP-Solar-Service: Config file: {args.configfile}")
             print("Command line using config file")
             print(
-                f'Creating device "{name}" (type: "{type}") on port "{port}" using protocol "{protocol}" for command "{command}" (tag: {tag})'
+                f'Creating device "{name}" (type: "{type}") on port "{port}" using protocol "{protocol}" for command "{command}" (tag: {tag}) outputing to: {outputs}'
             )
             exit(0)
     else:
