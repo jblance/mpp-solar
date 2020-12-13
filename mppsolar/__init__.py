@@ -224,12 +224,12 @@ def main():
             model = config[section].get("model", fallback=None)
             if model is not None and protocol is None:
                 protocol = get_protocol_for_model(model)
-            type = config[section].get("type")
-            port = config[section].get("port")
+            type = config[section].get("type", fallback="mppsolar")
+            port = config[section].get("port", fallback="/dev/ttyUSB0")
             baud = config[section].get("baud", fallback=2400)
             command = config[section].get("command")
             tag = config[section].get("tag")
-            outputs = config[section].get("outputs").split(",")
+            outputs = config[section].get("outputs", fallback="screen").split(",")
 
         if args.daemon:
             print(f"MPP-Solar-Service: Config file: {args.configfile}")
