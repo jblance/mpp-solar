@@ -149,7 +149,7 @@ def main():
         "--configfile",
         type=str,
         help="Full location of config file",
-        default="/etc/mpp-solar/mpp-solar.conf",
+        default=None,
     )
     parser.add_argument("--daemon", action="store_true", help="Run as daemon")
     parser.add_argument("--listknown", action="store_true", help="List known commands")
