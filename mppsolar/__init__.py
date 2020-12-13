@@ -207,7 +207,7 @@ def main():
 
     # If config file specified, process
     if args.configfile:
-        print("args.configfile is true")
+        print(f"args.configfile is true: {args.configfile}")
         import configparser
 
         config = configparser.ConfigParser()
