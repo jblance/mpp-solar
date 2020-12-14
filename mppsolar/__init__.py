@@ -241,7 +241,7 @@ def main():
             device = device_class(
                 name=name, port=port, protocol=protocol, outputs=outputs
             )
-            _commands.append((device, command))
+            _commands.append((device, command, tag, outputs))
 
         if args.daemon:
             print(f"MPP-Solar-Service: Config file: {args.configfile}")
@@ -256,11 +256,19 @@ def main():
             # this will run each section once
             log.info(f"Command line using config file: {args.configfile}")
             print("Command line using config file")
-            for _device, _command in _commands:
+            for _device, _command, _tag, _outputs in _commands:
                 log.debug(
                     f"getting results from device: {_device} for command: {_command}"
                 )
                 print(f"getting results from device: {_device} for command: {_command}")
+                results = _device.run_command(command=_command, show_raw=False)
+                # send to output processor(s)
+                log.debug(f"results: {results}")
+                outputs = get_outputs(_outputs)
+                for op in outputs:
+                    # maybe include the command and what the command is im the output
+                    # eg QDI run, Display Inverter Default Settings
+                    op.output(data=results, tag=_tag, mqtt_broker=mqtt_broker)
             exit(0)
     else:
         # No configfile specified
@@ -297,9 +305,7 @@ def main():
         device_class = get_device_class(args.type)
         log.debug(f"device_class {device_class}")
         # The device class __init__ will instantiate the port communications and protocol classes
-        device = device_class(
-            name=args.name, port=args.port, protocol=args.protocol, outputs=args.output
-        )
+        device = device_class(name=args.name, port=args.port, protocol=args.protocol)
 
         # determine whether to run command or call helper function
         if args.getstatus:
@@ -319,7 +325,7 @@ def main():
 
         # send to output processor(s)
         log.debug(f"results: {results}")
-        outputs = get_outputs(device.outputs)
+        outputs = get_outputs(args.output)
         for op in outputs:
             # maybe include the command and what the command is im the output
             # eg QDI run, Display Inverter Default Settings
