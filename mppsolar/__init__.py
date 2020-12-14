@@ -252,16 +252,36 @@ def main():
                 f"MPP-Solar-Service: Config setting - command sections found: {len(sections)}"
             )
 
+            while True:
+                # Loop through the configured commands
+                for _device, _command, _tag, _outputs in _commands:
+                    ## for item in mppUtilArray:
+                    # Tell systemd watchdog we are still alive
+                    systemd.daemon.notify("WATCHDOG=1")
+                    print(
+                        f"MPP-Solar-Service: Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
+                    )
+                    results = _device.run_command(command=_command, show_raw=False)
+                    # send to output processor(s)
+                    outputs = get_outputs(_outputs)
+                    for op in outputs:
+                        # maybe include the command and what the command is im the output
+                        # eg QDI run, Display Inverter Default Settings
+                        op.output(data=results, tag=_tag, mqtt_broker=mqtt_broker)
+                        # Tell systemd watchdog we are still alive
+                        systemd.daemon.notify("WATCHDOG=1")
+
+                print("MPP-Solar-Service: sleeping for {}sec".format(pause))
+                time.sleep(pause)
+
         else:
             # supplied a configfile, but running on command line
             # this will run each section once
             log.info(f"Command line using config file: {args.configfile}")
-            print("Command line using config file")
             for _device, _command, _tag, _outputs in _commands:
                 log.debug(
-                    f"getting results from device: {_device} for command: {_command}"
+                    f"getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
                 )
-                print(f"getting results from device: {_device} for command: {_command}")
                 results = _device.run_command(command=_command, show_raw=False)
                 # send to output processor(s)
                 log.debug(f"results: {results}")
@@ -331,70 +351,3 @@ def main():
             # maybe include the command and what the command is im the output
             # eg QDI run, Display Inverter Default Settings
             op.output(data=results, tag=tag, mqtt_broker=args.mqttbroker)
-
-
-def mpp_solar_service():
-    """
-    Helper function for the daemon version on mpp-solar
-    """
-
-    # Build array of commands to run
-    mppUtilArray = []
-    for section in sections:
-        # print('MPP-Solar-Service: Execute - {}'.format(config[section]))
-        model = config[section].get("model")
-        port = config[section].get("port")
-        baud = config[section].get("baud", fallback=2400)
-        command = config[section].get("command")
-        tag = config[section].get("tag")
-        _format = config[section].get("format")
-        mp = f"mppUtils({port}, {baud}, {model})"  # TODO: fix here
-        mppUtilArray.append(
-            {"mp": mp, "command": command, "format": _format, "tag": tag}
-        )
-
-    while True:
-        # Loop through the configured commands
-        for item in mppUtilArray:
-            # Tell systemd watchdog we are still alive
-            systemd.daemon.notify("WATCHDOG=1")
-            print("MPP-Solar-Service: item {}".format(item))
-            if item["format"] == "influx":
-                print("MPP-Solar-Service: format influx not supported")
-            elif item["format"] == "influx2":
-                # print('MPP-Solar-Service: format influx2 yet to be supported')
-                msgs = []
-                _data = item["mp"].getInfluxLineProtocol2(
-                    item["command"]
-                )  # TODO: fix here
-                for _item in _data:
-                    payload = "mpp-solar,command={} {}".format(item["tag"], _item)
-                    msg = {"topic": "mpp-solar", "payload": payload}
-                    msgs.append(msg)
-                # publish.multiple(msgs, hostname=mqtt_broker)
-            elif item["format"] == "mqtt1":
-                # print('MPP-Solar-Service: format mqtt1 yet to be supported')
-                msgs = []
-                _data = item["mp"].getResponseDict(item["command"])
-                for _item in _data:
-                    # Value
-                    topic = "mpp-solar/{}/{}/value".format(item["tag"], _item)
-                    payload = _data[_item][0]
-                    msg = {"topic": topic, "payload": payload}
-                    msgs.append(msg)
-                    # print (msg)
-                    # Unit
-                    topic = "mpp-solar/{}/{}/unit".format(item["tag"], _item)
-                    payload = "{}".format(_data[_item][1])
-                    msg = {"topic": topic, "payload": payload}
-                    msgs.append(msg)
-                    # print (msg)
-                # publish.multiple(msgs, hostname=mqtt_broker)
-            else:
-                print(
-                    "MPP-Solar-Service: format {} not supported".format(item["format"])
-                )
-        print("MPP-Solar-Service: sleeping for {}sec".format(pause))
-        # Tell systemd watchdog we are still alive
-        systemd.daemon.notify("WATCHDOG=1")
-        time.sleep(pause)

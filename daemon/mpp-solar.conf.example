@@ -2,7 +2,7 @@
 # Number of seconds to pause between command execution loop
 # 0 is no pause, greater than 60 will cause service restarts
 pause=5
-mqtt_broker=mqtthost
+mqtt_broker=localhost
 
 # This example would work on 2x PIP4048 installed in parallel
 [Inverter_1]
@@ -12,7 +12,7 @@ port=/dev/ttyUSB0
 baud=2400
 command=QPGS0
 tag=QPGS0
-outputs=screen
+outputs=mqtt,screen
 
 [Inverter_2]
 model=standard
@@ -25,15 +25,15 @@ outputs=screen,mqtt
 # This example would work on a single LV5048
 [Inverter1_L1]
 model=LV5048
-port=/dev/ttyUSB0
+port=/dev/hidraw0
 baud=2400
 command=QPGS0
 tag=Inverter1
 outputs=influx2_mqtt
 
 [Inverter1_L2]
-model=standard
-port=/dev/ttyUSB0
+model=LV5048
+port=/dev/hidraw0
 baud=2400
 command=QP2GS0
 tag=Inverter1

@@ -18,40 +18,46 @@ pause=5
 # Hostname / IP address of the MQTT broker
 mqtt_broker=mqtthost
 
-# The following sections define each command execution
-# example 1
+# This example would work on 2x PIP4048 installed in parallel
 # The section heading for information only - must be unique
-[Inverter1]
-# Model of inverter, currently only standard and LV5048 defined       
-model=standard      
+[Inverter_1]
+# Model of inverter,        
+model=standard
+# Protocol that the inverter uses - if not supplied will use model to attempt to determine protocol
+protocol=PI30
 # Port that mpp-solar connects to the inverter
 port=/dev/ttyUSB0
-# Speed of the connection
 baud=2400
 # Command to send to the inverter
-command=QPGS0       
-tag = Inverter1
-# Format of MQTT message to post - valid (so far) influx2
-# for MQTT to Grafana via telegraf (as documented)
-format=influx2
+command=QPGS0
+tag=QPGS0
+# Output processor(s) to use [comma separated with no spaces]
+outputs=mqtt,screen
 
-
-# example 2
-# To combine 2 commands for Influx math define multiple sections with the same tag
-[Inverter1_L1]      
-model=LV5048
+[Inverter_2]
+model=standard
 port=/dev/ttyUSB0
+baud=2400
+command=QPGS1
+tag=QPGS1
+outputs=screen,mqtt
+
+# This example would work on a single LV5048
+[Inverter1_L1]
+model=LV5048
+port=test
+baud=2400
 command=QPGS0
 tag=Inverter1
-format=influx2
+outputs=influx2_mqtt
 
-# To combine 2 commands for Influx math define multiple sections with the same tag
-[Inverter1_L2]      
-model=LV5048
-port=/dev/ttyUSB0
+[Inverter1_L2]
+model=standard
+port=test
+baud=2400
 command=QP2GS0
 tag=Inverter1
-format=influx2
+outputs=influx2_mqtt
 ```
 ## Add mpp-solar service ##
 

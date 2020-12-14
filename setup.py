@@ -83,7 +83,6 @@ setup(
     entry_points={
         "console_scripts": [
             "mpp-solar=mppsolar:main",
-            "mpp-solar-service=mppsolar:mpp_solar_service",
         ],
     },
     test_suite="tests.get_tests",

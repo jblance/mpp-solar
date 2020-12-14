@@ -11,43 +11,32 @@
 ## mpp-solar arguments
 `$ mpp-solar -h`
 ```
-usage: mpp-solar [-h] [-n NAME] [-t TYPE] [-p PORT] [-d DEVICE]
-                 [-P {PI00,PI16,PI18,PI30,PI41}] [-T TAG] [-b BAUD] [-M MODEL]
-                 [-o OUTPUT] [-q MQTTBROKER] [-c COMMAND] [--listknown]
-                 [--getstatus] [--getsettings] [--printcrc] [-R] [-v] [-D]
-                 [-I]
+sage: mpp-solar [-h] [-n NAME] [-t TYPE] [-p PORT] [-P {PI00,PI16,PI18,PI30,PI41}] [-T TAG] [-b BAUD] [-M MODEL] [-o OUTPUT] [-q MQTTBROKER] [-c COMMAND]
+                 [-C CONFIGFILE] [--daemon] [--listknown] [--getstatus] [--getsettings] [--printcrc] [-R] [-v] [-D] [-I]
 
-MPP Solar Command Utility, version: 0.7.0, First refactor version - under
-development
+MPP Solar Command Utility, version: 0.7.4, Refactored version - not backwards compatible, refactor mpp-solar-service
 
 optional arguments:
   -h, --help            show this help message and exit
-  -n NAME, --name NAME  Specifies the device name - used to differentiate
-                        different devices
+  -n NAME, --name NAME  Specifies the device name - used to differentiate different devices
   -t TYPE, --type TYPE  Specifies the device type (default: mppsolar)
-  -p PORT, --port PORT  Specifies the device communications port (/dev/ttyUSB0
-                        [default], /dev/hidraw0, test, ...)
-  -d DEVICE, --device DEVICE
-                        DEPRECATED, use -p
+  -p PORT, --port PORT  Specifies the device communications port (/dev/ttyUSB0 [default], /dev/hidraw0, test, ...)
   -P {PI00,PI16,PI18,PI30,PI41}, --protocol {PI00,PI16,PI18,PI30,PI41}
-                        Specifies the device command and response protocol,
-                        (default: PI30)
-  -T TAG, --tag TAG     Override the command name and use this instead (for
-                        mqtt and influx type output processors)
+                        Specifies the device command and response protocol, (default: PI30)
+  -T TAG, --tag TAG     Override the command name and use this instead (for mqtt and influx type output processors)
   -b BAUD, --baud BAUD  Baud rate for serial communications (default: 2400)
   -M MODEL, --model MODEL
-                        Specifies the inverter model to select commands for,
-                        defaults to "standard", currently supports LV5048
+                        Specifies the inverter model to select commands for, defaults to "standard", currently supports LV5048
   -o OUTPUT, --output OUTPUT
-                        Specifies the output processor(s) to use [comma
-                        separated if multiple] (screen [default], influx_mqtt,
-                        influx2_mqtt, mqtt, hass_config, hass_mqtt)
+                        Specifies the output processor(s) to use [comma separated if multiple] (screen [default], influx_mqtt, influx2_mqtt, mqtt, hass_config,
+                        hass_mqtt)
   -q MQTTBROKER, --mqttbroker MQTTBROKER
-                        Specifies the mqtt broker to publish to if using a
-                        mqtt output (localhost [default], hostname,
-                        ip.add.re.ss ...)
+                        Specifies the mqtt broker to publish to if using a mqtt output (localhost [default], hostname, ip.add.re.ss ...)
   -c COMMAND, --command COMMAND
                         Command to run
+  -C CONFIGFILE, --configfile CONFIGFILE
+                        Full location of config file
+  --daemon              Run as daemon
   --listknown           List known commands
   --getstatus           Get Inverter Status
   --getsettings         Get Inverter Settings

@@ -9,7 +9,7 @@ Description=MPP Solar Service
 
 [Service]
 # Command to execute when the service is started
-ExecStart=/usr/bin/python3 /usr/local/bin/mpp-solar-service -c /etc/mpp-solar/mpp-solar.conf
+ExecStart=/usr/bin/python3 /usr/local/bin/mpp-solar -C /etc/mpp-solar/mpp-solar.conf
 
 # Disable Python's buffering of STDOUT and STDERR, so that output from the
 # service shows up immediately in systemd's logs
@@ -17,7 +17,7 @@ Environment=PYTHONUNBUFFERED=1
 
 # Automatically restart the service if it crashes
 Restart=always
-WatchdogSec=60
+WatchdogSec=300
 
 # Our service will notify systemd once it is up and running
 Type=notify
