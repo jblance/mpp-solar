@@ -235,13 +235,13 @@ def main():
             tag = config[section].get("tag")
             outputs = config[section].get("outputs", fallback="screen")
             # todo: build array of commands
-            device_class = get_device_class(args.type)
+            device_class = get_device_class(type)
             log.debug(f"device_class {device_class}")
             # The device class __init__ will instantiate the port communications and protocol classes
             device = device_class(
-                name=args.name, port=args.port, protocol=args.protocol, outputs=outputs
+                name=name, port=port, protocol=protocol, outputs=outputs
             )
-            _commands.append(device)
+            _commands.append((device, command))
 
         if args.daemon:
             print(f"MPP-Solar-Service: Config file: {args.configfile}")
@@ -254,10 +254,13 @@ def main():
         else:
             # supplied a configfile, but running on command line
             # this will run each section once
-            log.info(f"MPP-Solar-Service: Config file: {args.configfile}")
+            log.info(f"Command line using config file: {args.configfile}")
             print("Command line using config file")
-            for _command in _commands:
-                print(_command)
+            for _device, _command in _commands:
+                log.debug(
+                    f"getting results from device: {_device} for command: {_command}"
+                )
+                print(f"getting results from device: {_device} for command: {_command}")
             exit(0)
     else:
         # No configfile specified
