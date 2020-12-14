@@ -14,6 +14,7 @@ logging.basicConfig()
 
 # Ongoing effort to map model "numbers" to the correct protocol
 MODEL_PROTOCOL_MAP = {
+    "standard": "PI30",
     "4048MS": "PI30",
     "LV5048": "PI41",
     "PI18": "PI18",
