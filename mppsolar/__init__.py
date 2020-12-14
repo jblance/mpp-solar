@@ -200,6 +200,8 @@ def main():
         import time
         import systemd.daemon
 
+        # Tell systemd that our service is ready
+        systemd.daemon.notify("READY=1")
         print("MPP-Solar-Service: Initializing ...")
         # set some default-defaults
         pause = 60
@@ -207,9 +209,9 @@ def main():
 
     # If config file specified, process
     if args.configfile:
-        print(f"args.configfile is true: {args.configfile}")
         import configparser
 
+        log.debug(f"args.configfile is true: {args.configfile}")
         config = configparser.ConfigParser()
         config.read(args.configfile)
         sections = config.sections()
@@ -219,6 +221,7 @@ def main():
             mqtt_broker = config["SETUP"].get("mqtt_broker", fallback="localhost")
             sections.remove("SETUP")
         # Process 'command' sections
+        _commands = []
         for section in sections:
             name = section
             protocol = config[section].get("protocol", fallback=None)
@@ -230,7 +233,15 @@ def main():
             baud = config[section].get("baud", fallback=2400)
             command = config[section].get("command")
             tag = config[section].get("tag")
-            outputs = config[section].get("outputs", fallback="screen").split(",")
+            outputs = config[section].get("outputs", fallback="screen")
+            # todo: build array of commands
+            device_class = get_device_class(args.type)
+            log.debug(f"device_class {device_class}")
+            # The device class __init__ will instantiate the port communications and protocol classes
+            device = device_class(
+                name=args.name, port=args.port, protocol=args.protocol, outputs=outputs
+            )
+            _commands.append(device)
 
         if args.daemon:
             print(f"MPP-Solar-Service: Config file: {args.configfile}")
@@ -239,14 +250,14 @@ def main():
             print(
                 f"MPP-Solar-Service: Config setting - command sections found: {len(sections)}"
             )
+
         else:
             # supplied a configfile, but running on command line
             # this will run each section once
             log.info(f"MPP-Solar-Service: Config file: {args.configfile}")
             print("Command line using config file")
-            print(
-                f'Creating device "{name}" (type: "{type}") on port "{port}" using protocol "{protocol}" for command "{command}" (tag: {tag}) outputing to: {outputs}'
-            )
+            for _command in _commands:
+                print(_command)
             exit(0)
     else:
         # No configfile specified
@@ -283,7 +294,9 @@ def main():
         device_class = get_device_class(args.type)
         log.debug(f"device_class {device_class}")
         # The device class __init__ will instantiate the port communications and protocol classes
-        device = device_class(name=args.name, port=args.port, protocol=args.protocol)
+        device = device_class(
+            name=args.name, port=args.port, protocol=args.protocol, outputs=args.output
+        )
 
         # determine whether to run command or call helper function
         if args.getstatus:
@@ -303,7 +316,7 @@ def main():
 
         # send to output processor(s)
         log.debug(f"results: {results}")
-        outputs = get_outputs(args.output)
+        outputs = get_outputs(device.outputs)
         for op in outputs:
             # maybe include the command and what the command is im the output
             # eg QDI run, Display Inverter Default Settings
@@ -314,23 +327,6 @@ def mpp_solar_service():
     """
     Helper function for the daemon version on mpp-solar
     """
-    import configparser
-    import time
-    import systemd.daemon
-
-    description = f"MPP Solar Daemon Helper Service, version: {__version__}, {__version_comment__}"
-
-    # Process arguments
-    parser = ArgumentParser(description=description)
-
-    parser.add_argument(
-        "-c",
-        "--configfile",
-        type=str,
-        help="Full location of config file",
-        default="/etc/mpp-solar/mpp-solar.conf",
-    )
-    args = parser.parse_args()
 
     # Build array of commands to run
     mppUtilArray = []
@@ -346,9 +342,6 @@ def mpp_solar_service():
         mppUtilArray.append(
             {"mp": mp, "command": command, "format": _format, "tag": tag}
         )
-
-    # Tell systemd that our service is ready
-    systemd.daemon.notify("READY=1")
 
     while True:
         # Loop through the configured commands

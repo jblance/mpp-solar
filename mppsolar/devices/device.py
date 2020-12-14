@@ -20,6 +20,10 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         self._protocol_class = None
         self._port = None
 
+    @abc.abstractmethod
+    def __str__(self):
+        raise NotImplementedError
+
     def is_test_device(self, serial_device):
         return "test" in serial_device.lower()
 

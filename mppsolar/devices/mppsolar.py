@@ -19,11 +19,21 @@ class mppsolar(AbstractDevice):
         self._name = kwargs["name"]
         self.set_port(port=kwargs["port"])
         self.set_protocol(protocol=kwargs["protocol"])
+        if "outputs" in kwargs:
+            self._outputs = kwargs["outputs"]
+        else:
+            self._outputs = "screen"
         log.debug(
-            f"mppsolar __init__ name {self._name}, port {self._port}, protocol {self._protocol}"
+            f"mppsolar __init__ name {self._name}, port {self._port}, protocol {self._protocol}, outputs {self._outputs}"
         )
         log.debug(f"mppsolar __init__ args {args}")
         log.debug(f"mppsolar __init__ kwargs {kwargs}")
+
+    def __str__(self):
+        """
+        Build a printable representation of this class
+        """
+        return f"mppsolar device - name: {self._name}, port: {self._port}, protocol: {self._protocol}, outputs: {self._outputs}"
 
     def run_command(self, command, show_raw=False) -> dict:
         """
