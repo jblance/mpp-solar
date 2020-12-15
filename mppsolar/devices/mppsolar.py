@@ -5,15 +5,6 @@ from .device import AbstractDevice
 log = logging.getLogger("MPP-Solar")
 
 
-def getVal(_dict, key, ind=None):
-    if key not in _dict:
-        return ""
-    if ind is None:
-        return _dict[key]
-    else:
-        return _dict[key][ind]
-
-
 class mppsolar(AbstractDevice):
     def __init__(self, *args, **kwargs) -> None:
         self._name = kwargs["name"]

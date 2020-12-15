@@ -110,7 +110,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             log.info("Using serialio for communications")
             from mppsolar.io.serialio import SerialIO
 
-            self._port = SerialIO(serial_port=port, serial_baud=2400)
+            self._port = SerialIO(device_path=port, serial_baud=2400)
         else:
             self._port = None
 
