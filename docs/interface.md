@@ -1,17 +1,17 @@
 # Inteface / How it all hangs together #
 
-* First is a DEVICE instance (one of the non-abstract classes from mppsolar/devices)
+* First is a **DEVICE** instance (one of the non-abstract classes from mppsolar/devices)
     * mppsolar
     * ...
 
-* The DEVICE will (should) set an IO PORT (one of the non-abstract classes from mppsolar/io)
+* The DEVICE will (should) set an **IO PORT** (one of the non-abstract classes from mppsolar/io)
     * esp32io
     * hidrawio
     * serialio
     * testio
     * ...
 
-* and a PROTOCOL (one of the non-abstract classes from mppsolar/protocols)
+* and a **PROTOCOL** (one of the non-abstract classes from mppsolar/protocols)
     * pi16
     * pi18
     * pi30
@@ -19,7 +19,7 @@
     * ...
 
 * a result will be obtained by running a command
-* the results **dict** will be output via 1 or more OUTPUTS (one of the non-abstract classes from mppsolar/outputs)
+* the results *dict* will be output via 1 or more **OUTPUTS** (one of the non-abstract classes from mppsolar/outputs)
     * screen
     * mqtt
     * influx_mqtt
@@ -27,7 +27,8 @@
     * ...
 
 ## DEVICE classes ##
-* Should inherit from the AbstractDevice class, e.g: `class mppsolar(AbstractDevice)`
+* Should initialize with name, port and protocol
+    * `device = device_class(name=args.name, port=args.port, protocol=args.protocol)`
 * and define the following functions:
 ```
 __str__(self) -> str
@@ -42,9 +43,6 @@ These functions are called based on the command line (or service) options
 _Generally speaking_ the DEVICE will run commands via the IO PORT using the PROTOCOL, e.g.
 ```
 def run_command(self, command, show_raw=False) -> dict:
-      """
-      mpp-solar specific method of running a 'raw' command, e.g. QPI or PI
-      """
       log.info(f"Running command {command}")
       [...snip...]
       response = self._port.send_and_receive(command, show_raw, self._protocol)
