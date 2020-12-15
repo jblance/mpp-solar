@@ -4,10 +4,10 @@ import logging
 
 log = logging.getLogger("MPP-Solar")
 
-SERIAL_TYPE_TEST = 1
-SERIAL_TYPE_USB = 2
-SERIAL_TYPE_ESP32 = 4
-SERIAL_TYPE_SERIAL = 8
+PORT_TYPE_TEST = 1
+PORT_TYPE_USB = 2
+PORT_TYPE_ESP32 = 4
+PORT_TYPE_SERIAL = 8
 
 
 class AbstractDevice(metaclass=abc.ABCMeta):
@@ -47,13 +47,13 @@ class AbstractDevice(metaclass=abc.ABCMeta):
 
     def get_port_type(self, port):
         if self.is_test_device(port):
-            return SERIAL_TYPE_TEST
+            return PORT_TYPE_TEST
         elif self.is_directusb_device(port):
-            return SERIAL_TYPE_USB
+            return PORT_TYPE_USB
         elif self.is_ESP32_device(port):
-            return SERIAL_TYPE_ESP32
+            return PORT_TYPE_ESP32
         else:
-            return SERIAL_TYPE_SERIAL
+            return PORT_TYPE_SERIAL
 
     def set_protocol(self, protocol=None):
         """
@@ -91,22 +91,22 @@ class AbstractDevice(metaclass=abc.ABCMeta):
 
     def set_port(self, port=None):
         port_type = self.get_port_type(port)
-        if port_type == SERIAL_TYPE_TEST:
+        if port_type == PORT_TYPE_TEST:
             log.info("Using testio for communications")
             from mppsolar.io.testio import TestIO
 
             self._port = TestIO()
-        elif port_type == SERIAL_TYPE_USB:
+        elif port_type == PORT_TYPE_USB:
             log.info("Using hidrawio for communications")
             from mppsolar.io.hidrawio import HIDRawIO
 
             self._port = HIDRawIO(device_path=port)
-        elif port_type == SERIAL_TYPE_ESP32:
+        elif port_type == PORT_TYPE_ESP32:
             log.info("Using esp32io for communications")
             from mppsolar.io.esp32io import ESP32IO
 
             self._port = ESP32IO(device_path=port)
-        elif port_type == SERIAL_TYPE_SERIAL:
+        elif port_type == PORT_TYPE_SERIAL:
             log.info("Using serialio for communications")
             from mppsolar.io.serialio import SerialIO
 
