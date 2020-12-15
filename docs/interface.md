@@ -18,6 +18,13 @@
     * pi41
     * ...
 
+* a result will be obtained by running a command
+* the results _dict_ will be output via 1 or more OUTPUTS (one of the non-abstract classes from mppsolar/outputs)
+    * screen
+    * mqtt
+    * influx_mqtt
+    * influx2_mqtt
+    * ...
 
 ## DEVICE classes ##
 * Should inherit from the AbstractDevice class, e.g: `class mppsolar(AbstractDevice)`
