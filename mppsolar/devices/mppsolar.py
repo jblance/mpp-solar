@@ -51,19 +51,18 @@ class mppsolar(AbstractDevice):
                 ]
             }
 
-        # TODO: implement
         response = self._port.send_and_receive(command, show_raw, self._protocol)
         log.debug(f"Send and Receive Response {response}")
         return response
 
-    def get_status(self, show_raw):
+    def get_status(self, show_raw) -> dict:
         # Run all the commands that are defined as status from the protocol definition
         data = {}
         for command in self._protocol.STATUS_COMMANDS:
             data.update(self.run_command(command))
         return data
 
-    def get_settings(self, show_raw):
+    def get_settings(self, show_raw) -> dict:
         # Run all the commands that are defined as settings from the protocol definition
         data = {}
         for command in self._protocol.SETTINGS_COMMANDS:
