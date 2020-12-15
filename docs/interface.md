@@ -50,12 +50,20 @@ def run_command(self, command, show_raw=False) -> dict:
 ```
 
 
+
 ## IO PORT classes ##
 * Should inherit from the BaseIO class, e.g: `class ESP32IO(BaseIO)`
 * and define the function:
 ```
 send_and_receive(self, command, show_raw, protocol) -> dict
 ```
+_Generally speaking_ the IO PORT will use the PROTOCOL decode function to build the response dict
+```
+decoded_response = protocol.decode(response_line, show_raw)
+```
+
+
+## PROTOCOL classes ##
 
 
 ## OUTPUTS ##
