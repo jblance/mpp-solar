@@ -19,7 +19,7 @@
     * ...
 
 * a result will be obtained by running a command
-* the results _dict_ will be output via 1 or more OUTPUTS (one of the non-abstract classes from mppsolar/outputs)
+* the results **dict** will be output via 1 or more OUTPUTS (one of the non-abstract classes from mppsolar/outputs)
     * screen
     * mqtt
     * influx_mqtt
@@ -29,11 +29,13 @@
 ## DEVICE classes ##
 * Should inherit from the AbstractDevice class, e.g: `class mppsolar(AbstractDevice)`
 * and define the following functions:
-    * __str__(self) -> str
-    * run_command(self, command, show_raw) -> dict
-    * get_status(self, show_raw) -> dict
-    * get_settings(self, show_raw) -> dict
-    * run_default_command(self, show_raw) -> dict
+```
+__str__(self) -> str
+run_command(self, command, show_raw) -> dict
+get_status(self, show_raw) -> dict
+get_settings(self, show_raw) -> dict
+run_default_command(self, show_raw) -> dict
+```
 
 These functions are called based on the command line (or service) options
 
@@ -53,4 +55,23 @@ def run_command(self, command, show_raw=False) -> dict:
 ## IO PORT classes ##
 * Should inherit from the BaseIO class, e.g: `class ESP32IO(BaseIO)`
 * and define the function:
-    * send_and_receive(self, command, show_raw, protocol) -> dict
+```
+send_and_receive(self, command, show_raw, protocol) -> dict
+```
+
+
+## OUTPUTS ##
+* Define a single function:
+```
+output(self, data, tag, mqtt_broker) -> None
+```
+This function performs the outputing of the data and expects a dict like below (for a simple response)
+`{'serial_number': ['9293333010501', ''], '_command': 'QID', '_command_description': 'Device Serial Number inquiry'}`
+
+```
+print(f"{'Parameter':<30}\t{'Value':<15} Unit")
+    for key in data:
+        value = data[key][0]
+        unit = data[key][1]
+        print(f"{key:<30}\t{value:<15}\t{unit:<4}")
+```

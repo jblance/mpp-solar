@@ -63,3 +63,4 @@ Instruction of one way of connecting the inverter output to Grafana
 
 ## Protocol / Command Documentation
 [Protocol Index](docs/README.md)
+[Interface](docs/interface.md)
