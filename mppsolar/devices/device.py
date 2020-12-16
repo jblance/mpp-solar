@@ -8,6 +8,7 @@ PORT_TYPE_TEST = 1
 PORT_TYPE_USB = 2
 PORT_TYPE_ESP32 = 4
 PORT_TYPE_SERIAL = 8
+PORT_TYPE_JKBLE = 16
 
 
 class AbstractDevice(metaclass=abc.ABCMeta):
@@ -45,6 +46,13 @@ class AbstractDevice(metaclass=abc.ABCMeta):
     def is_ESP32_device(self, serial_device):
         return "esp" in serial_device.lower()
 
+    def is_JKBle_device(self, serial_device):
+        """
+        Current all MAC addresses will be JK BLE devices
+        """
+        # '3c:a5:09:0a:85:79'
+        return ":" in serial_device.lower()
+
     def get_port_type(self, port):
         if self.is_test_device(port):
             return PORT_TYPE_TEST
@@ -52,6 +60,8 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             return PORT_TYPE_USB
         elif self.is_ESP32_device(port):
             return PORT_TYPE_ESP32
+        elif self.is_JKBle_device(port):
+            return PORT_TYPE_JKBLE
         else:
             return PORT_TYPE_SERIAL
 
@@ -106,6 +116,11 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             from mppsolar.io.esp32io import ESP32IO
 
             self._port = ESP32IO(device_path=port)
+        elif port_type == PORT_TYPE_JKBLE:
+            log.info("Using jkbleio for communications")
+            from mppsolar.io.jkbleio import JkBleIO
+
+            self._port = JkBleIO(device_path=port)
         elif port_type == PORT_TYPE_SERIAL:
             log.info("Using serialio for communications")
             from mppsolar.io.serialio import SerialIO
