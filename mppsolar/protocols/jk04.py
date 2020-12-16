@@ -71,17 +71,17 @@ class jk04(AbstractProtocol):
             # Maybe returna default here?
             return None
         if "command_code" in self._command_defn:
-            # fullcommand is 20 bytes long
-            cmd = bytearray(19)
+            # full command is 20 bytes long
+            cmd = bytearray(20)
             # starts with \xaa\x55\x90\xeb
-            cmd[0:3] = bytes.fromhex("aa5590eb")
+            cmd[0:4] = bytes.fromhex("aa5590eb")
             log.debug(f"cmd with SOR: {cmd}")
             # then has command code
             cmd[4] = int(self._command_defn["command_code"], 16)
             log.debug(f"cmd with command code: {cmd}")
-            cmd.append(crc8(cmd))
+            cmd[-1](crc8(cmd))
             log.debug(f"cmd with crc: {cmd}")
-            return full_command
+            return cmd
         return None
 
     def get_responses(self, response):
