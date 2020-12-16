@@ -4,7 +4,6 @@ import logging
 import re
 
 from .protocol_helpers import crcPI as crc
-from .jkbmsdecode import decodeHex
 
 log = logging.getLogger("MPP-Solar")
 
