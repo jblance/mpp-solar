@@ -7,7 +7,8 @@ log = logging.getLogger("MPP-Solar")
 
 
 class JkBleIO(BaseIO):
-    def __init__(self) -> None:
+    def __init__(self, device_path) -> None:
+        self._device = device_path
         self._test_data = b"(230.0 50.0 0030 42.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 0 0 1 0 54.0 0 1 000\x9E\x60\r"
 
     def send_and_receive(self, command, show_raw, protocol) -> dict:

@@ -11,7 +11,7 @@ log = logging.getLogger("MPP-Solar")
 class HIDRawIO(BaseIO):
     def __init__(self, device_path: str) -> None:
         # self._fd = os.open(device_path, flags=os.O_RDWR | os.O_NONBLOCK)
-        self._serial_device = device_path
+        self._device = device_path
 
     def send_and_receive(self, command, show_raw, protocol) -> dict:
         full_command = protocol.get_full_command(command)
@@ -21,7 +21,7 @@ class HIDRawIO(BaseIO):
         response_line = bytes()
         usb0 = None
         try:
-            usb0 = os.open(self._serial_device, os.O_RDWR | os.O_NONBLOCK)
+            usb0 = os.open(self._device, os.O_RDWR | os.O_NONBLOCK)
         except Exception as e:
             log.debug("USB open error: {}".format(e))
             return command
