@@ -77,7 +77,7 @@ class jk04(AbstractProtocol):
             cmd[0:3] = bytes.fromhex("aa5590eb")
             log.debug(f"cmd with SOR: {cmd}")
             # then has command code
-            cmd[4] = bytes.fromhex(self._command_defn["command_code"])
+            cmd[4] = int(self._command_defn["command_code"], 16)
             log.debug(f"cmd with command code: {cmd}")
             cmd.append(crc8(cmd))
             log.debug(f"cmd with crc: {cmd}")
