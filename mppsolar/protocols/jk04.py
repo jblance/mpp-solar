@@ -79,7 +79,7 @@ class jk04(AbstractProtocol):
             # then has command code
             cmd[4] = int(self._command_defn["command_code"], 16)
             log.debug(f"cmd with command code: {cmd}")
-            cmd[-1](crc8(cmd))
+            cmd[-1] = crc8(cmd)
             log.debug(f"cmd with crc: {cmd}")
             return cmd
         return None
