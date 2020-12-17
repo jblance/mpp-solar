@@ -137,4 +137,23 @@ class jk04(AbstractProtocol):
 
         log.debug(f"trimmed and split responses: {responses}")
 
+        print(len(responses))
+
+        # for i, result in enumerate(responses):
+        #     # decode result
+        #     result = result.decode("utf-8")
+        #     # Check if we are past the 'known' responses
+        #     if i >= len_command_defn:
+        #         resp_format = ["string", f"Unknown value in response {i}", ""]
+        #     else:
+        #         resp_format = self._command_defn["response"][i]
+        #
+        #     key = "{}".format(resp_format[1]).lower().replace(" ", "_")
+        #     # log.debug(f'result {result}, key {key}, resp_format {resp_format}')
+        #     # Process results
+        #     if resp_format[0] == "float":
+        #         if "--" in result:
+        #             result = 0
+        #         msgs[key] = [float(result), resp_format[2]]
+
         return msgs
