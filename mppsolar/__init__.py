@@ -76,9 +76,7 @@ def get_protocol_for_model(model=None):
 
 
 def main():
-    description = (
-        f"MPP Solar Command Utility, version: {__version__}, {__version_comment__}"
-    )
+    description = f"MPP Solar Command Utility, version: {__version__}, {__version_comment__}"
     parser = ArgumentParser(description=description)
     parser.add_argument(
         "-n",
@@ -155,21 +153,15 @@ def main():
     parser.add_argument("--daemon", action="store_true", help="Run as daemon")
     parser.add_argument("--listknown", action="store_true", help="List known commands")
     parser.add_argument("--getstatus", action="store_true", help="Get Inverter Status")
-    parser.add_argument(
-        "--getsettings", action="store_true", help="Get Inverter Settings"
-    )
+    parser.add_argument("--getsettings", action="store_true", help="Get Inverter Settings")
     parser.add_argument(
         "--printcrc",
         action="store_true",
         help="Display the command and crc and nothing else",
     )
 
-    parser.add_argument(
-        "-R", "--showraw", action="store_true", help="Display the raw results"
-    )
-    parser.add_argument(
-        "-v", "--version", action="store_true", help="Display the version"
-    )
+    parser.add_argument("-R", "--showraw", action="store_true", help="Display the raw results")
+    parser.add_argument("-v", "--version", action="store_true", help="Display the version")
     parser.add_argument(
         "-D",
         "--debug",
@@ -239,18 +231,14 @@ def main():
             device_class = get_device_class(type)
             log.debug(f"device_class {device_class}")
             # The device class __init__ will instantiate the port communications and protocol classes
-            device = device_class(
-                name=name, port=port, protocol=protocol, outputs=outputs
-            )
+            device = device_class(name=name, port=port, protocol=protocol, outputs=outputs)
             _commands.append((device, command, tag, outputs))
 
         if args.daemon:
             print(f"MPP-Solar-Service: Config file: {args.configfile}")
             print(f"MPP-Solar-Service: Config setting - pause: {pause}")
             print(f"MPP-Solar-Service: Config setting - mqtt_broker: {mqtt_broker}")
-            print(
-                f"MPP-Solar-Service: Config setting - command sections found: {len(sections)}"
-            )
+            print(f"MPP-Solar-Service: Config setting - command sections found: {len(sections)}")
 
             while True:
                 # Loop through the configured commands
@@ -304,11 +292,9 @@ def main():
             args.showraw = False
         if not args.mqttbroker:
             args.mqttbroker = "localhost"
-        if args.listknown:
-            log.error("listknown option is still todo")
-            exit(1)
         if args.printcrc:
             log.info(f"Calculating CRC using protocol {args.protocol}")
+            log.error("printcrc option is still todo")
             # TODO: calc CRC
             # _command = mp.getFullCommand(args.command)
             # if _command:
@@ -329,7 +315,9 @@ def main():
         device = device_class(name=args.name, port=args.port, protocol=args.protocol)
 
         # determine whether to run command or call helper function
-        if args.getstatus:
+        if args.listknown:
+            results = device.list_commands()
+        elif args.getstatus:
             # use get_status helper
             results = device.get_status(show_raw=args.showraw)
             # TODO: implement get_status

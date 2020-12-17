@@ -77,9 +77,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         protocol_id = protocol.lower()
         # Try to import the protocol module with the supplied name (may not exist)
         try:
-            proto_module = importlib.import_module(
-                "mppsolar.protocols." + protocol_id, "."
-            )
+            proto_module = importlib.import_module("mppsolar.protocols." + protocol_id, ".")
         except ModuleNotFoundError:
             log.error(f"No module found for protocol {protocol_id}")
             self._protocol = None
@@ -95,9 +93,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             return
         # Instantiate the class
         # TODO: fix protocol instantiate
-        self._protocol = self._protocol_class(
-            "init_var", proto_keyword="value", second_keyword=123
-        )
+        self._protocol = self._protocol_class("init_var", proto_keyword="value", second_keyword=123)
 
     def set_port(self, port=None):
         port_type = self.get_port_type(port)
@@ -129,6 +125,16 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         else:
             self._port = None
 
+    def list_commands(self):
+        # print(f"{'Parameter':<30}\t{'Value':<15} Unit")
+        if self._protocol is None:
+            log.error("Attempted to list commands with no protocol defined")
+            return {"ERROR": ["Attempted to list commands with no protocol defined", ""]}
+        result = {}
+        for command in self._protocol.COMMANDS:
+            result["command"] = [self._protocol.COMMANDS["description"], ""]
+        return result
+
     @abc.abstractmethod
     def run_command(self, command=None, show_raw=False):
         raise NotImplementedError
@@ -142,6 +148,4 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     def run_default_command(self, show_raw):
-        return self.run_command(
-            command=self._protocol.DEFAULT_COMMAND, show_raw=show_raw
-        )
+        return self.run_command(command=self._protocol.DEFAULT_COMMAND, show_raw=show_raw)
