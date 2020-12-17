@@ -141,7 +141,7 @@ class jk04(AbstractProtocol):
             for defn in self._command_defn["response"]:
                 print(f"defn {defn}")
                 # ["hex", 4, "Header", ""]
-                msgs[defn[2]] = responses[: defn[1]]
+                msgs[defn[2]] = [responses[: defn[1]], ""]
                 responses = responses[defn[1] :]
             # for i, result in enumerate(responses):
             #     # decode result
