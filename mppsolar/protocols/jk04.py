@@ -33,7 +33,7 @@ COMMANDS = {
         "type": "QUERY",
         "response": [
             ["hex", 4, "Header", ""],
-            ["int", 1, "Record Type", ""],
+            ["hex", 1, "Record Type", ""],
             ["int", 1, "Record Counter", ""],
         ],
         "test_responses": [
@@ -147,8 +147,8 @@ class jk04(AbstractProtocol):
                         print(f"value {value}")
                         value += f"{responses.pop(0):02x}"
                     msgs[defn[2]] = [value, ""]
-                else:
-                    msgs[defn[2]] = [responses.pop(), ""]
+                elif defn[0] == "int":
+                    msgs[defn[2]] = [responses.pop(0), ""]
                     responses = responses[defn[1] :]
             # for i, result in enumerate(responses):
             #     # decode result
