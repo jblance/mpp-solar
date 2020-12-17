@@ -20,6 +20,9 @@ log = logging.getLogger("MPP-Solar")
 # getCellInfo = b'\xaa\x55\x90\xeb\x96\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10'
 # message after 9003
 # aa5590ebc8010100000000000000000000000044
+# 55aaeb90
+# 02 record type
+# b5 counter
 
 COMMANDS = {
     "getInfo": {
@@ -29,7 +32,9 @@ COMMANDS = {
         "help": " -- queries the ble device information",
         "type": "QUERY",
         "response": [
-            ["offset", "" "Protocol Version", ""],
+            ["hex", 4, "Header", ""],
+            ["int", 1, "Record Type", ""],
+            ["int", 1, "Record Counter", ""],
         ],
         "test_responses": [
             bytes.fromhex(
@@ -135,6 +140,9 @@ class jk04(AbstractProtocol):
 
             for defn in self._command_defn["response"]:
                 print(f"defn {defn}")
+                # ["hex", 4, "Header", ""]
+                msgs[defn[2]] = responses[: defn[1]]
+                del responses[: defn[1]]
             # for i, result in enumerate(responses):
             #     # decode result
             #     result = result.decode("utf-8")
@@ -151,5 +159,5 @@ class jk04(AbstractProtocol):
             #         if "--" in result:
             #             result = 0
             #         msgs[key] = [float(result), resp_format[2]]
-
+            print(msgs)
         return msgs
