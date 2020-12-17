@@ -142,7 +142,7 @@ class jk04(AbstractProtocol):
                 print(f"defn {defn}")
                 # ["hex", 4, "Header", ""]
                 msgs[defn[2]] = responses[: defn[1]]
-                responses = responses[: defn[1]]
+                responses = responses[defn[1] :]
             # for i, result in enumerate(responses):
             #     # decode result
             #     result = result.decode("utf-8")
