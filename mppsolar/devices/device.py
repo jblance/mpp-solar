@@ -132,7 +132,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             return {"ERROR": ["Attempted to list commands with no protocol defined", ""]}
         result = {}
         for command in self._protocol.COMMANDS:
-            result["command"] = [self._protocol.COMMANDS["description"], ""]
+            result[command] = [self._protocol.COMMANDS[command]["description"], ""]
         return result
 
     @abc.abstractmethod
