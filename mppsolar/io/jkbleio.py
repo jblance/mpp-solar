@@ -16,10 +16,7 @@ class JkBleIO(BaseIO):
         log.info(f"full command {full_command} for command {command}")
         # Send the full command via the communications port
         command_defn = protocol.get_command_defn(command)
-        if command_defn is not None:
-            self._test_data = command_defn["test_responses"][
-                random.randrange(len(command_defn["test_responses"]))
-            ]
+        # Need to get response here
         response = self._test_data
         # response = b"(PI30\x9a\x0b\r"
         log.debug(f"Raw response {response}")
