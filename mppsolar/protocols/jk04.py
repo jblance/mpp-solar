@@ -144,6 +144,7 @@ class jk04(AbstractProtocol):
                 if defn[0] == "hex":
                     value = ""
                     for x in range(defn[1]):
+                        print(f"value {value}")
                         value += f"{responses.pop():02x}"
                     msgs[defn[2]] = [value, ""]
                 else:
