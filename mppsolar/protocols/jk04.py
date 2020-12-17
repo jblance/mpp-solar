@@ -94,3 +94,47 @@ class jk04(AbstractProtocol):
         # Remove CRC and \r of last response
         # responses[-1] = responses[-1][:-3]
         return response
+
+    def decode(self, response, show_raw) -> dict:
+        msgs = {}
+        log.info(f"response passed to decode: {response}")
+        # No response
+        if response is None:
+            log.info("No response")
+            msgs["ERROR"] = ["No response", ""]
+            return msgs
+
+        # Raw response requested
+        if show_raw:
+            log.debug(f'Protocol "{self._protocol_id}" raw response requested')
+            # TODO: deal with \x09 type crc response items better
+            _response = b""
+            for item in response:
+                _response += chr(item).encode()
+            raw_response = _response.decode("utf-8")
+            msgs["raw_response"] = [raw_response, ""]
+            return msgs
+
+        # Check for a stored command definition
+        if not self._command_defn:
+            # No definiution, so just return the data
+            len_command_defn = 0
+            log.debug(f"No definition for command {self._command}, raw response returned")
+            msgs["ERROR"] = [
+                f"No definition for command {self._command} in protocol {self._protocol_id}",
+                "",
+            ]
+        else:
+            len_command_defn = len(self._command_defn["response"])
+        # Decode response based on stored command definition
+        # if not self.is_response_valid(response):
+        #    log.info('Invalid response')
+        #    msgs['ERROR'] = ['Invalid response', '']
+        #    msgs['response'] = [response, '']
+        #    return msgs
+
+        responses = self.get_responses(response)
+
+        log.debug(f"trimmed and split responses: {responses}")
+
+        return msgs
