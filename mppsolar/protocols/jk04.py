@@ -38,7 +38,6 @@ COMMANDS = {
             ["asc", 10, "Device Model", ""],
             ["asc", 10, "Hardware Version", ""],
             ["asc", 10, "Software Version", ""],
-            ["hex", 300, "remainder", ""],
         ],
         "test_responses": [
             bytes.fromhex(
@@ -162,6 +161,8 @@ class jk04(AbstractProtocol):
                 elif defn[0] == "int":
                     msgs[defn[2]] = [responses.pop(0), ""]
                 else:
+                    msgs["remainder"] = [responses, ""]
+                    msgs["len remainder"] = [len(responses), ""]
                     log.error("undefined type")
             # for i, result in enumerate(responses):
             #     # decode result
