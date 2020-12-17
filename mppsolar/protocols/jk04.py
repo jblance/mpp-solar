@@ -18,6 +18,8 @@ log = logging.getLogger("MPP-Solar")
 # b'\xaaU\x90\xeb'
 # getInfo = b'\xaa\x55\x90\xeb\x97\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11'
 # getCellInfo = b'\xaa\x55\x90\xeb\x96\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10'
+# message after 9003
+# aa5590ebc8010100000000000000000000000044
 
 COMMANDS = {
     "getInfo": {
@@ -30,7 +32,7 @@ COMMANDS = {
             ["offset", "" "Protocol Version", ""],
         ],
         "test_responses": [
-            b"",
+            b"55aaeb9003f14a4b2d42324132345300000000000000332e300000000000332e322e330000000876450004000000506f7765722057616c6c203100000000313233340000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c2",
         ],
         "regex": "",
     },
@@ -60,9 +62,7 @@ class jk04(AbstractProtocol):
         Override the default get_full_command as its different for JK04
         # getInfo = b'\xaa\x55\x90\xeb\x97\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11'
         """
-        log.info(
-            f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
-        )
+        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
@@ -88,9 +88,9 @@ class jk04(AbstractProtocol):
         """
         Override the default get_responses as its different for JK04
         """
-        responses = response.split(b" ")
+        # responses = response.split(b" ")
         # Trim leading '(' of first response
-        responses[0] = responses[0][1:]
+        # responses[0] = responses[0][1:]
         # Remove CRC and \r of last response
-        responses[-1] = responses[-1][:-3]
-        return responses
+        # responses[-1] = responses[-1][:-3]
+        return response
