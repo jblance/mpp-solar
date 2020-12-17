@@ -145,7 +145,7 @@ class jk04(AbstractProtocol):
                     value = ""
                     for x in range(defn[1]):
                         print(f"value {value}")
-                        value += f"{responses.pop():02x}"
+                        value += f"{responses.pop(0):02x}"
                     msgs[defn[2]] = [value, ""]
                 else:
                     msgs[defn[2]] = [responses.pop(), ""]
