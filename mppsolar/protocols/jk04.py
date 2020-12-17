@@ -38,6 +38,7 @@ COMMANDS = {
             ["asc", 10, "Device Model", ""],
             ["asc", 10, "Hardware Version", ""],
             ["asc", 10, "Software Version", ""],
+            ["hex", 300, "remainder", ""],
         ],
         "test_responses": [
             bytes.fromhex(
