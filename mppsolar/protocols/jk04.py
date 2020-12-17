@@ -160,7 +160,8 @@ class jk04(AbstractProtocol):
                     msgs[defn[2]] = [value, ""]
                 elif defn[0] == "int":
                     msgs[defn[2]] = [responses.pop(0), ""]
-                    responses = responses[defn[1] :]
+                else:
+                    log.error("undefined type")
             # for i, result in enumerate(responses):
             #     # decode result
             #     result = result.decode("utf-8")
