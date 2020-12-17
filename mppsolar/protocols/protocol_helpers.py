@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import logging
-import sys
 import ctypes
 
 log = logging.getLogger("MPP-Solar")
@@ -172,12 +171,3 @@ def crcPI(data_bytes):
 
     log.debug(f"Generated CRC {crc_high:#04x} {crc_low:#04x} {crc:#06x}")
     return [crc_high, crc_low]
-
-
-x = sys.argv[1]
-v = bytes.fromhex(sys.argv[1])
-print(v)
-print(f"crc8 {v} {crc8(v)}")
-print(f"decode2ByteHex {v} {decode2ByteHex(v)}")
-print(f"decode4ByteHex {v} {decode4ByteHex(v)}")
-print(f"crcPI {x} {crcPI(x)}")
