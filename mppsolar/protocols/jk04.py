@@ -100,7 +100,7 @@ class jk04(AbstractProtocol):
         # responses[0] = responses[0][1:]
         # Remove CRC and \r of last response
         # responses[-1] = responses[-1][:-3]
-        return response
+        return bytearray(response)
 
     def decode(self, response, show_raw) -> dict:
         msgs = {}
@@ -141,8 +141,14 @@ class jk04(AbstractProtocol):
             for defn in self._command_defn["response"]:
                 print(f"defn {defn}")
                 # ["hex", 4, "Header", ""]
-                msgs[defn[2]] = [responses[: defn[1]], ""]
-                responses = responses[defn[1] :]
+                if defn[0] == "hex":
+                    value = ""
+                    for x in range(defn[1]):
+                        value += f"{responses.pop():02x}"
+                    msgs[defn[2]] = [value, ""]
+                else:
+                    msgs[defn[2]] = [responses.pop(), ""]
+                    responses = responses[defn[1] :]
             # for i, result in enumerate(responses):
             #     # decode result
             #     result = result.decode("utf-8")
