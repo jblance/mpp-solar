@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import logging
+import sys
+import ctypes
 
 log = logging.getLogger("MPP-Solar")
 
@@ -18,23 +20,56 @@ def crc8(byteData):
     return CRC
 
 
+def decode2ByteHex(hexToDecode):
+    """
+    Code a 2 byte hexString to volts as per jkbms approach (blackbox determined)
+    - need to decode as 4 hex chars
+    """
+    # hexString = bytes.fromhex(hexToDecode)
+    hexString = hexToDecode
+    log.debug(f"hexString: {hexString}")
+
+    answer = 0.0
+
+    # Make sure supplied String is long enough
+    if len(hexString) != 2:
+        log.warning(f"Hex encoded value must be 2 bytes long. Was {len(hexString)} length")
+        return 0
+
+    # 1st position
+    pos1 = hexString[0] >> 4
+    answer += pos1 * (2 ** 4 / 1000)
+    log.debug(f"answer after pos1 {answer}")
+    # 2nd position
+    pos2 = hexString[0] & 0x0F
+    answer += pos2 * (2 ** 0 / 1000)
+    log.debug(f"answer after pos2 {answer}")
+    # 3rd position
+    pos3 = hexString[1] >> 4
+    answer += pos3 * (2 ** 12 / 1000)
+    log.debug(f"answer after pos3 {answer}")
+    # 4th position
+    pos4 = hexString[1] & 0x0F
+    answer += pos4 * (2 ** 8 / 1000)
+    log.debug(f"answer after pos4 {answer}")
+    log.info(f"Hex {hexString} 2 byte decoded to {answer}")
+
+    return answer
+
+
 def decode4ByteHex(hexToDecode):
     """
     Code a 4 byte hexString to volts as per jkbms approach (blackbox determined)
     """
-    # hexString = bytes.fromhex(hexToDecode)
+    # hexString = decode2ByteHex
     hexString = hexToDecode
-    # print('hexString: {}'.format(hexString))
+    log.debug(f"hexString: {hexString}")
 
     answer = 0.0
 
     # Make sure supplied String is long enough
     if len(hexString) != 4:
-        log.warning(
-            "Hex encoded value must be 4 bytes long. Was {} length".format(
-                len(hexString)
-            )
-        )
+        log.warning(f"Hex encoded value must be 4 bytes long. Was {len(hexString)} length")
         return 0
 
     # Process most significant byte (position 3)
@@ -43,7 +78,7 @@ def decode4ByteHex(hexToDecode):
         return 0
     byte1Low = byte1 - 0x40
     answer = (2 ** (byte1Low * 2)) * 2
-    log.debug("After position 3: {}".format(answer))
+    log.debug(f"After position 3: {answer}")
     step1 = answer / 8.0
     step2 = answer / 128.0
     step3 = answer / 2048.0
@@ -59,21 +94,20 @@ def decode4ByteHex(hexToDecode):
         answer += ((byte2High - 8) * step1 * 2) + (8 * step1) + (byte2Low * step2)
     else:
         answer += (byte2High * step1) + (byte2Low * step2)
-    log.debug("After position 2: {}".format(answer))
+    log.debug(f"After position 2: {answer}")
     # position 1
     byte3 = hexString[1]
     byte3High = byte3 >> 4
     byte3Low = byte3 & 0xF
     answer += (byte3High * step3) + (byte3Low * step4)
-    log.debug("After position 1: {}".format(answer))
+    log.debug(f"After position 1: {answer}")
     # position 0
     byte4 = hexString[0]
     byte4High = byte4 >> 4
     byte4Low = byte4 & 0xF
     answer += (byte4High * step5) + (byte4Low * step6)
-    log.debug("After position 0: {}".format(answer))
-
-    log.info("Hex {} decoded to {}".format(hexString, answer))
+    log.debug(f"After position 0: {answer}")
+    log.info(f"Hex {hexString} 4 byte decoded to {answer}")
 
     return answer
 
@@ -83,7 +117,7 @@ def crcPI(data_bytes):
     Calculates CRC for supplied data_bytes
     """
     # assert type(byte_cmd) == bytes
-    log.debug("Calculating CRC for %s", data_bytes)
+    log.debug(f"Calculating CRC for {data_bytes}")
 
     crc = 0
     da = 0
@@ -138,3 +172,12 @@ def crcPI(data_bytes):
 
     log.debug(f"Generated CRC {crc_high:#04x} {crc_low:#04x} {crc:#06x}")
     return [crc_high, crc_low]
+
+
+x = sys.argv[1]
+v = bytes.fromhex(sys.argv[1])
+print(v)
+print(f"crc8 {v} {crc8(v)}")
+print(f"decode2ByteHex {v} {decode2ByteHex(v)}")
+print(f"decode4ByteHex {v} {decode4ByteHex(v)}")
+print(f"crcPI {x} {crcPI(x)}")
