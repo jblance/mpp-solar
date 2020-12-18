@@ -36,8 +36,9 @@ COMMANDS = {
             ["hex", 1, "Record Type", ""],
             ["int", 1, "Record Counter", ""],
             ["asc", 10, "Device Model", ""],
-            ["asc", 10, "Hardware Version", ""],
-            ["asc", 10, "Software Version", ""],
+            ["ascii", 10, "Hardware Version", ""],
+            ["ascii", 10, "Software Version", ""],
+            ["discard", 10, "", ""],
             ["rem"],
         ],
         "test_responses": [
@@ -143,22 +144,25 @@ class jk04(AbstractProtocol):
             print(f"Length of responses {len(responses)}")
 
             for defn in self._command_defn["response"]:
-                print(f"defn {defn}")
+                log.debug(f"Processing defn {defn}")
                 # ["hex", 4, "Header", ""]
                 if defn[0] == "hex":
                     value = ""
                     for x in range(defn[1]):
                         value += f"{responses.pop(0):02x}"
                     msgs[defn[2]] = [value, ""]
-                elif defn[0] == "asc":
+                elif defn[0] == "ascii":
                     value = ""
                     for x in range(defn[1]):
                         b = responses.pop(0)
                         if b == 0:
                             continue
                         value += f"{b:c}"
-                        print(f"value: {value}")
                     msgs[defn[2]] = [value, ""]
+                elif defn[0] == "discard":
+                    logging.debug(f"Discarding {defn[1]} values")
+                    for x in range(defn[1]):
+                        responses.pop(0)
                 elif defn[0] == "int":
                     msgs[defn[2]] = [responses.pop(0), ""]
                 else:
