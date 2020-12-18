@@ -16,7 +16,8 @@ NEW_COMMANDS = {
             ["hex", 4, "Header", ""],
             ["hex", 1, "Record Type", ""],
             ["int", 1, "Record Counter", ""],
-            ["loop", 24, "Voltage Cell", "V", "4ByteHex"],
+            ["loop", 24, "Voltage Cell", "V", "2ByteHex"],
+            ["rem"],
             ["loop", 25, "Resistance Cell", "Ohm", "4ByteHex"],
             ["4ByteHex", 1, "Average Cell Voltage", "V"],
             ["4ByteHex", 1, "Delta Cell Voltage", "V"],
@@ -29,7 +30,7 @@ NEW_COMMANDS = {
         ],
         "test_responses": [
             bytes.fromhex(
-                "55aaeb9002ff5b566240e34e62406e6a62404a506240acd7624011d26240bddd62409ad1624044c86240cedc6240ccc7624079e1624057dc624073a262405f80624088c46240000000000000000000000000000000000000000000000000000000000000000013315c3d0636143d26e0113d8021f03c1153363d8980123d7e7c033dac41233d1ad83c3d9d6f4f3d8eb51e3d6a2c293deb28653d189c523da3724e3deb94493d9ab2c23d00000000000000000000000000000000000000000000000000000000000000001aad62400084053c00000000ffff00000b000000000000000000000000000036a3554c40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000be0b54001456a43fb876a43f00a2"
+                "55aaeb9002b52e0d280dfa0c2e0d2f0d220d220d130d190d1d0d1d0d170d1f0d160dfb0c1f0d00000000000000000000000000000000ffff00001c0d350004029b00c600a000b300bc00cc00be00b100b4002d013d01b000a100ab00b200ad0000000000000000000000000000000000000000000000bcd1000000000000000000001e0116013c010000000000636b0c0300400d030000000000dc4d010064000000781e16000101480a000000000000000000000000070101000000980400000000260141400000000037feffff00000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080"
             ),
         ],
         "regex": "",
@@ -37,15 +38,15 @@ NEW_COMMANDS = {
 }
 
 
-class jk04(jkAbstractProtocol):
+class jk02(jkAbstractProtocol):
     """
-    JK04 - Handler for JKBMS 4 byte data communication
-         - e.g. 5b566240 = 3.5365V
+    JK02 - Handler for JKBMS 2 byte data communication
+         - e.g. ASAS = ??V
     """
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
-        self._protocol_id = b"JK04"
+        self._protocol_id = b"JK02"
         self.COMMANDS.update(NEW_COMMANDS)
         self.STATUS_COMMANDS = [
             "getCellData",

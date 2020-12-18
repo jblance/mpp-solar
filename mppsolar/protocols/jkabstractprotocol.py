@@ -1,7 +1,7 @@
 import logging
 
 from .protocol import AbstractProtocol
-from .protocol_helpers import decode4ByteHex, crc8
+from .protocol_helpers import decode4ByteHex, decode2ByteHex, crc8
 
 
 log = logging.getLogger("MPP-Solar")
@@ -214,6 +214,11 @@ class jkAbstractProtocol(AbstractProtocol):
                             v = responses[:4]
                             responses = responses[4:]
                             value = decode4ByteHex(v)
+                            msgs[param] = [f"{value:0.4f}", defn[3]]
+                        if defn[4] == "2ByteHex":
+                            v = responses[:2]
+                            responses = responses[2:]
+                            value = decode2ByteHex(v)
                             msgs[param] = [f"{value:0.4f}", defn[3]]
                 elif defn[0] == "rem":
                     log.debug("remainder")
