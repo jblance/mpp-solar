@@ -39,7 +39,7 @@ COMMANDS = {
             ["ascii", 10, "Hardware Version", ""],
             ["ascii", 10, "Software Version", ""],
             ["discard", 10, "", ""],
-            ["ascii", 18, "Device Name", ""],
+            ["ascii", 16, "Device Name", ""],
             ["ascii", 10, "Device Passcode", ""],
             ["rem"],
         ],
