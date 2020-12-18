@@ -49,6 +49,31 @@ COMMANDS = {
         ],
         "regex": "",
     },
+    "getCellData": {
+        "name": "getCellData",
+        "command_code": "96",
+        "description": "BLE Cell Data inquiry",
+        "help": " -- queries the ble device for the cell data",
+        "type": "QUERY",
+        "response": [
+            ["hex", 4, "Header", ""],
+            ["hex", 1, "Record Type", ""],
+            ["int", 1, "Record Counter", ""],
+            ["rem"],
+            ["ascii", 10, "Device Model", ""],
+            ["ascii", 10, "Hardware Version", ""],
+            ["ascii", 10, "Software Version", ""],
+            ["discard", 10, "", ""],
+            ["ascii", 16, "Device Name", ""],
+            ["ascii", 10, "Device Passcode", ""],
+        ],
+        "test_responses": [
+            bytes.fromhex(
+                "55aaeb9002ff5b566240e34e62406e6a62404a506240acd7624011d26240bddd62409ad1624044c86240cedc6240ccc7624079e1624057dc624073a262405f80624088c46240000000000000000000000000000000000000000000000000000000000000000013315c3d0636143d26e0113d8021f03c1153363d8980123d7e7c033dac41233d1ad83c3d9d6f4f3d8eb51e3d6a2c293deb28653d189c523da3724e3deb94493d9ab2c23d00000000000000000000000000000000000000000000000000000000000000001aad62400084053c00000000ffff00000b000000000000000000000000000036a3554c40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000be0b54001456a43fb876a43f00a2"
+            ),
+        ],
+        "regex": "",
+    },
 }
 
 
@@ -73,8 +98,8 @@ class jk04(AbstractProtocol):
     def get_full_command(self, command) -> bytes:
         """
         Override the default get_full_command as its different for JK04
-        # getInfo = b'\xaa\x55\x90\xeb\x97\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11'
         """
+        # getInfo = b'\xaa\x55\x90\xeb\x97\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11'
         log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
         # These need to be set to allow other functions to work`
         self._command = command
@@ -172,6 +197,7 @@ class jk04(AbstractProtocol):
                     log.debug("remainder")
                     msgs["remainder"] = [str(responses), ""]
                     msgs["len remainder"] = [len(responses), ""]
+                    return msgs
                 else:
                     log.error("undefined type")
         return msgs
