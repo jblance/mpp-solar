@@ -192,8 +192,9 @@ class jk04(AbstractProtocol):
                     msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "discard":
                     logging.debug(f"Discarding {defn[1]} values")
-                    for x in range(defn[1]):
-                        responses.pop(0)
+                    discard = responses[: defn[1]]
+                    logging.debug(f"Discarded {discard}")
+                    responses = responses[defn[1] :]
                 elif defn[0] == "int":
                     log.debug("int defn")
                     msgs[defn[2]] = [responses.pop(0), defn[3]]
