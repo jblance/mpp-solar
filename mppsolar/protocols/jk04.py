@@ -147,11 +147,13 @@ class jk04(AbstractProtocol):
                 log.debug(f"Processing defn {defn}")
                 # ["hex", 4, "Header", ""]
                 if defn[0] == "hex":
+                    log.debug("hex defn")
                     value = ""
                     for x in range(defn[1]):
                         value += f"{responses.pop(0):02x}"
                     msgs[defn[2]] = [value, ""]
                 elif defn[0] == "ascii":
+                    log.debug("ascii defn")
                     value = ""
                     for x in range(defn[1]):
                         b = responses.pop(0)
@@ -164,8 +166,10 @@ class jk04(AbstractProtocol):
                     for x in range(defn[1]):
                         responses.pop(0)
                 elif defn[0] == "int":
+                    log.debug("int defn")
                     msgs[defn[2]] = [responses.pop(0), ""]
                 else:
+                    log.debug("no defn")
                     msgs["remainder"] = [str(responses), ""]
                     msgs["len remainder"] = [len(responses), ""]
                     # log.error("undefined type")
