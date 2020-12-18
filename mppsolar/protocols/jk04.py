@@ -61,12 +61,9 @@ COMMANDS = {
             ["int", 1, "Record Counter", ""],
             ["loop", 24, "Voltage Cell", "V", "4ByteHex"],
             ["loop", 25, "Resistance Cell", "Ohm", "4ByteHex"],
+            ["4ByteHex", 1, "Average Cell Voltage", "V"],
+            ["4ByteHex", 1, "Delta Cell Voltage", "V"],
             ["rem"],
-            ["ascii", 10, "Hardware Version", ""],
-            ["ascii", 10, "Software Version", ""],
-            ["discard", 10, "", ""],
-            ["ascii", 16, "Device Name", ""],
-            ["ascii", 10, "Device Passcode", ""],
         ],
         "test_responses": [
             bytes.fromhex(
@@ -194,6 +191,12 @@ class jk04(AbstractProtocol):
                 elif defn[0] == "int":
                     log.debug("int defn")
                     msgs[defn[2]] = [responses.pop(0), defn[3]]
+                elif defn[0] == "4ByteHex":
+                    log.debug("4ByteHex defn")
+                    v = responses[:4]
+                    responses = responses[4:]
+                    value = decode4ByteHex(v)
+                    msgs[defn[2]] = [f"{value:0.4f}", defn[3]]
                 elif defn[0] == "loop":
                     log.debug("loop defn")
                     # loop of repeating data, eg cell voltages
