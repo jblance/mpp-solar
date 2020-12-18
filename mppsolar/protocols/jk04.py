@@ -162,7 +162,7 @@ class jk04(AbstractProtocol):
                 elif defn[0] == "int":
                     msgs[defn[2]] = [responses.pop(0), ""]
                 else:
-                    msgs["remainder"] = [responses, ""]
+                    msgs["remainder"] = [str(responses), ""]
                     msgs["len remainder"] = [len(responses), ""]
                     # log.error("undefined type")
             # for i, result in enumerate(responses):
