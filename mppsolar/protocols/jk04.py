@@ -191,9 +191,9 @@ class jk04(AbstractProtocol):
                         value += f"{b:c}"
                     msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "discard":
-                    logging.debug(f"Discarding {defn[1]} values")
+                    log.debug(f"Discarding {defn[1]} values")
                     discard = responses[: defn[1]]
-                    logging.debug(f"Discarded {discard}")
+                    log.debug(f"Discarded {discard}")
                     responses = responses[defn[1] :]
                 elif defn[0] == "int":
                     log.debug("int defn")
