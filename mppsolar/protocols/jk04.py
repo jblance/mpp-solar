@@ -1,6 +1,6 @@
 import logging
 
-from .protocol import jkAbstractProtocol
+from .jkabstractprotocol import jkAbstractProtocol
 
 
 log = logging.getLogger("MPP-Solar")
