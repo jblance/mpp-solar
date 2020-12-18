@@ -65,6 +65,7 @@ COMMANDS = {
             ["4ByteHex", 1, "Delta Cell Voltage", "V"],
             ["4ByteHex", 1, "Balance Current", "A"],
             ["discard", 20, "", ""],
+            ["4ByteHex", 1, "Battery Voltage", "V"],
             ["rem"],
         ],
         "test_responses": [
