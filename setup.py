@@ -68,7 +68,8 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=["pyserial", "paho-mqtt"],
+    # install_requires=["pyserial", "paho-mqtt", "bluepy"],
+    install_requires=[],
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
     # for example:
@@ -76,7 +77,6 @@ setup(
     extras_require={
         "dev": ["check-manifest"],
         "test": ["coverage"],
-        "ble": ["bluepy"],
     },
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow

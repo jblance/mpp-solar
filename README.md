@@ -39,8 +39,12 @@ Also
 - Direct USB connection to Inverter (LV5048)
 - see [documented approach](docs/ubuntu_install.md)
 
-## Install
-`sudo python3 ./setup.py install`
+## Install (from source)
+* Download or clone the repo
+* From the directory that has the requirements files:
+    * `sudo pip install -r requirements.txt`  # for the minimal install (dependances must be installed manually)
+    * `sudo pip install -r requirements-serial.txt`  # for the mqtt install (includes pyserial)
+    * `sudo pip install -r requirements-full.txt`  # for the full install (includes pyserial, mqtt and bluepy)
 
 [Documented Ubuntu Install](docs/ubuntu_install.md)
 
