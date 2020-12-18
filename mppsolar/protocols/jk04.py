@@ -60,6 +60,7 @@ COMMANDS = {
             ["hex", 1, "Record Type", ""],
             ["int", 1, "Record Counter", ""],
             ["loop", 24, "Voltage Cell", "V", "4ByteHex"],
+            ["loop", 25, "Resistance Cell", "Ohm", "4ByteHex"],
             ["rem"],
             ["ascii", 10, "Hardware Version", ""],
             ["ascii", 10, "Software Version", ""],
