@@ -7,11 +7,41 @@ from .baseio import BaseIO
 log = logging.getLogger("MPP-Solar")
 
 
+class jkBleDelegate(btle.DefaultDelegate):
+    """
+    BLE delegate to deal with notifications (information) from the JKBMS device
+    """
+
+    def __init__(me, jkbleio, protocol):
+        btle.DefaultDelegate.__init__(self)
+        # extra initialisation here
+        me._jkbleio = jkbleio
+        if protocol is None:
+            print("ERROR")
+            exit(1)
+        me._protocol = protocol
+        me.notificationData = bytearray()
+
+    def handleNotification(me, handle, data):
+        # handle is the handle of the characteristic / descriptor that posted the notification
+        # data is the data in this notification - may take multiple notifications to get all of a message
+        log.debug("From handle: {:#04x} Got {} bytes of data".format(handle, len(data)))
+        me.notificationData += bytearray(data)
+        if not me._protocol.is_record_start(me.notificationData):
+            log.debug(f"Not valid start of record - wiping data {me.notificationData}")
+            me.notificationData = bytearray()
+        if is_record_complete(me.notificationData):
+            me._jkbleio.record = me.notificationData
+            me.notificationData = bytearray()
+            # jkbledelegate.processRecord(record)
+
+
 class JkBleIO(BaseIO):
     def __init__(self, device_path) -> None:
         self._device = None
         self._device_path = device_path
         self.maxConnectionAttempts = 3
+        self.record = None
         self._test_data = bytes.fromhex(
             "55aaeb9002ff5b566240e34e62406e6a62404a506240acd7624011d26240bddd62409ad1624044c86240cedc6240ccc7624079e1624057dc624073a262405f80624088c46240000000000000000000000000000000000000000000000000000000000000000013315c3d0636143d26e0113d8021f03c1153363d8980123d7e7c033dac41233d1ad83c3d9d6f4f3d8eb51e3d6a2c293deb28653d189c523da3724e3deb94493d9ab2c23d00000000000000000000000000000000000000000000000000000000000000001aad62400084053c00000000ffff00000b000000000000000000000000000036a3554c40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000be0b54001456a43fb876a43f00a2"
         )
@@ -26,7 +56,7 @@ class JkBleIO(BaseIO):
         # response = self._test_data
 
         # Connect to BLE device
-        if self.ble_connect(self._device_path):
+        if self.ble_connect(self._device_path, protocol):
             response = self.ble_get_data(full_command)
             self.ble_disconnect()
         else:
@@ -43,14 +73,14 @@ class JkBleIO(BaseIO):
         log.info(f"Decoded response {decoded_response}")
         return decoded_response
 
-    def ble_connect(self, mac=None):
+    def ble_connect(self, mac=None, protocol=None):
         """
         Connect to a BLE device with 'mac' address
         """
         self._device = None
         # Intialise BLE device
         self._device = btle.Peripheral(None)
-        self._device.withDelegate(jkBleDelegate(self))
+        self._device.withDelegate(jkBleDelegate(self, protocol))
         # Connect to BLE Device
         connected = False
         attempts = 0
@@ -74,26 +104,55 @@ class JkBleIO(BaseIO):
         return
 
     def ble_get_data(self, command=None):
-        response = None
-        response = self._test_data
-        return response
+        self.record = None
 
+        # Get the device name
+        serviceId = self._device.getServiceByUUID(btle.AssignedNumbers.genericAccess)
+        deviceName = serviceId.getCharacteristics(btle.AssignedNumbers.deviceName)[0]
+        log.info("Connected to {}".format(deviceName.read()))
 
-#
-# jk = jkBMS(
-#     name=name,
-#     model=model,
-#     mac=mac,
-#     command=command,
-#     tag=tag,
-#     format=format,
-#     records=args.records,
-#     maxConnectionAttempts=max_connection_attempts,
-#     mqttBroker=mqtt_broker,
-# )
-# log.debug(str(jk))
-# if jk.connect():
-#     jk.getBLEData()
-#     jk.disconnect()
-# else:
-#     print("Failed to connect to {} {}".format(name, mac))
+        # Connect to the notify service
+        serviceNotifyUuid = "ffe0"
+        serviceNotify = self._device.getServiceByUUID(serviceNotifyUuid)
+
+        # Get the handles that we need to talk to
+        # Read
+        characteristicReadUuid = "ffe3"
+        characteristicRead = serviceNotify.getCharacteristics(characteristicReadUuid)[0]
+        handleRead = characteristicRead.getHandle()
+        log.info("Read characteristic: {}, handle {:x}".format(characteristicRead, handleRead))
+
+        # ## TODO sort below
+        # Need to dynamically find this handle....
+        log.info("Enable 0x0b handle", self._device.writeCharacteristic(0x0B, b"\x01\x00"))
+        log.info("Enable read handle", self._device.writeCharacteristic(handleRead, b"\x01\x00"))
+        log.info(
+            "Write getInfo to read handle", self._device.writeCharacteristic(handleRead, getInfo)
+        )
+        secs = 0
+        while True:
+            if self._device.waitForNotifications(1.0):
+                continue
+            secs += 1
+            if secs > 5:
+                break
+
+        log.info(
+            "Write getCellInfo to read handle",
+            self._device.writeCharacteristic(handleRead, getCellInfo),
+        )
+        loops = 0
+        recordsToGrab = 1
+        log.info("Grabbing {} records (after inital response)".format(recordsToGrab))
+
+        while True:
+            loops += 1
+            if loops > recordsToGrab * 15 + 16:
+                print("Got {} records".format(recordsToGrab))
+                break
+            if self._device.waitForNotifications(1.0):
+                continue
+
+        log.debug(f"Record now {self.record}")
+        # response = self._test_data
+        return self.record

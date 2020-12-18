@@ -23,6 +23,7 @@ log = logging.getLogger("MPP-Solar")
 # 55aaeb90
 # 02 record type
 # b5 counter
+SOR = bytes.fromhex("55aaeb90")
 
 COMMANDS = {
     "getInfo": {
@@ -135,6 +136,29 @@ class jk04(AbstractProtocol):
         # Remove CRC and \r of last response
         # responses[-1] = responses[-1][:-3]
         return bytearray(response)
+
+    def is_record_start(self, record):
+        if record.startswith(SOR):
+            log.debug("SOR found in record")
+            return True
+        return False
+
+    def is_record_complete(self, record):
+        """"""
+        # check record starts with 'SOR'
+        if not self.is_record_start(record):
+            log.error("No SOR found in record looking for completeness")
+            return False
+        # check that length one of the valid lengths (300, 320)
+        if len(record) == 300 or len(record) == 320:
+            # check the crc/checksum is correct for the record data
+            crc = ord(record[-1:])
+            calcCrc = crc8(record[:-1])
+            # print (crc, calcCrc)
+            if crc == calcCrc:
+                log.debug("Record CRC is valid")
+                return True
+        return False
 
     def decode(self, response, show_raw) -> dict:
         msgs = {}
