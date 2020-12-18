@@ -35,7 +35,7 @@ COMMANDS = {
             ["hex", 4, "Header", ""],
             ["hex", 1, "Record Type", ""],
             ["int", 1, "Record Counter", ""],
-            ["asc", 10, "Device Model", ""],
+            ["ascii", 10, "Device Model", ""],
             ["ascii", 10, "Hardware Version", ""],
             ["ascii", 10, "Software Version", ""],
             ["discard", 10, "", ""],
