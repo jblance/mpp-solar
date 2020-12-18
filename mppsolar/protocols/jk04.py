@@ -66,7 +66,7 @@ COMMANDS = {
             ["4ByteHex", 1, "Balance Current", "A"],
             ["discard", 20, "", ""],
             ["4ByteHex", 1, "Unknown1", ""],
-            ["discard", 48, "", ""],
+            ["discard", 52, "", ""],
             ["4ByteHex", 1, "Unknown2", ""],
             ["4ByteHex", 1, "Unknown3", ""],
             ["rem"],
