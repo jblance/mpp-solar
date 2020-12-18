@@ -201,10 +201,8 @@ class jk04(AbstractProtocol):
                         if defn[4] == "4ByteHex":
                             v = responses[:4]
                             responses = responses[4:]
-                            print(f"v is {v}")
                             value = decode4ByteHex(v)
-                            print(f"value is {value}")
-                            msgs[param] = [value, defn[3]]
+                            msgs[param] = [f"{value:0.4f}", defn[3]]
                 elif defn[0] == "rem":
                     log.debug("remainder")
                     msgs["remainder"] = [str(responses), ""]
