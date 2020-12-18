@@ -3,37 +3,9 @@ import logging
 
 
 from .baseio import BaseIO
+from .jkbledelegate import jkBleDelegate
 
 log = logging.getLogger("MPP-Solar")
-
-
-class jkBleDelegate(btle.DefaultDelegate):
-    """
-    BLE delegate to deal with notifications (information) from the JKBMS device
-    """
-
-    def __init__(me, jkbleio, protocol):
-        btle.DefaultDelegate.__init__(self)
-        # extra initialisation here
-        me._jkbleio = jkbleio
-        if protocol is None:
-            print("ERROR")
-            exit(1)
-        me._protocol = protocol
-        me.notificationData = bytearray()
-
-    def handleNotification(me, handle, data):
-        # handle is the handle of the characteristic / descriptor that posted the notification
-        # data is the data in this notification - may take multiple notifications to get all of a message
-        log.debug("From handle: {:#04x} Got {} bytes of data".format(handle, len(data)))
-        me.notificationData += bytearray(data)
-        if not me._protocol.is_record_start(me.notificationData):
-            log.debug(f"Not valid start of record - wiping data {me.notificationData}")
-            me.notificationData = bytearray()
-        if is_record_complete(me.notificationData):
-            me._jkbleio.record = me.notificationData
-            me.notificationData = bytearray()
-            # jkbledelegate.processRecord(record)
 
 
 class JkBleIO(BaseIO):
