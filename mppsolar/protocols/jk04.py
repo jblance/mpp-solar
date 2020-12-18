@@ -63,6 +63,8 @@ COMMANDS = {
             ["loop", 25, "Resistance Cell", "Ohm", "4ByteHex"],
             ["4ByteHex", 1, "Average Cell Voltage", "V"],
             ["4ByteHex", 1, "Delta Cell Voltage", "V"],
+            ["4ByteHex", 1, "Balance Current", "A"],
+            ["discard", 5, "", ""],
             ["rem"],
         ],
         "test_responses": [
