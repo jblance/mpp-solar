@@ -1,4 +1,4 @@
-"git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar"
+git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar
 pyserial
 paho-mqtt
 bluepy

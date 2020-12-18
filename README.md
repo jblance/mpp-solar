@@ -45,6 +45,7 @@ Also
     * `sudo pip install -r requirements.txt`  # for the minimal install (dependances must be installed manually)
     * `sudo pip install -r requirements-serial.txt`  # for the mqtt install (includes pyserial)
     * `sudo pip install -r requirements-full.txt`  # for the full install (includes pyserial, mqtt and bluepy)
+__Note:__ need `sudo apt-get install libglib2.0-dev` for bluepy
 
 [Documented Ubuntu Install](docs/ubuntu_install.md)
 
