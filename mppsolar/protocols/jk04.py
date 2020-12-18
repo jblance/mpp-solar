@@ -69,7 +69,6 @@ COMMANDS = {
             ["discard", 52, "", ""],
             ["4ByteHex", 1, "Unknown2", ""],
             ["4ByteHex", 1, "Unknown3", ""],
-            ["rem"],
         ],
         "test_responses": [
             bytes.fromhex(
@@ -92,7 +91,7 @@ class jk04(AbstractProtocol):
         self._protocol_id = b"JK04"
         self.COMMANDS = COMMANDS
         self.STATUS_COMMANDS = [
-            "",
+            "getCellData",
         ]
         self.SETTINGS_COMMANDS = [
             "getInfo",
