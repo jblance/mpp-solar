@@ -176,7 +176,7 @@ class jk04(AbstractProtocol):
                     value = ""
                     for x in range(defn[1]):
                         value += f"{responses.pop(0):02x}"
-                    msgs[defn[2]] = [value, ""]
+                    msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "ascii":
                     log.debug("ascii defn")
                     value = ""
@@ -185,18 +185,26 @@ class jk04(AbstractProtocol):
                         if b == 0:
                             continue
                         value += f"{b:c}"
-                    msgs[defn[2]] = [value, ""]
+                    msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "discard":
                     logging.debug(f"Discarding {defn[1]} values")
                     for x in range(defn[1]):
                         responses.pop(0)
                 elif defn[0] == "int":
                     log.debug("int defn")
-                    msgs[defn[2]] = [responses.pop(0), ""]
+                    msgs[defn[2]] = [responses.pop(0), defn[3]]
                 elif defn[0] == "loop":
+                    log.debug("loop defn")
                     # loop of repeating data, eg cell voltages
                     for x in range(defn[1]):
-                        print(f"{defn[2]}{x:02d}")
+                        param = f"{defn[2]}{x:02d}"
+                        if defn[4] == "4ByteHex":
+                            v = responses[:4]
+                            responses = responses[4:]
+                            print(f"v is {v}")
+                            value = decode4ByteHex(v)
+                            print(f"value is {value}")
+                            msgs[param] = [value, defn[3]]
                 elif defn[0] == "rem":
                     log.debug("remainder")
                     msgs["remainder"] = [str(responses), ""]
