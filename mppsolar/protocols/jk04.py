@@ -41,7 +41,6 @@ COMMANDS = {
             ["discard", 10, "", ""],
             ["ascii", 16, "Device Name", ""],
             ["ascii", 10, "Device Passcode", ""],
-            ["rem"],
         ],
         "test_responses": [
             bytes.fromhex(
@@ -142,8 +141,7 @@ class jk04(AbstractProtocol):
             len_command_defn = len(self._command_defn["response"])
             # Decode response based on stored command definition
             responses = self.get_responses(response)
-            log.debug(f"trimmed and split responses: {responses}")
-            print(f"Length of responses {len(responses)}")
+            log.debug(f"Length of responses {len(responses)}")
 
             for defn in self._command_defn["response"]:
                 log.debug(f"Processing defn {defn}")
@@ -170,26 +168,10 @@ class jk04(AbstractProtocol):
                 elif defn[0] == "int":
                     log.debug("int defn")
                     msgs[defn[2]] = [responses.pop(0), ""]
-                else:
-                    log.debug("no defn")
+                elif defn[0] == "rem":
+                    log.debug("remainder")
                     msgs["remainder"] = [str(responses), ""]
                     msgs["len remainder"] = [len(responses), ""]
-                    # log.error("undefined type")
-            # for i, result in enumerate(responses):
-            #     # decode result
-            #     result = result.decode("utf-8")
-            #     # Check if we are past the 'known' responses
-            #     if i >= len_command_defn:
-            #         resp_format = ["string", f"Unknown value in response {i}", ""]
-            #     else:
-            #         resp_format = self._command_defn["response"][i]
-            #
-            #     key = "{}".format(resp_format[1]).lower().replace(" ", "_")
-            #     # log.debug(f'result {result}, key {key}, resp_format {resp_format}')
-            #     # Process results
-            #     if resp_format[0] == "float":
-            #         if "--" in result:
-            #             result = 0
-            #         msgs[key] = [float(result), resp_format[2]]
-            print(msgs)
+                else:
+                    log.error("undefined type")
         return msgs
