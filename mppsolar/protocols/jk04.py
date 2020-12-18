@@ -59,8 +59,8 @@ COMMANDS = {
             ["hex", 4, "Header", ""],
             ["hex", 1, "Record Type", ""],
             ["int", 1, "Record Counter", ""],
+            ["loop", 24, "Voltage Cell", "V", "4ByteHex"],
             ["rem"],
-            ["ascii", 10, "Device Model", ""],
             ["ascii", 10, "Hardware Version", ""],
             ["ascii", 10, "Software Version", ""],
             ["discard", 10, "", ""],
@@ -193,6 +193,10 @@ class jk04(AbstractProtocol):
                 elif defn[0] == "int":
                     log.debug("int defn")
                     msgs[defn[2]] = [responses.pop(0), ""]
+                elif defn[0] == "loop":
+                    # loop of repeating data, eg cell voltages
+                    for x in range(defn[1]):
+                        print(f"{defn[2]}{x:02d}")
                 elif defn[0] == "rem":
                     log.debug("remainder")
                     msgs["remainder"] = [str(responses), ""]
