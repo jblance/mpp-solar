@@ -195,10 +195,17 @@ class jkAbstractProtocol(AbstractProtocol):
                     log.debug(f"Discarding {defn[1]} values")
                     discard = responses[: defn[1]]
                     log.debug(f"Discarded {discard}")
+                    msgs[defn[2]] = [f"{str(discard)}", defn[3]]
                     responses = responses[defn[1] :]
                 elif defn[0] == "int":
                     log.debug("int defn")
                     msgs[defn[2]] = [responses.pop(0), defn[3]]
+                elif defn[0] == "2ByteHex":
+                    log.debug("2ByteHex defn")
+                    v = responses[:2]
+                    responses = responses[2:]
+                    value = decode2ByteHex(v)
+                    msgs[defn[2]] = [f"{value:0.4f}", defn[3]]
                 elif defn[0] == "4ByteHex":
                     log.debug("4ByteHex defn")
                     v = responses[:4]
@@ -209,7 +216,7 @@ class jkAbstractProtocol(AbstractProtocol):
                     log.debug("loop defn")
                     # loop of repeating data, eg cell voltages
                     for x in range(defn[1]):
-                        param = f"{defn[2]}{x:02d}"
+                        param = f"{defn[2]}{x+1:02d}"
                         if defn[4] == "4ByteHex":
                             v = responses[:4]
                             responses = responses[4:]
