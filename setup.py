@@ -76,6 +76,7 @@ setup(
     extras_require={
         "dev": ["check-manifest"],
         "test": ["coverage"],
+        "ble": ["bluepy"],
     },
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
