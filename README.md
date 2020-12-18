@@ -16,6 +16,10 @@ for MPP and similar inverters, some known to work (to varying amounts):
 - Voltronic Axpert MKS 5KVA Off-grid Inverter-Chargers
 - LV5048
 
+Also supports JK BMS
+- JK-B2A24S (HW version 3.0)
+- JK-B1A24S (HW version 3.0)
+
 Good overview and technical discussion here
 http://forums.aeva.asn.au/viewtopic.php?f=31&t=4332
 
