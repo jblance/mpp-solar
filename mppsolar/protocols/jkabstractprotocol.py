@@ -1,4 +1,5 @@
 import logging
+import math
 
 from .protocol import AbstractProtocol
 from .protocol_helpers import decode4ByteHex, decode2ByteHex, crc8
@@ -191,6 +192,24 @@ class jkAbstractProtocol(AbstractProtocol):
                             continue
                         value += f"{b:c}"
                     msgs[defn[2]] = [value, defn[3]]
+                elif defn[0] == "uptime":
+                    log.debug("uptime defn")
+                    value = 0
+                    for x in range(defn[1]):
+                        b = responses.pop(0)
+                        value += b * 256 ** x
+                        log.debug(f"Uptime int value {value} for pos {x}")
+                    daysFloat = value / (60 * 60 * 24)
+                    days = math.trunc(daysFloat)
+                    hoursFloat = (daysFloat - days) * 24
+                    hours = math.trunc(hoursFloat)
+                    minutesFloat = (hoursFloat - hours) * 60
+                    minutes = math.trunc(minutesFloat)
+                    secondsFloat = (minutesFloat - minutes) * 60
+                    seconds = round(secondsFloat)
+                    uptime = f"{days}D{hours}H{minutes}M{seconds}S"
+                    log.info(f"Uptime result {uptime}")
+                    msgs[defn[2]] = [uptime, defn[3]]
                 elif defn[0] == "discard":
                     log.debug(f"Discarding {defn[1]} values")
                     discard = responses[: defn[1]]
@@ -206,12 +225,32 @@ class jkAbstractProtocol(AbstractProtocol):
                     responses = responses[2:]
                     value = decode2ByteHex(v)
                     msgs[defn[2]] = [f"{value:0.4f}", defn[3]]
+                elif defn[0] == "2ByteHexU":
+                    # used for unknow values provides undecoded hex as well
+                    log.debug("2ByteHexU defn")
+                    v = responses[:2]
+                    responses = responses[2:]
+                    value = decode2ByteHex(v)
+                    msgs[defn[2]] = [f"{value:0.4f}", f"{v[0]:02x} {v[1]:02x}"]
+                elif defn[0] == "2ByteHexC":
+                    # temperatures seem to be deocded value * 100
+                    log.debug("2ByteHexC defn")
+                    v = responses[:2]
+                    responses = responses[2:]
+                    value = decode2ByteHex(v) * 100
+                    msgs[defn[2]] = [f"{value:0.1f}", defn[3]]
                 elif defn[0] == "4ByteHex":
                     log.debug("4ByteHex defn")
                     v = responses[:4]
                     responses = responses[4:]
                     value = decode4ByteHex(v)
                     msgs[defn[2]] = [f"{value:0.4f}", defn[3]]
+                elif defn[0] == "4ByteHexU":
+                    log.debug("4ByteHexU defn")
+                    v = responses[:4]
+                    responses = responses[4:]
+                    value = decode4ByteHex(v)
+                    msgs[defn[2]] = [f"{value:0.4f}", f"{v[0]:02x} {v[1]:02x} {v[2]:02x} {v[3]:02x}"]
                 elif defn[0] == "loop":
                     log.debug("loop defn")
                     # loop of repeating data, eg cell voltages
