@@ -231,7 +231,9 @@ def main():
             device_class = get_device_class(type)
             log.debug(f"device_class {device_class}")
             # The device class __init__ will instantiate the port communications and protocol classes
-            device = device_class(name=name, port=port, protocol=protocol, outputs=outputs)
+            device = device_class(
+                name=name, port=port, protocol=protocol, outputs=outputs, baud=baud
+            )
             _commands.append((device, command, tag, outputs))
 
         if args.daemon:
@@ -312,7 +314,7 @@ def main():
         device_class = get_device_class(args.type)
         log.debug(f"device_class {device_class}")
         # The device class __init__ will instantiate the port communications and protocol classes
-        device = device_class(name=args.name, port=args.port, protocol=args.protocol)
+        device = device_class(name=args.name, port=args.port, protocol=args.protocol, baud=args.baud)
 
         # determine whether to run command or call helper function
         if args.listknown:

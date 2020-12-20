@@ -8,9 +8,12 @@ log = logging.getLogger("MPP-Solar")
 
 
 class SerialIO(BaseIO):
-    def __init__(self, device_path, serial_baud=2400) -> None:
+    def __init__(self, device_path, serial_baud) -> None:
         self._serial_port = device_path
-        self._serial_baud = serial_baud
+        if serial_baud is None:
+            self._serial_baud = 2400
+        else:
+            self._serial_baud = serial_baud
 
     def send_and_receive(self, command, show_raw, protocol) -> dict:
         full_command = protocol.get_full_command(command)
@@ -37,9 +40,7 @@ class SerialIO(BaseIO):
                     # add command name and description to response
                     decoded_response["_command"] = command
                     if command_defn is not None:
-                        decoded_response["_command_description"] = command_defn[
-                            "description"
-                        ]
+                        decoded_response["_command_description"] = command_defn["description"]
                     log.info(f"Decoded response {decoded_response}")
                     return decoded_response
         except Exception as e:

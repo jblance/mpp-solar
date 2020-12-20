@@ -8,11 +8,9 @@ log = logging.getLogger("MPP-Solar")
 class jk24s(AbstractDevice):
     def __init__(self, *args, **kwargs) -> None:
         self._name = kwargs["name"]
-        self.set_port(port=kwargs["port"])
+        self.set_port(port=kwargs["port"], baud=kwargs["baud"])
         self.set_protocol(protocol=kwargs["protocol"])
-        log.debug(
-            f"jk24s __init__ name {self._name}, port {self._port}, protocol {self._protocol}"
-        )
+        log.debug(f"jk24s __init__ name {self._name}, port {self._port}, protocol {self._protocol}")
         log.debug(f"jk24s __init__ args {args}")
         log.debug(f"jk24s __init__ kwargs {kwargs}")
 
@@ -32,9 +30,7 @@ class jk24s(AbstractDevice):
             log.error("Attempted to run command with no protocol defined")
             return {"ERROR": ["Attempted to run command with no protocol defined", ""]}
         if self._port is None:
-            log.error(
-                f"No communications port defined - unable to run command {command}"
-            )
+            log.error(f"No communications port defined - unable to run command {command}")
             return {
                 "ERROR": [
                     f"No communications port defined - unable to run command {command}",

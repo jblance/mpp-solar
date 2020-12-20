@@ -95,7 +95,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         # TODO: fix protocol instantiate
         self._protocol = self._protocol_class("init_var", proto_keyword="value", second_keyword=123)
 
-    def set_port(self, port=None):
+    def set_port(self, port=None, baud=None):
         port_type = self.get_port_type(port)
         if port_type == PORT_TYPE_TEST:
             log.info("Using testio for communications")
@@ -121,7 +121,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             log.info("Using serialio for communications")
             from mppsolar.io.serialio import SerialIO
 
-            self._port = SerialIO(device_path=port, serial_baud=2400)
+            self._port = SerialIO(device_path=port, serial_baud=baud)
         else:
             self._port = None
 
