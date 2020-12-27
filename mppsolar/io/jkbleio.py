@@ -78,6 +78,9 @@ class JkBleIO(BaseIO):
     def ble_get_data(self, command=None):
         self.record = None
 
+        if command is None:
+            return self.record
+
         # Get the device name
         serviceId = self._device.getServiceByUUID(btle.AssignedNumbers.genericAccess)
         deviceName = serviceId.getCharacteristics(btle.AssignedNumbers.deviceName)[0]
@@ -98,20 +101,20 @@ class JkBleIO(BaseIO):
         # Need to dynamically find this handle....
         log.info("Enable 0x0b handle", self._device.writeCharacteristic(0x0B, b"\x01\x00"))
         log.info("Enable read handle", self._device.writeCharacteristic(handleRead, b"\x01\x00"))
-        log.info(
-            "Write getInfo to read handle", self._device.writeCharacteristic(handleRead, getInfo)
-        )
-        secs = 0
-        while True:
-            if self._device.waitForNotifications(1.0):
-                continue
-            secs += 1
-            if secs > 5:
-                break
+        # log.info(
+        #     "Write getInfo to read handle", self._device.writeCharacteristic(handleRead, getInfo)
+        # )
+        # secs = 0
+        # while True:
+        #     if self._device.waitForNotifications(1.0):
+        #         continue
+        #     secs += 1
+        #     if secs > 5:
+        #         break
 
         log.info(
-            "Write getCellInfo to read handle",
-            self._device.writeCharacteristic(handleRead, getCellInfo),
+            "Write command to read handle",
+            self._device.writeCharacteristic(handleRead, command),
         )
         loops = 0
         recordsToGrab = 1
