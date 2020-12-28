@@ -28,7 +28,7 @@ class jkBleDelegate(btle.DefaultDelegate):
         if not self._protocol.is_record_start(self.notificationData):
             log.debug(f"Not valid start of record - wiping data {self.notificationData}")
             self.notificationData = bytearray()
-        if is_record_complete(self.notificationData):
+        if self._protocol.is_record_complete(self.notificationData):
             self._jkbleio.record = self.notificationData
             self.notificationData = bytearray()
             # jkbledelegate.processRecord(record)
