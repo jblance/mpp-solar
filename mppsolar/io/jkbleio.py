@@ -130,4 +130,4 @@ class JkBleIO(BaseIO):
 
         log.debug(f"Record now {self.record} len {len(self.record)}")
         # response = self._test_data
-        return self.record
+        return self.record[-300:]
