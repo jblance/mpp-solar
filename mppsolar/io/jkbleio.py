@@ -117,7 +117,7 @@ class JkBleIO(BaseIO):
             self._device.writeCharacteristic(handleRead, command),
         )
         loops = 0
-        recordsToGrab = 1
+        recordsToGrab = 2
         log.info("Grabbing {} records (after inital response)".format(recordsToGrab))
 
         while True:
@@ -128,6 +128,6 @@ class JkBleIO(BaseIO):
             if self._device.waitForNotifications(1.0):
                 continue
 
-        log.debug(f"Record now {self.record}")
+        log.debug(f"Record now {self.record} len {len(self.record)}")
         # response = self._test_data
         return self.record
