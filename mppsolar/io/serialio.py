@@ -29,8 +29,8 @@ class SerialIO(BaseIO):
                     s.flushInput()
                     s.flushOutput()
                     s.write(full_command)
-                    time.sleep(0.5 * x)  # give serial port time to receive the data
-                    response_line = s.readline()
+                    time.sleep(0.1 * x)  # give serial port time to receive the data
+                    response_line = s.read_until(expected=b'\r')
                     log.debug("serial response was: %s", response_line)
                     decoded_response = protocol.decode(response_line, show_raw)
                     log.debug(f"Decoded response {decoded_response}")
