@@ -7,6 +7,7 @@ from .jkbledelegate import jkBleDelegate
 
 log = logging.getLogger("MPP-Solar")
 
+getInfo = b'\xaa\x55\x90\xeb\x97\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11'
 
 class JkBleIO(BaseIO):
     def __init__(self, device_path) -> None:
@@ -101,16 +102,16 @@ class JkBleIO(BaseIO):
         # Need to dynamically find this handle....
         log.info("Enable 0x0b handle", self._device.writeCharacteristic(0x0B, b"\x01\x00"))
         log.info("Enable read handle", self._device.writeCharacteristic(handleRead, b"\x01\x00"))
-        # log.info(
-        #     "Write getInfo to read handle", self._device.writeCharacteristic(handleRead, getInfo)
-        # )
-        # secs = 0
-        # while True:
-        #     if self._device.waitForNotifications(1.0):
-        #         continue
-        #     secs += 1
-        #     if secs > 5:
-        #         break
+        log.info(
+            "Write getInfo to read handle", self._device.writeCharacteristic(handleRead, getInfo)
+        )
+        secs = 0
+        while True:
+            if self._device.waitForNotifications(1.0):
+                continue
+            secs += 1
+            if secs > 5:
+                break
 
         log.info(
             "Write command to read handle",
