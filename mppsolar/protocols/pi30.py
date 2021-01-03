@@ -855,8 +855,9 @@ class pi30(AbstractProtocol):
         if b'(NAK' in response:
             return False, {"ERROR": ["NAK", ""]}
 
-        crc_high, crc_low = crc(response[:-3])
-        if response[-3:-1] != bytes([crc_high, crc_low]):
-            return False, {"ERROR": ["Invalid response CRC", ""]}
+        if len(response) > 3:
+            crc_high, crc_low = crc(response[:-3])
+            if response[-3:-1] != bytes([crc_high, crc_low]):
+                return False, {"ERROR": ["Invalid response CRC", ""]}
 
         return True, {}
