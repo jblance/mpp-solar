@@ -1,7 +1,7 @@
 import abc
-import ctypes
 import logging
 import re
+from typing import Tuple
 
 from .protocol_helpers import crcPI as crc
 
@@ -71,13 +71,20 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         responses[-1] = responses[-1][:-3]
         return responses
 
-    def decode(self, response, show_raw) -> dict:
-        msgs = {}
-        log.info(f"response passed to decode: {response}")
-        # No response
+    def check_response_valid(self, response) -> Tuple[bool, dict]:
+        """
+        Simplest validity check, CRC checks should be added to individual protocols
+        """
         if response is None:
-            log.info("No response")
-            msgs["ERROR"] = ["No response", ""]
+            return False, {"ERROR": ["No response", ""]}
+        return True, {}
+
+    def decode(self, response, show_raw) -> dict:
+        log.info(f"response passed to decode: {response}")
+
+        valid, msgs = self.check_response_valid(response)
+        if not valid:
+            log.info(msgs["ERROR"][0])
             return msgs
 
         # Raw response requested
