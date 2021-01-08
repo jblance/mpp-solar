@@ -64,12 +64,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         """
         Default implementation of split and trim
         """
-        responses = response.split(b" ")
-        # Trim leading '(' of first response
-        responses[0] = responses[0][1:]
-        # Remove CRC and \r of last response
-        responses[-1] = responses[-1][:-3]
-        return responses
+        # Trim leading '(' + trailing CRC and \r of response, then split
+        return response[1:-3].split(b" ")
 
     def check_response_valid(self, response) -> Tuple[bool, dict]:
         """
