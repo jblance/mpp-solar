@@ -7,6 +7,7 @@ from .jkbledelegate import jkBleDelegate
 
 log = logging.getLogger("MPP-Solar")
 
+getInfo = b'\xaa\x55\x90\xeb\x97\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11'
 
 class JkBleIO(BaseIO):
     def __init__(self, device_path) -> None:
@@ -78,6 +79,9 @@ class JkBleIO(BaseIO):
     def ble_get_data(self, command=None):
         self.record = None
 
+        if command is None:
+            return self.record
+
         # Get the device name
         serviceId = self._device.getServiceByUUID(btle.AssignedNumbers.genericAccess)
         deviceName = serviceId.getCharacteristics(btle.AssignedNumbers.deviceName)[0]
@@ -110,11 +114,11 @@ class JkBleIO(BaseIO):
                 break
 
         log.info(
-            "Write getCellInfo to read handle",
-            self._device.writeCharacteristic(handleRead, getCellInfo),
+            "Write command to read handle",
+            self._device.writeCharacteristic(handleRead, command),
         )
         loops = 0
-        recordsToGrab = 1
+        recordsToGrab = 2
         log.info("Grabbing {} records (after inital response)".format(recordsToGrab))
 
         while True:
@@ -125,6 +129,6 @@ class JkBleIO(BaseIO):
             if self._device.waitForNotifications(1.0):
                 continue
 
-        log.debug(f"Record now {self.record}")
+        log.debug(f"Record now {self.record} len {len(self.record)}")
         # response = self._test_data
-        return self.record
+        return self.record[-300:]

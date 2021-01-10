@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import logging
-import ctypes
 
 log = logging.getLogger("MPP-Solar")
 
@@ -140,26 +139,24 @@ def crcPI(data_bytes):
     ]
 
     for c in data_bytes:
-        # todo fix spaces
-        if c == " ":
-            continue
         # log.debug('Encoding %s', c)
         # todo fix response for older python
         if type(c) == str:
             c = ord(c)
-        t_da = ctypes.c_uint8(crc >> 8)
-        da = t_da.value >> 4
-        crc <<= 4
+        da = ((crc >> 8) & 0xFF) >> 4
+        crc = (crc << 4) & 0xFFFF
+
         index = da ^ (c >> 4)
         crc ^= crc_ta[index]
-        t_da = ctypes.c_uint8(crc >> 8)
-        da = t_da.value >> 4
-        crc <<= 4
+
+        da = ((crc >> 8) & 0xFF) >> 4
+        crc = (crc << 4) & 0xFFFF
+
         index = da ^ (c & 0x0F)
         crc ^= crc_ta[index]
 
-    crc_low = ctypes.c_uint8(crc).value
-    crc_high = ctypes.c_uint8(crc >> 8).value
+    crc_low = crc & 0xFF
+    crc_high = (crc >> 8) & 0xFF
 
     if crc_low == 0x28 or crc_low == 0x0D or crc_low == 0x0A:
         crc_low += 1
