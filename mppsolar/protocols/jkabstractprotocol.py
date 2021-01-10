@@ -30,6 +30,7 @@ COMMANDS = {
     "getInfo": {
         "name": "getInfo",
         "command_code": "97",
+        "record_type": "3",
         "description": "BLE Device Information inquiry",
         "help": " -- queries the ble device information",
         "type": "QUERY",
@@ -119,6 +120,12 @@ class jkAbstractProtocol(AbstractProtocol):
     def is_record_start(self, record):
         if record.startswith(SOR):
             log.debug("SOR found in record")
+            return True
+        return False
+
+    def is_record_correct_type(self, record, type):
+        if record[len(SOR)] == type:
+            log.debug(f"Record is type {type}")
             return True
         return False
 

@@ -7,7 +7,8 @@ from .jkbledelegate import jkBleDelegate
 
 log = logging.getLogger("MPP-Solar")
 
-getInfo = b'\xaa\x55\x90\xeb\x97\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11'
+getInfo = b"\xaa\x55\x90\xeb\x97\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11"
+
 
 class JkBleIO(BaseIO):
     def __init__(self, device_path) -> None:
@@ -24,13 +25,15 @@ class JkBleIO(BaseIO):
         log.info(f"full command {full_command} for command {command}")
         # Send the full command via the communications port
         command_defn = protocol.get_command_defn(command)
+        record_type = command_defn["record_type"]
+        log.debug(f"expected record type {record_type} for command {command}")
 
         # Need to get response here
         # response = self._test_data
 
         # Connect to BLE device
         if self.ble_connect(self._device_path, protocol):
-            response = self.ble_get_data(full_command)
+            response = self.ble_get_data(full_command, record_type)
             self.ble_disconnect()
         else:
             print(f"Failed to connect to {self._device_path}")
@@ -53,7 +56,7 @@ class JkBleIO(BaseIO):
         self._device = None
         # Intialise BLE device
         self._device = btle.Peripheral(None)
-        self._device.withDelegate(jkBleDelegate(self, protocol))
+        self._device.withDelegate(jkBleDelegate(self, protocol, record_type))
         # Connect to BLE Device
         connected = False
         attempts = 0
@@ -118,7 +121,7 @@ class JkBleIO(BaseIO):
             self._device.writeCharacteristic(handleRead, command),
         )
         loops = 0
-        recordsToGrab = 2
+        recordsToGrab = 1
         log.info("Grabbing {} records (after inital response)".format(recordsToGrab))
 
         while True:

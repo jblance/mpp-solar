@@ -9,6 +9,7 @@ NEW_COMMANDS = {
     "getCellData": {
         "name": "getCellData",
         "command_code": "96",
+        "record_type": "2",
         "description": "BLE Cell Data inquiry",
         "help": " -- queries the ble device for the cell data",
         "type": "QUERY",

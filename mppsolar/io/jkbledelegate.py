@@ -10,7 +10,7 @@ class jkBleDelegate(btle.DefaultDelegate):
     BLE delegate to deal with notifications (information) from the JKBMS device
     """
 
-    def __init__(self, jkbleio, protocol):
+    def __init__(self, jkbleio, protocol, record_type=None):
         btle.DefaultDelegate.__init__(self)
         # extra initialisation here
         self._jkbleio = jkbleio
@@ -18,6 +18,7 @@ class jkBleDelegate(btle.DefaultDelegate):
             print("ERROR")
             exit(1)
         self._protocol = protocol
+        self._record_type = record_type
         self.notificationData = bytearray()
 
     def handleNotification(self, handle, data):
@@ -28,8 +29,13 @@ class jkBleDelegate(btle.DefaultDelegate):
         if not self._protocol.is_record_start(self.notificationData):
             log.debug(f"Not valid start of record - wiping data {self.notificationData}")
             self.notificationData = bytearray()
+        if not self._protocol.is_record_correct_type(self.notificationData, self._record_type):
+            log.debug(f"Not expected type of record - wiping data {self.notificationData}")
+            # self.notificationData = bytearray()
         if self._protocol.is_record_complete(self.notificationData):
             self._jkbleio.record = self.notificationData
             log.debug("record complete")
+
+
 self.notificationData = bytearray()
-            # jkbledelegate.processRecord(record)
+# jkbledelegate.processRecord(record)
