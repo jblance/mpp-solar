@@ -286,6 +286,11 @@ class jkAbstractProtocol(AbstractProtocol):
                             responses = responses[2:]
                             value = decode2ByteHex(v)
                             msgs[param] = [f"{value:0.4f}", defn[3]]
+                        if defn[4] == "16Int1000":
+                            value = responses.pop(0) * 256
+                            value += responses.pop(0)
+                            value = value / 1000
+                            msgs[param] = [f"{value:0.3f}", defn[3]]
                 elif defn[0] == "rem":
                     log.debug("remainder")
                     msgs["remainder"] = [str(responses), ""]

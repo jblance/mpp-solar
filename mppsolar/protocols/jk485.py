@@ -40,6 +40,9 @@ COMMANDS = {
             ["16Int1000", 1, "Max Balance Current", "A"],
             ["hex", 1, "Balance On / Off", ""],
             ["int", 1, "Set Number of Cells", ""],
+            ["loop", 24, "Voltage Cell", "V", "16Int1000"],
+            ["16Int", 1, "Temperature", "°C"],
+            ["hex", 1, "Checksum", ""],
             ["rem"],
         ],
         "test_responses": [
@@ -58,12 +61,12 @@ class jk485(jkAbstractProtocol):
         self._protocol_id = b"JK485"
         self.COMMANDS = COMMANDS
         self.STATUS_COMMANDS = [
-            "",
+            "getBalancerData",
         ]
         self.SETTINGS_COMMANDS = [
             "",
         ]
-        self.DEFAULT_COMMAND = ""
+        self.DEFAULT_COMMAND = "getBalancerData"
 
     def get_full_command(self, command) -> bytes:
         """
