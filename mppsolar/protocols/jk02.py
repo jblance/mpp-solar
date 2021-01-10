@@ -88,4 +88,4 @@ class jk02(jkAbstractProtocol):
         self.SETTINGS_COMMANDS = [
             "getInfo",
         ]
-        self.DEFAULT_COMMAND = "getInfo"
+        self.DEFAULT_COMMAND = "getCellData"
