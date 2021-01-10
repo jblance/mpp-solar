@@ -89,7 +89,7 @@ class jkAbstractProtocol(AbstractProtocol):
         self._command_defn = self.get_command_defn(command)
         # End of required variables setting
         if self._command_defn is None:
-            # Maybe returna default here?
+            # Maybe return a default here?
             return None
         if "command_code" in self._command_defn:
             # full command is 20 bytes long
@@ -219,6 +219,26 @@ class jkAbstractProtocol(AbstractProtocol):
                 elif defn[0] == "int":
                     log.debug("int defn")
                     msgs[defn[2]] = [responses.pop(0), defn[3]]
+                elif defn[0] == "16Int":
+                    log.debug("16Int defn")
+                    value = responses.pop(0) * 256
+                    value += responses.pop(0)
+                    print(f"value {value}")
+                    msgs[defn[2]] = [f"{value:0.3f}", defn[3]]
+                elif defn[0] == "16Int100":
+                    log.debug("16Int100 defn")
+                    value = responses.pop(0) * 256
+                    value += responses.pop(0)
+                    value = value / 100
+                    print(f"value {value}")
+                    msgs[defn[2]] = [f"{value:0.3f}", defn[3]]
+                elif defn[0] == "16Int1000":
+                    log.debug("16Int1000 defn")
+                    value = responses.pop(0) * 256
+                    value += responses.pop(0)
+                    value = value / 1000
+                    print(f"value {value}")
+                    msgs[defn[2]] = [f"{value:0.3f}", defn[3]]
                 elif defn[0] == "2ByteHex":
                     log.debug("2ByteHex defn")
                     v = responses[:2]

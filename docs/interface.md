@@ -64,6 +64,11 @@ decoded_response = protocol.decode(response_line, show_raw)
 
 
 ## PROTOCOL classes ##
+* Generally inherits from the AbstractProtocol base class
+* define the following functions:
+    * `get_full_command(self, command) -> bytes:`
+    * `get_command_defn(self, command) -> dict:` (from AbstractProtocol)
+    * `decode(self, response, show_raw) -> dict:` (default uses get_responses)
 
 
 ## OUTPUTS ##
