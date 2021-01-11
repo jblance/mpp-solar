@@ -8,6 +8,8 @@ log = logging.getLogger("MPP-Solar")
 
 class mppsolar(AbstractDevice):
     def __init__(self, *args, **kwargs) -> None:
+        log.debug(f"mppsolar __init__ args {args}")
+        log.debug(f"mppsolar __init__ kwargs {kwargs}")
         super().__init__()
         self._name = kwargs["name"]
         self.set_port(**kwargs)
@@ -15,8 +17,6 @@ class mppsolar(AbstractDevice):
         log.debug(
             f"mppsolar __init__ name {self._name}, port {self._port}, protocol {self._protocol}"
         )
-        log.debug(f"mppsolar __init__ args {args}")
-        log.debug(f"mppsolar __init__ kwargs {kwargs}")
 
     def __str__(self):
         """
