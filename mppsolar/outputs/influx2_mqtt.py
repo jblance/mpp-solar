@@ -8,10 +8,21 @@ class influx2_mqtt:
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.influx2_mqtt __init__ kwargs {kwargs}")
 
-    def output(self, data=None, tag=None, mqtt_broker="localhost"):
+    def output(self, data=None, tag=None, mqtt_broker="localhost", mqtt_user=None, mqtt_pass=None):
         log.info("Using output processor: influx2_mqtt")
+
         if data is None:
             return
+
+        if tag is None:
+            tag = "mpp-solar"
+
+        if mqtt_user is not None and mqtt_pass is not None:
+            auth = {"username": mqtt_user, "password": mqtt_pass}
+            log.info(f"Using mqtt authentication, username: {mqtt_user}, password: [supplied]")
+        else:
+            log.debug("No mqtt authentication used")
+            auth = None
 
         # Build array of Influx Line Protocol II messages
         msgs = []
@@ -28,4 +39,4 @@ class influx2_mqtt:
                 "payload": f"mppsolar,command={tag} {key}={value}",
             }
             msgs.append(msg)
-        publish.multiple(msgs, hostname=mqtt_broker)
+        publish.multiple(msgs, hostname=mqtt_broker, auth=auth)

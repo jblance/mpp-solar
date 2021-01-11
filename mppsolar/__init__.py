@@ -142,6 +142,18 @@ def main():
         help="Specifies the mqtt broker to publish to if using a mqtt output (localhost [default], hostname, ip.add.re.ss ...)",
         default="localhost",
     )
+    parser.add_argument(
+        "--mqttuser",
+        type=str,
+        help="Specifies the username to use for authenticated mqtt broker publishing",
+        default=None,
+    )
+    parser.add_argument(
+        "--mqttpass",
+        type=str,
+        help="Specifies the password to use for authenticated mqtt broker publishing",
+        default=None,
+    )
     parser.add_argument("-c", "--command", help="Command to run")
     parser.add_argument(
         "-C",
@@ -175,6 +187,7 @@ def main():
     args = parser.parse_args()
 
     # Display verison if asked
+    log.info(description)
     if args.version:
         print(description)
         exit(0)
@@ -186,7 +199,9 @@ def main():
         log.setLevel(logging.INFO)
         # ch.setLevel(logging.INFO)
 
-    log.info(description)
+    mqtt_broker = args.mqttbroker
+    mqtt_user = args.mqttuser
+    mqtt_pass = args.mqttpass
 
     # Initialize Daemon
     if args.daemon:
@@ -198,7 +213,6 @@ def main():
         print("MPP-Solar-Service: Initializing ...")
         # set some default-defaults
         pause = 60
-        mqtt_broker = "localhost"
 
     # If config file specified, process
     if args.configfile:
@@ -212,6 +226,8 @@ def main():
         if "SETUP" in config:
             pause = config["SETUP"].getint("pause", fallback=60)
             mqtt_broker = config["SETUP"].get("mqtt_broker", fallback="localhost")
+            mqtt_user = config["SETUP"].get("mqtt_user", fallback=None)
+            mqtt_pass = config["SETUP"].get("mqtt_pass", fallback=None)
             sections.remove("SETUP")
         # Process 'command' sections
         _commands = []
@@ -257,7 +273,13 @@ def main():
                     for op in outputs:
                         # maybe include the command and what the command is im the output
                         # eg QDI run, Display Inverter Default Settings
-                        op.output(data=results, tag=_tag, mqtt_broker=mqtt_broker)
+                        op.output(
+                            data=results,
+                            tag=_tag,
+                            mqtt_broker=mqtt_broker,
+                            mqtt_user=mqtt_user,
+                            mqtt_pass=mqtt_pass,
+                        )
                         # Tell systemd watchdog we are still alive
                         systemd.daemon.notify("WATCHDOG=1")
 
@@ -279,7 +301,13 @@ def main():
                 for op in outputs:
                     # maybe include the command and what the command is im the output
                     # eg QDI run, Display Inverter Default Settings
-                    op.output(data=results, tag=_tag, mqtt_broker=mqtt_broker)
+                    op.output(
+                        data=results,
+                        tag=_tag,
+                        mqtt_broker=mqtt_broker,
+                        mqtt_user=mqtt_user,
+                        mqtt_pass=mqtt_pass,
+                    )
             exit(0)
     else:
         # No configfile specified
@@ -292,8 +320,6 @@ def main():
             args.protocol = get_protocol_for_model(args.model)
         if not args.showraw:
             args.showraw = False
-        if not args.mqttbroker:
-            args.mqttbroker = "localhost"
         if args.printcrc:
             log.info(f"Calculating CRC using protocol {args.protocol}")
             log.error("printcrc option is still todo")
@@ -340,4 +366,10 @@ def main():
         for op in outputs:
             # maybe include the command and what the command is im the output
             # eg QDI run, Display Inverter Default Settings
-            op.output(data=results, tag=tag, mqtt_broker=args.mqttbroker)
+            op.output(
+                data=results,
+                tag=tag,
+                mqtt_broker=mqtt_broker,
+                mqtt_user=mqtt_user,
+                mqtt_pass=mqtt_pass,
+            )

@@ -8,10 +8,19 @@ class mqtt:
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.mqtt __init__ kwargs {kwargs}")
 
-    def output(self, data=None, tag=None, mqtt_broker="localhost"):
+    def output(self, data=None, tag=None, mqtt_broker="localhost", mqtt_user=None, mqtt_pass=None):
         log.info("Using output processor: mqtt")
+
         if data is None:
             return
+
+        if mqtt_user is not None and mqtt_pass is not None:
+            auth = {"username": mqtt_user, "password": mqtt_pass}
+            log.info(f"Using mqtt authentication, username: {mqtt_user}, password: [supplied]")
+        else:
+            log.debug("No mqtt authentication used")
+            auth = None
+
         # Build array of mqtt messages
         msgs = []
         # Remove command and _command_description
@@ -26,4 +35,4 @@ class mqtt:
             msg = {"topic": f"{tag}/status/{key}/value", "payload": value}
             msg = {"topic": f"{tag}/status/{key}/unit", "payload": unit}
             msgs.append(msg)
-        publish.multiple(msgs, hostname=mqtt_broker)
+        publish.multiple(msgs, hostname=mqtt_broker, auth=auth)

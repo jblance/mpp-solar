@@ -7,7 +7,7 @@ class screen:
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.screen __init__ kwargs {kwargs}")
 
-    def output(self, data=None, tag=None, mqtt_broker=None):
+    def output(self, data=None, tag=None, mqtt_broker=None, mqtt_user=None, mqtt_pass=None):
         log.info("Using output processor: screen")
         if not data:
             return
