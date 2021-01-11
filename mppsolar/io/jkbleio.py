@@ -16,36 +16,25 @@ class JkBleIO(BaseIO):
         self._device_path = device_path
         self.maxConnectionAttempts = 3
         self.record = None
-        self._test_data = bytes.fromhex(
-            "55aaeb9002ff5b566240e34e62406e6a62404a506240acd7624011d26240bddd62409ad1624044c86240cedc6240ccc7624079e1624057dc624073a262405f80624088c46240000000000000000000000000000000000000000000000000000000000000000013315c3d0636143d26e0113d8021f03c1153363d8980123d7e7c033dac41233d1ad83c3d9d6f4f3d8eb51e3d6a2c293deb28653d189c523da3724e3deb94493d9ab2c23d00000000000000000000000000000000000000000000000000000000000000001aad62400084053c00000000ffff00000b000000000000000000000000000036a3554c40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000be0b54001456a43fb876a43f00a2"
-        )
 
-    def send_and_receive(self, command, show_raw=False, protocol=None) -> dict:
-        full_command = protocol.get_full_command(command)
-        log.info(f"full command {full_command} for command {command}")
+    def send_and_receive(self, full_command, protocol=None) -> dict:
         # Send the full command via the communications port
         command_defn = protocol.get_command_defn(command)
         record_type = command_defn["record_type"]
         log.debug(f"expected record type {record_type} for command {command}")
 
-        # Need to get response here
-        # response = self._test_data
-
         # Connect to BLE device
-        if self.ble_connect(self._device_path, protocol):
-            response = self.ble_get_data(full_command, record_type)
+        if self.ble_connect(self._device_path, protocol, record_type):
+            response = self.ble_get_data(full_command)
             self.ble_disconnect()
         else:
             print(f"Failed to connect to {self._device_path}")
             response = None
         # End of BLE device connection
         log.debug(f"Raw response {response}")
-        decoded_response = protocol.decode(response, show_raw, command)
-        log.debug(f"Decoded response {decoded_response}")
-        log.info(f"Decoded response {decoded_response}")
-        return decoded_response
+        return response
 
-    def ble_connect(self, mac=None, protocol=None):
+    def ble_connect(self, mac=None, protocol=None, record_type):
         """
         Connect to a BLE device with 'mac' address
         """
@@ -129,5 +118,4 @@ class JkBleIO(BaseIO):
                 continue
 
         log.debug(f"Record now {self.record} len {len(self.record)}")
-        # response = self._test_data
         return self.record[-300:]

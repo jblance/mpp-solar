@@ -7,23 +7,6 @@ from .protocol_helpers import decode4ByteHex, decode2ByteHex, crc8
 
 log = logging.getLogger("MPP-Solar")
 
-# >>> print(f'{151:#04x}')
-# 0x97
-# >>> print(f'{1:#04x}')
-# 0x01
-# >>> print(f'{1:#02x}')
-# 0x1
-# >>> print(f'{1:#04x}')
-# 0x01
-# >>> bytes.fromhex('aa5590eb')
-# b'\xaaU\x90\xeb'
-# getInfo = b'\xaa\x55\x90\xeb\x97\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11'
-# getCellInfo = b'\xaa\x55\x90\xeb\x96\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10'
-# message after 9003
-# aa5590ebc8010100000000000000000000000044
-# 55aaeb90
-# 02 record type
-# b5 counter
 SOR = bytes.fromhex("55aaeb90")
 
 COMMANDS = {
@@ -116,11 +99,6 @@ class jkAbstractProtocol(AbstractProtocol):
         """
         Override the default get_responses as its different for JK
         """
-        # responses = response.split(b" ")
-        # Trim leading '(' of first response
-        # responses[0] = responses[0][1:]
-        # Remove CRC and \r of last response
-        # responses[-1] = responses[-1][:-3]
         return bytearray(response)
 
     def is_record_start(self, record):

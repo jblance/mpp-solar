@@ -35,7 +35,4 @@ class jkBleDelegate(btle.DefaultDelegate):
         if self._protocol.is_record_complete(self.notificationData):
             self._jkbleio.record = self.notificationData
             log.debug("record complete")
-
-
-self.notificationData = bytearray()
-# jkbledelegate.processRecord(record)
+            self.notificationData = bytearray()
