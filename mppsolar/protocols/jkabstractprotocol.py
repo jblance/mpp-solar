@@ -71,6 +71,7 @@ class jkAbstractProtocol(AbstractProtocol):
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
+        log.debug(f"self._command = {self._command}, self._command_defn = {self._command_defn}")
         # End of required variables setting
         if self._command_defn is None:
             # Maybe return a default here?
@@ -92,7 +93,7 @@ class jkAbstractProtocol(AbstractProtocol):
 
     def get_command_defn(self, command):
         log.debug(f"JkBLE get_command_defn for: {command}")
-        if self._command is None:
+        if command is None:
             return None
         super().get_command_defn(command)
 
