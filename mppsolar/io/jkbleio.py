@@ -34,7 +34,7 @@ class JkBleIO(BaseIO):
         log.debug(f"Raw response {response}")
         return response
 
-    def ble_connect(self, mac=None, protocol=None, record_type):
+    def ble_connect(self, mac=None, protocol=None, record_type=0x02):
         """
         Connect to a BLE device with 'mac' address
         """
