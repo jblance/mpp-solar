@@ -65,7 +65,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         else:
             return PORT_TYPE_SERIAL
 
-    def set_protocol(self, protocol=None):
+    def set_protocol(self, protocol=None, **kwargs):
         """
         Set the protocol for this device
         """
@@ -95,7 +95,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         # TODO: fix protocol instantiate
         self._protocol = self._protocol_class("init_var", proto_keyword="value", second_keyword=123)
 
-    def set_port(self, port=None, baud=2400):
+    def set_port(self, port=None, baud=2400, **kwawgs):
         port_type = self.get_port_type(port)
         if port_type == PORT_TYPE_TEST:
             log.info("Using testio for communications")
