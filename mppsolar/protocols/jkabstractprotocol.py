@@ -94,6 +94,7 @@ class jkAbstractProtocol(AbstractProtocol):
     def get_command_defn(self, command):
         log.debug(f"JkBLE get_command_defn for: {command}")
         if command is None:
+            log.debug("get_command_defn: command is None")
             return None
         super().get_command_defn(command)
 
