@@ -12,11 +12,7 @@ class TestIO(BaseIO):
         self._test_data = b"(230.0 50.0 0030 42.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 0 0 1 0 54.0 0 1 000\x9E\x60\r"
         self._counter = 0
 
-    def send_and_receive(self, command, show_raw, protocol) -> dict:
-        full_command = protocol.get_full_command(command)
-        log.info(f"full command {full_command} for command {command}")
-        # Send the full command via the communications port
-        command_defn = protocol.get_command_defn(command)
+    def send_and_receive(self, full_command, command_defn=None) -> dict:
         if command_defn is not None:
             self._test_data = command_defn["test_responses"][
                 random.randrange(len(command_defn["test_responses"]))
@@ -24,12 +20,4 @@ class TestIO(BaseIO):
         response = self._test_data
         # response = b"(PI30\x9a\x0b\r"
         log.debug(f"Raw response {response}")
-        decoded_response = protocol.decode(response, show_raw)
-        # _response = response.decode('utf-8')
-        log.debug(f"Decoded response {decoded_response}")
-        # add command name and description to response
-        decoded_response["_command"] = command
-        if command_defn is not None:
-            decoded_response["_command_description"] = command_defn["description"]
-        log.info(f"Decoded response {decoded_response}")
-        return decoded_response
+        return response
