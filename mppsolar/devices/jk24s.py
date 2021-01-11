@@ -7,9 +7,10 @@ log = logging.getLogger("MPP-Solar")
 
 class jk24s(AbstractDevice):
     def __init__(self, *args, **kwargs) -> None:
+        super().__init__()
         self._name = kwargs["name"]
-        self.set_port(port=kwargs["port"], baud=kwargs["baud"])
-        self.set_protocol(protocol=kwargs["protocol"])
+        self.set_port(**kwargs)
+        self.set_protocol(**kwargs)
         log.debug(f"jk24s __init__ name {self._name}, port {self._port}, protocol {self._protocol}")
         log.debug(f"jk24s __init__ args {args}")
         log.debug(f"jk24s __init__ kwargs {kwargs}")

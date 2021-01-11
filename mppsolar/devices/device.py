@@ -95,7 +95,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         # TODO: fix protocol instantiate
         self._protocol = self._protocol_class("init_var", proto_keyword="value", second_keyword=123)
 
-    def set_port(self, port=None, baud=None):
+    def set_port(self, port=None, baud=2400):
         port_type = self.get_port_type(port)
         if port_type == PORT_TYPE_TEST:
             log.info("Using testio for communications")
@@ -136,7 +136,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         return result
 
     @abc.abstractmethod
-    def run_command(self, command=None, show_raw=False):
+    def run_command(self, command, show_raw=False):
         raise NotImplementedError
 
     @abc.abstractmethod

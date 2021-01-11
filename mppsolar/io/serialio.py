@@ -10,10 +10,7 @@ log = logging.getLogger("MPP-Solar")
 class SerialIO(BaseIO):
     def __init__(self, device_path, serial_baud) -> None:
         self._serial_port = device_path
-        if serial_baud is None:
-            self._serial_baud = 2400
-        else:
-            self._serial_baud = serial_baud
+        self._serial_baud = serial_baud
 
     def send_and_receive(self, command, show_raw, protocol) -> dict:
         full_command = protocol.get_full_command(command)
