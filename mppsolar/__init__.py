@@ -166,11 +166,6 @@ def main():
     parser.add_argument("--listknown", action="store_true", help="List known commands")
     parser.add_argument("--getstatus", action="store_true", help="Get Inverter Status")
     parser.add_argument("--getsettings", action="store_true", help="Get Inverter Settings")
-    parser.add_argument(
-        "--printcrc",
-        action="store_true",
-        help="Display the command and crc and nothing else",
-    )
 
     parser.add_argument("-R", "--showraw", action="store_true", help="Display the raw results")
     parser.add_argument("-v", "--version", action="store_true", help="Display the version")
@@ -320,19 +315,7 @@ def main():
             args.protocol = get_protocol_for_model(args.model)
         if not args.showraw:
             args.showraw = False
-        if args.printcrc:
-            log.info(f"Calculating CRC using protocol {args.protocol}")
-            log.error("printcrc option is still todo")
-            # TODO: calc CRC
-            # _command = mp.getFullCommand(args.command)
-            # if _command:
-            #     print('{}'.format(_command.byte_command))
-            # else:
-            #     [crca, crcb] = mppcommand.crc(args.command)  # noqa: F821
-            #     print("{0} {1:#x} {2:#x}".format(args.command, crca, crcb))
-            exit(1)
 
-        #
         # create instance of device (supplying port + protocol types)
         log.info(
             f'Creating device "{args.name}" (type: "{args.type}") on port "{args.port}" using protocol "{args.protocol}" for command "{args.command}" (tag: {tag})'
