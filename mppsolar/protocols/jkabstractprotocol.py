@@ -74,6 +74,7 @@ class jkAbstractProtocol(AbstractProtocol):
         # End of required variables setting
         if self._command_defn is None:
             # Maybe return a default here?
+            log.debug("No command_defn found")
             return None
         if "command_code" in self._command_defn:
             # full command is 20 bytes long
