@@ -135,6 +135,30 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             result[command] = [self._protocol.COMMANDS[command]["description"], ""]
         return result
 
+    def run_commands(self, commands) -> dict:
+        """
+        Run multiple commands sequentially
+        :param commands: List of commands to run, either with or without an alias.
+        If an alias is provided, it will be substituted in place of cmd name in the returned dict
+        Additional elements in the tuple will be passed to run_command as ordered
+        Example: ['QPIWS', ...] or [('QPIWS', 'ALIAS'), ...] or [('QPIWS', 'ALIAS', True), ...] or mix and match
+        :return: Dictionary of responses
+        """
+        responses = {}
+        for i, command in enumerate(commands):
+            if isinstance(command, str):
+                responses[command] = self.run_command(command)
+            elif isinstance(command, tuple) and len(command) > 0:
+                if len(command) == 1:  # Treat as string
+                    responses[command[0]] = self.run_command(command[0])
+                elif len(command) == 2:
+                    responses[command[1]] = self.run_command(command[0])
+                else:
+                    responses[command[1]] = self.run_command(command[0], *command[2:])
+            else:
+                responses["Command {:d}".format(i)] = {"ERROR": ["Unknown command format", "(Indexed from 0)"]}
+        return responses
+
     @abc.abstractmethod
     def run_command(self, command, show_raw=False):
         raise NotImplementedError
