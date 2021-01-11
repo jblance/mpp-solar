@@ -2,7 +2,7 @@ import logging
 
 from .device import AbstractDevice
 from ..io.testio import TestIO
-from ..io.testio import JkBleIO
+from ..io.jkbleio import JkBleIO
 
 log = logging.getLogger("MPP-Solar")
 
