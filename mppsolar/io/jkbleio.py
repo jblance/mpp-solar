@@ -17,7 +17,7 @@ class JkBleIO(BaseIO):
         self.maxConnectionAttempts = 3
         self.record = None
 
-    def send_and_receive(self, full_command, protocol=None) -> dict:
+    def send_and_receive(self, command, protocol=None) -> dict:
         # Send the full command via the communications port
         full_command = protocol.get_full_command(command)
         log.info(f"full command {full_command} for command {command}")
