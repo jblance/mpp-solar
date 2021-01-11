@@ -63,6 +63,9 @@ for when you want to keep the install and dependencies separate from the rest of
 
 see worked example [here](docs/venv.md)
 
+## Troubleshooting ##
+ [Troubleshooting](docs/troubleshooting.md)
+
 ## MQTT / Influx / Grafana Setup ##
 Instruction of one way of connecting the inverter output to Grafana
 [Setup Instructions](docs/MQTT_Influx_Grafana.md)

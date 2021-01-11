@@ -18,3 +18,4 @@ File | Comment | Source
 
 * [Inverter to Grafana via MQTT, Telegraf and InfluxDB](MQTT_Influx_Grafana.md)
 * [Ubuntu Install](ubuntu_install.md)
+* [Troubleshooting](troubleshooting.md)

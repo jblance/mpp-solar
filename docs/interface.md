@@ -74,7 +74,7 @@ decoded_response = protocol.decode(response_line, show_raw)
 ## OUTPUTS ##
 * Define a single function:
 ```
-output(self, data, tag, mqtt_broker) -> None
+output(self, data, tag, mqtt_broker, mqtt_user, mqtt_pass) -> None
 ```
 This function performs the outputing of the data and expects a dict like below (for a simple response)
 `{'serial_number': ['9293333010501', ''], '_command': 'QID', '_command_description': 'Device Serial Number inquiry'}`

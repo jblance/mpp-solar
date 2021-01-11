@@ -71,12 +71,3 @@ number_of_mpp_trackers        	1
 machine_type                  	Hybrid         	    
 topology                      	transformerless
 ```
-
-## Allowing non-root use of hidraw ##
-
-- if you want to be able to use a hidraw device as pi (or other users)
-- create a file `/etc/udev/rules.d/99-hidraw.rules` with the below as the content
-  ```
-  KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="plugdev"
-  ```
-  - after a restart (or replug of the USB cable) any user of the plugdev group will be able to read from/write to any /dev/hidraw device
