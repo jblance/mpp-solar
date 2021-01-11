@@ -11,7 +11,7 @@ getInfo = b"\xaa\x55\x90\xeb\x97\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00
 
 
 class JkBleIO(BaseIO):
-    def __init__(self, name, device_path, protocol, baud) -> None:
+    def __init__(self, device_path, protocol) -> None:
         self._device = None
         self._device_path = device_path
         self.maxConnectionAttempts = 3
