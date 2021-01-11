@@ -30,5 +30,11 @@ crw-rw---- 1 root plugdev 245, 0 Oct 15 03:17 /dev/hidraw0
 ### Troubleshooting ###
 * Make sure the JK App is getting data correctly
 * Do a BLE scan (outside of python) `sudo hcitool lescan`
+```
+$ sudo hcitool lescan
+LE Scan ...
+3C:A5:09:0A:AA:AA (unknown)
+3C:A5:09:0A:AA:AA JK-B2A24S
+```
 * Try debuging without `mpp-solar -p <mac address> -P JK04 -D`
 * Log an issue with the above information

@@ -19,6 +19,9 @@ class JkBleIO(BaseIO):
 
     def send_and_receive(self, full_command, protocol=None) -> dict:
         # Send the full command via the communications port
+        full_command = protocol.get_full_command(command)
+        log.info(f"full command {full_command} for command {command}")
+
         command_defn = protocol.get_command_defn(command)
         record_type = command_defn["record_type"]
         log.debug(f"expected record type {record_type} for command {command}")
