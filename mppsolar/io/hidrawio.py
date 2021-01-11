@@ -13,18 +13,14 @@ class HIDRawIO(BaseIO):
         # self._fd = os.open(device_path, flags=os.O_RDWR | os.O_NONBLOCK)
         self._device = device_path
 
-    def send_and_receive(self, command, show_raw, protocol) -> dict:
-        full_command = protocol.get_full_command(command)
-        log.info(f"full command {full_command} for command {command}")
-        command_defn = protocol.get_command_defn(command)
-
+    def send_and_receive(self, full_command) -> dict:
         response_line = bytes()
         usb0 = None
         try:
             usb0 = os.open(self._device, os.O_RDWR | os.O_NONBLOCK)
         except Exception as e:
             log.debug("USB open error: {}".format(e))
-            return command
+            return {"ERROR": ["USB open error: {}".format(e), ""]}
         # Send the command to the open usb connection
         to_send = full_command
         try:
@@ -70,12 +66,4 @@ class HIDRawIO(BaseIO):
                 break
         log.debug("usb response was: %s", response_line)
         os.close(usb0)
-        decoded_response = protocol.decode(response_line, show_raw)
-        # _response = response.decode('utf-8')
-        log.debug(f"Decoded response {decoded_response}")
-        # add command name and description to response
-        decoded_response["_command"] = command
-        if command_defn is not None:
-            decoded_response["_command_description"] = command_defn["description"]
-        log.info(f"Decoded response {decoded_response}")
-        return decoded_response
+        return response_line

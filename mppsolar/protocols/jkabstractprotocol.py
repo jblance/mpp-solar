@@ -106,6 +106,12 @@ class jkAbstractProtocol(AbstractProtocol):
             return cmd
         return None
 
+    def get_command_defn(self, command):
+        log.debug(f"JkBLE get_command_defn for: {command}")
+        if self._command is None:
+            return None
+        super().get_command_defn(command)
+
     def get_responses(self, response):
         """
         Override the default get_responses as its different for JK
@@ -146,7 +152,7 @@ class jkAbstractProtocol(AbstractProtocol):
                 return True
         return False
 
-    def decode(self, response, show_raw) -> dict:
+    def decode(self, response, show_raw, command) -> dict:
         msgs = {}
         log.info(f"response passed to decode: {response}")
         # No response
@@ -166,22 +172,28 @@ class jkAbstractProtocol(AbstractProtocol):
             msgs["raw_response"] = [raw_response, ""]
             return msgs
 
+        command_defn = self.get_command_defn(command)
+        # Add metadata
+        msgs["_command"] = command
+        if command_defn is not None:
+            msgs["_command_description"] = command_defn["description"]
+
         # Check for a stored command definition
-        if not self._command_defn:
+        if not command_defn:
             # No definiution, so just return the data
             len_command_defn = 0
-            log.debug(f"No definition for command {self._command}, raw response returned")
+            log.debug(f"No definition for command {command}, raw response returned")
             msgs["ERROR"] = [
-                f"No definition for command {self._command} in protocol {self._protocol_id}",
+                f"No definition for command {command} in protocol {self._protocol_id}",
                 "",
             ]
         else:
-            len_command_defn = len(self._command_defn["response"])
+            len_command_defn = len(command_defn["response"])
             # Decode response based on stored command definition
             responses = self.get_responses(response)
             log.debug(f"Length of responses {len(responses)}")
 
-            for defn in self._command_defn["response"]:
+            for defn in command_defn["response"]:
                 log.debug(f"Processing defn {defn}")
                 # ["hex", 4, "Header", ""]
                 if defn[0] == "hex":

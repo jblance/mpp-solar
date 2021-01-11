@@ -1,15 +1,18 @@
 import logging
 
 from .device import AbstractDevice
+from ..io.jkbleio import JkBleIO
+from ..io.testio import TestIO
 
 log = logging.getLogger("MPP-Solar")
 
 
 class jk24s(AbstractDevice):
     def __init__(self, *args, **kwargs) -> None:
+        super().__init__()
         self._name = kwargs["name"]
-        self.set_port(port=kwargs["port"], baud=kwargs["baud"])
-        self.set_protocol(protocol=kwargs["protocol"])
+        self.set_port(**kwargs)
+        self.set_protocol(**kwargs)
         log.debug(f"jk24s __init__ name {self._name}, port {self._port}, protocol {self._protocol}")
         log.debug(f"jk24s __init__ args {args}")
         log.debug(f"jk24s __init__ kwargs {kwargs}")
@@ -38,9 +41,27 @@ class jk24s(AbstractDevice):
                 ]
             }
 
-        response = self._port.send_and_receive(command, show_raw, self._protocol)
-        log.debug(f"Send and Receive Response {response}")
-        return response
+        if isinstance(self._port, JkBleIO):  # JkBleIO is very different from the others
+            decoded_response = self._port.send_and_receive(command, show_raw, self._protocol)
+        else:  # Copy-pasted from default protocol
+            full_command = self._protocol.get_full_command(command)
+            log.info(f"full command {full_command} for command {command}")
+            # Band-aid solution, can't really segregate TestIO from protocols w/o major rework of TestIO
+            if isinstance(self._port, TestIO):
+                raw_response = self._port.send_and_receive(full_command,
+                                                           self._protocol.get_command_defn(command))
+            else:
+                raw_response = self._port.send_and_receive(full_command)
+            log.debug(f"Send and Receive Response {raw_response}")
+
+            # Handle errors; dict is returned on exception
+            if isinstance(raw_response, dict):
+                return raw_response
+
+            decoded_response = self._protocol.decode(raw_response, show_raw, command)
+
+        log.debug(f"Send and Receive Response {decoded_response}")
+        return decoded_response
 
     def get_status(self, show_raw) -> dict:
         # Run all the commands that are defined as status from the protocol definition

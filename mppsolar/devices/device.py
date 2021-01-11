@@ -65,7 +65,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         else:
             return PORT_TYPE_SERIAL
 
-    def set_protocol(self, protocol=None):
+    def set_protocol(self, protocol=None, **kwargs):
         """
         Set the protocol for this device
         """
@@ -95,7 +95,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         # TODO: fix protocol instantiate
         self._protocol = self._protocol_class("init_var", proto_keyword="value", second_keyword=123)
 
-    def set_port(self, port=None, baud=None):
+    def set_port(self, port=None, baud=2400, **kwawgs):
         port_type = self.get_port_type(port)
         if port_type == PORT_TYPE_TEST:
             log.info("Using testio for communications")
@@ -135,8 +135,32 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             result[command] = [self._protocol.COMMANDS[command]["description"], ""]
         return result
 
+    def run_commands(self, commands) -> dict:
+        """
+        Run multiple commands sequentially
+        :param commands: List of commands to run, either with or without an alias.
+        If an alias is provided, it will be substituted in place of cmd name in the returned dict
+        Additional elements in the tuple will be passed to run_command as ordered
+        Example: ['QPIWS', ...] or [('QPIWS', 'ALIAS'), ...] or [('QPIWS', 'ALIAS', True), ...] or mix and match
+        :return: Dictionary of responses
+        """
+        responses = {}
+        for i, command in enumerate(commands):
+            if isinstance(command, str):
+                responses[command] = self.run_command(command)
+            elif isinstance(command, tuple) and len(command) > 0:
+                if len(command) == 1:  # Treat as string
+                    responses[command[0]] = self.run_command(command[0])
+                elif len(command) == 2:
+                    responses[command[1]] = self.run_command(command[0])
+                else:
+                    responses[command[1]] = self.run_command(command[0], *command[2:])
+            else:
+                responses["Command {:d}".format(i)] = {"ERROR": ["Unknown command format", "(Indexed from 0)"]}
+        return responses
+
     @abc.abstractmethod
-    def run_command(self, command=None, show_raw=False):
+    def run_command(self, command, show_raw=False):
         raise NotImplementedError
 
     @abc.abstractmethod
