@@ -121,3 +121,27 @@ To check whether your service is enabled, use
 ```
 mpp-solar.service              enabled
 ```
+
+# Creating a System Service #
+Once you have a working user service you can turn it into a system service. Remember, however, that system services run in the system's central systemd instance and have a greater potential for disturbing your system's stability or security when not implemented correctly. In many cases, this step isn't really necessary and a user service will do just fine.
+
+## Stopping and Disabling the User Service ##
+Before turning our service into a system service let's make sure that its stopped and disabled. Otherwise we might end up with both a user service and a system service.
+```
+$ systemctl --user stop mpp-solar
+$ systemctl --user disable mpp-solar
+```
+## Moving the Unit File ##
+/etc/systemd/user/mpp-solar.service
+Previously, we stored our unit file in a directory appropriate for user services (`/etc/systemd/user/mpp-solar.service`). As with user unit files, systemd looks into more than one directory for system unit files. We'll be using `/etc/systemd/user/mpp-solar.service`, so move your unit file there and make sure that it has the right permissions
+```
+$ sudo mv /etc/systemd/user/mpp-solar.service /etc/systemd/system/
+$ sudo chown root:root /etc/systemd/system/mpp-solar.service
+$ sudo chmod 644 /etc/systemd/system/mpp-solar.service
+```
+Our service is now a system service! This also means that instead of using `systemctl --user ...` we will now use `systemctl ...` (without the `--user` option) instead (or `sudo systemctl ...` if we're modifying something). For example:
+```
+$ systemctl list-unit-files | grep mpp-solar
+python_demo_service.service                disabled
+```
+Similarly, use `journalctl --unit mpp-solar` to display the system service's logs.
