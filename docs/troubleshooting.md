@@ -19,3 +19,16 @@
 ```
 crw-rw---- 1 root plugdev 245, 0 Oct 15 03:17 /dev/hidraw0
 ```
+
+## JKBMS ##
+
+### Requirements ###
+* bluepy `sudo pip3 install bluepy`
+* paho-mqtt if publishing to MQTT `sudo pip3 install paho-mqtt`
+* a device with BLE support (Raspberry Pi 3 or 4 have BLE builtin)
+
+### Troubleshooting ###
+* Make sure the JK App is getting data correctly
+* Do a BLE scan (outside of python) `sudo hcitool lescan`
+* Try debuging without `mpp-solar -p <mac address> -P JK04 -D`
+* Log an issue with the above information
