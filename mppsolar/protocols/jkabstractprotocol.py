@@ -96,7 +96,7 @@ class jkAbstractProtocol(AbstractProtocol):
         if command is None:
             log.debug("get_command_defn: command is None")
             return None
-        super().get_command_defn(command)
+        return super().get_command_defn(command)
 
     def get_responses(self, response):
         """
