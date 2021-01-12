@@ -36,13 +36,13 @@ class influx2_mqtt:
             # Message format is: mpp-solar,command=QPGS0 max_charger_range=120.0
             if isinstance(value, int) or isinstance(value, float):
                 msg = {
-                    "topic": "mppsolar",
-                    "payload": f"mppsolar,command={tag} {key}={value}",
+                    "topic": "mpp-solar",
+                    "payload": f"mpp-solar,command={tag} {key}={value}",
                 }
             else:
                 msg = {
-                    "topic": "mppsolar",
-                    "payload": f"mppsolar,command={tag} {key}='{value}'",
+                    "topic": "mpp-solar",
+                    "payload": f"mpp-solar,command={tag} {key}='{value}'",
                 }
             msgs.append(msg)
         publish.multiple(msgs, hostname=mqtt_broker, auth=auth)
