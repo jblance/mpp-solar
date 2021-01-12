@@ -2,7 +2,7 @@ import logging
 
 from .device import AbstractDevice
 from ..io.testio import TestIO
-from ..io.jkbleio import JkBleIO
+
 
 log = logging.getLogger("MPP-Solar")
 
@@ -50,12 +50,12 @@ class mppsolar(AbstractDevice):
         log.info(f"full command {full_command} for command {command}")
 
         # JkBleIO is very different from the others, only has protocol jk02 and jk04, maybe change full_command?
-        if isinstance(self._port, JkBleIO):
-            # need record type, SOR
-            raw_response = self._port.send_and_receive(command, self._protocol)
+        # if isinstance(self._port, JkBleIO):
+        # need record type, SOR
+        #    raw_response = self._port.send_and_receive(command, self._protocol)
 
         # Band-aid solution, can't really segregate TestIO from protocols w/o major rework of TestIO
-        elif isinstance(self._port, TestIO):
+        if isinstance(self._port, TestIO):
             raw_response = self._port.send_and_receive(
                 full_command, self._protocol.get_command_defn(command)
             )
