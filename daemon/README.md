@@ -145,3 +145,25 @@ $ systemctl list-unit-files | grep mpp-solar
 python_demo_service.service                disabled
 ```
 Similarly, use `journalctl --unit mpp-solar` to display the system service's logs.
+
+
+## troubleshooting ##
+```
+Traceback (most recent call last):
+  File "/home/pi/venv/mppsolar/bin/mpp-solar", line 11, in <module>
+    load_entry_point('mpp-solar', 'console_scripts', 'mpp-solar')()
+  File "/home/pi/venv/mppsolar/src/mpp-solar/mppsolar/__init__.py", line 211, in main
+    systemd.daemon.notify("READY=1")
+  File "/home/pi/venv/mppsolar/lib/python3.7/site-packages/systemd/daemon.py", line 39, in notify
+    raise TypeError("state must be an instance of Notification")
+TypeError: state must be an instance of Notification
+```
+have systemd instead of systemd-python
+$ pip uninstall systemd
+$ pip install systemd-python
+Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
+Collecting systemd-python
+  Downloading https://www.piwheels.org/simple/systemd-python/systemd_python-234-cp37-cp37m-linux_armv7l.whl (179kB)
+    100% |████████████████████████████████| 184kB 51kB/s
+Installing collected packages: systemd-python
+Successfully installed systemd-python-234
