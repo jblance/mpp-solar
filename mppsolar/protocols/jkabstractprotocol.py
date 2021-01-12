@@ -122,7 +122,7 @@ class jkAbstractProtocol(AbstractProtocol):
         """"""
         # check record starts with 'SOR'
         if not self.is_record_start(record):
-            log.error("No SOR found in record looking for completeness")
+            log.debug("No SOR found in record looking for completeness")
             return False
         # check that length one of the valid lengths (300, 320)
         if len(record) == 300 or len(record) == 320:
