@@ -24,7 +24,7 @@ class SerialIO(BaseIO):
                 s.flushOutput()
                 s.write(full_command)
                 time.sleep(0.1)  # give serial port time to receive the data
-                response_line = s.read_until(expected=b"\r")
+                response_line = s.read_until(b"\r")
                 log.debug("serial response was: %s", response_line)
                 return response_line
         except Exception as e:
