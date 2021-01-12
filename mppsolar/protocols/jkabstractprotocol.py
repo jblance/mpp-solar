@@ -214,14 +214,18 @@ class jkAbstractProtocol(AbstractProtocol):
                     msgs[defn[2]] = [uptime, defn[3]]
                 elif defn[0] == "discard":
                     log.debug(f"Discarding {defn[1]} values")
-                    discard = responses[: defn[1]]
-                    responses = responses[defn[1] :]
-                    log.debug(f"Discarded {discard}")
+                    value = ""
+                    for x in range(defn[1]):
+                        value += f"{responses.pop(0):02x}"
+                    log.debug(f"Discarded {value}")
                     if defn[2] != "":
-                        msgs[defn[2]] = [f"{str(discard)}", defn[3]]
+                        msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "int":
                     log.debug("int defn")
                     msgs[defn[2]] = [responses.pop(0), defn[3]]
+                elif defn[0] == "int+":
+                    log.debug("int+ defn")
+                    msgs[defn[2]] = [responses.pop(0) + 1, defn[3]]
                 elif defn[0] == "16Int":
                     log.debug("16Int defn")
                     value = responses.pop(0) * 256
