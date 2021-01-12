@@ -215,9 +215,10 @@ class jkAbstractProtocol(AbstractProtocol):
                 elif defn[0] == "discard":
                     log.debug(f"Discarding {defn[1]} values")
                     discard = responses[: defn[1]]
-                    log.debug(f"Discarded {discard}")
-                    msgs[defn[2]] = [f"{str(discard)}", defn[3]]
                     responses = responses[defn[1] :]
+                    log.debug(f"Discarded {discard}")
+                    if defn[3]:
+                        msgs[defn[2]] = [f"{str(discard)}", defn[3]]
                 elif defn[0] == "int":
                     log.debug("int defn")
                     msgs[defn[2]] = [responses.pop(0), defn[3]]
