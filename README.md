@@ -1,9 +1,6 @@
 # MPP Solar Inverter Python Package
 
-## Note refactor underway - code likely broken / changing
-use the 'stable' release [0.4.6](https://github.com/jblance/mpp-solar/releases/tag/v0.4.6)
-
-_Note: python2 no longer supported_
+__Note: python < v3.6 not supported__
 
 [![Build Status](https://travis-ci.org/jblance/mpp-solar.svg?branch=master)](https://travis-ci.org/jblance/mpp-solar)
 [![Coverage Status](https://coveralls.io/repos/github/jblance/mpp-solar/badge.svg?branch=master)](https://coveralls.io/github/jblance/mpp-solar?branch=master)
