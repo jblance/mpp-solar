@@ -1,0 +1,32 @@
+# systemd unit file for the JKBMS Service
+#
+# needs to go to /etc/systemd/user/*
+
+[Unit]
+# Human readable name of the unit
+Description=JKBMS Service
+
+
+[Service]
+# Command to execute when the service is started
+ExecStart=/usr/bin/python3 /usr/local/bin/jkms -C /etc/jkbms/jkbms.conf --daemon
+
+# Disable Python's buffering of STDOUT and STDERR, so that output from the
+# service shows up immediately in systemd's logs
+Environment=PYTHONUNBUFFERED=1
+
+# Automatically restart the service if it crashes
+Restart=always
+WatchdogSec=300
+
+# Our service will notify systemd once it is up and running
+Type=notify
+
+# Use a dedicated user to run our service
+# User=jkbms_service
+
+
+[Install]
+# Tell systemd to automatically start this service when the system boots
+# (assuming the service is enabled)
+WantedBy=default.target

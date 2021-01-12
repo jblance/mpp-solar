@@ -184,6 +184,7 @@ def main():
 
     args = parser.parse_args()
     called_name = parser.prog.replace("-", "")
+    log_name = called_name.upper()
 
     # Display verison if asked
     log.info(description)
@@ -209,7 +210,7 @@ def main():
 
         # Tell systemd that our service is ready
         systemd.daemon.notify("READY=1")
-        print("MPP-Solar-Service: Initializing ...")
+        print(f"{log_name}-Service: Initializing ...")
         # set some default-defaults
         pause = 60
 
@@ -252,10 +253,10 @@ def main():
             _commands.append((device, command, tag, outputs))
 
         if args.daemon:
-            print(f"MPP-Solar-Service: Config file: {args.configfile}")
-            print(f"MPP-Solar-Service: Config setting - pause: {pause}")
-            print(f"MPP-Solar-Service: Config setting - mqtt_broker: {mqtt_broker}")
-            print(f"MPP-Solar-Service: Config setting - command sections found: {len(sections)}")
+            print(f"{log_name}-Service: Config file: {args.configfile}")
+            print(f"{log_name}-Service: Config setting - pause: {pause}")
+            print(f"{log_name}-Service: Config setting - mqtt_broker: {mqtt_broker}")
+            print(f"{log_name}-Service: Config setting - command sections found: {len(sections)}")
 
             while True:
                 # Loop through the configured commands
@@ -264,7 +265,7 @@ def main():
                     # Tell systemd watchdog we are still alive
                     systemd.daemon.notify("WATCHDOG=1")
                     print(
-                        f"MPP-Solar-Service: Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
+                        f"{log_name}-Service: Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
                     )
                     results = _device.run_command(command=_command, show_raw=False)
                     # send to output processor(s)
@@ -282,7 +283,7 @@ def main():
                         # Tell systemd watchdog we are still alive
                         systemd.daemon.notify("WATCHDOG=1")
 
-                print("MPP-Solar-Service: sleeping for {}sec".format(pause))
+                print(f"{log_name}-Service: sleeping for {pause} sec")
                 time.sleep(pause)
 
         else:

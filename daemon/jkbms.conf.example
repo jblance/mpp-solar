@@ -1,0 +1,14 @@
+[SETUP]
+# Number of seconds to pause between command execution loop
+# 0 is no pause, greater than 60 will cause service restarts
+pause=5
+mqtt_broker=localhost
+
+# This example would work on 2x PIP4048 installed in parallel
+[Inverter_1]
+protocol=JK04
+port=3C:A5:09:0A:AA:AA
+baud=2400
+command=getCellData
+tag=CellData
+outputs=screen
