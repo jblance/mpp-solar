@@ -42,7 +42,7 @@ class influx2_mqtt:
             else:
                 msg = {
                     "topic": "mpp-solar",
-                    "payload": f"mpp-solar,command={tag} {key}='{value}'",
+                    "payload": f'mpp-solar,command={tag} {key}="{value}"',
                 }
             msgs.append(msg)
         publish.multiple(msgs, hostname=mqtt_broker, auth=auth)
