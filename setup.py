@@ -85,6 +85,7 @@ setup(
     entry_points={
         "console_scripts": [
             "mpp-solar=mppsolar:main",
+            "jkbms=mppsolar:main",
         ],
     },
     test_suite="tests.get_tests",
