@@ -217,7 +217,7 @@ class jkAbstractProtocol(AbstractProtocol):
                     discard = responses[: defn[1]]
                     responses = responses[defn[1] :]
                     log.debug(f"Discarded {discard}")
-                    if defn[3]:
+                    if defn[3] != "":
                         msgs[defn[2]] = [f"{str(discard)}", defn[3]]
                 elif defn[0] == "int":
                     log.debug("int defn")
