@@ -62,7 +62,7 @@ setup(
     include_package_data=True,
     data_files=[
         ("/etc/systemd/user", ["daemon/mpp-solar.service"]),
-        ("/etc/systemd/user", ["daemon/jkbmd.service"]),
+        ("/etc/systemd/user", ["daemon/jkbms.service"]),
         ("/etc/mpp-solar", ["daemon/mpp-solar.conf.example"]),
         ("/etc/jkbms", ["daemon/jkbms.conf.example"]),
     ],
