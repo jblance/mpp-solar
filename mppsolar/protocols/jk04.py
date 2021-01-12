@@ -24,7 +24,7 @@ NEW_COMMANDS = {
             ["hex", 4, "Unknown", ""],
             ["hex", 4, "unk1", ""],
             ["hex", 4, "unk2", ""],
-            ["hex", 4, "unk3", ""],
+            ["4ByteHexU", 1, "unk3", ""],
             ["discard", 4, "disc", ""],
             ["hex", 4, "unk4", ""],
             ["4ByteHexU", 1, "Unknown1", ""],
