@@ -11,15 +11,14 @@
 ## mpp-solar arguments
 `$ mpp-solar -h`
 ```
-sage: mpp-solar [-h] [-n NAME] [-t TYPE] [-p PORT] [-P {PI00,PI16,PI18,PI30,PI41}] [-T TAG] [-b BAUD] [-M MODEL] [-o OUTPUT] [-q MQTTBROKER] [-c COMMAND]
-                 [-C CONFIGFILE] [--daemon] [--listknown] [--getstatus] [--getsettings] [--printcrc] [-R] [-v] [-D] [-I]
+usage: mpp-solar [-h] [-n NAME] [-p PORT] [-P {PI00,PI16,PI18,PI30,PI41}] [-T TAG] [-b BAUD] [-M MODEL] [-o OUTPUT] [-q MQTTBROKER] [--mqttuser MQTTUSER]
+                 [--mqttpass MQTTPASS] [-c COMMAND] [-C CONFIGFILE] [--daemon] [--listknown] [--getstatus] [--getsettings] [-R] [-v] [-D] [-I]
 
-MPP Solar Command Utility, version: 0.7.4, Refactored version - not backwards compatible, refactor mpp-solar-service
+Solar Device Command Utility, version: 0.7.15, recent changes: remove JKBLE temporarily
 
 optional arguments:
   -h, --help            show this help message and exit
   -n NAME, --name NAME  Specifies the device name - used to differentiate different devices
-  -t TYPE, --type TYPE  Specifies the device type (default: mppsolar)
   -p PORT, --port PORT  Specifies the device communications port (/dev/ttyUSB0 [default], /dev/hidraw0, test, ...)
   -P {PI00,PI16,PI18,PI30,PI41}, --protocol {PI00,PI16,PI18,PI30,PI41}
                         Specifies the device command and response protocol, (default: PI30)
@@ -32,6 +31,8 @@ optional arguments:
                         hass_mqtt)
   -q MQTTBROKER, --mqttbroker MQTTBROKER
                         Specifies the mqtt broker to publish to if using a mqtt output (localhost [default], hostname, ip.add.re.ss ...)
+  --mqttuser MQTTUSER   Specifies the username to use for authenticated mqtt broker publishing
+  --mqttpass MQTTPASS   Specifies the password to use for authenticated mqtt broker publishing
   -c COMMAND, --command COMMAND
                         Command to run
   -C CONFIGFILE, --configfile CONFIGFILE
@@ -40,12 +41,10 @@ optional arguments:
   --listknown           List known commands
   --getstatus           Get Inverter Status
   --getsettings         Get Inverter Settings
-  --printcrc            Display the command and crc and nothing else
   -R, --showraw         Display the raw results
   -v, --version         Display the version
   -D, --debug           Enable Debug and above (i.e. all) messages
   -I, --info            Enable Info and above level messages
-
 
 ```
 
@@ -70,4 +69,70 @@ battery_voltage_rating        	48.0           	V
 number_of_mpp_trackers        	1              	    
 machine_type                  	Hybrid         	    
 topology                      	transformerless
+```
+
+
+# JKBMS Usage #
+```
+$ jkbms -h
+usage: jkbms [-h] [-n NAME] [-p PORT] [-P {JK02,JK04,JK485}] [-T TAG] [-b BAUD] [-M MODEL] [-o OUTPUT] [-q MQTTBROKER] [--mqttuser MQTTUSER] [--mqttpass MQTTPASS]
+             [-c COMMAND] [-C CONFIGFILE] [--daemon] [--listknown] [--getstatus] [--getsettings] [-R] [-v] [-D] [-I]
+
+Solar Device Command Utility, version: 0.7.15, recent changes: remove JKBLE temporarily
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -n NAME, --name NAME  Specifies the device name - used to differentiate different devices
+  -p PORT, --port PORT  Specifies the device communications port (/dev/ttyUSB0 [default], /dev/hidraw0, test, ...)
+  -P {JK02,JK04,JK485}, --protocol {JK02,JK04,JK485}
+                        Specifies the device command and response protocol, (default: JK04)
+  -T TAG, --tag TAG     Override the command name and use this instead (for mqtt and influx type output processors)
+  -b BAUD, --baud BAUD  Baud rate for serial communications (default: 2400)
+  -M MODEL, --model MODEL
+                        Specifies the inverter model to select commands for, defaults to "standard", currently supports LV5048
+  -o OUTPUT, --output OUTPUT
+                        Specifies the output processor(s) to use [comma separated if multiple] (screen [default], influx_mqtt, influx2_mqtt, mqtt, hass_config,
+                        hass_mqtt)
+  -q MQTTBROKER, --mqttbroker MQTTBROKER
+                        Specifies the mqtt broker to publish to if using a mqtt output (localhost [default], hostname, ip.add.re.ss ...)
+  --mqttuser MQTTUSER   Specifies the username to use for authenticated mqtt broker publishing
+  --mqttpass MQTTPASS   Specifies the password to use for authenticated mqtt broker publishing
+  -c COMMAND, --command COMMAND
+                        Command to run
+  -C CONFIGFILE, --configfile CONFIGFILE
+                        Full location of config file
+  --daemon              Run as daemon
+  --listknown           List known commands
+  --getstatus           Get Inverter Status
+  --getsettings         Get Inverter Settings
+  -R, --showraw         Display the raw results
+  -v, --version         Display the version
+  -D, --debug           Enable Debug and above (i.e. all) messages
+  -I, --info            Enable Info and above level messages
+  ```
+
+```
+$ jkbms --listknown -P JK02
+Parameter                     	Value           Unit
+getInfo                       	BLE Device Information inquiry	    
+getCellData                   	BLE Cell Data inquiry
+```
+
+```
+$ jkbms -p 3C:A5:09:0A:AA:AA -c getInfo
+Command: getInfo - BLE Device Information inquiry
+------------------------------------------------------------
+Parameter                     	Value           Unit
+Header                        	55aaeb90       	    
+Record Type                   	03             	    
+Record Counter                	181            	    
+Device Model                  	JK-BD6A20S     	    
+Hardware Version              	10P4.0         	    
+Software Version              	4.1.7          	    
+Device Name                   	JK-BD6A20S    	    
+Device Passcode               	xxxx          	    
+Unknown1                      	200708         	    
+Unknown2                      	2006284075     	    
+User Data                     	Input Userdata 	    
+Settings Passcode?            	xxx         
 ```

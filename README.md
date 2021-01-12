@@ -68,7 +68,10 @@ Instruction of one way of connecting the inverter output to Grafana
 [Setup Instructions](docs/MQTT_Influx_Grafana.md)
 
 ## Example Usage
-[Usage](docs/usage.md)
+`$ mpp-solar -p /dev/hidraw0 -c QPI`
+
+`$ jkbms -p 3C:A5:09:0A:AA:AA -c getInfo`
+[More detailed usage](docs/usage.md)
 
 ## Protocol / Command Documentation
 [Protocol Index](docs/README.md)

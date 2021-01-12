@@ -2,6 +2,8 @@ import abc
 import importlib
 import logging
 
+from ..io.testio import TestIO
+
 log = logging.getLogger("MPP-Solar")
 
 PORT_TYPE_TEST = 1
@@ -20,10 +22,20 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         self._protocol = None
         self._protocol_class = None
         self._port = None
+        log.debug(f"{self._classname} __init__ args {args}")
+        log.debug(f"{self._classname} __init__ kwargs {kwargs}")
+        self._name = kwargs["name"]
+        self.set_port(**kwargs)
+        self.set_protocol(**kwargs)
+        log.debug(
+            f"{self._classname} __init__ name {self._name}, port {self._port}, protocol {self._protocol}"
+        )
 
-    @abc.abstractmethod
     def __str__(self):
-        raise NotImplementedError
+        """
+        Build a printable representation of this class
+        """
+        return f"{self._classname} device - name: {self._name}, port: {self._port}, protocol: {self._protocol}"
 
     def is_test_device(self, serial_device):
         return "test" in serial_device.lower()
@@ -156,20 +168,72 @@ class AbstractDevice(metaclass=abc.ABCMeta):
                 else:
                     responses[command[1]] = self.run_command(command[0], *command[2:])
             else:
-                responses["Command {:d}".format(i)] = {"ERROR": ["Unknown command format", "(Indexed from 0)"]}
+                responses["Command {:d}".format(i)] = {
+                    "ERROR": ["Unknown command format", "(Indexed from 0)"]
+                }
         return responses
 
-    @abc.abstractmethod
-    def run_command(self, command, show_raw=False):
-        raise NotImplementedError
+    def run_command(self, command, show_raw=False) -> dict:
+        """
+        generic method for running a 'raw' command
+        """
+        log.info(f"Running command {command}")
 
-    @abc.abstractmethod
-    def get_status(self, show_raw):
-        raise NotImplementedError
+        if self._protocol is None:
+            log.error("Attempted to run command with no protocol defined")
+            return {"ERROR": ["Attempted to run command with no protocol defined", ""]}
+        if self._port is None:
+            log.error(f"No communications port defined - unable to run command {command}")
+            return {
+                "ERROR": [
+                    f"No communications port defined - unable to run command {command}",
+                    "",
+                ]
+            }
 
-    @abc.abstractmethod
-    def get_settings(self, show_raw):
-        raise NotImplementedError
+        # Send command and receive data
+        full_command = self._protocol.get_full_command(command)
+        log.info(f"full command {full_command} for command {command}")
+
+        # JkBleIO is very different from the others, only has protocol jk02 and jk04, maybe change full_command?
+        # if isinstance(self._port, JkBleIO):
+        # need record type, SOR
+        #    raw_response = self._port.send_and_receive(command, self._protocol)
+
+        # Band-aid solution, can't really segregate TestIO from protocols w/o major rework of TestIO
+        if isinstance(self._port, TestIO):
+            raw_response = self._port.send_and_receive(
+                full_command, self._protocol.get_command_defn(command)
+            )
+        else:
+            raw_response = self._port.send_and_receive(full_command)
+        log.debug(f"Send and Receive Response {raw_response}")
+
+        # Handle errors; dict is returned on exception
+        # Maybe there should a decode for ERRORs and WARNINGS...
+        if isinstance(raw_response, dict):
+            return raw_response
+
+        # Decode response
+        decoded_response = self._protocol.decode(raw_response, show_raw, command)
+        log.debug(f"Decoded response {decoded_response}")
+        log.info(f"Decoded response {decoded_response}")
+
+        return decoded_response
+
+    def get_status(self, show_raw) -> dict:
+        # Run all the commands that are defined as status from the protocol definition
+        data = {}
+        for command in self._protocol.STATUS_COMMANDS:
+            data.update(self.run_command(command))
+        return data
+
+    def get_settings(self, show_raw) -> dict:
+        # Run all the commands that are defined as settings from the protocol definition
+        data = {}
+        for command in self._protocol.SETTINGS_COMMANDS:
+            data.update(self.run_command(command))
+        return data
 
     def run_default_command(self, show_raw):
         return self.run_command(command=self._protocol.DEFAULT_COMMAND, show_raw=show_raw)

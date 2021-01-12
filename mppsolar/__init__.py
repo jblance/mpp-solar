@@ -76,7 +76,7 @@ def get_protocol_for_model(model=None):
 
 
 def main():
-    description = f"MPP Solar Command Utility, version: {__version__}, {__version_comment__}"
+    description = f"Solar Device Command Utility, version: {__version__}, {__version_comment__}"
     parser = ArgumentParser(description=description)
     parser.add_argument(
         "-n",
@@ -86,27 +86,30 @@ def main():
         default="unnamed",
     )
     parser.add_argument(
-        "-t",
-        "--type",
-        type=str,
-        help="Specifies the device type (default: mppsolar)",
-        default="mppsolar",
-    )
-    parser.add_argument(
         "-p",
         "--port",
         type=str,
         help="Specifies the device communications port (/dev/ttyUSB0 [default], /dev/hidraw0, test, ...)",
         default="/dev/ttyUSB0",
     )
-    parser.add_argument(
-        "-P",
-        "--protocol",
-        type=str,
-        help="Specifies the device command and response protocol, (default: PI30)",
-        default="PI30",
-        choices=["PI00", "PI16", "PI18", "PI30", "PI41", "JK02", "JK04", "JK485"],
-    )
+    if parser.prog == "jkbms":
+        parser.add_argument(
+            "-P",
+            "--protocol",
+            type=str,
+            help="Specifies the device command and response protocol, (default: JK04)",
+            default="JK04",
+            choices=["JK02", "JK04", "JK485"],
+        )
+    else:
+        parser.add_argument(
+            "-P",
+            "--protocol",
+            type=str,
+            help="Specifies the device command and response protocol, (default: PI30)",
+            default="PI30",
+            choices=["PI00", "PI16", "PI18", "PI30", "PI41"],
+        )
     parser.add_argument(
         "-T",
         "--tag",
@@ -180,6 +183,7 @@ def main():
     )
 
     args = parser.parse_args()
+    called_name = parser.prog.replace("-", "")
 
     # Display verison if asked
     log.info(description)
@@ -318,9 +322,9 @@ def main():
 
         # create instance of device (supplying port + protocol types)
         log.info(
-            f'Creating device "{args.name}" (type: "{args.type}") on port "{args.port}" using protocol "{args.protocol}" for command "{args.command}" (tag: {tag})'
+            f'Creating device "{args.name}" (type: "{called_name}") on port "{args.port}" using protocol "{args.protocol}" for command "{args.command}" (tag: {tag})'
         )
-        device_class = get_device_class(args.type)
+        device_class = get_device_class(called_name)
         log.debug(f"device_class {device_class}")
         # The device class __init__ will instantiate the port communications and protocol classes
         device = device_class(name=args.name, port=args.port, protocol=args.protocol, baud=args.baud)
