@@ -111,6 +111,8 @@ class jkAbstractProtocol(AbstractProtocol):
         return False
 
     def is_record_correct_type(self, record, type):
+        if len(record) < len(SOR):
+            return False
         if record[len(SOR)] == type:
             log.debug(f"Record is type {type}")
             return True
