@@ -279,6 +279,7 @@ def main():
                             mqtt_broker=mqtt_broker,
                             mqtt_user=mqtt_user,
                             mqtt_pass=mqtt_pass,
+                            topic=parser.prog,
                         )
                         # Tell systemd watchdog we are still alive
                         systemd.daemon.notify("WATCHDOG=1")
@@ -307,6 +308,7 @@ def main():
                         mqtt_broker=mqtt_broker,
                         mqtt_user=mqtt_user,
                         mqtt_pass=mqtt_pass,
+                        topic=parser.prog,
                     )
             exit(0)
     else:
@@ -360,4 +362,5 @@ def main():
                 mqtt_broker=mqtt_broker,
                 mqtt_user=mqtt_user,
                 mqtt_pass=mqtt_pass,
+                topic=parser.prog,
             )
