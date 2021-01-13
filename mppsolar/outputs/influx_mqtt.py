@@ -1,5 +1,4 @@
 import logging
-import paho.mqtt.publish as publish
 
 from .mqtt import mqtt
 

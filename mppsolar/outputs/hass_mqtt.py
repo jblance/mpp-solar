@@ -1,25 +1,15 @@
 import logging
-import paho.mqtt.publish as publish
+
+from .mqtt import mqtt
 
 log = logging.getLogger("MPP-Solar")
 
 
-class hass_mqtt:
+class hass_mqtt(mqtt):
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.hass_mqtt __init__ kwargs {kwargs}")
 
-    def output(self, data=None, tag=None, mqtt_broker="localhost", mqtt_user=None, mqtt_pass=None):
-        log.info("Using output processor: hass_mqtt")
-        if data is None:
-            return
-
-        if mqtt_user is not None and mqtt_pass is not None:
-            auth = {"username": mqtt_user, "password": mqtt_pass}
-            log.info(f"Using mqtt authentication, username: {mqtt_user}, password: [supplied]")
-        else:
-            log.debug("No mqtt authentication used")
-            auth = None
-
+    def build_msgs(self, data, tag):
         # Build array of mqtt messages with hass update format
         # assumes hass_config has been run
         # or hass updated manually
@@ -36,4 +26,4 @@ class hass_mqtt:
             topic = f"homeassistant/sensor/pm_{tag}_{key}/state"
             msg = {"topic": topic, "payload": value}
             msgs.append(msg)
-        publish.multiple(msgs, hostname=mqtt_broker, auth=auth)
+        return msgs
