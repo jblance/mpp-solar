@@ -9,7 +9,9 @@ class influx_mqtt(mqtt):
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.influx_mqtt __init__ kwargs {kwargs}")
 
-    def build_msgs(self, data, tag):
+    def build_msgs(self, *args, **kwargs):
+        data = self.get_kwargs(kwargs, "data")
+        tag = self.get_kwargs(kwargs, "tag")
         # Build array of Influx Line Protocol messages
         msgs = []
         # Remove command and _command_description

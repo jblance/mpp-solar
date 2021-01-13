@@ -10,7 +10,9 @@ class mqtt(BaseOutput):
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.mqtt __init__ kwargs {kwargs}")
 
-    def build_msgs(self, data, tag):
+    def build_msgs(self, *args, **kwargs):
+        data = self.get_kwargs(kwargs, "data")
+        tag = self.get_kwargs(kwargs, "tag")
         # Build array of mqtt messages
         msgs = []
         # Remove command and _command_description
@@ -22,7 +24,7 @@ class mqtt(BaseOutput):
         for key in data:
             value = data[key][0]
             unit = data[key][1]
-            log.debug(f"key {key}, value {value}, unit {unit}")
+            log.debug(f"tag {tag}, key {key}, value {value}, unit {unit}")
             # 'tag'/status/total_output_active_power/value 1250
             # 'tag'/status/total_output_active_power/unit W
             msg = {"topic": f"{tag}/status/{key}/value", "payload": value}
@@ -40,6 +42,7 @@ class mqtt(BaseOutput):
         if data is None:
             return
         tag = self.get_kwargs(kwargs, "tag")
+        topic = self.get_kwargs(kwargs, "topic")
         mqtt_broker = self.get_kwargs(kwargs, "mqtt_broker", "localhost")
         mqtt_user = self.get_kwargs(kwargs, "mqtt_user")
         mqtt_pass = self.get_kwargs(kwargs, "mqtt_pass")
@@ -51,5 +54,5 @@ class mqtt(BaseOutput):
             log.debug("No mqtt authentication used")
             auth = None
 
-        msgs = self.build_msgs(data, tag)
+        msgs = self.build_msgs(data=data, tag=tag, topic=topic)
         publish.multiple(msgs, hostname=mqtt_broker, auth=auth)

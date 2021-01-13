@@ -9,7 +9,10 @@ class influx2_mqtt(mqtt):
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.influx2_mqtt __init__ kwargs {kwargs}")
 
-    def build_msgs(self, data, tag):
+    def build_msgs(self, *args, **kwargs):
+        data = self.get_kwargs(kwargs, "data")
+        tag = self.get_kwargs(kwargs, "tag")
+        topic = self.get_kwargs(kwargs, "topic", default="mpp-solar")
         # Build array of Influx Line Protocol II messages
         # Message format is: mpp-solar,command=QPGS0 max_charger_range=120.0
         #                    mpp-solar,command=inverter2 parallel_instance_number="valid"
@@ -25,13 +28,13 @@ class influx2_mqtt(mqtt):
             value = data[key][0]
             if isinstance(value, int) or isinstance(value, float):
                 msg = {
-                    "topic": "mpp-solar",
-                    "payload": f"mpp-solar,command={tag} {key}={value}",
+                    "topic": topic,
+                    "payload": f"{topic},command={tag} {key}={value}",
                 }
             else:
                 msg = {
-                    "topic": "mpp-solar",
-                    "payload": f'mpp-solar,command={tag} {key}="{value}"',
+                    "topic": topic,
+                    "payload": f'{topic},command={tag} {key}="{value}"',
                 }
             msgs.append(msg)
         return msgs

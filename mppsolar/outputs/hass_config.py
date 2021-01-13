@@ -9,7 +9,9 @@ class hass_config(mqtt):
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.hass_config __init__ kwargs {kwargs}")
 
-    def build_msgs(self, data, tag):
+    def build_msgs(self, *args, **kwargs):
+        data = self.get_kwargs(kwargs, "data")
+        tag = self.get_kwargs(kwargs, "tag")
         # Build array of mqtt messages with hass autoconfig format
         msgs = []
         # Remove command and _command_description
