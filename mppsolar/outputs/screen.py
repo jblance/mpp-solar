@@ -1,15 +1,19 @@
 import logging
 
+from .baseoutput import BaseOutput
+
 log = logging.getLogger("MPP-Solar")
 
 
-class screen:
+class screen(BaseOutput):
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.screen __init__ kwargs {kwargs}")
 
-    def output(self, data=None, tag=None, mqtt_broker=None, mqtt_user=None, mqtt_pass=None):
+    def output(self, *args, **kwargs):
         log.info("Using output processor: screen")
-        if not data:
+        log.debug(f"processor.screen.output kwargs {kwargs}")
+        data = self.get_kwargs(kwargs, "data")
+        if data is None:
             return
         _desc = "No description found"
         if "_command_description" in data:

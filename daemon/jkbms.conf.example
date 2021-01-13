@@ -4,11 +4,11 @@
 pause=5
 mqtt_broker=localhost
 
-# This example would work on 2x PIP4048 installed in parallel
+# This example would work on a JKBMS that uses JK04 protocol (HW v3.0)
 [Inverter_1]
+type=jkbms
 protocol=JK04
 port=3C:A5:09:0A:AA:AA
-baud=2400
 command=getCellData
 tag=CellData
 outputs=screen
