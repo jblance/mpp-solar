@@ -9,7 +9,7 @@ Description=JKBMS Service
 
 [Service]
 # Command to execute when the service is started
-ExecStart=/usr/bin/python3 /usr/local/bin/jkms -C /etc/jkbms/jkbms.conf --daemon
+ExecStart=/usr/bin/python3 /usr/local/bin/jkbms -C /etc/jkbms/jkbms.conf --daemon
 
 # Disable Python's buffering of STDOUT and STDERR, so that output from the
 # service shows up immediately in systemd's logs
