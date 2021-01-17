@@ -1,12 +1,15 @@
 import logging
 import paho.mqtt.publish as publish
 
-from .baseoutput import BaseOutput
+from .baseoutput import baseoutput
 
 log = logging.getLogger("MPP-Solar")
 
 
-class mqtt(BaseOutput):
+class mqtt(baseoutput):
+    def __str__(self):
+        return "mqtt - outputs the to the supplied mqtt broker: eg 'tag'/status/total_output_active_power/value 1250"
+
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.mqtt __init__ kwargs {kwargs}")
 

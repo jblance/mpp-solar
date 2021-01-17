@@ -6,6 +6,9 @@ log = logging.getLogger("MPP-Solar")
 
 
 class influx2_mqtt(mqtt):
+    def __str__(self):
+        return "influx2_mqtt - outputs the to the supplied mqtt broker: eg mpp-solar,command=QPGS0 max_charger_range=120.0"
+
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.influx2_mqtt __init__ kwargs {kwargs}")
 

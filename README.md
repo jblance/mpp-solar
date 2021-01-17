@@ -40,6 +40,9 @@ Also
 - Direct USB connection to Inverter (LV5048)
 - see [documented approach](docs/ubuntu_install.md)
 
+## Install
+`pip install -e "git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar"`
+
 ## Install (from source)
 * Download or clone the repo
 * From the directory that has the requirements files:

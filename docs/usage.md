@@ -11,34 +11,33 @@
 ## mpp-solar arguments
 `$ mpp-solar -h`
 ```
-usage: mpp-solar [-h] [-n NAME] [-p PORT] [-P {PI00,PI16,PI18,PI30,PI41}] [-T TAG] [-b BAUD] [-M MODEL] [-o OUTPUT] [-q MQTTBROKER] [--mqttuser MQTTUSER]
-                 [--mqttpass MQTTPASS] [-c COMMAND] [-C CONFIGFILE] [--daemon] [--listknown] [--getstatus] [--getsettings] [-R] [-v] [-D] [-I]
+usage: mpp-solar [-h] [-n NAME] [-p PORT] [--porttype PORTTYPE] [-P {PI00,PI16,PI18,PI30,PI41}] [-T TAG] [-b BAUD] [-M MODEL] [-o [OUTPUT]] [-q MQTTBROKER]
+                 [--mqttuser MQTTUSER] [--mqttpass MQTTPASS] [-c [COMMAND]] [-C CONFIGFILE] [--daemon] [--getstatus] [--getsettings] [-R] [-v] [-D] [-I]
 
-Solar Device Command Utility, version: 0.7.15, recent changes: remove JKBLE temporarily
+Solar Device Command Utility, version: 0.7.19, recent changes: fix json output
 
 optional arguments:
   -h, --help            show this help message and exit
   -n NAME, --name NAME  Specifies the device name - used to differentiate different devices
   -p PORT, --port PORT  Specifies the device communications port (/dev/ttyUSB0 [default], /dev/hidraw0, test, ...)
+  --porttype PORTTYPE   overrides the device communications port type
   -P {PI00,PI16,PI18,PI30,PI41}, --protocol {PI00,PI16,PI18,PI30,PI41}
                         Specifies the device command and response protocol, (default: PI30)
   -T TAG, --tag TAG     Override the command name and use this instead (for mqtt and influx type output processors)
   -b BAUD, --baud BAUD  Baud rate for serial communications (default: 2400)
   -M MODEL, --model MODEL
                         Specifies the inverter model to select commands for, defaults to "standard", currently supports LV5048
-  -o OUTPUT, --output OUTPUT
-                        Specifies the output processor(s) to use [comma separated if multiple] (screen [default], influx_mqtt, influx2_mqtt, mqtt, hass_config,
-                        hass_mqtt)
+  -o [OUTPUT], --output [OUTPUT]
+                        Specifies the output processor(s) to use [comma separated if multiple] (screen [default]) leave blank to give list
   -q MQTTBROKER, --mqttbroker MQTTBROKER
                         Specifies the mqtt broker to publish to if using a mqtt output (localhost [default], hostname, ip.add.re.ss ...)
   --mqttuser MQTTUSER   Specifies the username to use for authenticated mqtt broker publishing
   --mqttpass MQTTPASS   Specifies the password to use for authenticated mqtt broker publishing
-  -c COMMAND, --command COMMAND
+  -c [COMMAND], --command [COMMAND]
                         Command to run
   -C CONFIGFILE, --configfile CONFIGFILE
                         Full location of config file
   --daemon              Run as daemon
-  --listknown           List known commands
   --getstatus           Get Inverter Status
   --getsettings         Get Inverter Settings
   -R, --showraw         Display the raw results
@@ -75,44 +74,44 @@ topology                      	transformerless
 # JKBMS Usage #
 ```
 $ jkbms -h
-usage: jkbms [-h] [-n NAME] [-p PORT] [-P {JK02,JK04,JK485}] [-T TAG] [-b BAUD] [-M MODEL] [-o OUTPUT] [-q MQTTBROKER] [--mqttuser MQTTUSER] [--mqttpass MQTTPASS]
-             [-c COMMAND] [-C CONFIGFILE] [--daemon] [--listknown] [--getstatus] [--getsettings] [-R] [-v] [-D] [-I]
+usage: jkbms [-h] [-n NAME] [-p PORT] [--porttype PORTTYPE] [-P {JK02,JK04,JK485}] [-T TAG] [-b BAUD] [-M MODEL] [-o [OUTPUT]] [-q MQTTBROKER] [--mqttuser MQTTUSER]
+             [--mqttpass MQTTPASS] [-c [COMMAND]] [-C CONFIGFILE] [--daemon] [--getstatus] [--getsettings] [-R] [-v] [-D] [-I]
 
-Solar Device Command Utility, version: 0.7.15, recent changes: remove JKBLE temporarily
+Solar Device Command Utility, version: 0.7.19, recent changes: fix json output
 
 optional arguments:
   -h, --help            show this help message and exit
   -n NAME, --name NAME  Specifies the device name - used to differentiate different devices
   -p PORT, --port PORT  Specifies the device communications port (/dev/ttyUSB0 [default], /dev/hidraw0, test, ...)
+  --porttype PORTTYPE   overrides the device communications port type
   -P {JK02,JK04,JK485}, --protocol {JK02,JK04,JK485}
                         Specifies the device command and response protocol, (default: JK04)
   -T TAG, --tag TAG     Override the command name and use this instead (for mqtt and influx type output processors)
   -b BAUD, --baud BAUD  Baud rate for serial communications (default: 2400)
   -M MODEL, --model MODEL
                         Specifies the inverter model to select commands for, defaults to "standard", currently supports LV5048
-  -o OUTPUT, --output OUTPUT
-                        Specifies the output processor(s) to use [comma separated if multiple] (screen [default], influx_mqtt, influx2_mqtt, mqtt, hass_config,
-                        hass_mqtt)
+  -o [OUTPUT], --output [OUTPUT]
+                        Specifies the output processor(s) to use [comma separated if multiple] (screen [default]) leave blank to give list
   -q MQTTBROKER, --mqttbroker MQTTBROKER
                         Specifies the mqtt broker to publish to if using a mqtt output (localhost [default], hostname, ip.add.re.ss ...)
   --mqttuser MQTTUSER   Specifies the username to use for authenticated mqtt broker publishing
   --mqttpass MQTTPASS   Specifies the password to use for authenticated mqtt broker publishing
-  -c COMMAND, --command COMMAND
+  -c [COMMAND], --command [COMMAND]
                         Command to run
   -C CONFIGFILE, --configfile CONFIGFILE
                         Full location of config file
   --daemon              Run as daemon
-  --listknown           List known commands
   --getstatus           Get Inverter Status
   --getsettings         Get Inverter Settings
   -R, --showraw         Display the raw results
   -v, --version         Display the version
   -D, --debug           Enable Debug and above (i.e. all) messages
   -I, --info            Enable Info and above level messages
+
   ```
 
 ```
-$ jkbms --listknown -P JK02
+$ jkbms -P JK02 -c
 Parameter                     	Value           Unit
 getInfo                       	BLE Device Information inquiry	    
 getCellData                   	BLE Cell Data inquiry

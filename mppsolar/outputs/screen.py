@@ -1,11 +1,14 @@
 import logging
 
-from .baseoutput import BaseOutput
+from .baseoutput import baseoutput
 
 log = logging.getLogger("MPP-Solar")
 
 
-class screen(BaseOutput):
+class screen(baseoutput):
+    def __str__(self):
+        return "screen - [the default output module] outputs the results to standard out in a slightly formatted way"
+
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.screen __init__ kwargs {kwargs}")
 

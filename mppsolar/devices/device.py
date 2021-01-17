@@ -147,6 +147,22 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             result[command] = [self._protocol.COMMANDS[command]["description"], ""]
         return result
 
+    def list_outputs(self):
+        import pkgutil
+
+        pkgpath = __file__
+        pkgpath = pkgpath[: pkgpath.rfind("/")]
+        pkgpath += "/../outputs"
+        print(pkgpath)
+        result = []
+        for _, name, _ in pkgutil.iter_modules([pkgpath]):
+            # print(name)
+            _module_class = importlib.import_module("mppsolar.outputs." + name, ".")
+            _module = getattr(_module_class, name)
+            result.append(_module())
+
+        return result
+
     def run_commands(self, commands) -> dict:
         """
         Run multiple commands sequentially

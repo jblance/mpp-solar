@@ -33,12 +33,12 @@ def get_outputs(output_list):
         log.info(f"attempting to create output processor: {output}")
         try:
             output_module = importlib.import_module("mppsolar.outputs." + output, ".")
+            output_class = getattr(output_module, output)
+            ops.append(output_class())
         except ModuleNotFoundError:
             # perhaps raise a Powermon exception here??
             # maybe warn and keep going, only error if no outputs found?
             log.critical(f"No module found for output processor {output}")
-        output_class = getattr(output_module, output)
-        ops.append(output_class())
     return ops
 
 
@@ -92,6 +92,11 @@ def main():
         help="Specifies the device communications port (/dev/ttyUSB0 [default], /dev/hidraw0, test, ...)",
         default="/dev/ttyUSB0",
     )
+    parser.add_argument(
+        "--porttype",
+        type=str,
+        help="overrides the device communications port type",
+    )
     if parser.prog == "jkbms":
         parser.add_argument(
             "-P",
@@ -134,8 +139,10 @@ def main():
     parser.add_argument(
         "-o",
         "--output",
+        nargs="?",
         type=str,
-        help="Specifies the output processor(s) to use [comma separated if multiple] (screen [default], influx_mqtt, influx2_mqtt, mqtt, hass_config, hass_mqtt)",
+        help="Specifies the output processor(s) to use [comma separated if multiple] (screen [default]) leave blank to give list",
+        const="help",
         default="screen",
     )
     parser.add_argument(
@@ -157,7 +164,7 @@ def main():
         help="Specifies the password to use for authenticated mqtt broker publishing",
         default=None,
     )
-    parser.add_argument("-c", "--command", help="Command to run")
+    parser.add_argument("-c", "--command", nargs="?", const="help", help="Command to run")
     parser.add_argument(
         "-C",
         "--configfile",
@@ -166,7 +173,6 @@ def main():
         default=None,
     )
     parser.add_argument("--daemon", action="store_true", help="Run as daemon")
-    parser.add_argument("--listknown", action="store_true", help="List known commands")
     parser.add_argument("--getstatus", action="store_true", help="Get Inverter Status")
     parser.add_argument("--getsettings", action="store_true", help="Get Inverter Settings")
 
@@ -333,8 +339,14 @@ def main():
         device = device_class(name=args.name, port=args.port, protocol=args.protocol, baud=args.baud)
 
         # determine whether to run command or call helper function
-        if args.listknown:
+        if args.command == "help":
             results = device.list_commands()
+        elif args.output == "help":
+            results = device.list_outputs()
+            print("Available output modules:")
+            for result in results:
+                print(result)
+            exit()
         elif args.getstatus:
             # use get_status helper
             results = device.get_status(show_raw=args.showraw)
