@@ -96,6 +96,7 @@ def main():
         "--porttype",
         type=str,
         help="overrides the device communications port type",
+        default=None,
     )
     if parser.prog == "jkbms":
         parser.add_argument(
@@ -249,12 +250,18 @@ def main():
             command = config[section].get("command")
             tag = config[section].get("tag")
             outputs = config[section].get("outputs", fallback="screen")
+            portoveride = config[section].get("portoveride", fallback=None)
             # todo: build array of commands
             device_class = get_device_class(type)
             log.debug(f"device_class {device_class}")
             # The device class __init__ will instantiate the port communications and protocol classes
             device = device_class(
-                name=name, port=port, protocol=protocol, outputs=outputs, baud=baud
+                name=name,
+                port=port,
+                protocol=protocol,
+                outputs=outputs,
+                baud=baud,
+                portoveride=portoveride,
             )
             _commands.append((device, command, tag, outputs))
 
@@ -331,12 +338,18 @@ def main():
 
         # create instance of device (supplying port + protocol types)
         log.info(
-            f'Creating device "{args.name}" (type: "{called_name}") on port "{args.port}" using protocol "{args.protocol}" for command "{args.command}" (tag: {tag})'
+            f'Creating device "{args.name}" (type: "{called_name}") on port "{args.port} (portoveride={args.porttype})" using protocol "{args.protocol}" for command "{args.command}" (tag: {tag})'
         )
         device_class = get_device_class(called_name)
         log.debug(f"device_class {device_class}")
         # The device class __init__ will instantiate the port communications and protocol classes
-        device = device_class(name=args.name, port=args.port, protocol=args.protocol, baud=args.baud)
+        device = device_class(
+            name=args.name,
+            port=args.port,
+            protocol=args.protocol,
+            baud=args.baud,
+            portoveride=args.porttype,
+        )
 
         # determine whether to run command or call helper function
         if args.command == "help":

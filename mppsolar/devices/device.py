@@ -6,6 +6,7 @@ from ..io.testio import TestIO
 
 log = logging.getLogger("MPP-Solar")
 
+PORT_TYPE_UNKNOWN = 0
 PORT_TYPE_TEST = 1
 PORT_TYPE_USB = 2
 PORT_TYPE_ESP32 = 4
@@ -58,12 +59,23 @@ class AbstractDevice(metaclass=abc.ABCMeta):
     def is_ESP32_device(self, serial_device):
         return "esp" in serial_device.lower()
 
+    def is_serial_device(self, serial_device):
+        if "serial" in serial_device.lower():
+            return True
+        if "ttyusb" in serial_device.lower():
+            return True
+        return False
+
     def is_JKBle_device(self, serial_device):
         """
         Current all MAC addresses will be JK BLE devices
         """
         # '3c:a5:09:0a:85:79'
-        return ":" in serial_device.lower()
+        if ":" in serial_device.lower():
+            return True
+        if "jkble" in serial_device.lower():
+            return True
+        return False
 
     def get_port_type(self, port):
         if self.is_test_device(port):
@@ -74,8 +86,11 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             return PORT_TYPE_ESP32
         elif self.is_JKBle_device(port):
             return PORT_TYPE_JKBLE
-        else:
+        elif self.is_serial_device(port):
             return PORT_TYPE_SERIAL
+        else:
+            # maybe dont default to serial
+            return PORT_TYPE_UNKNOWN
 
     def set_protocol(self, protocol=None, **kwargs):
         """
@@ -107,8 +122,12 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         # TODO: fix protocol instantiate
         self._protocol = self._protocol_class("init_var", proto_keyword="value", second_keyword=123)
 
-    def set_port(self, port=None, baud=2400, **kwawgs):
-        port_type = self.get_port_type(port)
+    def set_port(self, port=None, baud=2400, portoveride=None, **kwawgs):
+        if portoveride:
+            log.info(f"Port overide: using port: {portoveride}")
+            port_type = self.get_port_type(portoveride)
+        else:
+            port_type = self.get_port_type(port)
         if port_type == PORT_TYPE_TEST:
             log.info("Using testio for communications")
             from mppsolar.io.testio import TestIO
