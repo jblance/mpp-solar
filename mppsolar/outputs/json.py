@@ -1,3 +1,4 @@
+import json as js
 import logging
 
 from .baseoutput import BaseOutput
@@ -12,12 +13,5 @@ class json(BaseOutput):
     def output(self, *args, **kwargs):
         log.info("Using output processor: json")
         log.debug(f"processor.json.output kwargs {kwargs}")
-        output = {}
         data = self.get_kwargs(kwargs, "data")
-        for key in data:
-            value = data[key]
-            if isinstance(value, list):
-                value = data[key][0]
-            # unit = data[key][1]
-            output[key] = value
-        print(output)
+        print(js.dumps(data))
