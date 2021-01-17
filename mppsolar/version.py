@@ -1,2 +1,2 @@
-__version__ = "0.7.19"
-__version_comment__ = "recent changes: fix json output"
+__version__ = "0.7.20"
+__version_comment__ = "recent changes: -o or -c with no value display valid options"

@@ -17,4 +17,13 @@ class json(baseoutput):
         log.info("Using output processor: json")
         log.debug(f"processor.json.output kwargs {kwargs}")
         data = self.get_kwargs(kwargs, "data")
-        print(js.dumps(data))
+
+        output = {}
+        for key in data:
+            value = data[key]
+            if isinstance(value, list):
+                value = data[key][0]
+            # unit = data[key][1]
+            output[key] = value
+
+        print(js.dumps(output))
