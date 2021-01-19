@@ -38,58 +38,41 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         """
         return f"{self._classname} device - name: {self._name}, port: {self._port}, protocol: {self._protocol}"
 
-    def is_test_device(self, serial_device):
-        return "test" in serial_device.lower()
-
-    def is_directusb_device(self, serial_device):
-        """
-        Determine if this instance is using direct USB connection
-        (instead of a serial connection)
-        """
-        if not serial_device:
-            return False
-        if "hidraw" in serial_device:
-            log.debug("Device matches hidraw")
-            return True
-        if "mppsolar" in serial_device:
-            log.debug("Device matches mppsolar")
-            return True
-        return False
-
-    def is_ESP32_device(self, serial_device):
-        return "esp" in serial_device.lower()
-
-    def is_serial_device(self, serial_device):
-        if "serial" in serial_device.lower():
-            return True
-        if "ttyusb" in serial_device.lower():
-            return True
-        return False
-
-    def is_JKBle_device(self, serial_device):
-        """
-        Current all MAC addresses will be JK BLE devices
-        """
-        # '3c:a5:09:0a:85:79'
-        if ":" in serial_device.lower():
-            return True
-        if "jkble" in serial_device.lower():
-            return True
-        return False
-
     def get_port_type(self, port):
-        if self.is_test_device(port):
+        if port is None:
+            return PORT_TYPE_UNKNOWN
+
+        port = port.lower()
+        # check for test type port
+        if "test" in port:
+            log.debug("device:get_port_type: port matches test")
             return PORT_TYPE_TEST
-        elif self.is_directusb_device(port):
+        # USB type ports
+        elif "hidraw" in serial_device:
+            log.debug("device:get_port_type: port matches hidraw")
             return PORT_TYPE_USB
-        elif self.is_ESP32_device(port):
+        elif "mppsolar" in serial_device:
+            log.debug("device:get_port_type: port matches mppsolar")
+            return PORT_TYPE_USB
+        # ESP type ports
+        elif "esp" in port:
+            log.debug("device:get_port_type: port matches esp")
             return PORT_TYPE_ESP32
-        elif self.is_JKBle_device(port):
+        # JKBLE type ports
+        elif ":" in port:
+            # all mac addresses currently return as JKBLE
+            log.debug("device:get_port_type: port matches jkble ':'")
             return PORT_TYPE_JKBLE
-        elif self.is_serial_device(port):
+        elif "jkble" in port:
+            log.debug("device:get_port_type: port matches jkble")
+            return PORT_TYPE_JKBLE
+        elif "serial" in port:
+            log.debug("device:get_port_type: port matches serial")
+            return PORT_TYPE_SERIAL
+        elif "ttyusb" in port:
+            log.debug("device:get_port_type: port matches ttyusb")
             return PORT_TYPE_SERIAL
         else:
-            # maybe dont default to serial
             return PORT_TYPE_UNKNOWN
 
     def set_protocol(self, protocol=None, **kwargs):
