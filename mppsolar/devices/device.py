@@ -12,6 +12,7 @@ PORT_TYPE_USB = 2
 PORT_TYPE_ESP32 = 4
 PORT_TYPE_SERIAL = 8
 PORT_TYPE_JKBLE = 16
+PORT_TYPE_ASYNCSERIAL = 32
 
 
 class AbstractDevice(metaclass=abc.ABCMeta):
@@ -47,6 +48,10 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         if "test" in port:
             log.debug("device:get_port_type: port matches test")
             return PORT_TYPE_TEST
+        # async serial
+        elif "asyncserial" in port:
+            log.debug("device:get_port_type: port matches asyncserial")
+            return PORT_TYPE_ASYNCSERIAL
         # USB type ports
         elif "hidraw" in serial_device:
             log.debug("device:get_port_type: port matches hidraw")
@@ -136,6 +141,12 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             from mppsolar.io.serialio import SerialIO
 
             self._port = SerialIO(device_path=port, serial_baud=baud)
+        elif port_type == PORT_TYPE_ASYNCSERIAL:
+            log.info("Using asyncserialio for communications")
+            from mppsolar.io.asyncserialio import AsyncSerialIO
+
+            self._port = AsyncSerialIO(device_path=port, serial_baud=baud)
+
         else:
             self._port = None
 
