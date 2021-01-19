@@ -31,7 +31,7 @@ class JkBleIO(BaseIO):
             response = self.ble_get_data(full_command)
             self.ble_disconnect()
         else:
-            print(f"Failed to connect to {self._device_path}")
+            log.error(f"Failed to connect to {self._device_path}")
             response = None
         # End of BLE device connection
         log.debug(f"Raw response {response}")
@@ -115,7 +115,7 @@ class JkBleIO(BaseIO):
         while True:
             loops += 1
             if loops > recordsToGrab * 15 + 16:
-                print("Got {} records".format(recordsToGrab))
+                log.info("jkbleio: ble_get_dataa: Got {} records".format(recordsToGrab))
                 break
             if self._device.waitForNotifications(1.0):
                 continue
