@@ -240,46 +240,46 @@ class jkAbstractProtocol(AbstractProtocol):
                     value += responses.pop(0)
                     value = value / 100
                     print(f"value {value}")
-                    msgs[defn[2]] = [f"{value:0.3f}", defn[3]]
+                    msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "16Int1000":
                     log.debug("16Int1000 defn")
                     value = responses.pop(0) * 256
                     value += responses.pop(0)
                     value = value / 1000
                     print(f"value {value}")
-                    msgs[defn[2]] = [f"{value:0.3f}", defn[3]]
+                    msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "2ByteHex":
                     log.debug("2ByteHex defn")
                     v = responses[:2]
                     responses = responses[2:]
                     value = decode2ByteHex(v)
-                    msgs[defn[2]] = [f"{value:0.4f}", defn[3]]
+                    msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "2ByteHexU":
                     # used for unknow values provides undecoded hex as well
                     log.debug("2ByteHexU defn")
                     v = responses[:2]
                     responses = responses[2:]
                     value = decode2ByteHex(v)
-                    msgs[defn[2]] = [f"{value:0.4f}", f"{v[0]:02x} {v[1]:02x}"]
+                    msgs[defn[2]] = [value, f"{v[0]:02x} {v[1]:02x}"]
                 elif defn[0] == "2ByteHexC":
                     # temperatures seem to be deocded value * 100
                     log.debug("2ByteHexC defn")
                     v = responses[:2]
                     responses = responses[2:]
                     value = decode2ByteHex(v) * 100
-                    msgs[defn[2]] = [f"{value:0.1f}", defn[3]]
+                    msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "4ByteHex":
                     log.debug("4ByteHex defn")
                     v = responses[:4]
                     responses = responses[4:]
                     value = decode4ByteHex(v)
-                    msgs[defn[2]] = [f"{value:0.4f}", defn[3]]
+                    msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "4ByteHexU":
                     log.debug("4ByteHexU defn")
                     v = responses[:4]
                     responses = responses[4:]
                     value = decode4ByteHex(v)
-                    msgs[defn[2]] = [f"{value:0.4f}", f"{v[0]:02x} {v[1]:02x} {v[2]:02x} {v[3]:02x}"]
+                    msgs[defn[2]] = [value, f"{v[0]:02x} {v[1]:02x} {v[2]:02x} {v[3]:02x}"]
                 elif defn[0] == "loop":
                     log.debug("loop defn")
                     # loop of repeating data, eg cell voltages
@@ -289,17 +289,17 @@ class jkAbstractProtocol(AbstractProtocol):
                             v = responses[:4]
                             responses = responses[4:]
                             value = decode4ByteHex(v)
-                            msgs[param] = [f"{value:0.4f}", defn[3]]
+                            msgs[param] = [value, defn[3]]
                         if defn[4] == "2ByteHex":
                             v = responses[:2]
                             responses = responses[2:]
                             value = decode2ByteHex(v)
-                            msgs[param] = [f"{value:0.4f}", defn[3]]
+                            msgs[param] = [value, defn[3]]
                         if defn[4] == "16Int1000":
                             value = responses.pop(0) * 256
                             value += responses.pop(0)
                             value = value / 1000
-                            msgs[param] = [f"{value:0.3f}", defn[3]]
+                            msgs[param] = [value, defn[3]]
                 elif defn[0] == "rem":
                     log.debug("remainder")
                     msgs["remainder"] = [str(responses), ""]
