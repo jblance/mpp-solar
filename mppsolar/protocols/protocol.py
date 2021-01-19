@@ -124,6 +124,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 resp_format = command_defn["response"][i]
 
             # key = "{}".format(resp_format[1]).lower().replace(" ", "_")
+            key = resp_format[1]
             # log.debug(f'result {result}, key {key}, resp_format {resp_format}')
             # Process results
             if resp_format[0] == "float":
