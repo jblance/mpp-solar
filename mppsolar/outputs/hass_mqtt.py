@@ -26,7 +26,7 @@ class hass_mqtt(mqtt):
         for key in data:
             value = data[key][0]
             # remove spaces
-            key = key.replace(" ", "_")
+            key = key.lower().replace(" ", "_")
             #
             # CONFIG / AUTODISCOVER
             #

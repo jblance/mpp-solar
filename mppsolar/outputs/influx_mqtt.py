@@ -27,7 +27,7 @@ class influx_mqtt(mqtt):
             value = data[key][0]
             unit = data[key][1]
             # remove spaces
-            key = key.replace(" ", "_")
+            key = key.lower().replace(" ", "_")
             # Message format is: tag, tag,setting=total_ac_output_apparent_power value=1577.0,unit="VA"
             if not unit:
                 unit = ""

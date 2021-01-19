@@ -25,7 +25,7 @@ class json(baseoutput):
                 value = data[key][0]
             # unit = data[key][1]
             # remove spaces
-            key = key.replace(" ", "_")
+            key = key.lower().replace(" ", "_")
             output[key] = value
 
         print(js.dumps(output))

@@ -22,9 +22,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         return self._protocol_id
 
     def get_full_command(self, command) -> bytes:
-        log.info(
-            f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
-        )
+        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
 
         byte_cmd = bytes(command, "utf-8")
         # calculate the CRC
@@ -98,9 +96,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         if not command_defn:
             # No definiution, so just return the data
             len_command_defn = 0
-            log.debug(
-                f"No definition for command {command}, (splitted) raw response returned"
-            )
+            log.debug(f"No definition for command {command}, (splitted) raw response returned")
             msgs["ERROR"] = [
                 f"No definition for command {command} in protocol {self._protocol_id}",
                 "",
@@ -127,7 +123,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             else:
                 resp_format = command_defn["response"][i]
 
-            key = "{}".format(resp_format[1]).lower().replace(" ", "_")
+            # key = "{}".format(resp_format[1]).lower().replace(" ", "_")
             # log.debug(f'result {result}, key {key}, resp_format {resp_format}')
             # Process results
             if resp_format[0] == "float":
@@ -172,11 +168,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         status = "disabled"
                     else:
                         # output[resp_format[2][item]['name']] = status
-                        _key = (
-                            "{}".format(resp_format[2][item]["name"])
-                            .lower()
-                            .replace(" ", "_")
-                        )
+                        _key = "{}".format(resp_format[2][item]["name"]).lower().replace(" ", "_")
                         msgs[_key] = [status, ""]
                 # msgs[key] = [output, '']
             elif command_defn["type"] == "SETTER":

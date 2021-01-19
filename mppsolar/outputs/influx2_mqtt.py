@@ -30,7 +30,7 @@ class influx2_mqtt(mqtt):
         for key in data:
             value = data[key][0]
             # remove spaces
-            key = key.replace(" ", "_")
+            key = key.lower().replace(" ", "_")
             if isinstance(value, int) or isinstance(value, float):
                 msg = {
                     "topic": topic,

@@ -28,7 +28,7 @@ class mqtt(baseoutput):
             value = data[key][0]
             unit = data[key][1]
             # remove spaces
-            key = key.replace(" ", "_")
+            key = key.lower().replace(" ", "_")
             log.debug(f"tag {tag}, key {key}, value {value}, unit {unit}")
             # 'tag'/status/total_output_active_power/value 1250
             # 'tag'/status/total_output_active_power/unit W
