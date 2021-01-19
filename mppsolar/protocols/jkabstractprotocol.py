@@ -179,6 +179,8 @@ class jkAbstractProtocol(AbstractProtocol):
             for defn in command_defn["response"]:
                 log.debug(f"Processing defn {defn}")
                 # ["hex", 4, "Header", ""]
+                if defn[2] == "":
+                    log.debug(f"skipping {defn} and no name defined")
                 if defn[0] == "hex":
                     log.debug("hex defn")
                     value = ""
