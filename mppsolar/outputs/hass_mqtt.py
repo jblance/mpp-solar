@@ -25,6 +25,8 @@ class hass_mqtt(mqtt):
         # Loop through responses
         for key in data:
             value = data[key][0]
+            # remove spaces
+            key = key.replace(" ", "_")
             #
             # CONFIG / AUTODISCOVER
             #

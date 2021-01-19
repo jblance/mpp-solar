@@ -24,6 +24,8 @@ class json(baseoutput):
             if isinstance(value, list):
                 value = data[key][0]
             # unit = data[key][1]
+            # remove spaces
+            key = key.replace(" ", "_")
             output[key] = value
 
         print(js.dumps(output))
