@@ -25,7 +25,7 @@ NEW_COMMANDS = {
             ["discard", 4, "", ""],
             ["int+", 1, "Highest Cell", ""],
             ["int+", 1, "Lowest Cell", ""],
-            ["hex", 2, "Flags?", ""],
+            ["hex", 2, "Flags", ""],
             ["hex", 4, "", ""],
             ["discard", 7, "", ""],
             ["hex", 4, "", ""],
