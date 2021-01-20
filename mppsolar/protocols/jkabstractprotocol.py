@@ -179,14 +179,26 @@ class jkAbstractProtocol(AbstractProtocol):
             for defn in command_defn["response"]:
                 log.debug(f"Processing defn {defn}")
                 # ["hex", 4, "Header", ""]
-                if defn[2] == "":
-                    log.debug(f"skipping {defn} and no name defined")
-                if defn[0] == "hex":
+                # if defn[2] == "":
+                #    log.debug(f"skipping {defn} and no name defined")
+                if defn[0] == "lookup":
+                    # calculated lookup column
+                    # looks for a columnb based on another
+                    # ["int+", 1, "Highest Cell", ""],
+                    # ["lookup", "Highest Cell", "Voltage Cell", "Highest Cell Voltage" ],
+                    log.debug("using lookup defn")
+                    lookup_value = msgs[defn[1]][0]
+                    key_tofind = f"{defn[2]}{lookup_value:02d}"
+                    value = msgs[key_tofind][0]
+                    unit = msgs[key_tofind][1]
+                    msgs[defn[3]] = [value, unit]
+                elif defn[0] == "hex":
                     log.debug("hex defn")
                     value = ""
                     for x in range(defn[1]):
                         value += f"{responses.pop(0):02x}"
-                    msgs[defn[2]] = [value, defn[3]]
+                    if defn[2] != "":
+                        msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "ascii":
                     log.debug("ascii defn")
                     value = ""
@@ -232,21 +244,21 @@ class jkAbstractProtocol(AbstractProtocol):
                     log.debug("16Int defn")
                     value = responses.pop(0) * 256
                     value += responses.pop(0)
-                    print(f"value {value}")
-                    msgs[defn[2]] = [f"{value:0.3f}", defn[3]]
+                    # print(f"value {value}")
+                    msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "16Int100":
                     log.debug("16Int100 defn")
                     value = responses.pop(0) * 256
                     value += responses.pop(0)
                     value = value / 100
-                    print(f"value {value}")
+                    # print(f"value {value}")
                     msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "16Int1000":
                     log.debug("16Int1000 defn")
                     value = responses.pop(0) * 256
                     value += responses.pop(0)
                     value = value / 1000
-                    print(f"value {value}")
+                    # print(f"value {value}")
                     msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "2ByteHex":
                     log.debug("2ByteHex defn")

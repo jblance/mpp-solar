@@ -36,6 +36,8 @@ NEW_COMMANDS = {
             ["hex", 4, "", ""],
             ["discard", 1, "", ""],
             ["hex", 1, "Checksum", ""],
+            ["lookup", "Highest Cell", "Voltage Cell", "Highest Cell Voltage"],
+            ["lookup", "Lowest Cell", "Voltage Cell", "Lowest Cell Voltage"],
         ],
         "test_responses": [
             bytes.fromhex(
