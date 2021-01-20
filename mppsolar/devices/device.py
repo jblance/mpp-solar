@@ -53,10 +53,10 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             log.debug("device:get_port_type: port matches asyncserial")
             return PORT_TYPE_ASYNCSERIAL
         # USB type ports
-        elif "hidraw" in serial_device:
+        elif "hidraw" in port:
             log.debug("device:get_port_type: port matches hidraw")
             return PORT_TYPE_USB
-        elif "mppsolar" in serial_device:
+        elif "mppsolar" in port:
             log.debug("device:get_port_type: port matches mppsolar")
             return PORT_TYPE_USB
         # ESP type ports
