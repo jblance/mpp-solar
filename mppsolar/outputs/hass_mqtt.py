@@ -25,6 +25,7 @@ class hass_mqtt(mqtt):
         # Loop through responses
         for key in data:
             value = data[key][0]
+            unit = data[key][1]
             # remove spaces
             key = key.lower().replace(" ", "_")
             #

@@ -1,4 +1,2 @@
-__version__ = "0.7.22"
-__version_comment__ = (
-    "recent changes: remove spaces in outputs, drop unknown response components in jk02 and 04"
-)
+__version__ = "0.7.23"
+__version_comment__ = "recent changes: fix hass_mqtt"
