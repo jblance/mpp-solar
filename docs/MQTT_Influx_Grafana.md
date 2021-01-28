@@ -22,7 +22,7 @@ basetopic/subtopic this is the message
 ```
 * If the message displayed in CMD1 window the test has passed. yay!
 
-* Test from mpp-solar, in CMD2 `mpp-info-pub -q localhost -c QID`
+* Test from mpp-solar, in CMD2 `mpp-solar -q localhost -c QID`
 * This should display something in CMD1 similar to (the numbers will be different and should match your inverter serial number):
 ```
 QID/serial_number/value 9293333010501
@@ -37,7 +37,7 @@ e.g. for cron
 `crontab -e` to edit
 and add a line like
 ```
-* * * * * /usr/local/bin/mpp-info-pub -q localhost -c QPIGS -i > /home/pi/cron.out 2>&1
+* * * * * /usr/local/bin/mpp-solar -q localhost -c QPIGS -i > /home/pi/cron.out 2>&1
 ```
 which will run the QPIGS command every minute and log errors to /home/pi/cron.out
 
