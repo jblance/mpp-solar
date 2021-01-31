@@ -170,7 +170,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     else:
                         # output[resp_format[2][item]['name']] = status
                         # _key = "{}".format(resp_format[2][item]["name"]).lower().replace(" ", "_")
-                        _key = esp_format[2][item]["name"]
+                        _key = resp_format[2][item]["name"]
                         msgs[_key] = [status, ""]
                 # msgs[key] = [output, '']
             elif command_defn["type"] == "SETTER":
