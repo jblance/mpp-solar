@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import logging
 
+from binascii import unhexlify
+from struct import unpack
+
 log = logging.getLogger("MPP-Solar")
 
 
@@ -70,41 +73,8 @@ def decode4ByteHex(hexToDecode):
         log.warning(f"Hex encoded value must be 4 bytes long. Was {len(hexString)} length")
         return 0
 
-    # Process most significant byte (position 3)
-    byte1 = hexString[3]
-    if byte1 == 0x0:
-        return 0
-    byte1Low = byte1 - 0x40
-    answer = (2 ** (byte1Low * 2)) * 2
-    log.debug(f"After position 3: {answer}")
-    step1 = answer / 8.0
-    step2 = answer / 128.0
-    step3 = answer / 2048.0
-    step4 = answer / 32768.0
-    step5 = answer / 524288.0
-    step6 = answer / 8388608.0
-
-    # position 2
-    byte2 = hexString[2]
-    byte2High = byte2 >> 4
-    byte2Low = byte2 & 0xF
-    if byte2High & 8:
-        answer += ((byte2High - 8) * step1 * 2) + (8 * step1) + (byte2Low * step2)
-    else:
-        answer += (byte2High * step1) + (byte2Low * step2)
-    log.debug(f"After position 2: {answer}")
-    # position 1
-    byte3 = hexString[1]
-    byte3High = byte3 >> 4
-    byte3Low = byte3 & 0xF
-    answer += (byte3High * step3) + (byte3Low * step4)
-    log.debug(f"After position 1: {answer}")
-    # position 0
-    byte4 = hexString[0]
-    byte4High = byte4 >> 4
-    byte4Low = byte4 & 0xF
-    answer += (byte4High * step5) + (byte4Low * step6)
-    log.debug(f"After position 0: {answer}")
+    # Use python tools for decode
+    answer = unpack("<f", hexString)[0]
     log.info(f"Hex {hexString} 4 byte decoded to {answer}")
 
     return answer
