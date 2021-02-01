@@ -49,6 +49,7 @@ class mqtt(baseoutput):
         tag = self.get_kwargs(kwargs, "tag")
         topic = self.get_kwargs(kwargs, "topic")
         mqtt_broker = self.get_kwargs(kwargs, "mqtt_broker", "localhost")
+        mqtt_port = self.get_kwargs(kwargs, "mqtt_port", 1883)
         mqtt_user = self.get_kwargs(kwargs, "mqtt_user")
         mqtt_pass = self.get_kwargs(kwargs, "mqtt_pass")
 
@@ -60,4 +61,4 @@ class mqtt(baseoutput):
             auth = None
 
         msgs = self.build_msgs(data=data, tag=tag, topic=topic)
-        publish.multiple(msgs, hostname=mqtt_broker, auth=auth)
+        publish.multiple(msgs, hostname=mqtt_broker, port=mqtt_port, auth=auth)

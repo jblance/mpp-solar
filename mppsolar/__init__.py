@@ -214,6 +214,7 @@ def main():
         # ch.setLevel(logging.INFO)
 
     mqtt_broker = args.mqttbroker
+    mqtt_port = args.mqttport
     mqtt_user = args.mqttuser
     mqtt_pass = args.mqttpass
 
@@ -228,7 +229,7 @@ def main():
             log.setLevel(logging.INFO)
         # Tell systemd that our service is ready
         systemd.daemon.notify("READY=1")
-        log.info(f"{log_name}-Service: Initializing ...")
+        log.info("Service Initializing ...")
         # set some default-defaults
         pause = 60
 
@@ -362,9 +363,10 @@ def main():
                     data=results,
                     tag=_tag,
                     mqtt_broker=mqtt_broker,
+                    mqtt_port=mqtt_port,
                     mqtt_user=mqtt_user,
                     mqtt_pass=mqtt_pass,
-                    topic=parser.prog,
+                    topic=prog_name,
                 )
                 # Tell systemd watchdog we are still alive
         if args.daemon:
@@ -375,72 +377,3 @@ def main():
             # Dont loop unless running as daemon
             log.debug("Not daemon, so not looping")
             break
-
-    else:
-        # supplied a configfile, but running on command line
-        exit(0)
-        # else:
-        #     # No configfile specified
-        #     # process some arguments
-        #     if args.tag:
-        #         tag = args.tag
-        #     else:
-        #         tag = args.command
-        #     if args.model is not None and args.protocol is None:
-        #         args.protocol = get_protocol_for_model(args.model)
-        #     if not args.showraw:
-        #         args.showraw = False
-
-        # # create instance of device (supplying port + protocol types)
-        # log.info(
-        #     f'Creating device "{args.name}" (type: "{s_prog_name}") on port "{args.port} (portoveride={args.porttype})" using protocol "{args.protocol}" for command "{args.command}" (tag: {tag})'
-        # )
-        # device_class = get_device_class(s_prog_name)
-        # log.debug(f"device_class {device_class}")
-        # # The device class __init__ will instantiate the port communications and protocol classes
-        # device = device_class(
-        #     name=args.name,
-        #     port=args.port,
-        #     protocol=args.protocol,
-        #     baud=args.baud,
-        #     portoveride=args.porttype,
-        # )
-
-        # determine whether to run command or call helper function
-        if args.command == "help":
-            results = device.list_commands()
-        elif args.output == "help":
-            results = device.list_outputs()
-            print("Available output modules:")
-            for result in results:
-                print(result)
-            exit()
-        elif args.getstatus:
-            # use get_status helper
-            results = device.get_status(show_raw=args.showraw)
-            # TODO: implement get_status
-        elif args.getsettings:
-            # use get_settings helper
-            results = device.get_settings(show_raw=args.showraw)
-            # TODO: implement get_settings
-        elif args.command:
-            # run the command
-            results = device.run_command(command=args.command, show_raw=args.showraw)
-        else:
-            # run the default command
-            results = device.run_default_command(show_raw=args.showraw)
-
-        # send to output processor(s)
-        log.debug(f"results: {results}")
-        outputs = get_outputs(args.output)
-        for op in outputs:
-            # maybe include the command and what the command is im the output
-            # eg QDI run, Display Inverter Default Settings
-            op.output(
-                data=results,
-                tag=tag,
-                mqtt_broker=mqtt_broker,
-                mqtt_user=mqtt_user,
-                mqtt_pass=mqtt_pass,
-                topic=parser.prog,
-            )
