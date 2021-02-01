@@ -266,18 +266,13 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         full_command = self._protocol.get_full_command(command)
         log.info(f"full command {full_command} for command {command}")
 
-        # JkBleIO is very different from the others, only has protocol jk02 and jk04, maybe change full_command?
-        # if isinstance(self._port, JkBleIO):
-        # need record type, SOR
-        #    raw_response = self._port.send_and_receive(command, self._protocol)
-
-        # Band-aid solution, can't really segregate TestIO from protocols w/o major rework of TestIO
-        if isinstance(self._port, TestIO):
-            raw_response = self._port.send_and_receive(
-                full_command, self._protocol.get_command_defn(command)
-            )
-        else:
-            raw_response = self._port.send_and_receive(full_command)
+        # Band-aid solution, need to reduce what is sent
+        raw_response = self._port.send_and_receive(
+            command=command,
+            full_command=full_command,
+            protocol=self._protocol,
+            command_defn=self._protocol.get_command_defn(command),
+        )
         log.debug(f"Send and Receive Response {raw_response}")
 
         # Handle errors; dict is returned on exception

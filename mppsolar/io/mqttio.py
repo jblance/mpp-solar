@@ -19,8 +19,9 @@ class MqttIO(BaseIO):
         self.mqtt_port = get_kwargs(kwargs, "mqtt_port", 1883)
         self.mqtt_user = get_kwargs(kwargs, "mqtt_user")
         self.mqtt_pass = get_kwargs(kwargs, "mqtt_pass")
+        self._name = get_kwargs(kwargs, "name")
         log.info(
-            f"MqttIO.__init__ mqtt_broker: {self.mqtt_broker}, port: {self.mqtt_port}, user: {self.mqtt_user}, pass: {self.mqtt_pass}"
+            f"MqttIO.__init__ name: {self._name},  mqtt_broker: {self.mqtt_broker}, port: {self.mqtt_port}, user: {self.mqtt_user}, pass: {self.mqtt_pass}"
         )
         self._msg = None
 
@@ -28,7 +29,10 @@ class MqttIO(BaseIO):
         log.debug(f"Mqttio sub_cb got msg, topic: {message.topic}, payload: {message.payload}")
         self._msg = message
 
-    def send_and_receive(self, full_command, client_id="ESP32-Sensor") -> dict:
+    def send_and_receive(self, *args, **kwargs) -> dict:
+        full_command = get_kwargs(kwargs, "full_command")
+        client_id = self._name
+
         wait_time = 5
         response_line = None
         command_topic = f"{client_id}/command"

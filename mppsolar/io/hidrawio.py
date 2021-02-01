@@ -4,6 +4,7 @@ import os
 import time
 
 from .baseio import BaseIO
+from ..helpers import get_kwargs
 
 log = logging.getLogger("MPP-Solar")
 
@@ -13,7 +14,8 @@ class HIDRawIO(BaseIO):
         # self._fd = os.open(device_path, flags=os.O_RDWR | os.O_NONBLOCK)
         self._device = device_path
 
-    def send_and_receive(self, full_command) -> dict:
+    def send_and_receive(self, *args, **kwargs) -> dict:
+        full_command = get_kwargs(kwargs, "full_command")
         response_line = bytes()
         usb0 = None
         try:

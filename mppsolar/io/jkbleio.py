@@ -3,6 +3,7 @@ import logging
 
 
 from .baseio import BaseIO
+from ..helpers import get_kwargs
 from .jkbledelegate import jkBleDelegate
 
 log = logging.getLogger("MPP-Solar")
@@ -17,8 +18,10 @@ class JkBleIO(BaseIO):
         self.maxConnectionAttempts = 3
         self.record = None
 
-    def send_and_receive(self, command, protocol) -> dict:
+    def send_and_receive(self, *args, **kwargs) -> dict:
         # Send the full command via the communications port
+        command = get_kwargs(kwargs, "command")
+        protocol = get_kwargs(kwargs, "protocol")
         full_command = protocol.get_full_command(command)
         log.info(f"full command {full_command} for command {command}")
 

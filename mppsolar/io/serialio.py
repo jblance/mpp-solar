@@ -3,16 +3,18 @@ import serial
 import time
 
 from .baseio import BaseIO
+from ..helpers import get_kwargs
 
 log = logging.getLogger("MPP-Solar")
 
 
 class SerialIO(BaseIO):
-    def __init__(self, device_path, serial_baud) -> None:
-        self._serial_port = device_path
-        self._serial_baud = serial_baud
+    def __init__(self, *args, **kwargs) -> None:
+        self._serial_port = get_kwargs(kwargs, "device_path")
+        self._serial_baud = get_kwargs(kwargs, "serial_baud")
 
-    def send_and_receive(self, full_command) -> dict:
+    def send_and_receive(self, *args, **kwargs) -> dict:
+        full_command = get_kwargs(kwargs, "full_command")
         response_line = None
         log.debug(f"port {self._serial_port}, baudrate {self._serial_baud}")
         try:

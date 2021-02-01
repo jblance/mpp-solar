@@ -36,7 +36,7 @@ class jkbms(AbstractDevice):
         # JkBleIO is very different from the others, only has protocol jk02 and jk04, maybe change full_command?
         if isinstance(self._port, JkBleIO):
             # need record type, SOR
-            raw_response = self._port.send_and_receive(command, self._protocol)
+            raw_response = self._port.send_and_receive(command=command, protocol=self._protocol)
 
             log.debug(f"Send and Receive Response {raw_response}")
 

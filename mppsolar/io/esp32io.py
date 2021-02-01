@@ -3,6 +3,7 @@ from machine import UART
 import time
 
 from .baseio import BaseIO
+from ..helpers import get_kwargs
 
 log = logging.getLogger("MPP-Solar")
 
@@ -17,14 +18,13 @@ class ESP32IO(BaseIO):
         self._serial_port = device_path
         self._serial_baud = serial_baud
 
-    def send_and_receive(self, full_command) -> dict:
+    def send_and_receive(self, *args, **kwargs) -> dict:
+        full_command = get_kwargs(kwargs, "full_command")
         log.info(f"ESP32 serial connection: executing {full_command}")
 
         response_line = None
         uart_no = self._serial_port.lower().split("esp")[1]
-        log.debug(
-            f"port {self._serial_port}, baudrate {self._serial_baud}, uart# {uart_no}"
-        )
+        log.debug(f"port {self._serial_port}, baudrate {self._serial_baud}, uart# {uart_no}")
         try:
             with UART(uart_no, self._serial_baud) as s:
                 # Execute command multiple times, increase timeouts each time
