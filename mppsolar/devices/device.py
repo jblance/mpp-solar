@@ -262,7 +262,6 @@ class AbstractDevice(metaclass=abc.ABCMeta):
 
         # Decode response
         decoded_response = self._protocol.decode(raw_response, show_raw, command)
-        log.debug(f"Decoded response {decoded_response}")
         log.info(f"Decoded response {decoded_response}")
 
         return decoded_response
