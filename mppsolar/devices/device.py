@@ -2,6 +2,7 @@ import abc
 import importlib
 import logging
 
+from ..helpers import get_kwargs
 from ..io.testio import TestIO
 
 log = logging.getLogger("MPP-Solar")
@@ -26,7 +27,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         self._port = None
         log.debug(f"{self._classname} __init__ args {args}")
         log.debug(f"{self._classname} __init__ kwargs {kwargs}")
-        self._name = kwargs["name"]
+        self._name = get_kwargs(kwargs, "name")
         self.set_port(**kwargs)
         self.set_protocol(**kwargs)
         log.debug(
@@ -80,10 +81,11 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         else:
             return PORT_TYPE_UNKNOWN
 
-    def set_protocol(self, protocol=None, **kwargs):
+    def set_protocol(self, *args, **kwargs):
         """
         Set the protocol for this device
         """
+        protocol = get_kwargs(kwargs, "protocol")
         log.debug(f"device.set_protocol with protocol {protocol}")
         if protocol is None:
             self._protocol = None
@@ -110,42 +112,65 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         # TODO: fix protocol instantiate
         self._protocol = self._protocol_class("init_var", proto_keyword="value", second_keyword=123)
 
-    def set_port(self, port=None, baud=2400, porttype=None, **kwawgs):
+    def set_port(self, *args, **kwargs):
+        port = get_kwargs(kwargs, "port")
+        baud = get_kwargs(kwargs, "baud", 2400)
+        porttype = get_kwargs(kwargs, "porttype")
+
         if porttype:
             log.info(f"Port overide: using port: {porttype}")
             port_type = self.get_port_type(porttype)
         else:
             port_type = self.get_port_type(port)
+
         if port_type == PORT_TYPE_TEST:
             log.info("Using testio for communications")
             from mppsolar.io.testio import TestIO
 
             self._port = TestIO()
+
         elif port_type == PORT_TYPE_USB:
             log.info("Using hidrawio for communications")
             from mppsolar.io.hidrawio import HIDRawIO
 
             self._port = HIDRawIO(device_path=port)
+
         elif port_type == PORT_TYPE_ESP32:
             log.info("Using esp32io for communications")
             from mppsolar.io.esp32io import ESP32IO
 
             self._port = ESP32IO(device_path=port)
+
         elif port_type == PORT_TYPE_JKBLE:
             log.info("Using jkbleio for communications")
             from mppsolar.io.jkbleio import JkBleIO
 
             self._port = JkBleIO(device_path=port)
+
         elif port_type == PORT_TYPE_SERIAL:
             log.info("Using serialio for communications")
             from mppsolar.io.serialio import SerialIO
 
             self._port = SerialIO(device_path=port, serial_baud=baud)
+
         elif port_type == PORT_TYPE_MQTT:
-            log.info("Using mqttio for communications")
+
+            mqtt_broker = get_kwargs(kwargs, "mqtt_broker", "localhost")
+            mqtt_port = get_kwargs(kwargs, "mqtt_port", 1883)
+            mqtt_user = get_kwargs(kwargs, "mqtt_user")
+            mqtt_pass = get_kwargs(kwargs, "mqtt_pass")
+            log.info(
+                f"Using mqttio for communications broker {mqtt_broker}, port {mqtt_port}, user {mqtt_user}, pass {mqtt_pass}"
+            )
+
             from mppsolar.io.mqttio import MqttIO
 
-            self._port = MqttIO(mqtt_broker=port, mqtt_port=baud)
+            self._port = MqttIO(
+                mqtt_broker=mqtt_broker,
+                mqtt_port=mqtt_port,
+                mqtt_user=mqtt_user,
+                mqtt_pass=mqtt_pass,
+            )
 
         else:
             self._port = None

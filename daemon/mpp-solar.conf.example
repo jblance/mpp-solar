@@ -9,6 +9,7 @@ mqtt_broker=localhost
 model=standard
 protocol=PI30
 port=/dev/ttyUSB0
+porttype=serial
 baud=2400
 command=QPGS0
 tag=QPGS0

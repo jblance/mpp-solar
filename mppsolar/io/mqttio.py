@@ -18,7 +18,7 @@ class MqttIO(BaseIO):
         self.mqtt_port = get_kwargs(kwargs, "mqtt_port", 1883)
         self.mqtt_user = get_kwargs(kwargs, "mqtt_user")
         self.mqtt_pass = get_kwargs(kwargs, "mqtt_pass")
-        log.debug(
+        log.info(
             f"MqttIO.__init__ mqtt_broker: {self.mqtt_broker}, port: {self.mqtt_port}, user: {self.mqtt_user}, pass: {self.mqtt_pass}"
         )
 
@@ -31,13 +31,24 @@ class MqttIO(BaseIO):
         else:
             log.debug("No mqtt authentication used")
             auth = None
-        command_topic = "%s/command" % (client_id)
-        result_topic = "%s/result" % (client_id)
-        # msgs = self.build_msgs(data=data, tag=tag, topic=topic)
-        msg = {"topic": command_topic, "payload": full_command}
-        print(msg)
-        publish.single(msg, hostname=self.mqtt_broker, port=self.mqtt_port, auth=auth)
+        command_topic = f"{client_id}/command"
+        result_topic = f"{client_id}/result"
+        print(f"topic: {command_topic}")
 
+        # single(topic, payload=None, qos=0, retain=False, hostname="localhost",
+        #        port=1883, client_id="", keepalive=60, will=None, auth=None, tls=None,
+        #        protocol=mqtt.MQTTv311, transport="tcp")
+        publish.single(
+            topic=command_topic,
+            payload=full_command,
+            hostname=self.mqtt_broker,
+            port=self.mqtt_port,
+            auth=auth,
+        )
+
+        # simple(topics, qos=0, msg_count=1, retained=False, hostname="localhost",
+        #       port=1883, client_id="", keepalive=60, will=None, auth=None, tls=None,
+        #       protocol=mqtt.MQTTv311)
         # try:
         #     with serial.serial_for_url(self._serial_port, self._serial_baud) as s:
         #         log.debug(f"Executing command via serialio...")

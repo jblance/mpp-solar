@@ -270,6 +270,10 @@ def main():
                 outputs=outputs,
                 baud=baud,
                 porttype=porttype,
+                mqtt_broker=mqtt_broker,
+                mqtt_port=mqtt_port,
+                mqtt_user=mqtt_user,
+                mqtt_pass=mqtt_pass,
             )
             # build array of commands
             _commands.append((device, command, tag, outputs))
@@ -308,6 +312,10 @@ def main():
             protocol=args.protocol,
             baud=args.baud,
             porttype=args.porttype,
+            mqtt_broker=mqtt_broker,
+            mqtt_port=mqtt_port,
+            mqtt_user=mqtt_user,
+            mqtt_pass=mqtt_pass,
         )
         #
 
