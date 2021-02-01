@@ -12,7 +12,7 @@ PORT_TYPE_USB = 2
 PORT_TYPE_ESP32 = 4
 PORT_TYPE_SERIAL = 8
 PORT_TYPE_JKBLE = 16
-PORT_TYPE_ASYNCSERIAL = 32
+PORT_TYPE_MQTT = 32
 
 
 class AbstractDevice(metaclass=abc.ABCMeta):
@@ -48,10 +48,10 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         if "test" in port:
             log.debug("device:get_port_type: port matches test")
             return PORT_TYPE_TEST
-        # async serial
-        elif "asyncserial" in port:
-            log.debug("device:get_port_type: port matches asyncserial")
-            return PORT_TYPE_ASYNCSERIAL
+        # mqtt
+        elif "mqtt" in port:
+            log.debug("device:get_port_type: port matches mqtt")
+            return PORT_TYPE_MQTT
         # USB type ports
         elif "hidraw" in port:
             log.debug("device:get_port_type: port matches hidraw")
@@ -110,10 +110,10 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         # TODO: fix protocol instantiate
         self._protocol = self._protocol_class("init_var", proto_keyword="value", second_keyword=123)
 
-    def set_port(self, port=None, baud=2400, portoveride=None, **kwawgs):
-        if portoveride:
-            log.info(f"Port overide: using port: {portoveride}")
-            port_type = self.get_port_type(portoveride)
+    def set_port(self, port=None, baud=2400, porttype=None, **kwawgs):
+        if porttype:
+            log.info(f"Port overide: using port: {porttype}")
+            port_type = self.get_port_type(porttype)
         else:
             port_type = self.get_port_type(port)
         if port_type == PORT_TYPE_TEST:
@@ -141,11 +141,11 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             from mppsolar.io.serialio import SerialIO
 
             self._port = SerialIO(device_path=port, serial_baud=baud)
-        elif port_type == PORT_TYPE_ASYNCSERIAL:
-            log.info("Using asyncserialio for communications")
-            from mppsolar.io.asyncserialio import AsyncSerialIO
+        elif port_type == PORT_TYPE_MQTT:
+            log.info("Using mqttio for communications")
+            from mppsolar.io.mqttio import MqttIO
 
-            self._port = AsyncSerialIO(device_path=port, serial_baud=baud)
+            self._port = MqttIO(mqtt_broker=port, mqtt_port=baud)
 
         else:
             self._port = None
