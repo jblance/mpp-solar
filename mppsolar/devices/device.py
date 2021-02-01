@@ -223,7 +223,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         if command == "get_settings":
             return self.get_settings()
         if not command:
-            return self.run_default_command()
+            command = self._protocol.DEFAULT_COMMAND
 
         if self._protocol is None:
             log.error("Attempted to run command with no protocol defined")
@@ -279,6 +279,3 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         for command in self._protocol.SETTINGS_COMMANDS:
             data.update(self.run_command(command))
         return data
-
-    def run_default_command(self):
-        return self.run_command(command=self._protocol.DEFAULT_COMMAND)
