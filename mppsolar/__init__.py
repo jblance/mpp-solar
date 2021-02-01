@@ -342,11 +342,13 @@ def main():
             # run the command
             commands.append("")
         else:
-            commands.append(args.command.split(","))
+            for cmd in args.command.split(","):
+                commands.append(cmd)
 
         outputs = args.output
         for command in commands:
             _commands.append((device, command, tag, outputs))
+        log.debug(f"Commands {_commands}")
 
     while True:
         # Loop through the configured commands
