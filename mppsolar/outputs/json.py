@@ -18,6 +18,8 @@ class json(baseoutput):
         log.debug(f"processor.json.output kwargs {kwargs}")
         data = self.get_kwargs(kwargs, "data")
 
+        data.pop("raw_response", None)
+
         output = {}
         for key in data:
             value = data[key]

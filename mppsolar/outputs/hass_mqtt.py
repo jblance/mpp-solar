@@ -22,6 +22,8 @@ class hass_mqtt(mqtt):
         # Remove command and _command_description
         data.pop("_command", None)
         data.pop("_command_description", None)
+        data.pop("raw_response", None)
+
         # Loop through responses
         for key in data:
             value = data[key][0]

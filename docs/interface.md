@@ -32,20 +32,20 @@
 * and define the following functions:
 ```
 __str__(self) -> str
-run_command(self, command, show_raw) -> dict
-get_status(self, show_raw) -> dict
-get_settings(self, show_raw) -> dict
-run_default_command(self, show_raw) -> dict
+run_command(self, command) -> dict
+get_status(self) -> dict
+get_settings(self) -> dict
+run_default_command(self) -> dict
 ```
 
 These functions are called based on the command line (or service) options
 
 _Generally speaking_ the DEVICE will run commands via the IO PORT using the PROTOCOL, e.g.
 ```
-def run_command(self, command, show_raw=False) -> dict:
+def run_command(self, command) -> dict:
       log.info(f"Running command {command}")
       [...snip...]
-      response = self._port.send_and_receive(command, show_raw, self._protocol)
+      response = self._port.send_and_receive(command, self._protocol)
       return response
 ```
 
@@ -55,11 +55,11 @@ def run_command(self, command, show_raw=False) -> dict:
 * Should inherit from the BaseIO class, e.g: `class ESP32IO(BaseIO)`
 * and define the function:
 ```
-send_and_receive(self, command, show_raw, protocol) -> dict
+send_and_receive(self, command, protocol) -> dict
 ```
 _Generally speaking_ the IO PORT will use the PROTOCOL decode function to build the response dict
 ```
-decoded_response = protocol.decode(response_line, show_raw)
+decoded_response = protocol.decode(response_line)
 ```
 
 
@@ -68,7 +68,7 @@ decoded_response = protocol.decode(response_line, show_raw)
 * define the following functions:
     * `get_full_command(self, command) -> bytes:`
     * `get_command_defn(self, command) -> dict:` (from AbstractProtocol)
-    * `decode(self, response, show_raw) -> dict:` (default uses get_responses)
+    * `decode(self, response) -> dict:` (default uses get_responses)
 
 
 ## OUTPUTS ##

@@ -20,6 +20,8 @@ class influx_mqtt(mqtt):
         # Remove command and _command_description
         cmd = data.pop("_command", None)
         data.pop("_command_description", None)
+        data.pop("raw_response", None)
+
         if tag is None:
             tag = cmd
         # Loop through responses

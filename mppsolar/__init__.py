@@ -53,9 +53,9 @@ def get_device_class(device_type=None):
     device_type = device_type.lower()
     try:
         device_module = importlib.import_module("mppsolar.devices." + device_type, ".")
-    except ModuleNotFoundError:
+    except ModuleNotFoundError as e:
         # perhaps raise a mppsolar exception here??
-        log.critical(f"No module found for device {device_type}")
+        log.critical(f"Error loading device {device_type}: {e}")
         return None
     device_class = getattr(device_module, device_type)
     return device_class
@@ -183,7 +183,6 @@ def main():
     parser.add_argument("--getstatus", action="store_true", help="Get Inverter Status")
     parser.add_argument("--getsettings", action="store_true", help="Get Inverter Settings")
 
-    parser.add_argument("-R", "--showraw", action="store_true", help="Display the raw results")
     parser.add_argument("-v", "--version", action="store_true", help="Display the version")
     parser.add_argument(
         "-D",
@@ -292,8 +291,6 @@ def main():
             tag = args.command
         if args.model is not None and args.protocol is None:
             args.protocol = get_protocol_for_model(args.model)
-        if not args.showraw:
-            args.showraw = False
 
         # create instance of device (supplying port + protocol types)
         log.info(
@@ -352,7 +349,7 @@ def main():
             log.info(
                 f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
             )
-            results = _device.run_command(command=_command, show_raw=False)
+            results = _device.run_command(command=_command)
             log.debug(f"results: {results}")
             # send to output processor(s)
             outputs = get_outputs(_outputs)

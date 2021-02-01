@@ -5,16 +5,16 @@ from .baseoutput import baseoutput
 log = logging.getLogger("MPP-Solar")
 
 
-class screen(baseoutput):
+class raw(baseoutput):
     def __str__(self):
-        return "[the default output module] outputs the results to standard out in a slightly formatted way"
+        return "outputs the raw results to standard out"
 
     def __init__(self, *args, **kwargs) -> None:
-        log.debug(f"processor.screen __init__ kwargs {kwargs}")
+        log.debug(f"processor.raw __init__ kwargs {kwargs}")
 
     def output(self, *args, **kwargs):
-        log.info("Using output processor: screen")
-        log.debug(f"processor.screen.output kwargs {kwargs}")
+        log.info("Using output processor: raw")
+        log.debug(f"processor.raw.output kwargs {kwargs}")
         data = self.get_kwargs(kwargs, "data")
         if data is None:
             return
@@ -27,10 +27,7 @@ class screen(baseoutput):
             print("-" * 60)
             del data["_command"]
         if "raw_response" in data:
-            del data["raw_response"]
-
-        print(f"{'Parameter':<30}\t{'Value':<15} Unit")
-        for key in data:
+            key = "raw_response"
             value = data[key][0]
-            unit = data[key][1]
-            print(f"{key:<30}\t{value:<15}\t{unit:<4}")
+            print(f"{key:<30}\t{value!a:<15}")
+        return

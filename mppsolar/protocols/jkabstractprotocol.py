@@ -135,7 +135,7 @@ class jkAbstractProtocol(AbstractProtocol):
                 return True
         return False
 
-    def decode(self, response, show_raw, command) -> dict:
+    def decode(self, response, command) -> dict:
         msgs = {}
         log.info(f"response passed to decode: {response}")
         # No response
@@ -144,16 +144,12 @@ class jkAbstractProtocol(AbstractProtocol):
             msgs["ERROR"] = ["No response", ""]
             return msgs
 
-        # Raw response requested
-        if show_raw:
-            log.debug(f'Protocol "{self._protocol_id}" raw response requested')
-            # TODO: deal with \x09 type crc response items better
-            _response = b""
-            for item in response:
-                _response += chr(item).encode()
-            raw_response = _response.decode("utf-8")
-            msgs["raw_response"] = [raw_response, ""]
-            return msgs
+        # Raw response
+        _response = b""
+        for item in response:
+            _response += chr(item).encode()
+        raw_response = _response.decode("utf-8")
+        msgs["raw_response"] = [raw_response, ""]
 
         command_defn = self.get_command_defn(command)
         # Add metadata

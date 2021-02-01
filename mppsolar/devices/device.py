@@ -209,7 +209,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
                 }
         return responses
 
-    def run_command(self, command, show_raw=False) -> dict:
+    def run_command(self, command) -> dict:
         """
         generic method for running a 'raw' command
         """
@@ -219,11 +219,11 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         if command == "list_outputs":
             return self.list_outputs()
         if command == "get_status":
-            return self.get_status(show_raw)
+            return self.get_status()
         if command == "get_settings":
-            return self.get_settings(show_raw)
+            return self.get_settings()
         if not command:
-            return self.run_default_command(show_raw)
+            return self.run_default_command()
 
         if self._protocol is None:
             log.error("Attempted to run command with no protocol defined")
@@ -261,24 +261,24 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             return raw_response
 
         # Decode response
-        decoded_response = self._protocol.decode(raw_response, show_raw, command)
+        decoded_response = self._protocol.decode(raw_response, command)
         log.info(f"Decoded response {decoded_response}")
 
         return decoded_response
 
-    def get_status(self, show_raw) -> dict:
+    def get_status(self) -> dict:
         # Run all the commands that are defined as status from the protocol definition
         data = {}
         for command in self._protocol.STATUS_COMMANDS:
             data.update(self.run_command(command))
         return data
 
-    def get_settings(self, show_raw) -> dict:
+    def get_settings(self) -> dict:
         # Run all the commands that are defined as settings from the protocol definition
         data = {}
         for command in self._protocol.SETTINGS_COMMANDS:
             data.update(self.run_command(command))
         return data
 
-    def run_default_command(self, show_raw):
-        return self.run_command(command=self._protocol.DEFAULT_COMMAND, show_raw=show_raw)
+    def run_default_command(self):
+        return self.run_command(command=self._protocol.DEFAULT_COMMAND)

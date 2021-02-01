@@ -11,7 +11,7 @@ class jkbms(AbstractDevice):
         self._classname = "jkbms"
         super().__init__(*args, **kwargs)
 
-    def run_command(self, command, show_raw=False) -> dict:
+    def run_command(self, command) -> dict:
         """
         jkbms method for running a 'raw' command
         """
@@ -46,10 +46,9 @@ class jkbms(AbstractDevice):
                 return raw_response
 
             # Decode response
-            decoded_response = self._protocol.decode(raw_response, show_raw, command)
-            log.debug(f"Decoded response {decoded_response}")
+            decoded_response = self._protocol.decode(raw_response, command)
             log.info(f"Decoded response {decoded_response}")
             return decoded_response
 
         else:
-            return super().run_command(command, show_raw=False)
+            return super().run_command(command)
