@@ -258,7 +258,7 @@ def main():
             command = config[section].get("command")
             tag = config[section].get("tag")
             outputs = config[section].get("outputs", fallback="screen")
-            porttype = config[section].get("portype", fallback=None)
+            porttype = config[section].get("porttype", fallback=None)
             #
             device_class = get_device_class(type)
             log.debug(f"device_class {device_class}")
