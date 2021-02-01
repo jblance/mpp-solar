@@ -1,8 +1,9 @@
 import logging
 import paho.mqtt.publish as publish
 import paho.mqtt.subscribe as subscribe
+import paho.mqtt.client as mqttc
 
-# import time
+import time
 
 from .baseio import BaseIO
 from ..helpers import get_kwargs
@@ -21,47 +22,56 @@ class MqttIO(BaseIO):
         log.info(
             f"MqttIO.__init__ mqtt_broker: {self.mqtt_broker}, port: {self.mqtt_port}, user: {self.mqtt_user}, pass: {self.mqtt_pass}"
         )
+        self._msg = None
+
+    def sub_cb(self, client, userdata, message):
+        log.debug(f"Mqttio sub_cb got msg, topic: {message.topic}, payload: {message.payload}")
+        self._msg = message
 
     def send_and_receive(self, full_command, client_id="ESP32-Sensor") -> dict:
+        wait_time = 5
         response_line = None
-        # print(self.mqtt_broker)
-        if self.mqtt_user is not None and self.mqtt_pass is not None:
-            auth = {"username": self.mqtt_user, "password": self.mqtt_pass}
-            log.info(f"Using mqtt authentication, username: {self.mqtt_user}, password: [supplied]")
-        else:
-            log.debug("No mqtt authentication used")
-            auth = None
         command_topic = f"{client_id}/command"
         result_topic = f"{client_id}/result"
-        print(f"topic: {command_topic}")
+        # print(self.mqtt_broker)
+        # Create mqtt client
+        # Client(client_id="", clean_session=True, userdata=None, protocol=MQTTv311, transport="tcp")
+        mqtt_client = mqttc.Client()
+        # mqtt_client.on_connect = on_connect
 
-        # single(topic, payload=None, qos=0, retain=False, hostname="localhost",
-        #        port=1883, client_id="", keepalive=60, will=None, auth=None, tls=None,
-        #        protocol=mqtt.MQTTv311, transport="tcp")
-        publish.single(
-            topic=command_topic,
-            payload=full_command,
-            hostname=self.mqtt_broker,
-            port=self.mqtt_port,
-            auth=auth,
-        )
+        if self.mqtt_user is not None and self.mqtt_pass is not None:
+            # auth = {"username": self.mqtt_user, "password": self.mqtt_pass}
+            log.info(f"Using mqtt authentication, username: {self.mqtt_user}, password: [supplied]")
+            mqtt_client.username_pw_set(self.mqtt_user, password=self.mqtt_pass)
+        else:
+            log.debug("No mqtt authentication used")
+            # auth = None
 
-        # simple(topics, qos=0, msg_count=1, retained=False, hostname="localhost",
-        #       port=1883, client_id="", keepalive=60, will=None, auth=None, tls=None,
-        #       protocol=mqtt.MQTTv311)
-        # try:
-        #     with serial.serial_for_url(self._serial_port, self._serial_baud) as s:
-        #         log.debug(f"Executing command via serialio...")
-        #         s.timeout = 1
-        #         s.write_timeout = 1
-        #         s.flushInput()
-        #         s.flushOutput()
-        #         s.write(full_command)
-        #         time.sleep(0.1)  # give serial port time to receive the data
-        #         response_line = s.read_until(b"\r")
-        #         log.debug("serial response was: %s", response_line)
-        #         return response_line
-        # except Exception as e:
-        #     log.warning(f"Serial read error: {e}")
-        # log.info("Command execution failed")
-        # return {"ERROR": ["Serial command execution failed", ""]}
+        # connect(host, port=1883, keepalive=60, bind_address="")
+        mqtt_client.connect(self.mqtt_broker, port=self.mqtt_port)
+
+        payload = full_command
+        log.debug(f"Publishing {payload} to topic: {command_topic}")
+
+        # publish(topic, payload=None, qos=0, retain=False)
+        mqtt_client.publish(command_topic, payload=payload)
+
+        mqtt_client.on_message = self.sub_cb
+        mqtt_client.subscribe(result_topic)
+        mqtt_client.loop_start()
+        time.sleep(wait_time)
+        mqtt_client.loop_stop(force=False)
+
+        if self._msg is None:
+            # Didnt get a result
+            return {
+                "ERROR": [
+                    f"Mqtt result message not received on topic {result_topic} after {wait_time}sec",
+                    "",
+                ]
+            }
+        else:
+            msg = self._msg
+            self._msg = None
+            log.debug(f"mqtt response on {msg.topic} was: {msg.payload}")
+            return msg.payload
