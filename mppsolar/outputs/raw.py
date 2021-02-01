@@ -1,6 +1,7 @@
 import logging
 
 from .baseoutput import baseoutput
+from ..helpers import get_kwargs
 
 log = logging.getLogger("MPP-Solar")
 
@@ -15,7 +16,7 @@ class raw(baseoutput):
     def output(self, *args, **kwargs):
         log.info("Using output processor: raw")
         log.debug(f"processor.raw.output kwargs {kwargs}")
-        data = self.get_kwargs(kwargs, "data")
+        data = get_kwargs(kwargs, "data")
         if data is None:
             return
         _desc = "No description found"

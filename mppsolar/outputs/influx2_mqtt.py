@@ -1,6 +1,7 @@
 import logging
 
 from .mqtt import mqtt
+from ..helpers import get_kwargs
 
 log = logging.getLogger("MPP-Solar")
 
@@ -13,9 +14,9 @@ class influx2_mqtt(mqtt):
         log.debug(f"processor.influx2_mqtt __init__ kwargs {kwargs}")
 
     def build_msgs(self, *args, **kwargs):
-        data = self.get_kwargs(kwargs, "data")
-        tag = self.get_kwargs(kwargs, "tag")
-        topic = self.get_kwargs(kwargs, "topic", default="mpp-solar")
+        data = get_kwargs(kwargs, "data")
+        tag = get_kwargs(kwargs, "tag")
+        topic = get_kwargs(kwargs, "topic", default="mpp-solar")
         # Build array of Influx Line Protocol II messages
         # Message format is: mpp-solar,command=QPGS0 max_charger_range=120.0
         #                    mpp-solar,command=inverter2 parallel_instance_number="valid"

@@ -2,6 +2,7 @@ import json as js
 import logging
 
 from .baseoutput import baseoutput
+from ..helpers import get_kwargs
 
 log = logging.getLogger("MPP-Solar")
 
@@ -16,7 +17,7 @@ class json(baseoutput):
     def output(self, *args, **kwargs):
         log.info("Using output processor: json")
         log.debug(f"processor.json.output kwargs {kwargs}")
-        data = self.get_kwargs(kwargs, "data")
+        data = get_kwargs(kwargs, "data")
 
         data.pop("raw_response", None)
 

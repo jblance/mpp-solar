@@ -2,6 +2,7 @@ import logging
 import paho.mqtt.publish as publish
 
 from .baseoutput import baseoutput
+from ..helpers import get_kwargs
 
 log = logging.getLogger("MPP-Solar")
 
@@ -14,8 +15,8 @@ class mqtt(baseoutput):
         log.debug(f"processor.mqtt __init__ kwargs {kwargs}")
 
     def build_msgs(self, *args, **kwargs):
-        data = self.get_kwargs(kwargs, "data")
-        tag = self.get_kwargs(kwargs, "tag")
+        data = get_kwargs(kwargs, "data")
+        tag = get_kwargs(kwargs, "tag")
         # Build array of mqtt messages
         msgs = []
         # Remove command and _command_description
@@ -44,15 +45,15 @@ class mqtt(baseoutput):
     def output(self, *args, **kwargs):
         log.info("Using output processor: mqtt")
         log.debug(f"processor.mqtt.output kwargs {kwargs}")
-        data = self.get_kwargs(kwargs, "data")
+        data = get_kwargs(kwargs, "data")
         if data is None:
             return
-        tag = self.get_kwargs(kwargs, "tag")
-        topic = self.get_kwargs(kwargs, "topic")
-        mqtt_broker = self.get_kwargs(kwargs, "mqtt_broker", "localhost")
-        mqtt_port = self.get_kwargs(kwargs, "mqtt_port", 1883)
-        mqtt_user = self.get_kwargs(kwargs, "mqtt_user")
-        mqtt_pass = self.get_kwargs(kwargs, "mqtt_pass")
+        tag = get_kwargs(kwargs, "tag")
+        topic = get_kwargs(kwargs, "topic")
+        mqtt_broker = get_kwargs(kwargs, "mqtt_broker", "localhost")
+        mqtt_port = get_kwargs(kwargs, "mqtt_port", 1883)
+        mqtt_user = get_kwargs(kwargs, "mqtt_user")
+        mqtt_pass = get_kwargs(kwargs, "mqtt_pass")
 
         if mqtt_user is not None and mqtt_pass is not None:
             auth = {"username": mqtt_user, "password": mqtt_pass}

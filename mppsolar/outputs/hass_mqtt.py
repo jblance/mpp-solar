@@ -1,6 +1,7 @@
 import logging
 
 from .mqtt import mqtt
+from ..helpers import get_kwargs
 
 log = logging.getLogger("MPP-Solar")
 
@@ -13,8 +14,8 @@ class hass_mqtt(mqtt):
         log.debug(f"processor.hass_mqtt __init__ kwargs {kwargs}")
 
     def build_msgs(self, *args, **kwargs):
-        data = self.get_kwargs(kwargs, "data")
-        tag = self.get_kwargs(kwargs, "tag")
+        data = get_kwargs(kwargs, "data")
+        tag = get_kwargs(kwargs, "tag")
         # Build array of mqtt messages with hass update format
         # assumes hass_config has been run
         # or hass updated manually
