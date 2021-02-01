@@ -223,12 +223,9 @@ def main():
         import time
         import systemd.daemon
 
-        # Set logging level to info at least
-        if log.level == logging.NOTSET:
-            log.setLevel(logging.INFO)
         # Tell systemd that our service is ready
         systemd.daemon.notify("READY=1")
-        log.info("Service Initializing ...")
+        print("Service Initializing ...")
         # set some default-defaults
         pause = 60
 
@@ -277,10 +274,16 @@ def main():
             # build array of commands
             _commands.append((device, command, tag, outputs))
 
-            log.info(f"Config file: {args.configfile}")
-            log.info(f"Config setting - pause: {pause}")
-            log.info(f"Config setting - mqtt_broker: {mqtt_broker}")
-            log.info(f"Config setting - command sections found: {len(sections)}")
+            if args.daemon:
+                print(f"Config file: {args.configfile}")
+                print(f"Config setting - pause: {pause}")
+                print(f"Config setting - mqtt_broker: {mqtt_broker}, port: {mqtt_port}")
+                print(f"Config setting - command sections found: {len(sections)}")
+            else:
+                log.info(f"Config file: {args.configfile}")
+                log.info(f"Config setting - pause: {pause}")
+                log.info(f"Config setting - mqtt_broker: {mqtt_broker}, port: {mqtt_port}")
+                log.info(f"Config setting - command sections found: {len(sections)}")
 
     else:
         # No configfile specified
@@ -346,9 +349,13 @@ def main():
             # Tell systemd watchdog we are still alive
             if args.daemon:
                 systemd.daemon.notify("WATCHDOG=1")
-            log.info(
-                f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
-            )
+                print(
+                    f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
+                )
+            else:
+                log.info(
+                    f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
+                )
             results = _device.run_command(command=_command)
             log.debug(f"results: {results}")
             # send to output processor(s)
@@ -368,7 +375,7 @@ def main():
                 # Tell systemd watchdog we are still alive
         if args.daemon:
             systemd.daemon.notify("WATCHDOG=1")
-            log.info(f"Sleeping for {pause} sec")
+            print(f"Sleeping for {pause} sec")
             time.sleep(pause)
         else:
             # Dont loop unless running as daemon

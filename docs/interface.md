@@ -35,7 +35,6 @@ __str__(self) -> str
 run_command(self, command) -> dict
 get_status(self) -> dict
 get_settings(self) -> dict
-run_default_command(self) -> dict
 ```
 
 These functions are called based on the command line (or service) options
