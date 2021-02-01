@@ -1,2 +1,2 @@
-__version__ = "0.7.23"
-__version_comment__ = "recent changes: fix hass_mqtt"
+__version__ = "0.7.24"
+__version_comment__ = "recent changes: tidy __init__ to remove duplication"

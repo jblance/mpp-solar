@@ -8,7 +8,7 @@ log = logging.getLogger("MPP-Solar")
 
 class json(baseoutput):
     def __str__(self):
-        return "json - outputs the results to standard out in json format"
+        return "outputs the results to standard out in json format"
 
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.json __init__ kwargs {kwargs}")

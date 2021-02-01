@@ -156,6 +156,10 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             log.error("Attempted to list commands with no protocol defined")
             return {"ERROR": ["Attempted to list commands with no protocol defined", ""]}
         result = {}
+        result["_command"] = "command help"
+        result[
+            "_command_description"
+        ] = f"List available commands for protocol {str(self._protocol._protocol_id, 'utf-8')}"
         for command in self._protocol.COMMANDS:
             result[command] = [self._protocol.COMMANDS[command]["description"], ""]
         return result
@@ -166,14 +170,17 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         pkgpath = __file__
         pkgpath = pkgpath[: pkgpath.rfind("/")]
         pkgpath += "/../outputs"
-        print(pkgpath)
-        result = []
+        # print(pkgpath)
+        result = {}
+        result["_command"] = "outputs help"
+        result["_command_description"] = "List available output modules"
         for _, name, _ in pkgutil.iter_modules([pkgpath]):
             # print(name)
             _module_class = importlib.import_module("mppsolar.outputs." + name, ".")
             _module = getattr(_module_class, name)
-            result.append(_module())
-
+            # print(_module())
+            result[name] = (str(_module()), "", "")
+        # print(result)
         return result
 
     def run_commands(self, commands) -> dict:
@@ -207,6 +214,16 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         generic method for running a 'raw' command
         """
         log.info(f"Running command {command}")
+        if command == "list_commands":
+            return self.list_commands()
+        if command == "list_outputs":
+            return self.list_outputs()
+        if command == "get_status":
+            return self.get_status(show_raw)
+        if command == "get_settings":
+            return self.get_settings(show_raw)
+        if not command:
+            return self.run_default_command(show_raw)
 
         if self._protocol is None:
             log.error("Attempted to run command with no protocol defined")

@@ -7,7 +7,7 @@ log = logging.getLogger("MPP-Solar")
 
 class influx_mqtt(mqtt):
     def __str__(self):
-        return """influx_mqtt - outputs the to the supplied mqtt broker: eg <tag>, <tag>,setting=total_ac_output_apparent_power value=1577.0,unit="VA" """
+        return """outputs the to the supplied mqtt broker: eg <tag>, <tag>,setting=total_ac_output_apparent_power value=1577.0,unit="VA" """
 
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.influx_mqtt __init__ kwargs {kwargs}")

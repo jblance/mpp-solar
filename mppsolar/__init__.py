@@ -154,6 +154,12 @@ def main():
         default="localhost",
     )
     parser.add_argument(
+        "--mqttport",
+        type=str,
+        help="Specifies the mqtt broker port if needed (default: 1883)",
+        default=1883,
+    )
+    parser.add_argument(
         "--mqttuser",
         type=str,
         help="Specifies the username to use for authenticated mqtt broker publishing",
@@ -190,8 +196,9 @@ def main():
     )
 
     args = parser.parse_args()
-    called_name = parser.prog.replace("-", "")
-    log_name = called_name.upper()
+    prog_name = parser.prog
+    s_prog_name = prog_name.replace("-", "")
+    log_name = s_prog_name.upper()
 
     # Display verison if asked
     log.info(description)
@@ -210,14 +217,18 @@ def main():
     mqtt_user = args.mqttuser
     mqtt_pass = args.mqttpass
 
+    _commands = []
     # Initialize Daemon
     if args.daemon:
         import time
         import systemd.daemon
 
+        # Set logging level to info at least
+        if log.level == logging.NOTSET:
+            log.setLevel(logging.INFO)
         # Tell systemd that our service is ready
         systemd.daemon.notify("READY=1")
-        print(f"{log_name}-Service: Initializing ...")
+        log.info(f"{log_name}-Service: Initializing ...")
         # set some default-defaults
         pause = 60
 
@@ -233,11 +244,11 @@ def main():
         if "SETUP" in config:
             pause = config["SETUP"].getint("pause", fallback=60)
             mqtt_broker = config["SETUP"].get("mqtt_broker", fallback="localhost")
+            mqtt_port = config["SETUP"].get("mqtt_port", fallback=1883)
             mqtt_user = config["SETUP"].get("mqtt_user", fallback=None)
             mqtt_pass = config["SETUP"].get("mqtt_pass", fallback=None)
             sections.remove("SETUP")
         # Process 'command' sections
-        _commands = []
         for section in sections:
             name = section
             protocol = config[section].get("protocol", fallback=None)
@@ -251,7 +262,7 @@ def main():
             tag = config[section].get("tag")
             outputs = config[section].get("outputs", fallback="screen")
             portoveride = config[section].get("portoveride", fallback=None)
-            # todo: build array of commands
+            #
             device_class = get_device_class(type)
             log.debug(f"device_class {device_class}")
             # The device class __init__ will instantiate the port communications and protocol classes
@@ -263,67 +274,14 @@ def main():
                 baud=baud,
                 portoveride=portoveride,
             )
+            # build array of commands
             _commands.append((device, command, tag, outputs))
 
-        if args.daemon:
-            print(f"{log_name}-Service: Config file: {args.configfile}")
-            print(f"{log_name}-Service: Config setting - pause: {pause}")
-            print(f"{log_name}-Service: Config setting - mqtt_broker: {mqtt_broker}")
-            print(f"{log_name}-Service: Config setting - command sections found: {len(sections)}")
+            log.info(f"Config file: {args.configfile}")
+            log.info(f"Config setting - pause: {pause}")
+            log.info(f"Config setting - mqtt_broker: {mqtt_broker}")
+            log.info(f"Config setting - command sections found: {len(sections)}")
 
-            while True:
-                # Loop through the configured commands
-                for _device, _command, _tag, _outputs in _commands:
-                    ## for item in mppUtilArray:
-                    # Tell systemd watchdog we are still alive
-                    systemd.daemon.notify("WATCHDOG=1")
-                    print(
-                        f"{log_name}-Service: Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
-                    )
-                    results = _device.run_command(command=_command, show_raw=False)
-                    # send to output processor(s)
-                    outputs = get_outputs(_outputs)
-                    for op in outputs:
-                        # maybe include the command and what the command is im the output
-                        # eg QDI run, Display Inverter Default Settings
-                        op.output(
-                            data=results,
-                            tag=_tag,
-                            mqtt_broker=mqtt_broker,
-                            mqtt_user=mqtt_user,
-                            mqtt_pass=mqtt_pass,
-                            topic=parser.prog,
-                        )
-                        # Tell systemd watchdog we are still alive
-                        systemd.daemon.notify("WATCHDOG=1")
-
-                print(f"{log_name}-Service: sleeping for {pause} sec")
-                time.sleep(pause)
-
-        else:
-            # supplied a configfile, but running on command line
-            # this will run each section once
-            log.info(f"Command line using config file: {args.configfile}")
-            for _device, _command, _tag, _outputs in _commands:
-                log.debug(
-                    f"getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
-                )
-                results = _device.run_command(command=_command, show_raw=False)
-                # send to output processor(s)
-                log.debug(f"results: {results}")
-                outputs = get_outputs(_outputs)
-                for op in outputs:
-                    # maybe include the command and what the command is im the output
-                    # eg QDI run, Display Inverter Default Settings
-                    op.output(
-                        data=results,
-                        tag=_tag,
-                        mqtt_broker=mqtt_broker,
-                        mqtt_user=mqtt_user,
-                        mqtt_pass=mqtt_pass,
-                        topic=parser.prog,
-                    )
-            exit(0)
     else:
         # No configfile specified
         # process some arguments
@@ -338,9 +296,9 @@ def main():
 
         # create instance of device (supplying port + protocol types)
         log.info(
-            f'Creating device "{args.name}" (type: "{called_name}") on port "{args.port} (portoveride={args.porttype})" using protocol "{args.protocol}" for command "{args.command}" (tag: {tag})'
+            f'Creating device "{args.name}" (type: "{s_prog_name}") on port "{args.port} (portoveride={args.porttype})" using protocol "{args.protocol}" for command "{args.command}" (tag: {tag})'
         )
-        device_class = get_device_class(called_name)
+        device_class = get_device_class(s_prog_name)
         log.debug(f"device_class {device_class}")
         # The device class __init__ will instantiate the port communications and protocol classes
         device = device_class(
@@ -350,6 +308,103 @@ def main():
             baud=args.baud,
             portoveride=args.porttype,
         )
+        #
+
+        # determine whether to run command or call helper function
+        commands = []
+        if args.command == "help":
+            commands.append("list_commands")
+        elif args.output == "help":
+            commands.append("list_outputs")
+            args.output = "screen"
+            # print("Available output modules:")
+            # for result in results:
+            #    print(result)
+            # exit()
+        elif args.getstatus:
+            # use get_status helper
+            commands.append("get_status")
+            # TODO: implement get_status
+        elif args.getsettings:
+            # use get_settings helper
+            commands.append("get_settings")
+            # TODO: implement get_settings
+        elif args.command is None:
+            # run the command
+            commands.append("")
+        else:
+            commands.append(args.command.split(","))
+
+        outputs = args.output
+        for command in commands:
+            _commands.append((device, command, tag, outputs))
+
+    while True:
+        # Loop through the configured commands
+        if not args.daemon:
+            log.info(f"Looping {len(_commands)} commands")
+        for _device, _command, _tag, _outputs in _commands:
+            ## for item in mppUtilArray:
+            # Tell systemd watchdog we are still alive
+            if args.daemon:
+                systemd.daemon.notify("WATCHDOG=1")
+            log.info(
+                f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
+            )
+            results = _device.run_command(command=_command, show_raw=False)
+            log.debug(f"results: {results}")
+            # send to output processor(s)
+            outputs = get_outputs(_outputs)
+            for op in outputs:
+                # maybe include the command and what the command is im the output
+                # eg QDI run, Display Inverter Default Settings
+                op.output(
+                    data=results,
+                    tag=_tag,
+                    mqtt_broker=mqtt_broker,
+                    mqtt_user=mqtt_user,
+                    mqtt_pass=mqtt_pass,
+                    topic=parser.prog,
+                )
+                # Tell systemd watchdog we are still alive
+        if args.daemon:
+            systemd.daemon.notify("WATCHDOG=1")
+            log.info(f"Sleeping for {pause} sec")
+            time.sleep(pause)
+        else:
+            # Dont loop unless running as daemon
+            log.debug("Not daemon, so not looping")
+            break
+
+    else:
+        # supplied a configfile, but running on command line
+        exit(0)
+        # else:
+        #     # No configfile specified
+        #     # process some arguments
+        #     if args.tag:
+        #         tag = args.tag
+        #     else:
+        #         tag = args.command
+        #     if args.model is not None and args.protocol is None:
+        #         args.protocol = get_protocol_for_model(args.model)
+        #     if not args.showraw:
+        #         args.showraw = False
+
+        # # create instance of device (supplying port + protocol types)
+        # log.info(
+        #     f'Creating device "{args.name}" (type: "{s_prog_name}") on port "{args.port} (portoveride={args.porttype})" using protocol "{args.protocol}" for command "{args.command}" (tag: {tag})'
+        # )
+        # device_class = get_device_class(s_prog_name)
+        # log.debug(f"device_class {device_class}")
+        # # The device class __init__ will instantiate the port communications and protocol classes
+        # device = device_class(
+        #     name=args.name,
+        #     port=args.port,
+        #     protocol=args.protocol,
+        #     baud=args.baud,
+        #     portoveride=args.porttype,
+        # )
 
         # determine whether to run command or call helper function
         if args.command == "help":

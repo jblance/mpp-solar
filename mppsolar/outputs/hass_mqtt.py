@@ -7,7 +7,7 @@ log = logging.getLogger("MPP-Solar")
 
 class hass_mqtt(mqtt):
     def __str__(self):
-        return """hass_mqtt - outputs the to the supplied mqtt broker in hass format: eg "homeassistant/sensor/pm_{tag}_{key}/state" """
+        return """outputs the to the supplied mqtt broker in hass format: eg "homeassistant/sensor/pm_{tag}_{key}/state" """
 
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.hass_mqtt __init__ kwargs {kwargs}")
