@@ -93,10 +93,10 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             # No definiution, so just return the data
             len_command_defn = 0
             log.debug(f"No definition for command {command}, (splitted) raw response returned")
-            msgs["ERROR"] = [
+            msgs["WARNING"] = [
                 f"No definition for command {command} in protocol {self._protocol_id}",
                 "",
-            ]  # TODO: Is it really an error though? Perhaps should be called a warning?
+            ]
         else:
             len_command_defn = len(command_defn["response"])
         # Decode response based on stored command definition
