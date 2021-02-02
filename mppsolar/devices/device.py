@@ -166,6 +166,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             from mppsolar.io.mqttio import MqttIO
 
             self._port = MqttIO(
+                client_id=self._name,
                 mqtt_broker=mqtt_broker,
                 mqtt_port=mqtt_port,
                 mqtt_user=mqtt_user,
@@ -265,6 +266,16 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         # Send command and receive data
         full_command = self._protocol.get_full_command(command)
         log.info(f"full command {full_command} for command {command}")
+        if full_command is None:
+            log.error(
+                f"full_command not found for {command} in protocol {self._protocol._protocol_id}"
+            )
+            return {
+                "ERROR": [
+                    f"full_command not found for {command} in protocol {self._protocol._protocol_id}",
+                    "",
+                ]
+            }
 
         # Band-aid solution, need to reduce what is sent
         raw_response = self._port.send_and_receive(
