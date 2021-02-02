@@ -77,6 +77,9 @@ class MqttIO(BaseIO):
         else:
             msg_topic = self._msg.topic
             msg_payload = self._msg.payload.decode("unicode_escape")
+            log.debug(
+                f"mqtt raw response on {self._msg.topic} was: {self._msg.payload}, payload type: {type(self._msg.payload)}"
+            )
             # msg_payload = self._msg.payload
             self._msg = None
             log.debug(f"mqtt response on {msg_topic} was: {msg_payload}")
