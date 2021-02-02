@@ -819,13 +819,21 @@ class pi30(AbstractProtocol):
     def check_response_valid(self, response):
         if response is None:
             return False, {"ERROR": ["No response", ""]}
+        if len(response) <= 3:
+            return False, {"ERROR": ["Response to short", ""]}
 
-        if b"(NAK" in response:
-            return False, {"ERROR": ["NAK", ""]}
+        if type(response) is str:
+            if "(NAK" in response:
+                return False, {"ERROR": ["NAK", ""]}
+            crc_high, crc_low = crc(response[:-3])
+            if [ord(response[-3]), ord(response[-2])] != [crc_high, crc_low]:
+                return False, {"ERROR": ["Invalid response CRCs", ""]}
+        elif type(response) is bytes:
+            if b"(NAK" in response:
+                return False, {"ERROR": ["NAK", ""]}
 
-        if len(response) > 3:
             crc_high, crc_low = crc(response[:-3])
             if response[-3:-1] != bytes([crc_high, crc_low]):
                 return False, {"ERROR": ["Invalid response CRC", ""]}
-
+        log.debug("CRCs match")
         return True, {}

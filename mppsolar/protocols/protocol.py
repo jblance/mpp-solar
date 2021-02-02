@@ -57,6 +57,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         Default implementation of split and trim
         """
         # Trim leading '(' + trailing CRC and \r of response, then split
+        if type(response) is str:
+            return response[1:-3].split(" ")
         return response[1:-3].split(b" ")
 
     def check_response_valid(self, response) -> Tuple[bool, dict]:
@@ -78,7 +80,10 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         # Add Raw response
         _response = b""
         for item in response:
-            _response += chr(item).encode()
+            if type(item) is int:
+                _response += chr(item).encode()
+            else:
+                _response += item.encode()
         raw_response = _response.decode("utf-8")
         msgs["raw_response"] = [raw_response, ""]
 
@@ -112,7 +117,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
         for i, result in enumerate(responses):
             # decode result
-            result = result.decode("utf-8")
+            if type(result) is bytes:
+                result = result.decode("utf-8")
             # Check if we are past the 'known' responses
             if i >= len_command_defn:
                 resp_format = ["string", f"Unknown value in response {i}", ""]
