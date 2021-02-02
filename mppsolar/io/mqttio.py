@@ -19,9 +19,9 @@ class MqttIO(BaseIO):
         self.mqtt_port = get_kwargs(kwargs, "mqtt_port", 1883)
         self.mqtt_user = get_kwargs(kwargs, "mqtt_user")
         self.mqtt_pass = get_kwargs(kwargs, "mqtt_pass")
-        self._name = get_kwargs(kwargs, "name")
+        self.client_id = get_kwargs(kwargs, "client_id")
         log.info(
-            f"MqttIO.__init__ name: {self._name},  mqtt_broker: {self.mqtt_broker}, port: {self.mqtt_port}, user: {self.mqtt_user}, pass: {self.mqtt_pass}"
+            f"MqttIO.__init__ client_id: {self.client_id},  mqtt_broker: {self.mqtt_broker}, port: {self.mqtt_port}, user: {self.mqtt_user}, pass: {self.mqtt_pass}"
         )
         self._msg = None
 
@@ -31,7 +31,7 @@ class MqttIO(BaseIO):
 
     def send_and_receive(self, *args, **kwargs) -> dict:
         full_command = get_kwargs(kwargs, "full_command")
-        client_id = self._name
+        client_id = self.client_id
 
         wait_time = 5
         response_line = None
@@ -75,7 +75,9 @@ class MqttIO(BaseIO):
                 ]
             }
         else:
-            msg = self._msg
+            msg_topic = self._msg.topic
+            msg_payload = self._msg.payload.decode("unicode_escape")
+            # msg_payload = self._msg.payload
             self._msg = None
-            log.debug(f"mqtt response on {msg.topic} was: {msg.payload}")
-            return msg.payload
+            log.debug(f"mqtt response on {msg_topic} was: {msg_payload}")
+            return msg_payload
