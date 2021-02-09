@@ -54,6 +54,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.8",
     ],
+    python_requires=">=3.6",
     # What does your project relate to?
     keywords="hardware serial communication",
     # You can just specify the packages manually here if your project is
