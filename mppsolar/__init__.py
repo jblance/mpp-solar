@@ -190,13 +190,26 @@ def main():
         default=None,
     )
     parser.add_argument("-c", "--command", nargs="?", const="help", help="Command to run")
-    parser.add_argument(
-        "-C",
-        "--configfile",
-        type=str,
-        help="Full location of config file",
-        default=None,
-    )
+    if parser.prog == "jkbms":
+        parser.add_argument(
+            "-C",
+            "--configfile",
+            nargs="?",
+            type=str,
+            help="Full location of config file (default None, /etc/jkbms/jkbms.conf if -C supplied)",
+            const="/etc/jkbms/jkbms.conf",
+            default=None,
+        )
+    else:
+        parser.add_argument(
+            "-C",
+            "--configfile",
+            nargs="?",
+            type=str,
+            help="Full location of config file (default None, /etc/mpp-solar/mpp-solar.conf if -C supplied)",
+            const="/etc/mpp-solar/mpp-solar.conf",
+            default=None,
+        )
     parser.add_argument("--daemon", action="store_true", help="Run as daemon")
     parser.add_argument("--getstatus", action="store_true", help="Get Inverter Status")
     parser.add_argument("--getsettings", action="store_true", help="Get Inverter Settings")
