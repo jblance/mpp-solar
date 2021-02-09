@@ -53,6 +53,7 @@ class hass_mqtt(mqtt):
                 # topic "homeassistant/binary_sensor/garden/config"
                 # msg '{"name": "garden", "device_class": "motion", "state_topic": "homeassistant/binary_sensor/garden/state", "unit_of_measurement": "°C"}'
                 topic = f"homeassistant/sensor/mpp_{tag}_{key}/config"
+                topic = topic.replace(" ", "_")
                 name = f"{tag} {_key}"
                 payload = f'{{"name": "{name}", "state_topic": "homeassistant/sensor/mpp_{tag}_{key}/state", "unit_of_measurement": "{unit}"}}'
                 # msg = {"topic": topic, "payload": payload, "retain": True}
