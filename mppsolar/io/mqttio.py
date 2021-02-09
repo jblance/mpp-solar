@@ -1,3 +1,4 @@
+import json as js
 import logging
 import paho.mqtt.publish as publish
 import paho.mqtt.subscribe as subscribe
@@ -31,6 +32,7 @@ class MqttIO(BaseIO):
 
     def send_and_receive(self, *args, **kwargs) -> dict:
         full_command = get_kwargs(kwargs, "full_command")
+        command = get_kwargs(kwargs, "command")
         client_id = self.client_id
 
         wait_time = 5
@@ -55,6 +57,9 @@ class MqttIO(BaseIO):
         mqtt_client.connect(self.mqtt_broker, port=self.mqtt_port)
 
         payload = full_command
+        _payload = "{'command': '%s', 'full_command': %s}" % (command, full_command)
+        print(_payload)
+
         log.debug(f"Publishing {payload} to topic: {command_topic}")
 
         # publish(topic, payload=None, qos=0, retain=False)
