@@ -1,7 +1,9 @@
 import logging
+import re
 
 from .mqtt import mqtt
 from ..helpers import get_kwargs
+from ..helpers import key_wanted
 
 log = logging.getLogger("MPP-Solar")
 
@@ -16,6 +18,15 @@ class influx_mqtt(mqtt):
     def build_msgs(self, *args, **kwargs):
         data = get_kwargs(kwargs, "data")
         tag = get_kwargs(kwargs, "tag")
+        keep_case = get_kwargs(kwargs, "keep_case")
+
+        filter = get_kwargs(kwargs, "filter")
+        if filter is not None:
+            filter = re.compile(filter)
+        excl_filter = get_kwargs(kwargs, "excl_filter")
+        if excl_filter is not None:
+            excl_filter = re.compile(excl_filter)
+
         # Build array of Influx Line Protocol messages
         msgs = []
         # Remove command and _command_description
@@ -30,13 +41,17 @@ class influx_mqtt(mqtt):
             value = data[key][0]
             unit = data[key][1]
             # remove spaces
-            key = key.lower().replace(" ", "_")
+            key = key.replace(" ", "_")
+            if not keep_case:
+                # make lowercase
+                key = key.lower()
             # Message format is: tag, tag,setting=total_ac_output_apparent_power value=1577.0,unit="VA"
-            if not unit:
-                unit = ""
-            msg = {
-                "topic": "mpp-solar",
-                "payload": f"{tag},setting={key} value={value},unit={unit}",
-            }
-            msgs.append(msg)
+            if key_wanted(key, filter, excl_filter):
+                if not unit:
+                    unit = ""
+                msg = {
+                    "topic": "mpp-solar",
+                    "payload": f"{tag},setting={key} value={value},unit={unit}",
+                }
+                msgs.append(msg)
         return msgs

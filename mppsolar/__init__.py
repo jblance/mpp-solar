@@ -147,6 +147,24 @@ def main():
         default="screen",
     )
     parser.add_argument(
+        "--keepcase",
+        action="store_true",
+        help="Do not convert the field names to lowercase",
+        default=False,
+    )
+    parser.add_argument(
+        "--filter",
+        type=str,
+        help="Specifies the filter to reduce the output - only those fields that match will be output (uses re.search)",
+        default=None,
+    )
+    parser.add_argument(
+        "--exclfilter",
+        type=str,
+        help="Specifies the filter to reduce the output - any fields that match will be excluded from the output (uses re.search)",
+        default=None,
+    )
+    parser.add_argument(
         "-q",
         "--mqttbroker",
         type=str,
@@ -216,6 +234,9 @@ def main():
     mqtt_port = args.mqttport
     mqtt_user = args.mqttuser
     mqtt_pass = args.mqttpass
+    filter = args.filter
+    excl_filter = args.exclfilter
+    keep_case = args.keepcase
 
     _commands = []
     # Initialize Daemon
@@ -373,6 +394,7 @@ def main():
             for op in outputs:
                 # maybe include the command and what the command is im the output
                 # eg QDI run, Display Inverter Default Settings
+                log.debug(f"Using output filter: {filter}")
                 op.output(
                     data=results,
                     tag=_tag,
@@ -381,6 +403,9 @@ def main():
                     mqtt_user=mqtt_user,
                     mqtt_pass=mqtt_pass,
                     topic=prog_name,
+                    filter=filter,
+                    excl_filter=excl_filter,
+                    keep_case=keep_case,
                 )
                 # Tell systemd watchdog we are still alive
         if args.daemon:

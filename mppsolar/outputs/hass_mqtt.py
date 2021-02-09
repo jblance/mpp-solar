@@ -1,14 +1,16 @@
 import logging
+import re
 
 from .mqtt import mqtt
 from ..helpers import get_kwargs
+from ..helpers import key_wanted
 
 log = logging.getLogger("MPP-Solar")
 
 
 class hass_mqtt(mqtt):
     def __str__(self):
-        return """outputs the to the supplied mqtt broker in hass format: eg "homeassistant/sensor/pm_{tag}_{key}/state" """
+        return """outputs the to the supplied mqtt broker in hass format: eg "homeassistant/sensor/mpp_{tag}_{key}/state" """
 
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"processor.hass_mqtt __init__ kwargs {kwargs}")
@@ -16,6 +18,15 @@ class hass_mqtt(mqtt):
     def build_msgs(self, *args, **kwargs):
         data = get_kwargs(kwargs, "data")
         tag = get_kwargs(kwargs, "tag")
+        keep_case = get_kwargs(kwargs, "keep_case")
+
+        filter = get_kwargs(kwargs, "filter")
+        if filter is not None:
+            filter = re.compile(filter)
+        excl_filter = get_kwargs(kwargs, "excl_filter")
+        if excl_filter is not None:
+            excl_filter = re.compile(excl_filter)
+
         # Build array of mqtt messages with hass update format
         # assumes hass_config has been run
         # or hass updated manually
@@ -26,27 +37,34 @@ class hass_mqtt(mqtt):
         data.pop("raw_response", None)
 
         # Loop through responses
-        for key in data:
-            value = data[key][0]
-            unit = data[key][1]
+        for _key in data:
+            value = data[_key][0]
+            unit = data[_key][1]
             # remove spaces
-            key = key.lower().replace(" ", "_")
-            #
-            # CONFIG / AUTODISCOVER
-            #
-            # <discovery_prefix>/<component>/[<node_id>/]<object_id>/config
-            # topic "homeassistant/binary_sensor/garden/config"
-            # msg '{"name": "garden", "device_class": "motion", "state_topic": "homeassistant/binary_sensor/garden/state", "unit_of_measurement": "°C"}'
-            topic = f"homeassistant/sensor/pm_{tag}_{key}/config"
-            payload = f'{{"name": "pm_{tag}_{key}", "state_topic": "homeassistant/sensor/pm_{tag}_{key}/state", "unit_of_measurement": "{unit}"}}'
-            msg = {"topic": topic, "payload": payload, "retain": True}
-            #
-            # VALUE SETTING
-            #
-            # unit = data[key][1]
-            # 'tag'/status/total_output_active_power/value 1250
-            # 'tag'/status/total_output_active_power/unit W
-            topic = f"homeassistant/sensor/pm_{tag}_{key}/state"
-            msg = {"topic": topic, "payload": value}
-            msgs.append(msg)
+            key = _key.replace(" ", "_")
+            if not keep_case:
+                # make lowercase
+                key = key.lower()
+            if key_wanted(key, filter, excl_filter):
+                #
+                # CONFIG / AUTODISCOVER
+                #
+                # <discovery_prefix>/<component>/[<node_id>/]<object_id>/config
+                # topic "homeassistant/binary_sensor/garden/config"
+                # msg '{"name": "garden", "device_class": "motion", "state_topic": "homeassistant/binary_sensor/garden/state", "unit_of_measurement": "°C"}'
+                topic = f"homeassistant/sensor/mpp_{tag}_{key}/config"
+                name = f"{tag} {_key}"
+                payload = f'{{"name": "{name}", "state_topic": "homeassistant/sensor/mpp_{tag}_{key}/state", "unit_of_measurement": "{unit}"}}'
+                # msg = {"topic": topic, "payload": payload, "retain": True}
+                msg = {"topic": topic, "payload": payload}
+                msgs.append(msg)
+                #
+                # VALUE SETTING
+                #
+                # unit = data[key][1]
+                # 'tag'/status/total_output_active_power/value 1250
+                # 'tag'/status/total_output_active_power/unit W
+                topic = f"homeassistant/sensor/mpp_{tag}_{key}/state"
+                msg = {"topic": topic, "payload": value}
+                msgs.append(msg)
         return msgs
