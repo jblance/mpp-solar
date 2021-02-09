@@ -280,6 +280,8 @@ def main():
             tag = config[section].get("tag")
             outputs = config[section].get("outputs", fallback="screen")
             porttype = config[section].get("porttype", fallback=None)
+            filter = config[section].get("filter", fallback=None)
+            excl_filter = config[section].get("exclfilter", fallback=None)
             #
             device_class = get_device_class(type)
             log.debug(f"device_class {device_class}")
@@ -297,7 +299,7 @@ def main():
                 mqtt_pass=mqtt_pass,
             )
             # build array of commands
-            _commands.append((device, command, tag, outputs))
+            _commands.append((device, command, tag, outputs, filter, excl_filter))
 
             if args.daemon:
                 print(f"Config file: {args.configfile}")
@@ -368,14 +370,14 @@ def main():
 
         outputs = args.output
         for command in commands:
-            _commands.append((device, command, tag, outputs))
+            _commands.append((device, command, tag, outputs, filter, excl_filter))
         log.debug(f"Commands {_commands}")
 
     while True:
         # Loop through the configured commands
         if not args.daemon:
             log.info(f"Looping {len(_commands)} commands")
-        for _device, _command, _tag, _outputs in _commands:
+        for _device, _command, _tag, _outputs, filter, excl_filter in _commands:
             ## for item in mppUtilArray:
             # Tell systemd watchdog we are still alive
             if args.daemon:
