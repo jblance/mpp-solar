@@ -26,6 +26,12 @@ class mqtt(baseoutput):
         cmd = data.pop("_command", None)
         data.pop("_command_description", None)
         data.pop("raw_response", None)
+        filter = get_kwargs(kwargs, "filter")
+        if filter is not None:
+            filter = re.compile(filter)
+        excl_filter = get_kwargs(kwargs, "excl_filter")
+        if excl_filter is not None:
+            excl_filter = re.compile(excl_filter)
         if tag is None:
             tag = cmd
         # Loop through responses
