@@ -62,7 +62,17 @@ class mqtt(baseoutput):
         if data is None:
             return
         mqtt_broker = get_kwargs(kwargs, "mqtt_broker", "localhost")
-        mqtt_port = get_kwargs(kwargs, "mqtt_port", 1883)
+        _port = get_kwargs(kwargs, "mqtt_port", 1883)
+        try:
+            mqtt_port = int(_port)
+        except ValueError as e:
+            log.warn(f"Unable to cast {_port} to int - check value supplied for mqttport")
+            log.warn(e)
+            return
+        except Exception as e:
+            log.warn(e)
+            return
+
         mqtt_user = get_kwargs(kwargs, "mqtt_user")
         mqtt_pass = get_kwargs(kwargs, "mqtt_pass")
 
@@ -87,7 +97,13 @@ class mqtt(baseoutput):
                 for msg in msgs:
                     print(msg)
             else:
-                publish.multiple(msgs, hostname=mqtt_broker, port=mqtt_port, auth=auth)
+                try:
+                    publish.multiple(msgs, hostname=mqtt_broker, port=mqtt_port, auth=auth)
+                except Exception as e:
+                    log.warn(
+                        f"Error publishing MQTT messages to broker '{mqtt_broker}' on port '{mqtt_port}' with auth '{auth}'"
+                    )
+                    log.warn(e)
         else:
             if mqtt_broker == "screen":
                 print("MQTT build_msgs returned no messages")
