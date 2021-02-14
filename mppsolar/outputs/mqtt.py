@@ -83,6 +83,13 @@ class mqtt(baseoutput):
         msgs = self.build_msgs(**kwargs)
         log.debug(f"mqtt.output msgs {msgs}")
         if msgs:
-            publish.multiple(msgs, hostname=mqtt_broker, port=mqtt_port, auth=auth)
+            if mqtt_broker == "screen":
+                for msg in msgs:
+                    print(msg)
+            else:
+                publish.multiple(msgs, hostname=mqtt_broker, port=mqtt_port, auth=auth)
         else:
-            log.warn("MQTT build_msgs returned no messages")
+            if mqtt_broker == "screen":
+                print("MQTT build_msgs returned no messages")
+            else:
+                log.warn("MQTT build_msgs returned no messages")
