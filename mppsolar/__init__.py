@@ -360,9 +360,11 @@ def main():
         # determine whether to run command or call helper function
         commands = []
         if args.command == "help":
+            keep_case = True
             commands.append("list_commands")
         elif args.output == "help":
             commands.append("list_outputs")
+            keep_case = True
             args.output = "screen"
             # print("Available output modules:")
             # for result in results:
