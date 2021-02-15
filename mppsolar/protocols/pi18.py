@@ -5,7 +5,7 @@ from .protocol_helpers import crcPI as crc
 
 # from .pi30 import COMMANDS
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("pi18")
 
 COMMANDS = {
     "ET": {
@@ -128,7 +128,9 @@ class pi18(AbstractProtocol):
         """
         Override the default get_full_command as its different for PI18
         """
-        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
+        log.info(
+            f"get_full_command: Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
+        )
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
@@ -147,7 +149,7 @@ class pi18(AbstractProtocol):
         if _type == "QUERY":
             _prefix = f"^P{len(command_crc):03}"
             full_command = bytes(_prefix, "utf-8") + command_crc
-        log.debug(f"full command: {full_command}")
+        log.debug(f"get_full_command: full command: {full_command}")
         return full_command
 
     def get_responses(self, response):

@@ -4,7 +4,7 @@ from .protocol import AbstractProtocol
 
 # from .pi30 import COMMANDS
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("vedirect")
 
 # (AAA BBB CCC DDD EEE
 # (000 001 002 003 004
@@ -108,7 +108,9 @@ class vedirect(AbstractProtocol):
         """
         Override the default get_full_command as its different for VEDirect
         """
-        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
+        log.info(
+            f"get_full_command: Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
+        )
         # These need to be set to allow other functions to work`
         self._command = command
         # self._command_defn = self.get_command_defn(command)
@@ -117,7 +119,7 @@ class vedirect(AbstractProtocol):
         cmd = bytes(self._command, "utf-8")
         # combine byte_cmd, return
         full_command = cmd  # + bytes([13])
-        log.debug(f"full command: {full_command}")
+        log.debug(f"get_full_command: full command: {full_command}")
         return full_command
 
     def get_responses(self, response):

@@ -5,7 +5,7 @@ from .mqtt import mqtt
 from ..helpers import get_kwargs
 from ..helpers import key_wanted
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("hass_mqtt")
 
 
 class hass_mqtt(mqtt):
@@ -13,7 +13,7 @@ class hass_mqtt(mqtt):
         return """outputs the to the supplied mqtt broker in hass format: eg "homeassistant/sensor/mpp_{tag}_{key}/state" """
 
     def __init__(self, *args, **kwargs) -> None:
-        log.debug(f"processor.hass_mqtt __init__ kwargs {kwargs}")
+        log.debug(f"__init__: kwargs {kwargs}")
 
     def build_msgs(self, *args, **kwargs):
         data = get_kwargs(kwargs, "data")

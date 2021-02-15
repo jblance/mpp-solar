@@ -6,7 +6,7 @@ from .baseio import BaseIO
 from ..helpers import get_kwargs
 from .jkbledelegate import jkBleDelegate
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("JkBleIO")
 
 getInfo = b"\xaa\x55\x90\xeb\x97\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11"
 

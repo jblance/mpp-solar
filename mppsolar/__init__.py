@@ -6,12 +6,6 @@ from sys import exit
 
 from .version import __version__, __version_comment__  # noqa: F401
 
-log = logging.getLogger("MPP-Solar")
-# logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-# set default log level
-log.setLevel(logging.WARNING)
-logging.basicConfig()
-
 # Ongoing effort to map model "numbers" to the correct protocol
 MODEL_PROTOCOL_MAP = {
     "standard": "PI30",
@@ -19,6 +13,10 @@ MODEL_PROTOCOL_MAP = {
     "LV5048": "PI41",
     "PI18": "PI18",
 }
+
+# Set-up logger
+# log = logging.getLogger(log_name)
+log = logging.getLogger("")
 
 
 def get_outputs(output_list):
@@ -230,18 +228,22 @@ def main():
     s_prog_name = prog_name.replace("-", "")
     log_name = s_prog_name.upper()
 
+    # logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    # Turn on debug if needed
+    if args.debug:
+        log.setLevel(logging.DEBUG)
+    elif args.info:
+        log.setLevel(logging.INFO)
+    else:
+        # set default log level
+        log.setLevel(logging.WARNING)
+    logging.basicConfig()
+
     # Display verison if asked
     log.info(description)
     if args.version:
         print(description)
         exit(0)
-    # Turn on debug if needed
-    if args.debug:
-        log.setLevel(logging.DEBUG)
-        # ch.setLevel(logging.DEBUG)
-    elif args.info:
-        log.setLevel(logging.INFO)
-        # ch.setLevel(logging.INFO)
 
     mqtt_broker = args.mqttbroker
     mqtt_port = args.mqttport

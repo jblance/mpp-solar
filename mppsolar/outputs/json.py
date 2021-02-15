@@ -6,7 +6,7 @@ from .baseoutput import baseoutput
 from ..helpers import get_kwargs
 from ..helpers import key_wanted
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("json")
 
 
 class json(baseoutput):
@@ -14,11 +14,11 @@ class json(baseoutput):
         return "outputs the results to standard out in json format"
 
     def __init__(self, *args, **kwargs) -> None:
-        log.debug(f"processor.json __init__ kwargs {kwargs}")
+        log.debug(f"__init__: kwargs {kwargs}")
 
     def output(self, *args, **kwargs):
-        log.info("Using output processor: json")
-        log.debug(f"processor.json.output kwargs {kwargs}")
+        log.info("output: Using output processor: json")
+        log.debug(f"output: kwargs {kwargs}")
         data = get_kwargs(kwargs, "data")
         keep_case = get_kwargs(kwargs, "keep_case")
         data.pop("raw_response", None)

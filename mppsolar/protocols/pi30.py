@@ -3,7 +3,7 @@ import logging
 from .protocol import AbstractProtocol
 from .protocol_helpers import crcPI as crc
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("pi30")
 
 COMMANDS = {
     "F": {
@@ -835,5 +835,5 @@ class pi30(AbstractProtocol):
             crc_high, crc_low = crc(response[:-3])
             if response[-3:-1] != bytes([crc_high, crc_low]):
                 return False, {"ERROR": ["Invalid response CRC", ""]}
-        log.debug("CRCs match")
+        log.debug("check_response_valid: CRCs match")
         return True, {}

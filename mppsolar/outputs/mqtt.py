@@ -6,7 +6,7 @@ from .baseoutput import baseoutput
 from ..helpers import get_kwargs
 from ..helpers import key_wanted
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("mqtt")
 
 
 class mqtt(baseoutput):
@@ -14,7 +14,7 @@ class mqtt(baseoutput):
         return "outputs the to the supplied mqtt broker: eg 'tag'/status/total_output_active_power/value 1250"
 
     def __init__(self, *args, **kwargs) -> None:
-        log.debug(f"processor.mqtt __init__ kwargs {kwargs}")
+        log.debug(f"__init__: kwargs {kwargs}")
 
     def build_msgs(self, *args, **kwargs):
         data = get_kwargs(kwargs, "data")
@@ -44,7 +44,7 @@ class mqtt(baseoutput):
                 # make lowercase
                 key = key.lower()
             if key_wanted(key, filter, excl_filter):
-                log.debug(f"tag {tag}, key {key}, value {value}, unit {unit}")
+                log.debug(f"build_msgs: tag {tag}, key {key}, value {value}, unit {unit}")
                 # 'tag'/status/total_output_active_power/value 1250
                 # 'tag'/status/total_output_active_power/unit W
                 msg = {"topic": f"{tag}/status/{key}/value", "payload": value}
@@ -52,12 +52,12 @@ class mqtt(baseoutput):
                 if unit:
                     msg = {"topic": f"{tag}/status/{key}/unit", "payload": unit}
                     msgs.append(msg)
-        log.debug(msgs)
+        log.debug(f"build_msgs: {msgs}")
         return msgs
 
     def output(self, *args, **kwargs):
-        log.info("Using output processor: mqtt")
-        log.debug(f"processor.mqtt.output kwargs {kwargs}")
+        log.info("output: Using output processor: mqtt")
+        log.debug(f"output: kwargs {kwargs}")
         data = get_kwargs(kwargs, "data")
         if data is None:
             return
@@ -66,7 +66,7 @@ class mqtt(baseoutput):
         try:
             mqtt_port = int(_port)
         except ValueError as e:
-            log.warn(f"Unable to cast {_port} to int - check value supplied for mqttport")
+            log.warn(f"output: Unable to cast {_port} to int - check value supplied for mqttport")
             log.warn(e)
             return
         except Exception as e:
@@ -85,9 +85,11 @@ class mqtt(baseoutput):
 
         if mqtt_user is not None and mqtt_pass is not None:
             auth = {"username": mqtt_user, "password": mqtt_pass}
-            log.info(f"Using mqtt authentication, username: {mqtt_user}, password: [supplied]")
+            log.info(
+                f"output: Using mqtt authentication, username: {mqtt_user}, password: [supplied]"
+            )
         else:
-            log.debug("No mqtt authentication used")
+            log.debug("output: No mqtt authentication used")
             auth = None
 
         msgs = self.build_msgs(**kwargs)
@@ -101,11 +103,11 @@ class mqtt(baseoutput):
                     publish.multiple(msgs, hostname=mqtt_broker, port=mqtt_port, auth=auth)
                 except Exception as e:
                     log.warn(
-                        f"Error publishing MQTT messages to broker '{mqtt_broker}' on port '{mqtt_port}' with auth '{auth}'"
+                        f"output: Error publishing MQTT messages to broker '{mqtt_broker}' on port '{mqtt_port}' with auth '{auth}'"
                     )
                     log.warn(e)
         else:
             if mqtt_broker == "screen":
                 print("MQTT build_msgs returned no messages")
             else:
-                log.warn("MQTT build_msgs returned no messages")
+                log.warn("output: MQTT build_msgs returned no messages")

@@ -5,7 +5,7 @@ import random
 from .baseio import BaseIO
 from ..helpers import get_kwargs
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("TestIO")
 
 
 class TestIO(BaseIO):
@@ -22,5 +22,5 @@ class TestIO(BaseIO):
             ]
         response = self._test_data
         # response = b"(PI30\x9a\x0b\r"
-        log.debug(f"Raw response {response}")
+        log.debug(f"send_and_receive: Raw response {response}")
         return response

@@ -6,7 +6,7 @@ from typing import Tuple
 from .protocol_helpers import crcPI as crc
 from .protocol_helpers import get_resp_defn
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("AbstractProtocol")
 
 
 class AbstractProtocol(metaclass=abc.ABCMeta):
@@ -23,34 +23,36 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         return self._protocol_id
 
     def get_full_command(self, command) -> bytes:
-        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
+        log.info(
+            f"get_full_command: Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
+        )
 
         byte_cmd = bytes(command, "utf-8")
         # calculate the CRC
         crc_high, crc_low = crc(byte_cmd)
         # combine byte_cmd, CRC , return
         full_command = byte_cmd + bytes([crc_high, crc_low, 13])
-        log.debug(f"full command: {full_command}")
+        log.debug(f"get_full_command: full command: {full_command}")
         return full_command
 
     def get_command_defn(self, command) -> dict:
-        log.debug(f"get_command_defn for: {command}")
+        log.debug(f"get_command_defn: Processing command '{command}'")
         if command in self.COMMANDS:
             # print(command)
-            log.debug(f"Found command {command} in protocol {self._protocol_id}")
+            log.debug(f"get_command_defn: Found command {command} in protocol {self._protocol_id}")
             return self.COMMANDS[command]
         for _command in self.COMMANDS:
             if "regex" in self.COMMANDS[_command] and self.COMMANDS[_command]["regex"]:
-                log.debug(f"Regex commands _command: {_command}")
+                log.debug(f"get_command_defn: Regex commands _command: {_command}")
                 _re = re.compile(self.COMMANDS[_command]["regex"])
                 match = _re.match(command)
                 if match:
                     log.debug(
-                        f"Matched: {command} to: {self.COMMANDS[_command]['name']} value: {match.group(1)}"
+                        f"get_command_defn: Matched: {command} to: {self.COMMANDS[_command]['name']} value: {match.group(1)}"
                     )
                     self._command_value = match.group(1)
                     return self.COMMANDS[_command]
-        log.info(f"No command_defn found for {command}")
+        log.info(f"get_command_defn: No command_defn found for {command}")
         return None
 
     def get_responses(self, response) -> list:
@@ -71,7 +73,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         return True, {}
 
     def decode(self, response, command) -> dict:
-        log.info(f"response passed to decode: {response}")
+        log.info(f"decode: response passed to decode: {response}")
 
         valid, msgs = self.check_response_valid(response)
         if not valid:
@@ -98,7 +100,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         if not command_defn:
             # No definiution, so just return the data
             len_command_defn = 0
-            log.debug(f"No definition for command {command}, (splitted) raw response returned")
+            log.debug(
+                f"decode: No definition for command {command}, (splitted) raw response returned"
+            )
             msgs["WARNING"] = [
                 f"No definition for command {command} in protocol {self._protocol_id}",
                 "",
@@ -114,11 +118,11 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
         responses = self.get_responses(response)
 
-        log.debug(f"trimmed and split responses: {responses}")
+        log.debug(f"decode: trimmed and split responses: {responses}")
 
         # Responses are determined by a KEY lookup (instead or in sequence)
         if command_defn["type"] == "KEYED":
-            log.info("Processing KEYED type responses")
+            log.info("decode: Processing KEYED type responses")
             # print(command_defn["response"])
             for response in responses:
                 field = response[0]
@@ -142,7 +146,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 msgs[key] = [value, units]
         else:
             # Responses are determined by the order they are returned
-            log.info("Processing SEQUENCE type responses")
+            log.info("decode: Processing SEQUENCE type responses")
 
             for i, result in enumerate(responses):
                 # decode result

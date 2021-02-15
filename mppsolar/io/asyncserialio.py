@@ -5,7 +5,7 @@ import time
 from .baseio import BaseIO
 from ..helpers import get_kwargs
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("AsyncSerialIO")
 
 
 class AsyncSerialIO(BaseIO):

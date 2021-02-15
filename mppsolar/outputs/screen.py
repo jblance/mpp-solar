@@ -5,7 +5,7 @@ from .baseoutput import baseoutput
 from ..helpers import get_kwargs
 from ..helpers import key_wanted
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("screen")
 
 
 class screen(baseoutput):
@@ -16,8 +16,8 @@ class screen(baseoutput):
         log.debug(f"processor.screen __init__ kwargs {kwargs}")
 
     def output(self, *args, **kwargs):
-        log.info("Using output processor: screen")
-        log.debug(f"processor.screen.output kwargs {kwargs}")
+        log.info("output: Using output processor: screen")
+        log.debug(f"output: kwargs {kwargs}")
         data = get_kwargs(kwargs, "data")
         if data is None:
             return

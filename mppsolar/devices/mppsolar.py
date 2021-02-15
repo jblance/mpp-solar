@@ -1,9 +1,4 @@
-import logging
-
 from .device import AbstractDevice
-
-
-log = logging.getLogger("MPP-Solar")
 
 
 class mppsolar(AbstractDevice):

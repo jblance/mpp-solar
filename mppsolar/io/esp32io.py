@@ -5,7 +5,7 @@ import time
 from .baseio import BaseIO
 from ..helpers import get_kwargs
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("ESP32IO")
 
 
 class ESP32IO(BaseIO):

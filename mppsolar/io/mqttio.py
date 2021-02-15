@@ -9,7 +9,7 @@ import time
 from .baseio import BaseIO
 from ..helpers import get_kwargs
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("MqttIO")
 
 
 class MqttIO(BaseIO):
@@ -22,7 +22,7 @@ class MqttIO(BaseIO):
         self.mqtt_pass = get_kwargs(kwargs, "mqtt_pass")
         self.client_id = get_kwargs(kwargs, "client_id")
         log.info(
-            f"MqttIO.__init__ client_id: {self.client_id},  mqtt_broker: {self.mqtt_broker}, port: {self.mqtt_port}, user: {self.mqtt_user}, pass: {self.mqtt_pass}"
+            f"__init__: client_id: {self.client_id},  mqtt_broker: {self.mqtt_broker}, port: {self.mqtt_port}, user: {self.mqtt_user}, pass: {self.mqtt_pass}"
         )
         self._msg = None
 

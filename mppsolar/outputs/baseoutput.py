@@ -1,7 +1,7 @@
 import logging
 
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("baseoutput")
 
 
 class baseoutput:

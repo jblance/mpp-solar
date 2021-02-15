@@ -3,7 +3,7 @@ import logging
 from .jkabstractprotocol import jkAbstractProtocol
 
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("jk02")
 
 NEW_COMMANDS = {
     "getCellData": {

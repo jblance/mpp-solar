@@ -4,7 +4,7 @@ import logging
 from binascii import unhexlify
 from struct import unpack
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("protocol_helpers")
 
 
 def crc8(byteData):

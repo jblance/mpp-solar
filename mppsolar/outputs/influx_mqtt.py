@@ -5,7 +5,7 @@ from .mqtt import mqtt
 from ..helpers import get_kwargs
 from ..helpers import key_wanted
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("influx_mqtt")
 
 
 class influx_mqtt(mqtt):
@@ -13,7 +13,7 @@ class influx_mqtt(mqtt):
         return """outputs the to the supplied mqtt broker: eg <tag>, <tag>,setting=total_ac_output_apparent_power value=1577.0,unit="VA" """
 
     def __init__(self, *args, **kwargs) -> None:
-        log.debug(f"processor.influx_mqtt __init__ kwargs {kwargs}")
+        log.debug(f"__init__: kwargs {kwargs}")
 
     def build_msgs(self, *args, **kwargs):
         data = get_kwargs(kwargs, "data")

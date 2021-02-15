@@ -3,7 +3,7 @@ import logging
 from .baseoutput import baseoutput
 from ..helpers import get_kwargs
 
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("raw")
 
 
 class raw(baseoutput):
@@ -11,11 +11,11 @@ class raw(baseoutput):
         return "outputs the raw results to standard out"
 
     def __init__(self, *args, **kwargs) -> None:
-        log.debug(f"processor.raw __init__ kwargs {kwargs}")
+        log.debug(f"__init__: kwargs {kwargs}")
 
     def output(self, *args, **kwargs):
-        log.info("Using output processor: raw")
-        log.debug(f"processor.raw.output kwargs {kwargs}")
+        log.info("output: Using output processor: raw")
+        log.debug(f"output: kwargs {kwargs}")
         data = get_kwargs(kwargs, "data")
         if data is None:
             return

@@ -1,9 +1,4 @@
-import logging
-
 from .device import AbstractDevice
-from ..io.jkbleio import JkBleIO
-
-log = logging.getLogger("MPP-Solar")
 
 
 class jkbms(AbstractDevice):

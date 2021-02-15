@@ -3,7 +3,7 @@ import abc
 import logging
 
 # from time import sleep
-log = logging.getLogger("MPP-Solar")
+log = logging.getLogger("BaseIO")
 
 
 class BaseIO(metaclass=abc.ABCMeta):
