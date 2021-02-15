@@ -1,2 +1,2 @@
-__version__ = "0.7.34"
-__version_comment__ = "recent changes: ve.direct and asyncserial added"
+__version__ = "0.7.35"
+__version_comment__ = "recent changes: tag_mqtt added"
