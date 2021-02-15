@@ -21,6 +21,23 @@ def crc8(byteData):
     return CRC
 
 
+def get_resp_defn(key, defns):
+    """
+    look for a definition for the supplied key
+    """
+    # print(key, defns)
+    if not key:
+        return None
+    key = key.decode("utf-8")
+    for defn in defns:
+        if key == defn[0]:
+            # print(key, defn)
+            return defn
+    # did not find definition for this key
+    log.info(f"No defn found for {key} key")
+    return [key, key, "", ""]
+
+
 def decode2ByteHex(hexToDecode):
     """
     Code a 2 byte hexString to volts as per jkbms approach (blackbox determined)

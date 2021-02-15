@@ -14,6 +14,7 @@ PORT_TYPE_ESP32 = 4
 PORT_TYPE_SERIAL = 8
 PORT_TYPE_JKBLE = 16
 PORT_TYPE_MQTT = 32
+PORT_TYPE_ASYNCSERIAL = 64
 
 
 class AbstractDevice(metaclass=abc.ABCMeta):
@@ -72,6 +73,9 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         elif "jkble" in port:
             log.debug("device:get_port_type: port matches jkble")
             return PORT_TYPE_JKBLE
+        elif "asyncserial" in port:
+            log.debug("device:get_port_type: port matches asyncserial")
+            return PORT_TYPE_ASYNCSERIAL
         elif "serial" in port:
             log.debug("device:get_port_type: port matches serial")
             return PORT_TYPE_SERIAL
@@ -152,6 +156,12 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             from mppsolar.io.serialio import SerialIO
 
             self._port = SerialIO(device_path=port, serial_baud=baud)
+
+        elif port_type == PORT_TYPE_ASYNCSERIAL:
+            log.info("Using asyncserialio for communications")
+            from mppsolar.io.asyncserialio import AsyncSerialIO
+
+            self._port = AsyncSerialIO(device_path=port, serial_baud=baud, records=30)
 
         elif port_type == PORT_TYPE_MQTT:
 

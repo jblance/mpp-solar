@@ -4,6 +4,7 @@ import re
 from typing import Tuple
 
 from .protocol_helpers import crcPI as crc
+from .protocol_helpers import get_resp_defn
 
 log = logging.getLogger("MPP-Solar")
 
@@ -115,73 +116,102 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
         log.debug(f"trimmed and split responses: {responses}")
 
-        for i, result in enumerate(responses):
-            # decode result
-            if type(result) is bytes:
-                result = result.decode("utf-8")
-            # Check if we are past the 'known' responses
-            if i >= len_command_defn:
-                resp_format = ["string", f"Unknown value in response {i}", ""]
-            else:
-                resp_format = command_defn["response"][i]
+        # Responses are determined by a KEY lookup (instead or in sequence)
+        if command_defn["type"] == "KEYED":
+            log.info("Processing KEYED type responses")
+            # print(command_defn["response"])
+            for response in responses:
+                field = response[0]
+                _defn = get_resp_defn(field, command_defn["response"])
+                if _defn is None:
+                    continue
+                if len(response) <= 1:
+                    continue
+                key = _defn[1]
+                value = response[1]
+                units = _defn[2]
+                _type = _defn[3]
+                if _type == "exclude":
+                    continue
+                elif _type == "float":
+                    value = float(value)
+                elif _type == "mFloat":
+                    value = float(value) / 1000
+                else:
+                    value = value.decode("utf-8")
+                msgs[key] = [value, units]
+        else:
+            # Responses are determined by the order they are returned
+            log.info("Processing SEQUENCE type responses")
 
-            # key = "{}".format(resp_format[1]).lower().replace(" ", "_")
-            key = resp_format[1]
-            # log.debug(f'result {result}, key {key}, resp_format {resp_format}')
-            # Process results
-            if resp_format[0] == "float":
-                if "--" in result:
-                    result = 0
-                msgs[key] = [float(result), resp_format[2]]
-            elif resp_format[0] == "int":
-                if "--" in result:
-                    result = 0
-                msgs[key] = [int(result), resp_format[2]]
-            elif resp_format[0] == "string":
-                msgs[key] = [result, resp_format[2]]
-            elif resp_format[0] == "10int":
-                if "--" in result:
-                    result = 0
-                msgs[key] = [float(result) / 10, resp_format[2]]
-            # eg. ['option', 'Output source priority', ['Utility first', 'Solar first', 'SBU first']],
-            elif resp_format[0] == "option":
-                msgs[key] = [resp_format[2][int(result)], ""]
-            # eg. ['keyed', 'Machine type', {'00': 'Grid tie', '01': 'Off Grid', '10': 'Hybrid'}],
-            elif resp_format[0] == "keyed":
-                msgs[key] = [resp_format[2][result], ""]
-            # eg. ['flags', 'Device status', [ 'is_load_on', 'is_charging_on' ...
-            elif resp_format[0] == "flags":
-                for j, flag in enumerate(result):
-                    msgs[resp_format[2][j]] = [int(flag), "True - 1/False - 0"]
-            # eg. ['stat_flags', 'Warning status', ['Reserved', 'Inver...
-            elif resp_format[0] == "stat_flags":
-                output = ""
-                for j, flag in enumerate(result):
-                    if flag == "1":
-                        output = "{}\n\t- {}".format(output, resp_format[2][j])
-                msgs[key] = [output, ""]
-            # eg. ['enflags', 'Device Status', {'a': {'name': 'Buzzer', 'state': 'disabled'},
-            elif resp_format[0] == "enflags":
-                # output = {}
-                status = "unknown"
-                for item in result:
-                    if item == "E":
-                        status = "enabled"
-                    elif item == "D":
-                        status = "disabled"
-                    else:
-                        # output[resp_format[2][item]['name']] = status
-                        # _key = "{}".format(resp_format[2][item]["name"]).lower().replace(" ", "_")
-                        if resp_format[2].get(item, None):
-                            _key = resp_format[2][item]["name"]
+            for i, result in enumerate(responses):
+                # decode result
+                if type(result) is bytes:
+                    result = result.decode("utf-8")
+
+                # Check if we are past the 'known' responses
+                if i >= len_command_defn:
+                    resp_format = ["string", f"Unknown value in response {i}", ""]
+                else:
+                    resp_format = command_defn["response"][i]
+
+                # key = "{}".format(resp_format[1]).lower().replace(" ", "_")
+                key = resp_format[1]
+                # log.debug(f'result {result}, key {key}, resp_format {resp_format}')
+                # Process results
+                if resp_format[0] == "float":
+                    if "--" in result:
+                        result = 0
+                    msgs[key] = [float(result), resp_format[2]]
+                elif resp_format[0] == "int":
+                    if "--" in result:
+                        result = 0
+                    msgs[key] = [int(result), resp_format[2]]
+                elif resp_format[0] == "string":
+                    msgs[key] = [result, resp_format[2]]
+                elif resp_format[0] == "10int":
+                    if "--" in result:
+                        result = 0
+                    msgs[key] = [float(result) / 10, resp_format[2]]
+                # eg. ['option', 'Output source priority', ['Utility first', 'Solar first', 'SBU first']],
+                elif resp_format[0] == "option":
+                    msgs[key] = [resp_format[2][int(result)], ""]
+                # eg. ['keyed', 'Machine type', {'00': 'Grid tie', '01': 'Off Grid', '10': 'Hybrid'}],
+                elif resp_format[0] == "keyed":
+                    msgs[key] = [resp_format[2][result], ""]
+                # eg. ['flags', 'Device status', [ 'is_load_on', 'is_charging_on' ...
+                elif resp_format[0] == "flags":
+                    for j, flag in enumerate(result):
+                        msgs[resp_format[2][j]] = [int(flag), "True - 1/False - 0"]
+                # eg. ['stat_flags', 'Warning status', ['Reserved', 'Inver...
+                elif resp_format[0] == "stat_flags":
+                    output = ""
+                    for j, flag in enumerate(result):
+                        if flag == "1":
+                            output = "{}\n\t- {}".format(output, resp_format[2][j])
+                    msgs[key] = [output, ""]
+                # eg. ['enflags', 'Device Status', {'a': {'name': 'Buzzer', 'state': 'disabled'},
+                elif resp_format[0] == "enflags":
+                    # output = {}
+                    status = "unknown"
+                    for item in result:
+                        if item == "E":
+                            status = "enabled"
+                        elif item == "D":
+                            status = "disabled"
                         else:
-                            _key = "unknown_{}".format(item)
-                        msgs[_key] = [status, ""]
-                # msgs[key] = [output, '']
-            elif command_defn["type"] == "SETTER":
-                # _key = "{}".format(command_defn["name"]).lower().replace(" ", "_")
-                _key = command_defn["name"]
-                msgs[_key] = [result, ""]
-            else:
-                msgs[i] = [result, ""]
+                            # output[resp_format[2][item]['name']] = status
+                            # _key = "{}".format(resp_format[2][item]["name"]).lower().replace(" ", "_")
+                            if resp_format[2].get(item, None):
+                                _key = resp_format[2][item]["name"]
+                            else:
+                                _key = "unknown_{}".format(item)
+                            msgs[_key] = [status, ""]
+                    # msgs[key] = [output, '']
+                elif command_defn["type"] == "SETTER":
+                    # _key = "{}".format(command_defn["name"]).lower().replace(" ", "_")
+                    _key = command_defn["name"]
+                    msgs[_key] = [result, ""]
+                else:
+                    msgs[i] = [result, ""]
         return msgs
