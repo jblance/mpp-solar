@@ -47,6 +47,78 @@ optional arguments:
 
 ```
 
+## List available commands for a protocol
+To list all the available commands for a given protocol, specify the protocol and `-c` but do not supply a command
+
+`$ mpp-solar -P PI30 -c`
+```
+Command: command help - List available commands for protocol PI30
+------------------------------------------------------------
+Parameter                     	Value           Unit
+F                             	Set Device Output Frequency	    
+MCHGC                         	Set Max Charging Current (for parallel units)	    
+MNCHGC                        	Set Utility Max Charging Current (more than 100A) (for 4000/5000)	    
+MUCHGC                        	Set Utility Max Charging Current	    
+PBCV                          	Set Battery re-charge voltage	    
+PBDV                          	Set Battery re-discharge voltage	    
+PBFT                          	Set Battery Float Charging Voltage	    
+PBT                           	Set Battery Type	    
+PCP                           	Set Device Charger Priority	    
+PCVV                          	Set Battery C.V. (constant voltage) charging voltage	    
+PEPD                          	Set the enabled / disabled state of various Inverter settings (e.g. buzzer, overload, interrupt alarm)	    
+PF                            	Set Control Parameters to Default Values	    
+PGR                           	Set Grid Working Range	    
+POP                           	Set Device Output Source Priority	    
+POPM                          	Set Device Output Mode (for 4000/5000)	    
+PPCP                          	Set Parallel Device Charger Priority (for 4000/5000)	    
+PPVOKC                        	Set PV OK Condition	    
+PSDV                          	Set Battery Cut-off Voltage	    
+PSPB                          	Set Solar Power Balance	    
+Q1                            	Q1 query       	    
+QBOOT                         	DSP Has Bootstrap inquiry	    
+QDI                           	Default Settings inquiry	    
+QFLAG                         	Flag Status inquiry	    
+QID                           	Device Serial Number inquiry	    
+QMCHGCR                       	Max Charging Current Options inquiry	    
+QMOD                          	Mode inquiry   	    
+QMUCHGCR                      	Max Utility Charging Current Options inquiry	    
+QOPM                          	Output Mode inquiry	    
+QPGS                          	Parallel Information inquiry	    
+QPI                           	Protocol ID inquiry	    
+QPIGS                         	General Status Parameters inquiry	    
+QPIRI                         	Current Settings inquiry	    
+QPIWS                         	Warning status inquiry	    
+QVFW                          	Main CPU firmware version inquiry	    
+QVFW2                         	Secondary CPU firmware version inquiry	    
+```
+
+or
+`$ jkbms -P JK04 -c`
+```
+ommand: command help - List available commands for protocol JK04
+------------------------------------------------------------
+Parameter                     	Value           Unit
+getInfo                       	BLE Device Information inquiry	    
+getCellData                   	BLE Cell Data inquiry
+```
+
+## List available output processors
+To list all the available output processors, specify `-o` but do not supply any outputs
+`$ mpp-solar -o`
+```
+ommand: outputs help - List available output modules
+------------------------------------------------------------
+Parameter                     	Value           Unit
+baseoutput                    	the base class for the output processors, not used directly	    
+hass_mqtt                     	outputs the to the supplied mqtt broker in hass format: eg "homeassistant/sensor/mpp_{tag}_{key}/state" 	    
+influx2_mqtt                  	outputs the to the supplied mqtt broker: eg mpp-solar,command=QPGS0 max_charger_range=120.0	    
+influx_mqtt                   	outputs the to the supplied mqtt broker: eg <tag>, <tag>,setting=total_ac_output_apparent_power value=1577.0,unit="VA" 	    
+json                          	outputs the results to standard out in json format	    
+mqtt                          	outputs the to the supplied mqtt broker: eg 'tag'/status/total_output_active_power/value 1250	    
+raw                           	outputs the raw results to standard out	    
+screen                        	[the default output module] outputs the results to standard out in a slightly formatted way
+```
+
 ## Example
 run mpp-solar
 - giving the 'run' the name FirstInverter
