@@ -138,11 +138,35 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 if _type == "exclude":
                     continue
                 elif _type == "float":
-                    value = float(value)
+                    try:
+                        value = float(value)
+                    except:
+                        pass
+                elif _type == "dFloat":
+                    try:
+                        value = float(value) / 10
+                    except:
+                        value = f"{value} * 0.1"
+                elif _type == "cFloat":
+                    try:
+                        value = float(value) / 100
+                    except:
+                        value = f"{value} * 0.01"
                 elif _type == "mFloat":
-                    value = float(value) / 1000
+                    try:
+                        value = float(value) / 1000
+                    except:
+                        value = f"{value}m"
+                elif _type == "hFloat":
+                    try:
+                        value = float(value) * 100
+                    except:
+                        value = f"{value} * 100"
                 else:
-                    value = value.decode("utf-8")
+                    try:
+                        value = value.decode("utf-8")
+                    except:
+                        pass
                 msgs[key] = [value, units]
         else:
             # Responses are determined by the order they are returned

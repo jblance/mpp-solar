@@ -4,7 +4,7 @@ from .protocol import AbstractProtocol
 
 # from .pi30 import COMMANDS
 
-log = logging.getLogger("vedirect")
+log = logging.getLogger("ved")
 
 # (AAA BBB CCC DDD EEE
 # (000 001 002 003 004
@@ -32,7 +32,7 @@ COMMANDS = {
             ["T", "Battery temperature", "°C", "float"],
             ["P", "Instantaneous power", "W", "float"],
             ["CE", "Consumed Amp Hours", "Ah", "mFloat"],
-            ["SOC", "State-of-charge", "‰ ", "float"],
+            ["SOC", "State-of-charge", "%", "dFloat"],
             ["TTG", "Time-to-go", "Minutes", "float"],
             ["Alarm", "Alarm condition active", "", ""],
             ["Relay", "Relay state", "", ""],
@@ -54,12 +54,12 @@ COMMANDS = {
             ["H14", "Number of high auxiliary voltage alarms", "", ""],
             ["H15", "Minimum auxiliary (battery) voltage", "V", "mFloat"],
             ["H16", "Maximum auxiliary (battery) voltage", "V", "mFloat"],
-            ["H17", "Amount of discharged energy", "0.01 kWh", "float"],
-            ["H18", "Amount of charged energy", "0.01 kWh", "float"],
-            ["H19", "Yield total (user resettable counter)", "0.01 kWh", "float"],
-            ["H20", "Yield today", "0.01 kWh", "float"],
+            ["H17", "Amount of discharged energy", "kWh", "cFloat"],
+            ["H18", "Amount of charged energy", "kWh", "cFloat"],
+            ["H19", "Yield total (user resettable counter)", "kWh", "cFloat"],
+            ["H20", "Yield today", "kWh", "cFloat"],
             ["H21", "Maximum power today", "W", "float"],
-            ["H22", "Yield yesterday", "0.01 kWh", "float"],
+            ["H22", "Yield yesterday", "kWh", "cFloat"],
             ["H23", "Maximum power yesterday", "W", "float"],
             ["ERR", "Error code", "", ""],
             ["CS", "State of operation", "", ""],
@@ -70,7 +70,7 @@ COMMANDS = {
             ["SER#", "Serial number", "", ""],
             ["HSDS", "Day sequence number (0..364)", "", ""],
             ["MODE", "Device mode", "", ""],
-            ["AC_OUT_V", "AC output voltage", "0.01 V", "float"],
+            ["AC_OUT_V", "AC output voltage", "V", "hFloat"],
             ["AC_OUT_I", "AC output current", "0.1 A", "float"],
             ["AC_OUT_S", "AC output apparent power", "VA", "float"],
             ["WARN", "Warning reason", "", ""],
@@ -87,14 +87,14 @@ COMMANDS = {
 }
 
 
-class vedirect(AbstractProtocol):
+class ved(AbstractProtocol):
     """
-    VEDirect - VEDirect protocol handler
+    VED - VEDirect protocol handler
     """
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
-        self._protocol_id = b"VEDirect"
+        self._protocol_id = b"VED"
         self.COMMANDS = COMMANDS
         self.STATUS_COMMANDS = [
             "default",
