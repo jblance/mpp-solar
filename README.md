@@ -63,7 +63,10 @@ __Note:__ need `sudo apt-get install libglib2.0-dev` for bluepy
 
 [Documented Ubuntu Install](docs/ubuntu_install.md)
 
-
+## Using a config file
+* You can setup a config file instead of using command line options
+* this is particularly useful for running as a service / dameon
+[details here](docs/configfile.md)
 
 ## Troubleshooting ##
  [Troubleshooting](docs/troubleshooting.md)

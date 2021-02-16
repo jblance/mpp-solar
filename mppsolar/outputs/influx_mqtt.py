@@ -10,7 +10,7 @@ log = logging.getLogger("influx_mqtt")
 
 class influx_mqtt(mqtt):
     def __str__(self):
-        return """outputs the to the supplied mqtt broker: eg <tag>, <tag>,setting=total_ac_output_apparent_power value=1577.0,unit="VA" """
+        return """outputs the to the supplied mqtt broker: eg {tag}, {tag},setting=total_ac_output_apparent_power value=1577.0,unit="VA" """
 
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"__init__: kwargs {kwargs}")

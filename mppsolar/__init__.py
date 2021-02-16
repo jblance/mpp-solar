@@ -291,7 +291,7 @@ def main():
             type = config[section].get("type", fallback="mppsolar")
             port = config[section].get("port", fallback="/dev/ttyUSB0")
             baud = config[section].get("baud", fallback=2400)
-            command = config[section].get("command")
+            _command = config[section].get("command")
             tag = config[section].get("tag")
             outputs = config[section].get("outputs", fallback="screen")
             porttype = config[section].get("porttype", fallback=None)
@@ -314,7 +314,13 @@ def main():
                 mqtt_pass=mqtt_pass,
             )
             # build array of commands
-            _commands.append((device, command, tag, outputs, filter, excl_filter))
+            commands = []
+            for cmd in _command.split(","):
+                commands.append(cmd)
+
+            for command in commands:
+                _commands.append((device, command, tag, outputs, filter, excl_filter))
+            log.debug(f"Commands from config fiel {_commands}")
 
             if args.daemon:
                 print(f"Config file: {args.configfile}")

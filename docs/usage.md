@@ -106,17 +106,18 @@ getCellData                   	BLE Cell Data inquiry
 To list all the available output processors, specify `-o` but do not supply any outputs
 `$ mpp-solar -o`
 ```
-ommand: outputs help - List available output modules
+Command: outputs help - List available output modules
 ------------------------------------------------------------
 Parameter                     	Value           Unit
 baseoutput                    	the base class for the output processors, not used directly	    
 hass_mqtt                     	outputs the to the supplied mqtt broker in hass format: eg "homeassistant/sensor/mpp_{tag}_{key}/state" 	    
-influx2_mqtt                  	outputs the to the supplied mqtt broker: eg mpp-solar,command=QPGS0 max_charger_range=120.0	    
-influx_mqtt                   	outputs the to the supplied mqtt broker: eg <tag>, <tag>,setting=total_ac_output_apparent_power value=1577.0,unit="VA" 	    
+influx2_mqtt                  	outputs the to the supplied mqtt broker: eg mpp-solar,command={tag} max_charger_range=120.0	    
+influx_mqtt                   	outputs the to the supplied mqtt broker: eg {tag}, {tag},setting=total_ac_output_apparent_power value=1577.0,unit="VA" 	    
 json                          	outputs the results to standard out in json format	    
-mqtt                          	outputs the to the supplied mqtt broker: eg 'tag'/status/total_output_active_power/value 1250	    
+mqtt                          	outputs the to the supplied mqtt broker: eg {tag}/status/total_output_active_power/value 1250	    
 raw                           	outputs the raw results to standard out	    
-screen                        	[the default output module] outputs the results to standard out in a slightly formatted way
+screen                        	[the default output module] outputs the results to standard out in a slightly formatted way	    
+tag_mqtt                      	outputs the to the supplied mqtt broker using the supplied tag as the topic: eg {tag}/max_charger_range 120.0	    
 ```
 
 ## Example
