@@ -41,38 +41,22 @@ def get_resp_defn(key, defns):
     return [key, key, "", ""]
 
 
-def decode2ByteHex(hexToDecode):
+def decode2ByteHex(hexString):
     """
     Code a 2 byte hexString to volts as per jkbms approach (blackbox determined)
     - need to decode as 4 hex chars
     """
-    # hexString = bytes.fromhex(hexToDecode)
-    hexString = hexToDecode
     log.debug(f"hexString: {hexString}")
 
     answer = 0.0
 
-    # Make sure supplied String is long enough
+    # Make sure supplied String is the correct length
     if len(hexString) != 2:
         log.warning(f"Hex encoded value must be 2 bytes long. Was {len(hexString)} length")
         return 0
 
-    # 1st position
-    pos1 = hexString[0] >> 4
-    answer += pos1 * (2 ** 4 / 1000)
-    log.debug(f"answer after pos1 {answer}")
-    # 2nd position
-    pos2 = hexString[0] & 0x0F
-    answer += pos2 * (2 ** 0 / 1000)
-    log.debug(f"answer after pos2 {answer}")
-    # 3rd position
-    pos3 = hexString[1] >> 4
-    answer += pos3 * (2 ** 12 / 1000)
-    log.debug(f"answer after pos3 {answer}")
-    # 4th position
-    pos4 = hexString[1] & 0x0F
-    answer += pos4 * (2 ** 8 / 1000)
-    log.debug(f"answer after pos4 {answer}")
+    # Use python tools for decode
+    answer = unpack("<h", hexString)[0] / 1000
     log.info(f"Hex {hexString} 2 byte decoded to {answer}")
 
     return answer

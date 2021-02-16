@@ -272,7 +272,8 @@ class jkAbstractProtocol(AbstractProtocol):
                     v = responses[:2]
                     responses = responses[2:]
                     value = decode2ByteHex(v)
-                    msgs[defn[2]] = [value, f"{v[0]:02x} {v[1]:02x}"]
+                    if defn[2] != "":
+                        msgs[defn[2]] = [value, f"{v[0]:02x} {v[1]:02x}"]
                 elif defn[0] == "2ByteHexC":
                     # temperatures seem to be deocded value * 100
                     log.debug("decode: 2ByteHexC defn")
@@ -313,9 +314,9 @@ class jkAbstractProtocol(AbstractProtocol):
                             value = value / 1000
                             msgs[param] = [value, defn[3]]
                 elif defn[0] == "rem":
-                    log.debug("decode: remainder")
-                    msgs["remainder"] = [str(responses), ""]
-                    msgs["len remainder"] = [len(responses), ""]
+                    log.debug(f"decode: {len(responses)} bytes remain: {str(responses)}")
+                    # msgs["remainder"] = [str(responses), ""]
+                    # msgs["len remainder"] = [len(responses), ""]
                     return msgs
                 else:
                     log.error("decode: undefined type")
