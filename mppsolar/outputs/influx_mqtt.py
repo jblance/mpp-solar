@@ -19,6 +19,7 @@ class influx_mqtt(mqtt):
         data = get_kwargs(kwargs, "data")
         tag = get_kwargs(kwargs, "tag")
         keep_case = get_kwargs(kwargs, "keep_case")
+        topic = get_kwargs(kwargs, "topic", default="mpp-solar")
 
         filter = get_kwargs(kwargs, "filter")
         if filter is not None:
@@ -50,7 +51,7 @@ class influx_mqtt(mqtt):
                 if not unit:
                     unit = ""
                 msg = {
-                    "topic": "mpp-solar",
+                    "topic": topic,
                     "payload": f"{tag},setting={key} value={value},unit={unit}",
                 }
                 msgs.append(msg)

@@ -336,16 +336,12 @@ def main():
     else:
         # No configfile specified
         # process some arguments
-        if args.tag:
-            tag = args.tag
-        else:
-            tag = args.command
         if args.model is not None and args.protocol is None:
             args.protocol = get_protocol_for_model(args.model)
 
         # create instance of device (supplying port + protocol types)
         log.info(
-            f'Creating device "{args.name}" (type: "{s_prog_name}") on port "{args.port} (porttype={args.porttype})" using protocol "{args.protocol}" for command "{args.command}" (tag: {tag})'
+            f'Creating device "{args.name}" (type: "{s_prog_name}") on port "{args.port} (porttype={args.porttype})" using protocol "{args.protocol}"'
         )
         device_class = get_device_class(s_prog_name)
         log.debug(f"device_class {device_class}")
@@ -393,6 +389,10 @@ def main():
 
         outputs = args.output
         for command in commands:
+            if args.tag:
+                tag = args.tag
+            else:
+                tag = command
             _commands.append((device, command, tag, outputs, filter, excl_filter))
         log.debug(f"Commands {_commands}")
 

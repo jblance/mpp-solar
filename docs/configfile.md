@@ -35,3 +35,95 @@ excl_filter=test  # optional - if defined any field names that match the filter 
 ```
 
 [list of outputs](usage.md#List-available-output-processors)
+
+## Config file examples
+
+### mpp-solar running on a Pi with 2x PIP4048
+- that is connected (via a USB to serial adapter on /dev/ttyUSB0)
+- to a two PIP4048 (protocol PI30) setup in parallel (with parallel cards)
+- with an MQTT broker on 'mqtthost'
+
+```
+[SETUP]
+pause=5
+mqtt_broker=mqtthost
+
+[Inverter_1]
+port=/dev/ttyUSB0
+protocol=PI30
+command=QPGS0
+tag=QPGS0
+outputs=mqtt
+
+[Inverter_2]
+port=/dev/ttyUSB0
+protocol=PI30
+command=QPGS1
+tag=QPGS1
+outputs=mqtt
+```
+
+this would generate mqtt messages like:
+```
+...[snip]...
+{'topic': 'QPGS0/status/fault_code/value', 'payload': 'No fault'}
+{'topic': 'QPGS0/status/grid_voltage/value', 'payload': 0.0}
+{'topic': 'QPGS0/status/grid_voltage/unit', 'payload': 'V'}
+{'topic': 'QPGS0/status/grid_frequency/value', 'payload': 0.0}
+{'topic': 'QPGS0/status/grid_frequency/unit', 'payload': 'Hz'}
+{'topic': 'QPGS0/status/ac_output_voltage/value', 'payload': 230.6}
+...[snip]...
+{'topic': 'QPGS1/status/fault_code/value', 'payload': 'No fault'}
+{'topic': 'QPGS1/status/grid_voltage/value', 'payload': 0.0}
+{'topic': 'QPGS1/status/grid_voltage/unit', 'payload': 'V'}
+{'topic': 'QPGS1/status/grid_frequency/value', 'payload': 0.0}
+{'topic': 'QPGS1/status/grid_frequency/unit', 'payload': 'Hz'}
+{'topic': 'QPGS1/status/ac_output_voltage/value', 'payload': 230.6}
+...[snip]...
+```
+
+### mpp-solar running on a ubuntu with a single LV5048
+- connected via a direct USB cable to the inverter (/dev/hidraw0)
+```
+# This example would work on a single LV5048
+[LV5048]
+protocol=PI41
+port=/dev/hidraw0
+command=QPGS0,QP2GS0
+tag=Inverter1
+outputs=influx2_mqtt
+```
+this would generate mqtt messages like:
+```
+...[snip]...
+'topic': 'mpp-solar', 'payload': 'mpp-solar,command=Inverter1 l2_ac_output_frequency=59.98'}
+{'topic': 'mpp-solar', 'payload': 'mpp-solar,command=Inverter1 l2_ac_output_apparent_power=149'}
+{'topic': 'mpp-solar', 'payload': 'mpp-solar,command=Inverter1 l2_ac_output_active_power=130'}
+{'topic': 'mpp-solar', 'payload': 'mpp-solar,command=Inverter1 l2_load_percentage=5'}
+{'topic': 'mpp-solar', 'payload': 'mpp-solar,command=Inverter1 l2_battery_voltage=56.1'}
+{'topic': 'mpp-solar', 'payload': 'mpp-solar,command=Inverter1 l2_battery_charging_current=0'}
+...[snip]...
+```
+
+### jkbms running on pi using BLE to communicate with a JK-B2A24S
+
+```
+[JKBMS]
+type=jkbms
+protocol=JK04
+port=3C:A5:49:AA:AA:AA
+command=getCellData
+tag=CellData
+outputs=influx_mqtt
+```
+this would generate mqtt messages like:
+```
+...[snip]...
+{'topic': 'jkbms', 'payload': 'CellData,setting=average_cell_voltage value=2.327305316925049,unit=V'}
+{'topic': 'jkbms', 'payload': 'CellData,setting=delta_cell_voltage value=0.178879976272583,unit=V'}
+{'topic': 'jkbms', 'payload': 'CellData,setting=highest_cell value=8,unit='}
+{'topic': 'jkbms', 'payload': 'CellData,setting=lowest_cell value=12,unit='}
+{'topic': 'jkbms', 'payload': 'CellData,setting=flags value=0101,unit='}
+{'topic': 'jkbms', 'payload': 'CellData,setting=uptime value=0D3H23M12S,unit='}
+...[snip]...
+```

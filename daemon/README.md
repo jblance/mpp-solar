@@ -9,56 +9,8 @@ Need python-systemd package
 Need to create a config file `/etc/mpp-solar/mpp-solar.conf`
 * Use the example `/etc/mpp-solar/mpp-solar.conf.example` as a start
 
-### Config File Description ###
-```
-# Required section
-[SETUP]
-# Number of seconds to pause at the end of each loop (0 is no pause)
-pause=5
-# Hostname / IP address of the MQTT broker
-mqtt_broker=mqtthost
+[see here for examples](../docs/configfile.md#Config-file-examples)
 
-# This example would work on 2x PIP4048 installed in parallel
-# The section heading for information only - must be unique
-[Inverter_1]
-# Model of inverter,        
-model=standard
-# Protocol that the inverter uses - if not supplied will use model to attempt to determine protocol
-protocol=PI30
-# Port that mpp-solar connects to the inverter
-port=/dev/ttyUSB0
-baud=2400
-# Command to send to the inverter
-command=QPGS0
-tag=QPGS0
-# Output processor(s) to use [comma separated with no spaces]
-outputs=mqtt,screen
-
-[Inverter_2]
-model=standard
-port=/dev/ttyUSB0
-baud=2400
-command=QPGS1
-tag=QPGS1
-outputs=screen,mqtt
-
-# This example would work on a single LV5048
-[Inverter1_L1]
-model=LV5048
-port=test
-baud=2400
-command=QPGS0
-tag=Inverter1
-outputs=influx2_mqtt
-
-[Inverter1_L2]
-model=standard
-port=test
-baud=2400
-command=QP2GS0
-tag=Inverter1
-outputs=influx2_mqtt
-```
 ## Add mpp-solar service ##
 
 * Check the service exists
