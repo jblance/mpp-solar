@@ -13,6 +13,8 @@ File | Comment | Source
 [PI30_PIP-GK_MK-Protocol.pdf](PI30_PIP-GK_MK-Protocol.pdf) | |
 [PI34_ForumEA_B_mppt-1.pdf)](PI34_ForumEA_B_mppt-1.pdf) | |
 [PI41_LV5048.5KW.protocol-20190222.for.customer.pdf](PI41_LV5048.5KW.protocol-20190222.for.customer.pdf) | |
+[VE.Direct-Protocol-3.29.pdf](VE.Direct-Protocol-3.29.pdf) | Protocol description for Victron VE Direct devices | [link](https://www.victronenergy.com/support-and-downloads/whitepapers)
+[BMV-7xx-HEX-Protocol-public.pdf](BMV-7xx-HEX-Protocol-public.pdf) | HEX Protocol description for Victron VE Direct devices  | [link](https://www.victronenergy.com/support-and-downloads/whitepapers)
 
 ## Other documentation ##
 
