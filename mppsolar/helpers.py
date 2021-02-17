@@ -17,12 +17,12 @@ def key_wanted(key, filter=None, excl_filter=None):
         log.debug(f"key_wanted: key {key} matches excl_filter {excl_filter} so key excluded")
         return False
     if filter is None:
-        log.info(
+        log.debug(
             f"key_wanted: No filter and key {key} not excluded by excl_filter {excl_filter} so key wanted"
         )
         return True
     elif filter.search(key):
-        log.info(
+        log.debug(
             f"key_wanted: key {key} matches filter {filter} and not excl_filter {excl_filter} so key wanted"
         )
         return True
