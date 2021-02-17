@@ -1,6 +1,8 @@
 import logging
+from typing import Tuple
 
 from .protocol import AbstractProtocol
+from .protocol_helpers import vedHexChecksum
 
 # from .pi30 import COMMANDS
 
@@ -10,11 +12,12 @@ log = logging.getLogger("ved")
 # (000 001 002 003 004
 
 COMMANDS = {
-    "default": {
-        "name": "default",
+    "vedtext": {
+        "name": "vedtext",
         "description": "VE Direct Text",
         "help": " -- the output of the VE Direct text protocol",
-        "type": "KEYED",
+        "type": "VEDTEXT",
+        "response_type": "KEYED",
         "response": [
             ["V", "Main or channel 1 (battery) voltage", "V", "mFloat"],
             ["V2", "Channel 2 (battery) voltage", "V", "mFloat"],
@@ -84,6 +87,31 @@ COMMANDS = {
         ],
         "regex": "",
     },
+    "batteryCapacity": {
+        "name": "batteryCapacity",
+        "description": "battery capacity",
+        "help": " -- display the battery capacity setting value",
+        "type": "VEDGET",
+        "command_code": "0010",
+        "response_type": "POSITIONAL",
+        "response": [
+            ["discard", 1, "Command type", ""],
+            ["discard", 2, "Command", ""],
+            [
+                "keyed",
+                1,
+                "Command response flag",
+                {"00": "OK", "01": "Unknown ID", "02": "Not supported", "04": "Parameter Error"},
+            ],
+            ["<int", 2, "Battery Capacity", "Ah"],
+            ["discard", 1, "checksum", ""],
+        ],
+        "test_responses": [
+            b":70010007800C6\n",
+            b"\x00\x1a:70010007800C6\n",
+        ],
+        "regex": "",
+    },
 }
 
 
@@ -97,12 +125,12 @@ class ved(AbstractProtocol):
         self._protocol_id = b"VED"
         self.COMMANDS = COMMANDS
         self.STATUS_COMMANDS = [
-            "default",
+            "vedtext",
         ]
         self.SETTINGS_COMMANDS = [
             "",
         ]
-        self.DEFAULT_COMMAND = "default"
+        self.DEFAULT_COMMAND = "vedtext"
 
     def get_full_command(self, command) -> bytes:
         """
@@ -113,25 +141,88 @@ class ved(AbstractProtocol):
         )
         # These need to be set to allow other functions to work`
         self._command = command
-        # self._command_defn = self.get_command_defn(command)
+        self._command_defn = self.get_command_defn(command)
         # End of required variables setting
-        # print("")
-        cmd = bytes(self._command, "utf-8")
-        # combine byte_cmd, return
-        full_command = cmd  # + bytes([13])
-        log.debug(f"get_full_command: full command: {full_command}")
-        return full_command
+        if self._command_defn is None:
+            return None
+
+        # VEDHEX
+        # : start of command
+        # 7 Get
+        # 0000 id of the value to get
+        # 00 flags
+        # 00 cs
+        # \n
+        # eg b':70010003E\n' = get battery capacity id = 0x1000 = 0010 little endian
+        cmd_type = self._command_defn["type"]
+        if cmd_type == "VEDTEXT":
+            # Just listen - dont need to send a command
+            log.debug(f"get_full_command: command is VEDTEXT type so returning {cmd_type}")
+            return cmd_type
+        elif cmd_type == "VEDGET":
+            ID = self._command_defn["command_code"]
+            cmd = f"7{ID}00"
+            # pad cmd and convert to bytes for checksum
+            _r = f"0{cmd}"
+            _r = bytes.fromhex(_r)
+            checksum = vedHexChecksum(_r)
+            cmd = f":{cmd}{checksum:02X}\n"
+            log.debug(f"get_full_command: full command: {cmd}")
+            return cmd
+        log.warn(f"get_full_command: unable to generate full command - is the definition wrong?")
+        return None
+
+    def check_response_valid(self, response) -> Tuple[bool, dict]:
+        """
+        VED HEX protocol - sum of bytes should be 0x55
+        VED Text protocol - no validity check
+        """
+        if not response:
+            return False, {"ERROR": ["No response", ""]}
+        if b":" in response:
+            # HEX protocol response
+            log.debug(f"checking validity of {response}")
+            _r = response.split(b":")[1][:-1].decode()
+            # print(f"trimmed response {_r}")
+            _r = f"0{_r}"
+            # print(f"padded response {_r}")
+            _r = bytes.fromhex(_r)
+            # print(f"bytes response {_r}")
+            data = _r[:-1]
+            checksum = _r[-1:][0]
+            if vedHexChecksum(data) == checksum:
+                log.debug(f"VED Hex Checksum matches in response '{response}' checksum:{checksum}")
+                return True, {}
+            else:
+                # print("VED Hex Checksum does not match")
+                return False, {
+                    "ERROR": [f"VED HEX checksum did not match for response {response}", ""]
+                }
+        else:
+            return True, {}
 
     def get_responses(self, response):
         """
         Override the default get_responses as its different for PI00
         """
+        # remove \n
         response = response.replace(b"\n", b"")
         responses = []
-        _responses = response.split(b"\r")
-        for resp in _responses:
-            _resp = resp.split(b"\t")
-            responses.append(_resp)
+        # for hex protocol responses - these contain a :
+        if b":" in response:
+            # trim anything before ':'
+            _r = response.split(b":")[1].decode()
+            # pad command (which is single char)
+            _r = f"0{_r}"
+            # convert string hex to bytes
+            _r = bytes.fromhex(_r)
+            return bytearray(_r)
+        else:
+            # for text protocol responses
+            _responses = response.split(b"\r")
+            for resp in _responses:
+                _resp = resp.split(b"\t")
+                responses.append(_resp)
         # Trim leading '(' of first response
         # 3responses[0] = responses[0][1:]
         # Remove CRC and \r of last response

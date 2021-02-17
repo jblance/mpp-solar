@@ -1,6 +1,7 @@
 import abc
 import logging
 import re
+import struct
 from typing import Tuple
 
 from .protocol_helpers import crcPI as crc
@@ -121,8 +122,14 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.debug(f"decode: trimmed and split responses: {responses}")
 
         # Responses are determined by a KEY lookup (instead or in sequence)
-        if command_defn["type"] == "KEYED":
-            log.info("decode: Processing KEYED type responses")
+        if "response_type" in command_defn:
+            response_type = command_defn["response_type"]
+        else:
+            response_type = "default"
+        log.info(f"decode: Processing response of type {response_type}")
+
+        if response_type == "KEYED":
+            log.debug("decode: Processing KEYED type responses")
             # print(command_defn["response"])
             for response in responses:
                 field = response[0]
@@ -168,6 +175,50 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     except:
                         pass
                 msgs[key] = [value, units]
+        elif response_type == "POSITIONAL":
+            log.debug("decode: Processing KEYED type responses")
+            # print("decode: Processing KEYED type responses")
+            for defn in command_defn["response"]:
+                _type = defn[0]
+                if _type == "lookup":
+                    pass
+                elif _type == "discard":
+                    responses = responses[defn[1] :]
+                elif _type == "hex":
+                    log.debug("decode: hex defn")
+                    value = ""
+                    for x in range(defn[1]):
+                        value += f"{responses.pop(0):02x}"
+                    # if defn[2] != "":
+                    msgs[defn[2]] = [value, defn[3]]
+                elif _type == "keyed":
+                    log.debug("decode: keyed defn")
+                    key = ""
+                    for x in range(defn[1]):
+                        key += f"{responses.pop(0):02x}"
+                    value = defn[3][key]
+                    msgs[defn[2]] = [value, ""]
+                    # msgs[key] = [resp_format[2][result], ""]
+                elif _type == "<int":
+                    log.debug("decode: <int defn")
+                    result = responses[: defn[1]]
+                    responses = responses[defn[1] :]
+                    value = struct.unpack("<h", result)[0]
+                    msgs[defn[2]] = [value, defn[3]]
+                elif _type == "<hex":
+                    # convert little endian hex to big endian..
+                    log.debug("decode: <hex defn")
+                    value = ""
+                    x = responses[: defn[1]]
+                    responses = responses[defn[1] :]
+                    _x = struct.unpack("<h", x)[0]
+                    x = struct.pack(">h", _x)
+                    for _byte in x:
+                        value += f"{_byte:02x}"
+                    # if defn[2] != "":
+                    msgs[defn[2]] = [value, defn[3]]
+            # print(responses)
+            # print(command_defn)
         else:
             # Responses are determined by the order they are returned
             log.info("decode: Processing SEQUENCE type responses")

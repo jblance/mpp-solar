@@ -21,6 +21,18 @@ def crc8(byteData):
     return CRC
 
 
+def vedHexChecksum(byteData):
+    """
+    Generate VE Direct HEX Checksum
+     - sum of byteData + CS = 0x55
+    """
+    CS = 0x55
+    for b in byteData:
+        CS -= b
+    CS = CS & 0xFF
+    return CS
+
+
 def get_resp_defn(key, defns):
     """
     look for a definition for the supplied key
