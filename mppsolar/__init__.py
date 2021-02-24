@@ -6,14 +6,6 @@ from sys import exit
 
 from .version import __version__, __version_comment__  # noqa: F401
 
-# Ongoing effort to map model "numbers" to the correct protocol
-MODEL_PROTOCOL_MAP = {
-    "standard": "PI30",
-    "4048MS": "PI30",
-    "LV5048": "PI41",
-    "PI18": "PI18",
-}
-
 # Set-up logger
 # log = logging.getLogger(log_name)
 log = logging.getLogger("")
@@ -57,20 +49,6 @@ def get_device_class(device_type=None):
         return None
     device_class = getattr(device_module, device_type)
     return device_class
-
-
-def get_protocol_for_model(model=None):
-    """
-    Try to find the correct protocol for a given model of inverter
-    """
-    if model is None:
-        return None
-    if model in MODEL_PROTOCOL_MAP:
-        protocol = MODEL_PROTOCOL_MAP[model]
-        log.info(f"Model {model} specified, setting protocol to {protocol}")
-        return protocol
-    log.info(f"Cannot find protocol for model {model}")
-    return None
 
 
 def main():
@@ -127,14 +105,6 @@ def main():
         help="Baud rate for serial communications (default: 2400)",
         default=2400,
     )
-    parser.add_argument(
-        "-M",
-        "--model",
-        type=str,
-        help='Specifies the inverter model to select commands for, defaults to "standard", currently supports LV5048',
-        default="standard",
-    )
-
     parser.add_argument(
         "-o",
         "--output",
@@ -285,9 +255,6 @@ def main():
         for section in sections:
             name = section
             protocol = config[section].get("protocol", fallback=None)
-            model = config[section].get("model", fallback=None)
-            if model is not None and protocol is None:
-                protocol = get_protocol_for_model(model)
             type = config[section].get("type", fallback="mppsolar")
             port = config[section].get("port", fallback="/dev/ttyUSB0")
             baud = config[section].get("baud", fallback=2400)
@@ -335,10 +302,6 @@ def main():
 
     else:
         # No configfile specified
-        # process some arguments
-        if args.model is not None and args.protocol is None:
-            args.protocol = get_protocol_for_model(args.model)
-
         # create instance of device (supplying port + protocol types)
         log.info(
             f'Creating device "{args.name}" (type: "{s_prog_name}") on port "{args.port} (porttype={args.porttype})" using protocol "{args.protocol}"'
