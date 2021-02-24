@@ -2,7 +2,7 @@ import logging
 import math
 
 from .protocol import AbstractProtocol
-from .protocol_helpers import decode4ByteHex, decode2ByteHex, crc8
+from .protocol_helpers import decode4ByteHex1000, decode4ByteHex, decode2ByteHex, crc8
 
 
 log = logging.getLogger("jkAbstractProtocol")
@@ -232,8 +232,8 @@ class jkAbstractProtocol(AbstractProtocol):
                     for x in range(defn[1]):
                         value += f"{responses.pop(0):02x}"
                     log.debug(f"decode: Discarded {value}")
-                    if defn[2] != "":
-                        msgs[defn[2]] = [value, defn[3]]
+                    # if defn[2] != "":
+                    #    msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "int":
                     log.debug("decode: int defn")
                     msgs[defn[2]] = [responses.pop(0), defn[3]]
@@ -286,6 +286,12 @@ class jkAbstractProtocol(AbstractProtocol):
                     v = responses[:4]
                     responses = responses[4:]
                     value = decode4ByteHex(v)
+                    msgs[defn[2]] = [value, defn[3]]
+                elif defn[0] == "4ByteHex1000":
+                    log.debug("decode: 4ByteHex1000 defn")
+                    v = responses[:4]
+                    responses = responses[4:]
+                    value = decode4ByteHex1000(v)
                     msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "4ByteHexU":
                     log.debug("decode: 4ByteHexU defn")

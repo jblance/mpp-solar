@@ -74,6 +74,59 @@ def decode2ByteHex(hexString):
     return answer
 
 
+def decode4ByteHex1000(hexToDecode):
+    """
+    Code a 4 byte hexString  per jkbms approach (blackbox determined)
+    - need to decode as 8 hex chars
+    """
+    # hexString = bytes.fromhex(hexToDecode)
+    hexString = hexToDecode
+    log.debug(f"hexString: {hexString}")
+
+    answer = 0.0
+
+    # Make sure supplied String is long enough
+    if len(hexString) != 4:
+        log.warning(f"Hex encoded value must be 4 bytes long. Was {len(hexString)} length")
+        return 0
+
+    # 1st position
+    pos1 = hexString[0] >> 4
+    answer += pos1 * (2 ** 4 / 1000)
+    log.debug(f"answer after pos1 {answer}")
+    # 2nd position
+    pos2 = hexString[0] & 0x0F
+    answer += pos2 * (2 ** 0 / 1000)
+    log.debug(f"answer after pos2 {answer}")
+    # 3rd position
+    pos3 = hexString[1] >> 4
+    answer += pos3 * (2 ** 12 / 1000)
+    log.debug(f"answer after pos3 {answer}")
+    # 4th position
+    pos4 = hexString[1] & 0x0F
+    answer += pos4 * (2 ** 8 / 1000)
+    # 5st position
+    pos5 = hexString[2] >> 4
+    answer += pos5 * (2 ** 20 / 1000)
+    log.debug(f"answer after pos5 {answer}")
+    # 6st position
+    pos6 = hexString[2] & 0x0F
+    answer += pos6 * (2 ** 16 / 1000)
+    log.debug(f"answer after pos6 {answer}")
+    # 7th position
+    pos7 = hexString[3] >> 4
+    answer += pos7 * (2 ** 28 / 1000)
+    log.debug(f"answer after pos7 {answer}")
+    # 8th position
+    pos8 = hexString[3] & 0x0F
+    answer += pos8 * (2 ** 24 / 1000)
+
+    log.debug(f"answer after pos8 {answer}")
+    log.info(f"Hex {hexString} 8 byte decoded to {answer}")
+
+    return answer
+
+
 def decode4ByteHex(hexToDecode):
     """
     Code a 4 byte hexString to volts as per jkbms approach (blackbox determined)
