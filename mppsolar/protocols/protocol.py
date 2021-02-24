@@ -121,7 +121,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
         log.debug(f"decode: trimmed and split responses: {responses}")
 
-        # Responses are determined by a KEY lookup (instead or in sequence)
+        # Responses are determined by a KEY lookup (instead of in sequence)
         if "response_type" in command_defn:
             response_type = command_defn["response_type"]
         else:
@@ -176,7 +176,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         pass
                 msgs[key] = [value, units]
         elif response_type == "POSITIONAL":
-            log.debug("decode: Processing KEYED type responses")
+            log.debug("decode: Processing POSITIONAL type responses")
             # print("decode: Processing KEYED type responses")
             for defn in command_defn["response"]:
                 _type = defn[0]
