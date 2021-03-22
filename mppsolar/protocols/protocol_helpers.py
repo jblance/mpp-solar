@@ -179,7 +179,6 @@ def crcPI(data_bytes):
 
     for c in data_bytes:
         # log.debug('Encoding %s', c)
-        # todo fix response for older python
         if type(c) == str:
             c = ord(c)
         da = ((crc >> 8) & 0xFF) >> 4
