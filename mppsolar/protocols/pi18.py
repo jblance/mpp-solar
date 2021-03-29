@@ -153,8 +153,8 @@ class pi18(AbstractProtocol):
         crc_high, crc_low = crc(_pre_cmd)
         # combine byte_cmd, CRC , return
         # PI18 full command "^P005GS\x..\x..\r"
-        command_crc = _pre_cmd + bytes([crc_high, crc_low, 13])
-        full_command = bytes(_prefix, "utf-8") + command_crc
+        _crc = bytes([crc_high, crc_low, 13])
+        full_command = bytes(_prefix, "utf-8") + _crc
         log.debug(f"get_full_command: full command: {full_command}")
         return full_command
 
@@ -163,6 +163,10 @@ class pi18(AbstractProtocol):
         Override the default get_responses as its different for PI18
         """
         responses = response.split(b",")
+        if responses[0] == b"^0\x1b\xe3\r":
+            # is a reject response
+            return ["NAK"]
+
         # Drop ^Dxxx from first response
         responses[0] = responses[0][4:]
         # Remove CRC of last response

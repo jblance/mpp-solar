@@ -238,7 +238,12 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 key = resp_format[1]
                 # log.debug(f'result {result}, key {key}, resp_format {resp_format}')
                 # Process results
-                if resp_format[0] == "float":
+                if result == "NAK":
+                    msgs[f"WARNING{i}"] = [
+                        f"Command {command} was rejected",
+                        "",
+                    ]
+                elif resp_format[0] == "float":
                     if "--" in result:
                         result = 0
                     msgs[key] = [float(result), resp_format[2]]
