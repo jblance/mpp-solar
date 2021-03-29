@@ -140,15 +140,20 @@ class pi18(AbstractProtocol):
 
         _cmd = bytes(self._command, "utf-8")
         _type = self._command_defn["type"]
-
+        
+        data_length = len(_cmd) + 2 + 1
+        if _type == "QUERY":
+            _prefix = f"^P{data_length:03}"
+        else:
+            _prefix = f"^S{data_length:03}"
+        _pre_cmd = bytes(_prefix, "utf-8") + _cmd
+        log.debug(f"get_full_command: _pre_cmd: {_pre_cmd}")
         # calculate the CRC
-        crc_high, crc_low = crc(_cmd)
+        crc_high, crc_low = crc(_pre_cmd)
         # combine byte_cmd, CRC , return
         # PI18 full command "^P005GS\x..\x..\r"
-        command_crc = _cmd + bytes([crc_high, crc_low, 13])
-        if _type == "QUERY":
-            _prefix = f"^P{len(command_crc):03}"
-            full_command = bytes(_prefix, "utf-8") + command_crc
+        command_crc = _pre_cmd + bytes([crc_high, crc_low, 13])
+        full_command = bytes(_prefix, "utf-8") + command_crc
         log.debug(f"get_full_command: full command: {full_command}")
         return full_command
 
