@@ -154,7 +154,7 @@ class pi18(AbstractProtocol):
         # combine byte_cmd, CRC , return
         # PI18 full command "^P005GS\x..\x..\r"
         _crc = bytes([crc_high, crc_low, 13])
-        full_command = bytes(_prefix, "utf-8") + _crc
+        full_command = _pre_cmd + _crc
         log.debug(f"get_full_command: full command: {full_command}")
         return full_command
 
