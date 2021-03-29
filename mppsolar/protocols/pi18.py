@@ -70,6 +70,7 @@ COMMANDS = {
         ],
         "test_responses": [
             b"D1062232,499,2232,499,0971,0710,019,008,000,000,000,000,000,044,000,000,0520,0000,1941,0000,0,2,0,1,0,2,1,0\x09\x7b\r",
+            b"^0\x1b\xe3\r",
         ],
         "regex": "",
     },
@@ -140,7 +141,7 @@ class pi18(AbstractProtocol):
 
         _cmd = bytes(self._command, "utf-8")
         _type = self._command_defn["type"]
-        
+
         data_length = len(_cmd) + 2 + 1
         if _type == "QUERY":
             _prefix = f"^P{data_length:03}"
