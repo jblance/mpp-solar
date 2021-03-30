@@ -569,6 +569,7 @@ COMMANDS = {
                     "Phase 3 of 3 phase output",
                     "Phase 1 of 2 phase output",
                     "Phase 2 of 2 phase output",
+                    "Unknown Output Mode",
                 ],
             ],
             [
@@ -581,9 +582,12 @@ COMMANDS = {
             ["int", "Max AC charger current", "A"],
             ["int", "PV input current", "A"],
             ["int", "Battery discharge current", "A"],
+            ["float", "Unknown float", ""],
+            ["string", "Unknown flags?", ""],
         ],
         "test_responses": [
             b"(1 92931701100510 B 00 000.0 00.00 230.6 50.00 0275 0141 005 51.4 001 100 083.3 002 00574 00312 003 10100110 1 2 060 120 10 04 000\xcc#\r",
+            b"(1 92912102100033 B 00 000.0 00.00 120.1 59.99 0048 0000 000 53.1 000 059 000.0 000 00154 00016 000 00000110 7 1 060 120 030 00 000 000.0 00\xe7c\r",
         ],
         "regex": "QPGS(\\d)$",
     },
