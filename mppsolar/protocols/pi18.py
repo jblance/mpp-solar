@@ -168,7 +168,7 @@ class pi18(AbstractProtocol):
             return ["NAK"]
 
         # Drop ^Dxxx from first response
-        responses[0] = responses[0][4:]
+        responses[0] = responses[0][5:]
         # Remove CRC of last response
         responses[-1] = responses[-1][:-3]
         return responses
