@@ -337,6 +337,7 @@ COMMANDS = {
                     "Phase 3 of 3 Phase output",
                     "Phase 1 of 2 phase output",
                     "Phase 2 of 2 phase output",
+                    "unknown output phase",
                 ],
             ],
             ["float", "Battery Redischarge Voltage", "V"],
@@ -466,6 +467,7 @@ COMMANDS = {
                     "Phase 3 of 3 Phase output",
                     "Phase 1 of 2 phase output",
                     "Phase 2 of 2 phase output",
+                    "unknown output phase",
                 ],
             ]
         ],
@@ -709,6 +711,7 @@ COMMANDS = {
                     "Phase 3 of 3 Phase output",
                     "Phase 1 of 2 phase output",
                     "Phase 2 of 2 phase output",
+                    "unknown output",
                 ],
             ],
             ["float", "Battery Redischarge Voltage", "V"],
