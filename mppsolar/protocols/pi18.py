@@ -14,7 +14,7 @@ COMMANDS = {
         "description": "Total Generated Energy query",
         "help": " -- Query total generated energy",
         "type": "QUERY",
-        "response": [["int", "Total generated energy", "KWh"]],
+        "response": [["int", "Total generated energy", "Wh"]],
         "test_responses": [
             b"",
         ],
