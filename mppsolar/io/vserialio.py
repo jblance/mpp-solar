@@ -22,7 +22,7 @@ class VSerialIO(BaseIO):
         #    command_defn=self._protocol.get_command_defn(command),
 
         full_command = get_kwargs(kwargs, "full_command")
-        print(full_command)
+        # print(full_command)
         # "VEDTEXT"
         responses = b""
         log.debug(f"port {self._serial_port}, baudrate {self._serial_baud}, records {self._records}")
