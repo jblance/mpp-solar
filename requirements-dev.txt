@@ -1,4 +1,0 @@
--e . mpp-solar
-pyserial
-paho-mqtt
-bluepy
