@@ -11,7 +11,7 @@ log = logging.getLogger("mqtt")
 
 class mqtt(baseoutput):
     def __str__(self):
-        return "outputs the to the supplied mqtt broker: eg {tag}/status/total_output_active_power/value 1250"
+        return "outputs the results to the supplied mqtt broker: eg {tag}/status/total_output_active_power/value 1250"
 
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"__init__: kwargs {kwargs}")
