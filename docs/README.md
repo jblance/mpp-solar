@@ -1,5 +1,43 @@
 # Documentation #
 
+Good overview and technical discussion here of mpp-solar inverters: http://forums.aeva.asn.au/viewtopic.php?f=31&t=4332
+
+## Tested On ##
+- Raspberry Pi 3
+  - 2x USB to serial adapters (like https://www.adafruit.com/product/18)
+  - connected to 2x PIP-4048MS inverters connected in parallel
+
+- Raspberry Pi 3
+  - USB cable to USB port of inverter
+  - connected to 1x PIP-4048MS (/dev/hidraw0 on Pi)
+
+- Raspberry Pi
+  - 3x USB to serial adapters
+  - connected to 3x LV5048 inverters
+
+- Ubuntu 2020.04
+  - Direct USB connection to Inverter (LV5048)
+  - see [documented approach](docs/ubuntu_install.md)
+
+
+## Using a config file
+* You can setup a config file instead of using command line options
+* this is particularly useful for running as a service / dameon
+[details here](docs/configfile.md)
+
+## Troubleshooting ##
+ [Troubleshooting](docs/troubleshooting.md)
+
+## MQTT / Influx / Grafana Setup ##
+Instruction of one way of connecting the inverter output to Grafana
+[Setup Instructions](docs/MQTT_Influx_Grafana.md)
+
+
+## Protocol / Command Documentation
+[Protocol Index](docs/README.md)
+[Interface](docs/interface.md)
+
+
 ## Protocol / Command References ##
 
 File | Comment | Source

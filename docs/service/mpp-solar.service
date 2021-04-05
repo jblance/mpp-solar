@@ -1,4 +1,4 @@
-# systemd unit file for the Python Demo Service
+# systemd unit file for the MPP-Solar Service
 #
 # needs to go to /etc/systemd/user/*
 

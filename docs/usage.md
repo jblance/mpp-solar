@@ -1,7 +1,7 @@
 # Usage
 
 ## Troubleshooting / Notes ##
-- The commands default to using `/dev/ttyUSB0` if you are using direct USB connection try adding `-d /dev/hidraw0` to the commands
+- The commands default to using `/dev/ttyUSB0` if you are using direct USB connection try adding `-p /dev/hidraw0` to the commands
 - if you have other USB devices connected the inverter might show up as `/dev/hidraw1` or `/dev/hidraw2`
 - if uncertain, remove and re-connect the connection to the inverter and look at the end of the `dmesg` response to see what was reconnected
 - also in some instances only root has access to the device that the inverter is connected to - if you are getting no response try using `sudo`
@@ -11,36 +11,41 @@
 ## mpp-solar arguments
 `$ mpp-solar -h`
 ```
-usage: mpp-solar [-h] [-n NAME] [-p PORT] [--porttype PORTTYPE] [-P {PI00,PI16,PI18,PI30,PI41}] [-T TAG] [-b BAUD] [-M MODEL] [-o [OUTPUT]] [-q MQTTBROKER]
-                 [--mqttuser MQTTUSER] [--mqttpass MQTTPASS] [-c [COMMAND]] [-C CONFIGFILE] [--daemon] [--getstatus] [--getsettings] [-R] [-v] [-D] [-I]
+usage: mpp-solar [-h] [-n NAME] [-p PORT] [--porttype PORTTYPE] [-P {PI00,PI16,PI18,PI30,PI41,VED}] [-T TAG] [-b BAUD] [-o [OUTPUT]] [--keepcase] [--filter FILTER]
+                 [--exclfilter EXCLFILTER] [-q MQTTBROKER] [--mqttport MQTTPORT] [--mqtttopic MQTTTOPIC] [--mqttuser MQTTUSER] [--mqttpass MQTTPASS] [-c [COMMAND]]
+                 [-C [CONFIGFILE]] [--daemon] [--getstatus] [--getsettings] [-v] [-D] [-I]
 
-Solar Device Command Utility, version: 0.7.19, recent changes: fix json output
+Solar Device Command Utility, version: 0.7.40, recent changes: add mqtt_topic option and json_mqtt output
 
 optional arguments:
   -h, --help            show this help message and exit
   -n NAME, --name NAME  Specifies the device name - used to differentiate different devices
   -p PORT, --port PORT  Specifies the device communications port (/dev/ttyUSB0 [default], /dev/hidraw0, test, ...)
   --porttype PORTTYPE   overrides the device communications port type
-  -P {PI00,PI16,PI18,PI30,PI41}, --protocol {PI00,PI16,PI18,PI30,PI41}
+  -P {PI00,PI16,PI18,PI30,PI41,VED}, --protocol {PI00,PI16,PI18,PI30,PI41,VED}
                         Specifies the device command and response protocol, (default: PI30)
   -T TAG, --tag TAG     Override the command name and use this instead (for mqtt and influx type output processors)
   -b BAUD, --baud BAUD  Baud rate for serial communications (default: 2400)
-  -M MODEL, --model MODEL
-                        Specifies the inverter model to select commands for, defaults to "standard", currently supports LV5048
   -o [OUTPUT], --output [OUTPUT]
                         Specifies the output processor(s) to use [comma separated if multiple] (screen [default]) leave blank to give list
+  --keepcase            Do not convert the field names to lowercase
+  --filter FILTER       Specifies the filter to reduce the output - only those fields that match will be output (uses re.search)
+  --exclfilter EXCLFILTER
+                        Specifies the filter to reduce the output - any fields that match will be excluded from the output (uses re.search)
   -q MQTTBROKER, --mqttbroker MQTTBROKER
                         Specifies the mqtt broker to publish to if using a mqtt output (localhost [default], hostname, ip.add.re.ss ...)
+  --mqttport MQTTPORT   Specifies the mqtt broker port if needed (default: 1883)
+  --mqtttopic MQTTTOPIC
+                        provides an override topic (or prefix) for mqtt messages (default: None)
   --mqttuser MQTTUSER   Specifies the username to use for authenticated mqtt broker publishing
   --mqttpass MQTTPASS   Specifies the password to use for authenticated mqtt broker publishing
   -c [COMMAND], --command [COMMAND]
                         Command to run
-  -C CONFIGFILE, --configfile CONFIGFILE
-                        Full location of config file
+  -C [CONFIGFILE], --configfile [CONFIGFILE]
+                        Full location of config file (default None, /etc/mpp-solar/mpp-solar.conf if -C supplied)
   --daemon              Run as daemon
   --getstatus           Get Inverter Status
   --getsettings         Get Inverter Settings
-  -R, --showraw         Display the raw results
   -v, --version         Display the version
   -D, --debug           Enable Debug and above (i.e. all) messages
   -I, --info            Enable Info and above level messages
@@ -114,7 +119,8 @@ hass_mqtt                     	outputs the to the supplied mqtt broker in hass f
 influx2_mqtt                  	outputs the to the supplied mqtt broker: eg mpp-solar,command={tag} max_charger_range=120.0	    
 influx_mqtt                   	outputs the to the supplied mqtt broker: eg {tag}, {tag},setting=total_ac_output_apparent_power value=1577.0,unit="VA" 	    
 json                          	outputs the results to standard out in json format	    
-mqtt                          	outputs the to the supplied mqtt broker: eg {tag}/status/total_output_active_power/value 1250	    
+json_mqtt                     	outputs all the results to the supplied mqtt broker in a single message formated as json: eg 	    
+mqtt                          	outputs the results to the supplied mqtt broker: eg {tag}/status/total_output_active_power/value 1250	    
 raw                           	outputs the raw results to standard out	    
 screen                        	[the default output module] outputs the results to standard out in a slightly formatted way	    
 tag_mqtt                      	outputs the to the supplied mqtt broker using the supplied tag as the topic: eg {tag}/max_charger_range 120.0	    

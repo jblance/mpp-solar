@@ -7,8 +7,8 @@ for when you want to keep the install and dependencies separate from the rest of
 * activate venv `source venv/mppsolar/bin/activate` (needed each time before using)
 * pip install from git `pip install -e "git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar"` (only needed if the code is updated)
 
-## Worked Example
 
+## Worked Example
 ### Check python version
 ```
 pi@batteryshed:~ $ python3 --version

@@ -7,12 +7,13 @@ Need python-systemd package
 * or `pip install systemd-python`
 
 Need to create a config file `/etc/mpp-solar/mpp-solar.conf`
-* Use the example `/etc/mpp-solar/mpp-solar.conf.example` as a start
+* Use the example [mpp-solar example](service/mpp-solar.conf.example) as a start
 
-[see here for examples](../docs/configfile.md#Config-file-examples)
+[see here for examples](configfile.md#Config-file-examples)
 
 ## Add mpp-solar service ##
-
+* Create a unit file `/etc/systemd/user/mpp-solar.service`
+  * copy [mpp-solar](service/mpp-solar.service) to `/etc/systemd/user/mpp-solar.service`
 * Check the service exists
 `systemctl --user list-unit-files|grep mpp-solar`
 ```
@@ -24,17 +25,18 @@ mpp-solar.service              disabled
 * Check service status
 `systemctl --user status mpp-solar`
 ```
-mpp-solar.service - MPP Solar Service
+● mpp-solar.service - MPP Solar Service
    Loaded: loaded (/etc/systemd/user/mpp-solar.service; enabled; vendor preset: enabled)
-   Active: active (running) since Wed 2020-04-08 16:19:46 NZST; 10s ago
- Main PID: 21724 (python)
+   Active: active (running) since Tue 2021-04-06 08:20:45 NZST; 3h 2min ago
+ Main PID: 2682 (python3)
    CGroup: /user.slice/user-1000.slice/user@1000.service/mpp-solar.service
-           └─21724 /usr/bin/python /usr/local/bin/mpp-solar-service -c /etc/mpp-solar/mpp-solar.conf
+           └─2682 /usr/bin/python3 /usr/local/bin/mpp-solar -C /etc/mpp-solar/mpp-solar.conf --daemon
 
-Apr 08 16:19:46 batteryshed python[21724]: MPP-Solar-Service: Config file: /etc/mpp-solar/mpp-solar.conf
-Apr 08 16:19:46 batteryshed python[21724]: MPP-Solar-Service: Config setting - pause: 1
-Apr 08 16:19:46 batteryshed python[21724]: MPP-Solar-Service: Config setting - mqtt_broker: mqtthost
-Apr 08 16:19:46 batteryshed python[21724]: MPP-Solar-Service: Config setting - command sections found: 2
+Apr 06 11:22:51 batteryshed python3[2682]: Getting results from device: mppsolar device - name: Inverter_2, port: <mppsolar.io.hidrawio.HIDRawIO object at 0x75cd5290>
+Apr 06 11:22:55 batteryshed python3[2682]: Getting results from device: mppsolar device - name: Inverter_2, port: <mppsolar.io.hidrawio.HIDRawIO object at 0x75cd5290>
+Apr 06 11:22:57 batteryshed python3[2682]: Getting results from device: mppsolar device - name: Inverter_2, port: <mppsolar.io.hidrawio.HIDRawIO object at 0x75cd5290>
+Apr 06 11:23:00 batteryshed python3[2682]: Sleeping for 1 sec
+Apr 06 11:23:01 batteryshed python3[2682]: Getting results from device: mppsolar device - name: Inverter_1, port: <mppsolar.io.serialio.SerialIO object at 0x75ed4ff0>
 ...
 ```
 
@@ -46,11 +48,11 @@ Apr 08 16:19:46 batteryshed python[21724]: MPP-Solar-Service: Config setting - c
 
 Logs and service output
 * The output should show up in systemd's logs, which by default are redirected to syslog:
-`grep 'MPP-Solar-Service' /var/log/syslog`
+`grep 'mppsolar' /var/log/syslog`
 ```
-Apr  8 16:23:27 batteryshed python[21724]: MPP-Solar-Service: item {'tag': u'QPGS0', 'command': u'QPGS0', 'mp': <mppsolar.mpputils.mppUtils instance at 0x75d61c88>, 'format': u'influx2'}
-Apr  8 16:23:30 batteryshed python[21724]: MPP-Solar-Service: item {'tag': u'QPGS1', 'command': u'QPGS1', 'mp': <mppsolar.mpputils.mppUtils instance at 0x75d61df0>, 'format': u'influx2'}
-Apr  8 16:23:32 batteryshed python[21724]: MPP-Solar-Service: sleeping for 1sec
+Apr  6 11:27:20 batteryshed python3[2682]: Getting results from device: mppsolar device - name: Inverter_2, port: <mppsolar.io.hidrawio.HIDRawIO object at 0x75cd5290>, protocol: <mppsolar.protocols.pi30.pi30 object at 0x75ed4f30> for command: Q1, tag: Inverter2, outputs: hass_mqtt
+Apr  6 11:27:22 batteryshed python3[2682]: Getting results from device: mppsolar device - name: Inverter_2, port: <mppsolar.io.hidrawio.HIDRawIO object at 0x75cd5290>, protocol: <mppsolar.protocols.pi30.pi30 object at 0x75ed4f30> for command: QPIGS, tag: Inverter2, outputs: hass_mqtt
+Apr  6 11:27:25 batteryshed python3[2682]: Sleeping for 1 sec
 ```
 
 * Another way to display the service's output is via
