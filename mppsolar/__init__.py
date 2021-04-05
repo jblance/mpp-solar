@@ -146,6 +146,12 @@ def main():
         default=1883,
     )
     parser.add_argument(
+        "--mqtttopic",
+        type=str,
+        help="provides an override topic (or prefix) for mqtt messages (default: None)",
+        default=None,
+    )
+    parser.add_argument(
         "--mqttuser",
         type=str,
         help="Specifies the username to use for authenticated mqtt broker publishing",
@@ -217,6 +223,9 @@ def main():
 
     mqtt_broker = args.mqttbroker
     mqtt_port = args.mqttport
+    mqtt_topic = args.mqtttopic
+    if mqtt_topic is None:
+        mqtt_topic = prog_name
     mqtt_user = args.mqttuser
     mqtt_pass = args.mqttpass
     filter = args.filter
@@ -390,7 +399,7 @@ def main():
                     mqtt_port=mqtt_port,
                     mqtt_user=mqtt_user,
                     mqtt_pass=mqtt_pass,
-                    topic=prog_name,
+                    mqtt_topic=mqtt_topic,
                     filter=filter,
                     excl_filter=excl_filter,
                     keep_case=keep_case,

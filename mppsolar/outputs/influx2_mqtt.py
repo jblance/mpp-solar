@@ -19,7 +19,7 @@ class influx2_mqtt(mqtt):
         data = get_kwargs(kwargs, "data")
         tag = get_kwargs(kwargs, "tag")
         keep_case = get_kwargs(kwargs, "keep_case")
-        topic = get_kwargs(kwargs, "topic", default="mpp-solar")
+        topic = get_kwargs(kwargs, "mqtt_topic", default="mpp-solar")
         filter = get_kwargs(kwargs, "filter")
         if filter is not None:
             filter = re.compile(filter)
