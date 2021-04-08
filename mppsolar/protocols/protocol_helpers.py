@@ -33,26 +33,6 @@ def vedHexChecksum(byteData):
     return CS
 
 
-def get_resp_defn(key, defns):
-    """
-    look for a definition for the supplied key
-    """
-    # print(key, defns)
-    if not key:
-        return None
-    try:
-        key = key.decode("utf-8")
-    except UnicodeDecodeError as e:
-        log.info(f"get_resp_defn: key decode error for {key}")
-    for defn in defns:
-        if key == defn[0]:
-            # print(key, defn)
-            return defn
-    # did not find definition for this key
-    log.info(f"No defn found for {key} key")
-    return [key, key, "", ""]
-
-
 def decode2ByteHex(hexString):
     """
     Code a 2 byte hexString to volts as per jkbms approach (blackbox determined)
