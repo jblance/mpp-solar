@@ -1,6 +1,6 @@
 import logging
 
-from .protocol import AbstractProtocol
+from .abstractprotocol import AbstractProtocol
 
 # from .pi30 import COMMANDS
 

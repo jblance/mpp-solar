@@ -1,6 +1,6 @@
 import logging
 
-from .protocol import AbstractProtocol
+from .abstractprotocol import AbstractProtocol
 from .protocol_helpers import crcPI as crc
 
 log = logging.getLogger("pi30")

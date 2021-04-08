@@ -1,7 +1,7 @@
 import logging
 import math
 
-from .protocol import AbstractProtocol
+from .abstractprotocol import AbstractProtocol
 from .protocol_helpers import decode4ByteHex1000, decode4ByteHex, decode2ByteHex, crc8
 
 

@@ -4,8 +4,9 @@ import re
 import struct
 from typing import Tuple
 
+from ..helpers import get_resp_defn
 from .protocol_helpers import crcPI as crc
-from .protocol_helpers import get_resp_defn
+
 
 log = logging.getLogger("AbstractProtocol")
 

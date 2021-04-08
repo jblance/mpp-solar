@@ -1,7 +1,7 @@
 import logging
 from typing import Tuple
 
-from .protocol import AbstractProtocol
+from .abstractprotocol import AbstractProtocol
 from .protocol_helpers import vedHexChecksum
 
 # from .pi30 import COMMANDS
