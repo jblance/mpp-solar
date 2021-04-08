@@ -5,7 +5,7 @@ __Note: python earlier than version 3.6 is not supported__
 
 Python package with reference library of commands (and responses)
 designed to get information from inverters and other solar and power devices
-Support for:
+Currently has support for:
 - MPP-Solar and similar inverters, e.g.
   - PIP-4048MS
   - IPS-4000WM
