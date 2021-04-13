@@ -133,7 +133,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             log.info("set_port: Using testio for communications")
             from mppsolar.io.testio import TestIO
 
-            self._port = TestIO()
+            self._port = TestIO(device_path=port)
 
         elif port_type == PORT_TYPE_USB:
             log.info("set_port: Using hidrawio for communications")
