@@ -21,18 +21,20 @@ Currently has support for:
 
 ## Compute hardware support ##
 The python code is designed to run on Linux type python environments using python 3.6 or newer
-[hardware that has been known to work](docs/hardware.md)
+
+[Hardware that has been known to work](https://github.com/jblance/mpp-solar/blob/master/docs/hardware.md)
 
 ## Installation ##
 * to get the latest stable version: `sudo pip install mpp-solar`
-* [more installation options](docs/installation.md)
+* [more installation options](https://github.com/jblance/mpp-solar/blob/master/docs/installation.md)
 
 ## Usage ###
 `$ mpp-solar -h` or `$ jkbms -h` will display the available options
 
-[More detailed usage](docs/usage.md)
-
-[More detailed documentation](docs/README.md)
+[More detailed usage](https://github.com/jblance/mpp-solar/blob/master/docs/usage.md)
 
 ## Troubleshooting ##
-[Troubleshooting](docs/troubleshooting.md)
+[Troubleshooting](https://github.com/jblance/mpp-solar/blob/master/docs/troubleshooting.md)
+
+## Full Documentation ##
+[More detailed documentation](https://github.com/jblance/mpp-solar/blob/master/docs/README.md)
