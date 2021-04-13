@@ -245,13 +245,17 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         "",
                     ]
                 elif resp_format[0] == "float":
-                    if "--" in result:
-                        result = 0
-                    msgs[key] = [float(result), resp_format[2]]
+                    try:
+                        result = float(result)
+                    except ValueError as e:
+                        log.debug(f"Error resolving {result} as float")
+                    msgs[key] = [result, resp_format[2]]
                 elif resp_format[0] == "int":
-                    if "--" in result:
-                        result = 0
-                    msgs[key] = [int(result), resp_format[2]]
+                    try:
+                        result = int(result)
+                    except ValueError as e:
+                        log.debug(f"Error resolving {result} as int")
+                    msgs[key] = [result, resp_format[2]]
                 elif resp_format[0] == "string":
                     msgs[key] = [result, resp_format[2]]
                 elif resp_format[0] == "10int":
