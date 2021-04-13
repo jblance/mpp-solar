@@ -1,5 +1,23 @@
 # Usage
 
+* Run 'QPI' command against an inverter (will use default protocol PI30) connected via direct USB on /dev/hidraw0 (will output results to screen)
+  * `$ mpp-solar -p /dev/hidraw0 -c QPI`
+* Run the above with more information about what is happening (INFO level messages)
+  * `$ mpp-solar -p /dev/hidraw0 -c QPI -I`
+* Run the above with LOTS of information about what is happening (DEBUG level messages)
+  * `$ mpp-solar -p /dev/hidraw0 -c QPI -D`
+* Run the top but output to mqtt
+  * `$ mpp-solar -p /dev/hidraw0 -c QPI -o mqtt -q mqttbroker`
+* Show help / usage
+  * `$ mpp-solar -h`
+* List commands for protocol PI41
+  * `$ mpp-solar -P PI41 -c`
+* List output modules available
+  * `$ mpp-solar -o`
+
+* Run 'getInfo' command against jkbms BMS with bluetooth MAC '3C:A5:09:0A:AA:AA'
+  * `$ jkbms -p 3C:A5:09:0A:AA:AA -c getInfo`
+
 ## Troubleshooting / Notes ##
 - The commands default to using `/dev/ttyUSB0` if you are using direct USB connection try adding `-p /dev/hidraw0` to the commands
 - if you have other USB devices connected the inverter might show up as `/dev/hidraw1` or `/dev/hidraw2`
