@@ -14,4 +14,4 @@
 
 - Ubuntu 2020.04
   - Direct USB connection to Inverter (LV5048)
-  - see [documented approach](docs/ubuntu_install.md)
+  - see [documented approach](ubuntu_install.md)
