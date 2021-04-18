@@ -296,7 +296,7 @@ def main():
 
             for command in commands:
                 _commands.append((device, command, tag, outputs, filter, excl_filter))
-            log.debug(f"Commands from config fiel {_commands}")
+            log.debug(f"Commands from config file {_commands}")
 
             if args.daemon:
                 print(f"Config file: {args.configfile}")
