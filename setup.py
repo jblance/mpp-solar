@@ -83,7 +83,7 @@ setup(
         "console_scripts": [
             "mpp-solar=mppsolar:main",
             "jkbms=mppsolar:main",
-            "mpp-test=mppsolar.mpp-test:main",
+            "mpp-test=mppsolar.mpptest:main",
         ],
     },
     test_suite="tests.get_tests",
