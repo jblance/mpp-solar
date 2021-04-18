@@ -109,6 +109,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 f"No definition for command {command} in protocol {self._protocol_id}",
                 "",
             ]
+            return msgs
         else:
             len_command_defn = len(command_defn["response"])
         # Decode response based on stored command definition
