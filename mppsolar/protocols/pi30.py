@@ -135,7 +135,7 @@ COMMANDS = {
     "PEPD": {
         "name": "PEPD",
         "description": "Set the enabled / disabled state of various Inverter settings (e.g. buzzer, overload, interrupt alarm)",
-        "help": " -- examples: PEABJ/PDKUVXYZ (enable A buzzer, B overload bypass, J power saving / disable K LCD go to default after 1min, U overload restart, V overtemp restart, X backlight, Y alarm on primary source interrupt, Z fault code record)",
+        "help": " -- examples: PEABJ/PDKUVXYZ (enable A buzzer,  B overload bypass, J power saving / disable K LCD go to default after 1min, U overload restart, V overtemp restart, X backlight, Y alarm on primary source interrupt, Z fault code record)",
         "type": "SETTER",
         "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
