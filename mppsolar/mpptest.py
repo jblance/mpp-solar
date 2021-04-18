@@ -6,8 +6,9 @@ from sys import exit
 
 from .version import __version__, __version_comment__  # noqa: F401
 from . import get_device_class
+from . import get_outputs
 
-log = logging.getLogger("mpp-test")
+log = logging.getLogger("")
 
 
 def main():
@@ -50,17 +51,17 @@ def main():
     parser.add_argument(
         "-I", "--info", action="store_true", help="Enable Info and above level messages"
     )
+    parser.add_argument("-c", "--command", default="QPI", help="Command to run")
 
     args = parser.parse_args()
+    prog_name = parser.prog
+    s_prog_name = "mppsolar"
 
     # Turn on debug if needed
     if args.debug:
         log.setLevel(logging.DEBUG)
-    elif args.info:
-        log.setLevel(logging.INFO)
     else:
-        # set default log level
-        log.setLevel(logging.WARNING)
+        log.setLevel(logging.INFO)
     logging.basicConfig()
 
     # Display verison if asked
@@ -76,14 +77,21 @@ def main():
     log.debug(f"device_class {device_class}")
     # The device class __init__ will instantiate the port communications and protocol classes
     device = device_class(
-        name=args.name,
         port=args.port,
         protocol=args.protocol,
         baud=args.baud,
         porttype=args.porttype,
-        mqtt_broker=mqtt_broker,
-        mqtt_port=mqtt_port,
-        mqtt_user=mqtt_user,
-        mqtt_pass=mqtt_pass,
     )
-    #
+    print(device)
+
+    results = device.run_command(command=args.command)
+    log.info(f"results: {results}")
+
+    outputs = get_outputs("screen")
+    for op in outputs:
+        # maybe include the command and what the command is im the output
+        # eg QDI run, Display Inverter Default Settings
+        log.debug(f"Using output filter: {filter}")
+        op.output(
+            data=results,
+        )
