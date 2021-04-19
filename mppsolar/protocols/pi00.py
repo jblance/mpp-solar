@@ -19,7 +19,6 @@ COMMANDS = {
         "test_responses": [
             b"(PI00\x42\x42\r",
         ],
-        "regex": "",
     },
     "QPIRI": {
         "name": "QPIRI",
@@ -45,7 +44,6 @@ COMMANDS = {
         "test_responses": [
             b"(230.0 50.0 013.0 230.0 013.0 18.0 048.0 1 10 0\x86\x42\r",
         ],
-        "regex": "",
     },
 }
 

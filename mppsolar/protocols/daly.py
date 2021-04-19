@@ -33,7 +33,6 @@ COMMANDS = {
         "test_responses": [
             bytes.fromhex("A58090080000000000000000bd\n"),
         ],
-        "regex": "",
     },
 }
 

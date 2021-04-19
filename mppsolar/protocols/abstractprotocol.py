@@ -39,8 +39,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
     def get_command_defn(self, command) -> dict:
         log.debug(f"get_command_defn: Processing command '{command}'")
-        if command in self.COMMANDS:
-            # print(command)
+        if command in self.COMMANDS and "regex" not in self.COMMANDS[command]:
             log.debug(f"get_command_defn: Found command {command} in protocol {self._protocol_id}")
             return self.COMMANDS[command]
         for _command in self.COMMANDS:
@@ -109,6 +108,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 f"No definition for command {command} in protocol {self._protocol_id}",
                 "",
             ]
+            msgs["response"] = [raw_response, ""]
             return msgs
         else:
             len_command_defn = len(command_defn["response"])

@@ -18,7 +18,6 @@ COMMANDS = {
         "test_responses": [
             b"",
         ],
-        "regex": "",
     },
     "GS": {
         "name": "GS",
@@ -72,7 +71,6 @@ COMMANDS = {
             b"D1062232,499,2232,499,0971,0710,019,008,000,000,000,000,000,044,000,000,0520,0000,1941,0000,0,2,0,1,0,2,1,0\x09\x7b\r",
             b"^0\x1b\xe3\r",
         ],
-        "regex": "",
     },
     "MOD": {
         "name": "MOD",
@@ -97,7 +95,6 @@ COMMANDS = {
         "test_responses": [
             b"",
         ],
-        "regex": "",
     },
     "PI": {
         "name": "PI",
@@ -109,7 +106,6 @@ COMMANDS = {
         "test_responses": [
             b"",
         ],
-        "regex": "",
     },
 }
 

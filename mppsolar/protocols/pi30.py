@@ -154,7 +154,6 @@ COMMANDS = {
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
         ],
-        "regex": "",
     },
     "PGR": {
         "name": "PGR",
@@ -274,7 +273,6 @@ COMMANDS = {
         "test_responses": [
             b"(00000 00000 01 01 00 059 045 053 068 00 00 000 0040 0580 0000 50.00 13\x39\xB9\r",
         ],
-        "regex": "",
     },
     "QBOOT": {
         "name": "QBOOT",
@@ -284,7 +282,6 @@ COMMANDS = {
         "test_responses": [
             "",
         ],
-        "regex": "",
     },
     "QDI": {
         "name": "QDI",
@@ -361,7 +358,6 @@ COMMANDS = {
         "test_responses": [
             b"(230.0 50.0 0030 42.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 0 0 1 0 54.0 0 1 000\x9E\x60\r",
         ],
-        "regex": "",
     },
     "QFLAG": {
         "name": "QFLAG",
@@ -391,7 +387,6 @@ COMMANDS = {
         "test_responses": [
             b"(EakxyDbjuvz\x2F\x29\r",
         ],
-        "regex": "",
     },
     "QID": {
         "name": "QID",
@@ -402,7 +397,6 @@ COMMANDS = {
         "test_responses": [
             b"(9293333010501\xBB\x07\r",
         ],
-        "regex": "",
     },
     "QMCHGCR": {
         "name": "QMCHGCR",
@@ -413,7 +407,6 @@ COMMANDS = {
         "test_responses": [
             b"",
         ],
-        "regex": "",
     },
     "QMOD": {
         "name": "QMOD",
@@ -437,7 +430,6 @@ COMMANDS = {
         "test_responses": [
             b"(S\x64\x39\r",
         ],
-        "regex": "",
     },
     "QMUCHGCR": {
         "name": "QMUCHGCR",
@@ -448,7 +440,6 @@ COMMANDS = {
         "test_responses": [
             b"",
         ],
-        "regex": "",
     },
     "QOPM": {
         "name": "QOPM",
@@ -474,7 +465,6 @@ COMMANDS = {
         "test_responses": [
             b"",
         ],
-        "regex": "",
     },
     "QPGS": {
         "name": "QPGS",
@@ -591,7 +581,7 @@ COMMANDS = {
             b"(1 92931701100510 B 00 000.0 00.00 230.6 50.00 0275 0141 005 51.4 001 100 083.3 002 00574 00312 003 10100110 1 2 060 120 10 04 000\xcc#\r",
             b"(1 92912102100033 B 00 000.0 00.00 120.1 59.99 0048 0000 000 53.1 000 059 000.0 000 00154 00016 000 00000110 7 1 060 120 030 00 000 000.0 00\xe7c\r",
         ],
-        "regex": "QPGS(\\d)$",
+        "regex": "QPGS(\\d+)$",
     },
     "QPI": {
         "name": "QPI",
@@ -604,7 +594,6 @@ COMMANDS = {
         "test_responses": [
             b"(PI30\x9a\x0b\r",
         ],
-        "regex": "",
     },
     "QPIGS": {
         "name": "QPIGS",
@@ -654,7 +643,6 @@ COMMANDS = {
         "test_responses": [
             b"(000.0 00.0 230.0 49.9 0161 0119 003 460 57.50 012 100 0069 0014 103.8 57.45 00000 00110110 00 00 00856 010\x24\x8c\r",
         ],
-        "regex": "",
     },
     "QPIRI": {
         "name": "QPIRI",
@@ -737,7 +725,6 @@ COMMANDS = {
             b"(120.0 25.0 120.0 60.0 25.0 3000 3000 48.0 46.0 44.0 58.4 54.4 2 30 060 1 2 0 9 01 0 6 54.0 0 1 000 0\x8f\xed\r",
             b"(230.0 13.0 230.0 50.0 13.0 3000 2400 24.0 23.0 21.0 28.2 27.0 0 30 50 0 2 1 - 01 1 0 26.0 0 0\xb9\xbd\r",
         ],
-        "regex": "",
     },
     "QPIWS": {
         "name": "QPIWS",
@@ -787,7 +774,6 @@ COMMANDS = {
         "test_responses": [
             b"(00000100000000000000000000000000\xFE\x82\r",
         ],
-        "regex": "",
     },
     "QVFW": {
         "name": "QVFW",
@@ -798,7 +784,6 @@ COMMANDS = {
         "test_responses": [
             b"(VERFW:00072.70\x53\xA7\r",
         ],
-        "regex": "",
     },
     "QVFW2": {
         "name": "QVFW2",
@@ -809,7 +794,6 @@ COMMANDS = {
         "test_responses": [
             b"",
         ],
-        "regex": "",
     },
 }
 
