@@ -90,7 +90,7 @@ def main():
             type=str,
             help="Specifies the device command and response protocol, (default: PI30)",
             default="PI30",
-            choices=["PI00", "PI16", "PI18", "PI30", "PI41", "VED", "DALY"],
+            choices=["PI00", "PI16", "PI18", "PI30", "PI30REVO", "PI41", "VED", "DALY"],
         )
     parser.add_argument(
         "-T",

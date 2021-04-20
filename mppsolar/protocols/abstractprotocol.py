@@ -298,10 +298,26 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                                 _key = "unknown_{}".format(item)
                             msgs[_key] = [status, ""]
                     # msgs[key] = [output, '']
+                elif resp_format[0] == "multi":
+                    for x, item in enumerate(result):
+                        item_value = int(item)
+                        item_resp_format = resp_format[1][x]
+                        item_type = item_resp_format[0]
+                        # print(x, item_value, item_resp_format, item_type)
+                        if item_type == "option":
+                            item_name = item_resp_format[1]
+                            resolved_value = item_resp_format[2][item_value]
+                            msgs[item_name] = [resolved_value, ""]
+                        elif item_type == "string":
+                            item_name = item_resp_format[1]
+                            msgs[item_name] = [item_value, ""]
+                        else:
+                            print(f"item type {item_type} not defined")
                 elif command_defn["type"] == "SETTER":
                     # _key = "{}".format(command_defn["name"]).lower().replace(" ", "_")
                     _key = command_defn["name"]
                     msgs[_key] = [result, ""]
                 else:
+                    log.info(f"Processing unknown response format {result}")
                     msgs[i] = [result, ""]
         return msgs

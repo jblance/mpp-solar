@@ -17,7 +17,20 @@ def crc8(byteData):
         # char = int(str[j:j+2], 16)
         # print(b)
         CRC = CRC + b
-        CRC &= 0xFF
+    CRC &= 0xFF
+    return CRC
+
+
+def crc8P1(byteData):
+    """
+    Generate 8 bit CRC of supplied string + 1
+    eg as used in REVO PI30 protocol
+    """
+    CRC = 0
+    for b in byteData:
+        CRC = CRC + b
+    CRC += 1
+    CRC &= 0xFF
     return CRC
 
 
