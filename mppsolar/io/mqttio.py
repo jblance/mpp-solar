@@ -1,13 +1,14 @@
+import binascii
 import json as js
 import logging
-import paho.mqtt.publish as publish
-import paho.mqtt.subscribe as subscribe
-import paho.mqtt.client as mqttc
-
 import time
 
-from .baseio import BaseIO
+import paho.mqtt.client as mqttc
+import paho.mqtt.publish as publish
+import paho.mqtt.subscribe as subscribe
+
 from ..helpers import get_kwargs
+from .baseio import BaseIO
 
 log = logging.getLogger("MqttIO")
 
@@ -22,7 +23,7 @@ class MqttIO(BaseIO):
         self.mqtt_pass = get_kwargs(kwargs, "mqtt_pass")
         self.client_id = get_kwargs(kwargs, "client_id")
         log.info(
-            f"__init__: client_id: {self.client_id},  mqtt_broker: {self.mqtt_broker}, port: {self.mqtt_port}, user: {self.mqtt_user}, pass: {self.mqtt_pass}"
+            f"__init__: client_id: {self.client_id}, mqtt_broker: {self.mqtt_broker}, port: {self.mqtt_port}, user: {self.mqtt_user}, pass: {self.mqtt_pass}"
         )
         self._msg = None
 
@@ -53,16 +54,14 @@ class MqttIO(BaseIO):
             log.debug("No mqtt authentication used")
             # auth = None
 
-        # connect(host, port=1883, keepalive=60, bind_address="")
         mqtt_client.connect(self.mqtt_broker, port=self.mqtt_port)
 
-        payload = full_command
-        _payload = "{'command': '%s', 'full_command': %s}" % (command, full_command)
-        print(_payload)
+        command_hex = binascii.hexlify(full_command)
+        payload = {"command": command, "command_hex": command_hex.decode()}
+        payload = js.dumps(payload)
 
         log.debug(f"Publishing {payload} to topic: {command_topic}")
 
-        # publish(topic, payload=None, qos=0, retain=False)
         mqtt_client.publish(command_topic, payload=payload)
 
         mqtt_client.on_message = self.sub_cb
@@ -81,11 +80,18 @@ class MqttIO(BaseIO):
             }
         else:
             msg_topic = self._msg.topic
-            msg_payload = self._msg.payload.decode("unicode_escape")
+            # decode the payload
+            # payload should be a json dumped byte string
+            # payload: b'{"command_hex": "515049beac0d", "result": "", "command": "QPI"}'
             log.debug(
                 f"mqtt raw response on {self._msg.topic} was: {self._msg.payload}, payload type: {type(self._msg.payload)}"
             )
-            # msg_payload = self._msg.payload
+            # Return the byte-string to a dict
+            payload_dict = js.loads(self._msg.payload)
+            # Get 'results', and convert back to bytes
+            result = binascii.unhexlify(payload_dict["result"])
+            # TODO: Currently ignoring this - might want to update return types at some point
+            cmd = payload_dict["command"]
             self._msg = None
-            log.debug(f"mqtt response on {msg_topic} was: {msg_payload}")
-            return msg_payload
+            log.debug(f"mqtt response on {msg_topic} for command {cmd} was: {result}")
+            return result
