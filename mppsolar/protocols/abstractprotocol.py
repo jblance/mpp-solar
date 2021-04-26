@@ -207,6 +207,54 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     responses = responses[defn[1] :]
                     value = struct.unpack("<h", result)[0]
                     msgs[defn[2]] = [value, defn[3]]
+                elif _type == "int":
+                    log.debug("decode: int defn")
+                    result = responses[: defn[1]]
+                    responses = responses[defn[1] :]
+                    value = result[0]
+                    msgs[defn[2]] = [value, defn[3]]
+                elif _type == "int-40":
+                    log.debug("decode: int-40 defn")
+                    result = responses[: defn[1]]
+                    responses = responses[defn[1] :]
+                    value = result[0] - 40
+                    msgs[defn[2]] = [value, defn[3]]
+                elif _type == "2int":
+                    log.debug("decode: 2int defn")
+                    result = responses[: defn[1]]
+                    responses = responses[defn[1] :]
+                    value = struct.unpack(">h", result)[0]
+                    msgs[defn[2]] = [value, defn[3]]
+                elif _type == "2mInt":
+                    log.debug("decode: 2mInt defn")
+                    result = responses[: defn[1]]
+                    responses = responses[defn[1] :]
+                    value = struct.unpack(">h", result)[0]
+                    try:
+                        value = float(value) / 1000
+                    except:
+                        value = f"{value} * 0.1"
+                    msgs[defn[2]] = [value, defn[3]]
+                elif _type == "2dInt":
+                    log.debug("decode: 2dInt defn")
+                    result = responses[: defn[1]]
+                    responses = responses[defn[1] :]
+                    value = struct.unpack(">h", result)[0]
+                    try:
+                        value = float(value) / 10
+                    except:
+                        value = f"{value} * 0.1"
+                    msgs[defn[2]] = [value, defn[3]]
+                elif _type == "2dInt-30k":
+                    log.debug("decode: 2dInt-30k defn")
+                    result = responses[: defn[1]]
+                    responses = responses[defn[1] :]
+                    value = struct.unpack(">h", result)[0]
+                    try:
+                        value = (float(value) - 30000) / 10
+                    except:
+                        value = f"({value} - 30000) * 0.1"
+                    msgs[defn[2]] = [value, defn[3]]
                 elif _type == "<hex":
                     # convert little endian hex to big endian..
                     log.debug("decode: <hex defn")
@@ -219,6 +267,11 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         value += f"{_byte:02x}"
                     # if defn[2] != "":
                     msgs[defn[2]] = [value, defn[3]]
+                elif _type == "option":
+                    result = responses[: defn[1]][0]
+                    responses = responses[defn[1] :]
+                    value = defn[3][int(result)]
+                    msgs[defn[2]] = [value, ""]
             # print(responses)
             # print(command_defn)
         else:
