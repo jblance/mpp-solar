@@ -51,4 +51,7 @@ class screen(baseoutput):
                 # make lowercase
                 key = key.lower()
             if key_wanted(key, filter, excl_filter):
-                print(f"{key:<30}\t{value:<15}\t{unit:<4}")
+                try:
+                    print(f"{key:<30}\t{value:<15}\t{unit:<4}")
+                except TypeError:
+                    print(key, value, unit)
