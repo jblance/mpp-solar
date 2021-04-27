@@ -52,9 +52,7 @@ def get_device_class(device_type=None):
 
 
 def main():
-    description = (
-        f"Solar Device Command Utility, version: {__version__}, {__version_comment__}"
-    )
+    description = f"Solar Device Command Utility, version: {__version__}, {__version_comment__}"
     parser = ArgumentParser(description=description)
     parser.add_argument(
         "-n",
@@ -165,9 +163,7 @@ def main():
         help="Specifies the password to use for authenticated mqtt broker publishing",
         default=None,
     )
-    parser.add_argument(
-        "-c", "--command", nargs="?", const="help", help="Command to run"
-    )
+    parser.add_argument("-c", "--command", nargs="?", const="help", help="Command to run")
     if parser.prog == "jkbms":
         parser.add_argument(
             "-C",
@@ -190,13 +186,9 @@ def main():
         )
     parser.add_argument("--daemon", action="store_true", help="Run as daemon")
     parser.add_argument("--getstatus", action="store_true", help="Get Inverter Status")
-    parser.add_argument(
-        "--getsettings", action="store_true", help="Get Inverter Settings"
-    )
+    parser.add_argument("--getsettings", action="store_true", help="Get Inverter Settings")
 
-    parser.add_argument(
-        "-v", "--version", action="store_true", help="Display the version"
-    )
+    parser.add_argument("-v", "--version", action="store_true", help="Display the version")
     parser.add_argument(
         "-D",
         "--debug",
@@ -314,9 +306,7 @@ def main():
             else:
                 log.info(f"Config file: {args.configfile}")
                 log.info(f"Config setting - pause: {pause}")
-                log.info(
-                    f"Config setting - mqtt_broker: {mqtt_broker}, port: {mqtt_port}"
-                )
+                log.info(f"Config setting - mqtt_broker: {mqtt_broker}, port: {mqtt_port}")
                 log.info(f"Config setting - command sections found: {len(sections)}")
 
     else:
@@ -357,11 +347,9 @@ def main():
         elif args.getstatus:
             # use get_status helper
             commands.append("get_status")
-            # TODO: implement get_status
         elif args.getsettings:
             # use get_settings helper
             commands.append("get_settings")
-            # TODO: implement get_settings
         elif args.command is None:
             # run the command
             commands.append("")

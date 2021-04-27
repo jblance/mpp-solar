@@ -34,6 +34,57 @@ def crc8P1(byteData):
     return CRC
 
 
+def Hex2Int(hexString):
+    """
+    Decode the first byte of a hexString to int
+    """
+    answer = hexString[0]
+    log.info(f"Hex {hexString} decoded to {answer}")
+
+    return answer
+
+
+def Hex2Str(hexString):
+    """
+    Return the hexString as ASCII representation of hex
+    """
+    answer = ""
+    for x in hexString:
+        answer += f"{x:02x}"
+
+    log.info(f"Hex {hexString} decoded to {answer}")
+
+    return answer
+
+
+def Little2ByteHex2Int(hexString):
+    """
+    Decode a 2 byte hexString to int (little endian coded)
+    """
+    # Make sure supplied String is the correct length
+    if len(hexString) != 2:
+        log.warning(f"Hex encoded value must be 2 bytes long. Was {len(hexString)} length")
+        return 0
+
+    answer = unpack("<h", hexString)[0]
+    log.info(f"Hex {hexString} 2 byte decoded to {answer}")
+    return answer
+
+
+def Big2ByteHex2Int(hexString):
+    """
+    Decode a 2 byte hexString to int (big endian coded)
+    """
+    # Make sure supplied String is the correct length
+    if len(hexString) != 2:
+        log.warning(f"Hex encoded value must be 2 bytes long. Was {len(hexString)} length")
+        return 0
+
+    answer = unpack(">h", hexString)[0]
+    log.info(f"Hex {hexString} 2 byte decoded to {answer}")
+    return answer
+
+
 def vedHexChecksum(byteData):
     """
     Generate VE Direct HEX Checksum

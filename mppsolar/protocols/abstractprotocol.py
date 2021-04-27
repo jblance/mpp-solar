@@ -5,8 +5,11 @@ import struct
 from typing import Tuple
 
 from ..helpers import get_resp_defn
+from .protocol_helpers import Big2ByteHex2Int
+from .protocol_helpers import Little2ByteHex2Int
+from .protocol_helpers import Hex2Int
+from .protocol_helpers import Hex2Str
 from .protocol_helpers import crcPI as crc
-
 
 log = logging.getLogger("AbstractProtocol")
 
@@ -73,7 +76,54 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             return False, {"ERROR": ["No response", ""]}
         return True, {}
 
+    def process_response(self, data_name=None, data_type=None, data_units=None, raw_value=None):
+        template = None
+        # Check for a format modifying template
+        if ":" in data_type:
+            data_type, template = data_type.split(":")
+            log.info(f"Got template {template} for {data_name} {raw_value}")
+
+        if data_type == "lookup":
+            log.warn("lookup not implemented...")
+            return data_name, None, data_units
+        if data_type == "exclude" or data_type == "discard":
+            # Just ignore these ones
+            log.debug(f"Discarding {data_name}:{raw_value}")
+            return None, raw_value, data_units
+        if data_type == "option":
+            response_id = int(raw_value[0])
+            responses = data_units
+            r = responses[response_id]
+            return data_name, r, ""
+        if data_type == "keyed":
+            log.debug("decode: keyed defn")
+            # [
+            #     "keyed",
+            #     1,
+            #     "Command response flag",
+            #     {
+            #         "00": "OK",
+            #         "01": "Unknown ID",
+            #         "02": "Not supported",
+            #         "04": "Parameter Error",
+            #     },
+            # ],
+            key = ""
+            for x in raw_value:
+                key += f"{x:02x}"
+            r = data_units[key]
+            return data_name, r, ""
+        format_string = f"{data_type}(raw_value)"
+        r = eval(format_string)
+        if template is not None:
+            r = eval(template)
+        return data_name, r, data_units
+
     def decode(self, response, command) -> dict:
+        """
+        Take the raw response and turn it into a dict of name: value, unit entries
+        """
+
         log.info(f"decode: response passed to decode: {response}")
 
         valid, msgs = self.check_response_valid(response)
@@ -91,14 +141,14 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         raw_response = _response.decode("utf-8")
         msgs["raw_response"] = [raw_response, ""]
 
-        command_defn = self.get_command_defn(command)
         # Add metadata
         msgs["_command"] = command
+        # Check for a stored command definition
+        command_defn = self.get_command_defn(command)
         if command_defn is not None:
             msgs["_command_description"] = command_defn["description"]
-
-        # Check for a stored command definition
-        if not command_defn:
+            len_command_defn = len(command_defn["response"])
+        else:
             # No definiution, so just return the data
             len_command_defn = 0
             log.debug(
@@ -110,170 +160,72 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             ]
             msgs["response"] = [raw_response, ""]
             return msgs
-        else:
-            len_command_defn = len(command_defn["response"])
-        # Decode response based on stored command definition
-        # if not self.is_response_valid(response):
-        #    log.info('Invalid response')
-        #    msgs['ERROR'] = ['Invalid response', '']
-        #    msgs['response'] = [response, '']
-        #    return msgs
 
+        # Split the response into individual responses
         responses = self.get_responses(response)
-
         log.debug(f"decode: trimmed and split responses: {responses}")
 
-        # Responses are determined by a KEY lookup (instead of in sequence)
+        # Determine the type of response
         if "response_type" in command_defn:
             response_type = command_defn["response_type"]
         else:
             response_type = "default"
         log.info(f"decode: Processing response of type {response_type}")
 
-        if response_type == "KEYED":
-            log.debug("decode: Processing KEYED type responses")
-            # print(command_defn["response"])
-            for response in responses:
-                field = response[0]
-                _defn = get_resp_defn(field, command_defn["response"])
-                if _defn is None:
-                    continue
-                if len(response) <= 1:
-                    continue
-                key = _defn[1]
-                value = response[1]
-                units = _defn[2]
-                _type = _defn[3]
-                if _type == "exclude":
-                    continue
-                elif _type == "float":
-                    try:
-                        value = float(value)
-                    except ValueError:
-                        pass
-                elif _type == "dFloat":
-                    try:
-                        value = float(value) / 10
-                    except ValueError:
-                        value = f"{value} * 0.1"
-                elif _type == "cFloat":
-                    try:
-                        value = float(value) / 100
-                    except ValueError:
-                        value = f"{value} * 0.01"
-                elif _type == "mFloat":
-                    try:
-                        value = float(value) / 1000
-                    except ValueError:
-                        value = f"{value}m"
-                elif _type == "hFloat":
-                    try:
-                        value = float(value) * 100
-                    except ValueError:
-                        value = f"{value} * 100"
-                else:
-                    try:
-                        value = value.decode("utf-8")
-                    except ValueError:
-                        pass
-                msgs[key] = [value, units]
-        elif response_type == "POSITIONAL":
-            log.debug("decode: Processing POSITIONAL type responses")
-            # print("decode: Processing KEYED type responses")
-            for defn in command_defn["response"]:
-                _type = defn[0]
-                if _type == "lookup":
-                    pass
-                elif _type == "discard":
-                    responses = responses[defn[1] :]
-                elif _type == "hex":
-                    log.debug("decode: hex defn")
-                    value = ""
-                    for x in range(defn[1]):
-                        value += f"{responses.pop(0):02x}"
-                    # if defn[2] != "":
-                    msgs[defn[2]] = [value, defn[3]]
-                elif _type == "keyed":
-                    log.debug("decode: keyed defn")
-                    key = ""
-                    for x in range(defn[1]):
-                        key += f"{responses.pop(0):02x}"
-                    value = defn[3][key]
-                    msgs[defn[2]] = [value, ""]
-                    # msgs[key] = [resp_format[2][result], ""]
-                elif _type == "<int":
-                    log.debug("decode: <int defn")
-                    result = responses[: defn[1]]
-                    responses = responses[defn[1] :]
-                    value = struct.unpack("<h", result)[0]
-                    msgs[defn[2]] = [value, defn[3]]
-                elif _type == "int":
-                    log.debug("decode: int defn")
-                    result = responses[: defn[1]]
-                    responses = responses[defn[1] :]
-                    value = result[0]
-                    msgs[defn[2]] = [value, defn[3]]
-                elif _type == "int-40":
-                    log.debug("decode: int-40 defn")
-                    result = responses[: defn[1]]
-                    responses = responses[defn[1] :]
-                    value = result[0] - 40
-                    msgs[defn[2]] = [value, defn[3]]
-                elif _type == "2int":
-                    log.debug("decode: 2int defn")
-                    result = responses[: defn[1]]
-                    responses = responses[defn[1] :]
-                    value = struct.unpack(">h", result)[0]
-                    msgs[defn[2]] = [value, defn[3]]
-                elif _type == "2mInt":
-                    log.debug("decode: 2mInt defn")
-                    result = responses[: defn[1]]
-                    responses = responses[defn[1] :]
-                    value = struct.unpack(">h", result)[0]
-                    try:
-                        value = float(value) / 1000
-                    except ValueError:
-                        value = f"{value} * 0.1"
-                    msgs[defn[2]] = [value, defn[3]]
-                elif _type == "2dInt":
-                    log.debug("decode: 2dInt defn")
-                    result = responses[: defn[1]]
-                    responses = responses[defn[1] :]
-                    value = struct.unpack(">h", result)[0]
-                    try:
-                        value = float(value) / 10
-                    except ValueError:
-                        value = f"{value} * 0.1"
-                    msgs[defn[2]] = [value, defn[3]]
-                elif _type == "2dInt-30k":
-                    log.debug("decode: 2dInt-30k defn")
-                    result = responses[: defn[1]]
-                    responses = responses[defn[1] :]
-                    value = struct.unpack(">h", result)[0]
-                    try:
-                        value = (float(value) - 30000) / 10
-                    except ValueError:
-                        value = f"({value} - 30000) * 0.1"
-                    msgs[defn[2]] = [value, defn[3]]
-                elif _type == "<hex":
-                    # convert little endian hex to big endian..
-                    log.debug("decode: <hex defn")
-                    value = ""
-                    x = responses[: defn[1]]
-                    responses = responses[defn[1] :]
-                    _x = struct.unpack("<h", x)[0]
-                    x = struct.pack(">h", _x)
-                    for _byte in x:
-                        value += f"{_byte:02x}"
-                    # if defn[2] != "":
-                    msgs[defn[2]] = [value, defn[3]]
-                elif _type == "option":
-                    result = responses[: defn[1]][0]
-                    responses = responses[defn[1] :]
-                    value = defn[3][int(result)]
-                    msgs[defn[2]] = [value, ""]
-            # print(responses)
-            # print(command_defn)
+        # Decode response based on stored command definition and type
+
+        # KEYED - responses are determined by a KEY lookup and can be in any order
+        if response_type == "KEYED" or response_type == "POSITIONAL":
+            for i, response in enumerate(responses):
+                if response_type == "KEYED":
+                    log.debug("decode: Processing KEYED type responses")
+                    # example defn ["H1", "Depth of the deepest discharge", "Ah", "mFloat"],
+                    # example response data [b'H1', b'-32914']
+                    if len(response) <= 1:
+                        # Not enough data in response, so ignore
+                        continue
+                    lookup_key = response[0]
+                    raw_value = response[1]
+                    response_defn = get_resp_defn(lookup_key, command_defn["response"])
+                    if response_defn is None:
+                        # No definition for this key, so ignore???
+                        log.warn(f"No definition for {response}")
+                        continue
+                    data_name = response_defn[1]
+                    data_units = response_defn[2]
+                    data_type = response_defn[3]
+                elif response_type == "POSITIONAL":
+                    log.debug("decode: Processing POSITIONAL type responses")
+                    # POSITIONAL - responses are not separated and are determined by the position in the response
+                    # example defn :
+                    #   ["discard", 1, "start flag", ""],
+                    #   ["Big2ByteHex2Int", 2, "Battery Bank Voltage", "V"],
+                    # example response data:
+                    #   [b'\xa5', b'\x01', b'\x90', b'\x08', b'\x01\t', b'\x00\x00', b'u\xcf', b'\x03\x99', b'']
+                    raw_value = response
+                    # Check if we are past the 'known' responses
+                    if i >= len_command_defn:
+                        response_defn = ["str", f"Unknown value in response {i}", ""]
+                    else:
+                        response_defn = command_defn["response"][i]
+                    if response_defn is None:
+                        # No definition for this key, so ignore???
+                        log.warn(f"No definition for {response}")
+                        response_defn = ["str", f"Undefined value in response {i}", ""]
+                    data_name = response_defn[2]
+                    data_units = response_defn[3]
+                    data_type = response_defn[0]
+                # print(data_type, data_name, raw_value)
+                data_name, value, data_units = self.process_response(
+                    data_type=data_type,
+                    data_name=data_name,
+                    data_units=data_units,
+                    raw_value=raw_value,
+                )
+                # print(data_type, data_name, raw_value, value)
+                if data_name is not None:
+                    msgs[data_name] = [value, data_units]
+
         else:
             # Responses are determined by the order they are returned
             log.info("decode: Processing SEQUENCE type responses")

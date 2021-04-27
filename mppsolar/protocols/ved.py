@@ -19,65 +19,65 @@ COMMANDS = {
         "type": "VEDTEXT",
         "response_type": "KEYED",
         "response": [
-            ["V", "Main or channel 1 (battery) voltage", "V", "mFloat"],
-            ["V2", "Channel 2 (battery) voltage", "V", "mFloat"],
-            ["V3", "Channel 3 (battery) voltage", "V", "mFloat"],
-            ["VS", "Auxiliary (starter) voltage", "V", "mFloat"],
-            ["VM", "Mid-point voltage of the battery bank", "V", "mFloat"],
+            ["V", "Main or channel 1 (battery) voltage", "V", "float:r/1000"],
+            ["V2", "Channel 2 (battery) voltage", "V", "float:r/1000"],
+            ["V3", "Channel 3 (battery) voltage", "V", "float:r/1000"],
+            ["VS", "Auxiliary (starter) voltage", "V", "float:r/1000"],
+            ["VM", "Mid-point voltage of the battery bank", "V", "float:r/1000"],
             ["DM", "Mid-point deviation of the battery bank", "‰", "float"],
-            ["VPV", "Panel voltage", "V", "mFloat"],
+            ["VPV", "Panel voltage", "V", "float:r/1000"],
             ["PPV", "Panel power", "W", "float"],
-            ["I", "Main or channel 1 battery current", "A", "mFloat"],
-            ["I2", "Channel 2 battery current", "A", "mFloat"],
-            ["I3", "Channel 3 battery current", "A", "mFloat"],
-            ["IL", "Load current", "A", "mFloat"],
-            ["LOAD", "Load output state (ON/OFF)", "", ""],
+            ["I", "Main or channel 1 battery current", "A", "float:r/1000"],
+            ["I2", "Channel 2 battery current", "A", "float:r/1000"],
+            ["I3", "Channel 3 battery current", "A", "float:r/1000"],
+            ["IL", "Load current", "A", "float:r/1000"],
+            ["LOAD", "Load output state (ON/OFF)", "", "bytes:r.decode()"],
             ["T", "Battery temperature", "°C", "float"],
             ["P", "Instantaneous power", "W", "float"],
-            ["CE", "Consumed Amp Hours", "Ah", "mFloat"],
-            ["SOC", "State-of-charge", "%", "dFloat"],
+            ["CE", "Consumed Amp Hours", "Ah", "float:r/1000"],
+            ["SOC", "State-of-charge", "%", "float:r/10"],
             ["TTG", "Time-to-go", "Minutes", "float"],
-            ["Alarm", "Alarm condition active", "", ""],
-            ["Relay", "Relay state", "", ""],
-            ["AR", "Alarm reason", "", ""],
-            ["OR", "Off reason", "", ""],
-            ["H1", "Depth of the deepest discharge", "Ah", "mFloat"],
-            ["H2", "Depth of the last discharge", "Ah", "mFloat"],
-            ["H3", "Depth of the average discharge", "Ah", "mFloat"],
-            ["H4", "Number of charge cycles", "", ""],
-            ["H5", "Number of full discharges", "", ""],
-            ["H6", "Cumulative Amp Hours drawn", "Ah", "mFloat"],
-            ["H7", "Minimum main (battery) voltage", "V", "mFloat"],
-            ["H8", "Maximum main (battery) voltage", "V", "mFloat"],
+            ["Alarm", "Alarm condition active", "", "bytes:r.decode()"],
+            ["Relay", "Relay state", "", "bytes:r.decode()"],
+            ["AR", "Alarm reason", "", "bytes:r.decode()"],
+            ["OR", "Off reason", "", "bytes:r.decode()"],
+            ["H1", "Depth of the deepest discharge", "Ah", "float:r/1000"],
+            ["H2", "Depth of the last discharge", "Ah", "float:r/1000"],
+            ["H3", "Depth of the average discharge", "Ah", "float:r/1000"],
+            ["H4", "Number of charge cycles", "", "bytes:r.decode()"],
+            ["H5", "Number of full discharges", "", "bytes:r.decode()"],
+            ["H6", "Cumulative Amp Hours drawn", "Ah", "float:r/1000"],
+            ["H7", "Minimum main (battery) voltage", "V", "float:r/1000"],
+            ["H8", "Maximum main (battery) voltage", "V", "float:r/1000"],
             ["H9", "Number of seconds since last full charge", "Seconds", "float"],
-            ["H10", "Number of automatic synchronizations", "", ""],
-            ["H11", "Number of low main voltage alarms", "", ""],
-            ["H12", "Number of high main voltage alarms", "", ""],
-            ["H13", "Number of low auxiliary voltage alarms", "", ""],
-            ["H14", "Number of high auxiliary voltage alarms", "", ""],
-            ["H15", "Minimum auxiliary (battery) voltage", "V", "mFloat"],
-            ["H16", "Maximum auxiliary (battery) voltage", "V", "mFloat"],
-            ["H17", "Amount of discharged energy", "kWh", "cFloat"],
-            ["H18", "Amount of charged energy", "kWh", "cFloat"],
-            ["H19", "Yield total (user resettable counter)", "kWh", "cFloat"],
-            ["H20", "Yield today", "kWh", "cFloat"],
+            ["H10", "Number of automatic synchronizations", "", "bytes:r.decode()"],
+            ["H11", "Number of low main voltage alarms", "", "bytes:r.decode()"],
+            ["H12", "Number of high main voltage alarms", "", "bytes:r.decode()"],
+            ["H13", "Number of low auxiliary voltage alarms", "", "bytes:r.decode()"],
+            ["H14", "Number of high auxiliary voltage alarms", "", "bytes:r.decode()"],
+            ["H15", "Minimum auxiliary (battery) voltage", "V", "float:r/1000"],
+            ["H16", "Maximum auxiliary (battery) voltage", "V", "float:r/1000"],
+            ["H17", "Amount of discharged energy", "kWh", "float:r/100"],
+            ["H18", "Amount of charged energy", "kWh", "float:r/100"],
+            ["H19", "Yield total (user resettable counter)", "kWh", "float:r/100"],
+            ["H20", "Yield today", "kWh", "float:r/100"],
             ["H21", "Maximum power today", "W", "float"],
-            ["H22", "Yield yesterday", "kWh", "cFloat"],
+            ["H22", "Yield yesterday", "kWh", "float:r/100"],
             ["H23", "Maximum power yesterday", "W", "float"],
-            ["ERR", "Error code", "", ""],
-            ["CS", "State of operation", "", ""],
-            ["BMV", "Model description (deprecated)", "", ""],
-            ["FW", "Firmware version (16 bit)", "", ""],
-            ["FWE", "Firmware version (24 bit)", "", ""],
-            ["PID", "Product ID", "", ""],
-            ["SER#", "Serial number", "", ""],
-            ["HSDS", "Day sequence number (0..364)", "", ""],
-            ["MODE", "Device mode", "", ""],
-            ["AC_OUT_V", "AC output voltage", "V", "hFloat"],
+            ["ERR", "Error code", "", "bytes:r.decode()"],
+            ["CS", "State of operation", "", "bytes:r.decode()"],
+            ["BMV", "Model description (deprecated)", "", "bytes:r.decode()"],
+            ["FW", "Firmware version (16 bit)", "", "bytes:r.decode()"],
+            ["FWE", "Firmware version (24 bit)", "", "bytes:r.decode()"],
+            ["PID", "Product ID", "", "bytes:r.decode()"],
+            ["SER#", "Serial number", "", "bytes:r.decode()"],
+            ["HSDS", "Day sequence number (0..364)", "", "bytes:r.decode()"],
+            ["MODE", "Device mode", "", "bytes:r.decode()"],
+            ["AC_OUT_V", "AC output voltage", "V", "float:r*100"],
             ["AC_OUT_I", "AC output current", "0.1 A", "float"],
             ["AC_OUT_S", "AC output apparent power", "VA", "float"],
-            ["WARN", "Warning reason", "", ""],
-            ["MPPT", "Tracker operation mode", "", ""],
+            ["WARN", "Warning reason", "", "bytes:r.decode()"],
+            ["MPPT", "Tracker operation mode", "", "bytes:r.decode()"],
             ["Checksum", "Checksum", "", "exclude"],
         ],
         "test_responses": [
@@ -107,7 +107,7 @@ COMMANDS = {
                     "04": "Parameter Error",
                 },
             ],
-            ["<int", 2, "Battery Capacity", "Ah"],
+            ["Little2ByteHex2Int", 2, "Battery Capacity", "Ah"],
             ["discard", 1, "checksum", ""],
         ],
         "test_responses": [
@@ -160,9 +160,7 @@ class ved(AbstractProtocol):
         cmd_type = self._command_defn["type"]
         if cmd_type == "VEDTEXT":
             # Just listen - dont need to send a command
-            log.debug(
-                f"get_full_command: command is VEDTEXT type so returning {cmd_type}"
-            )
+            log.debug(f"get_full_command: command is VEDTEXT type so returning {cmd_type}")
             return cmd_type
         elif cmd_type == "VEDGET":
             ID = self._command_defn["command_code"]
@@ -174,9 +172,7 @@ class ved(AbstractProtocol):
             cmd = f":{cmd}{checksum:02X}\n"
             log.debug(f"get_full_command: full command: {cmd}")
             return cmd
-        log.warn(
-            "get_full_command: unable to generate full command - is the definition wrong?"
-        )
+        log.warn("get_full_command: unable to generate full command - is the definition wrong?")
         return None
 
     def check_response_valid(self, response) -> Tuple[bool, dict]:
@@ -198,9 +194,7 @@ class ved(AbstractProtocol):
             data = _r[:-1]
             checksum = _r[-1:][0]
             if vedHexChecksum(data) == checksum:
-                log.debug(
-                    f"VED Hex Checksum matches in response '{response}' checksum:{checksum}"
-                )
+                log.debug(f"VED Hex Checksum matches in response '{response}' checksum:{checksum}")
                 return True, {}
             else:
                 # print("VED Hex Checksum does not match")
@@ -226,9 +220,23 @@ class ved(AbstractProtocol):
             _r = response.split(b":")[1].decode()
             # pad command (which is single char)
             _r = f"0{_r}"
-            # convert string hex to bytes
             _r = bytes.fromhex(_r)
-            return bytearray(_r)
+            if (
+                self._command_defn is not None
+                and self._command_defn["response_type"] == "POSITIONAL"
+            ):
+                # Have a POSITIONAL type response, so need to break it up...
+                for defn in self._command_defn["response"]:
+                    size = defn[1]
+                    item = _r[:size]
+                    responses.append(item)
+                    _r = _r[size:]
+                return responses
+            else:
+                return bytearray(response)
+                # convert string hex to bytes
+                _r = bytes.fromhex(_r)
+                return bytearray(_r)
         else:
             # for text protocol responses
             _responses = response.split(b"\r")
