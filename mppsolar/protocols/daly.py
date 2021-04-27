@@ -17,7 +17,7 @@ COMMANDS = {
         "description": "State of Charge",
         "help": " -- display the battery state of charge",
         "type": "DALY",
-        "command_code": "90",  
+        "command_code": "90",
         "response_type": "POSITIONAL",
         "response": [
             ["discard", 1, "start flag", ""],
@@ -32,8 +32,8 @@ COMMANDS = {
         ],
         "test_responses": [
             # bytes.fromhex("A58090080000000000000000bd\n"),
-            #b'\xa5\x01\x90\x08\x02\x10\x00\x00uo\x03\xbc\xf3',
-            b'\xa5\x01\x90\x08\x02\x14\x00\x00uE\x03x\x89',
+            # b'\xa5\x01\x90\x08\x02\x10\x00\x00uo\x03\xbc\xf3',
+            b"\xa5\x01\x90\x08\x02\x14\x00\x00uE\x03x\x89",
         ],
     },
     "cellMinMax": {
@@ -56,7 +56,7 @@ COMMANDS = {
             ["discard", 1, "checksum", ""],
         ],
         "test_responses": [
-            b'\xa5\x01\x91\x08\r\x00\x0f\x0c\xfe\x01\x03x\xe1',
+            b"\xa5\x01\x91\x08\r\x00\x0f\x0c\xfe\x01\x03x\xe1",
         ],
     },
     "cellTemperatures": {
@@ -79,9 +79,7 @@ COMMANDS = {
             ["2dInt", 2, "SOC", "%"],
             ["discard", 1, "checksum", ""],
         ],
-        "test_responses": [
-            b'\xa5\x01\x92\x087\x017\x01\xfe\x01\x03x*'
-        ],
+        "test_responses": [b"\xa5\x01\x92\x087\x017\x01\xfe\x01\x03x*"],
     },
     "mosStatus": {
         "name": "mosStatus",
@@ -102,9 +100,7 @@ COMMANDS = {
             ["hex", 4, "Residual Capacity (TODO)", "(HEX) mAH"],
             ["discard", 1, "checksum", ""],
         ],
-        "test_responses": [
-            b'\xa5\x01\x93\x08\x02\x01\x01x\x00\x03\xcb@\xcb'
-        ],
+        "test_responses": [b"\xa5\x01\x93\x08\x02\x01\x01x\x00\x03\xcb@\xcb"],
     },
     "status": {
         "name": "status",
@@ -128,10 +124,9 @@ COMMANDS = {
             ["discard", 1, "checksum", ""],
         ],
         "test_responses": [
-            b'\xa5\x01\x94\x08\x10\x01\x00\x00\x00\x00\x03@\x96',
+            b"\xa5\x01\x94\x08\x10\x01\x00\x00\x00\x00\x03@\x96",
         ],
     },
-
 }
 
 
@@ -199,11 +194,15 @@ class daly(AbstractProtocol):
         data = _r[:-1]
         checksum = _r[-1:][0]
         if dalyChecksum(data) == checksum:
-            log.debug(f"DALY Checksum matches response '{response}' checksum:{checksum}")
+            log.debug(
+                f"DALY Checksum matches response '{response}' checksum:{checksum}"
+            )
             return True, {}
         else:
             # print("VED Hex Checksum does not match")
-            return False, {"ERROR": [f"DALY checksum did not match for response {response}", ""]}
+            return False, {
+                "ERROR": [f"DALY checksum did not match for response {response}", ""]
+            }
 
     def get_responses(self, response):
         """

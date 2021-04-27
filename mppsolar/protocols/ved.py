@@ -100,7 +100,12 @@ COMMANDS = {
                 "keyed",
                 1,
                 "Command response flag",
-                {"00": "OK", "01": "Unknown ID", "02": "Not supported", "04": "Parameter Error"},
+                {
+                    "00": "OK",
+                    "01": "Unknown ID",
+                    "02": "Not supported",
+                    "04": "Parameter Error",
+                },
             ],
             ["<int", 2, "Battery Capacity", "Ah"],
             ["discard", 1, "checksum", ""],
@@ -155,7 +160,9 @@ class ved(AbstractProtocol):
         cmd_type = self._command_defn["type"]
         if cmd_type == "VEDTEXT":
             # Just listen - dont need to send a command
-            log.debug(f"get_full_command: command is VEDTEXT type so returning {cmd_type}")
+            log.debug(
+                f"get_full_command: command is VEDTEXT type so returning {cmd_type}"
+            )
             return cmd_type
         elif cmd_type == "VEDGET":
             ID = self._command_defn["command_code"]
@@ -167,7 +174,9 @@ class ved(AbstractProtocol):
             cmd = f":{cmd}{checksum:02X}\n"
             log.debug(f"get_full_command: full command: {cmd}")
             return cmd
-        log.warn(f"get_full_command: unable to generate full command - is the definition wrong?")
+        log.warn(
+            "get_full_command: unable to generate full command - is the definition wrong?"
+        )
         return None
 
     def check_response_valid(self, response) -> Tuple[bool, dict]:
@@ -189,12 +198,17 @@ class ved(AbstractProtocol):
             data = _r[:-1]
             checksum = _r[-1:][0]
             if vedHexChecksum(data) == checksum:
-                log.debug(f"VED Hex Checksum matches in response '{response}' checksum:{checksum}")
+                log.debug(
+                    f"VED Hex Checksum matches in response '{response}' checksum:{checksum}"
+                )
                 return True, {}
             else:
                 # print("VED Hex Checksum does not match")
                 return False, {
-                    "ERROR": [f"VED HEX checksum did not match for response {response}", ""]
+                    "ERROR": [
+                        f"VED HEX checksum did not match for response {response}",
+                        "",
+                    ]
                 }
         else:
             return True, {}

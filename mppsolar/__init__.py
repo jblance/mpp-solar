@@ -52,7 +52,9 @@ def get_device_class(device_type=None):
 
 
 def main():
-    description = f"Solar Device Command Utility, version: {__version__}, {__version_comment__}"
+    description = (
+        f"Solar Device Command Utility, version: {__version__}, {__version_comment__}"
+    )
     parser = ArgumentParser(description=description)
     parser.add_argument(
         "-n",
@@ -163,7 +165,9 @@ def main():
         help="Specifies the password to use for authenticated mqtt broker publishing",
         default=None,
     )
-    parser.add_argument("-c", "--command", nargs="?", const="help", help="Command to run")
+    parser.add_argument(
+        "-c", "--command", nargs="?", const="help", help="Command to run"
+    )
     if parser.prog == "jkbms":
         parser.add_argument(
             "-C",
@@ -186,9 +190,13 @@ def main():
         )
     parser.add_argument("--daemon", action="store_true", help="Run as daemon")
     parser.add_argument("--getstatus", action="store_true", help="Get Inverter Status")
-    parser.add_argument("--getsettings", action="store_true", help="Get Inverter Settings")
+    parser.add_argument(
+        "--getsettings", action="store_true", help="Get Inverter Settings"
+    )
 
-    parser.add_argument("-v", "--version", action="store_true", help="Display the version")
+    parser.add_argument(
+        "-v", "--version", action="store_true", help="Display the version"
+    )
     parser.add_argument(
         "-D",
         "--debug",
@@ -202,7 +210,7 @@ def main():
     args = parser.parse_args()
     prog_name = parser.prog
     s_prog_name = prog_name.replace("-", "")
-    log_name = s_prog_name.upper()
+    # log_name = s_prog_name.upper()
 
     # logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     # Turn on debug if needed
@@ -306,7 +314,9 @@ def main():
             else:
                 log.info(f"Config file: {args.configfile}")
                 log.info(f"Config setting - pause: {pause}")
-                log.info(f"Config setting - mqtt_broker: {mqtt_broker}, port: {mqtt_port}")
+                log.info(
+                    f"Config setting - mqtt_broker: {mqtt_broker}, port: {mqtt_port}"
+                )
                 log.info(f"Config setting - command sections found: {len(sections)}")
 
     else:
@@ -373,7 +383,7 @@ def main():
         if not args.daemon:
             log.info(f"Looping {len(_commands)} commands")
         for _device, _command, _tag, _outputs, filter, excl_filter in _commands:
-            ## for item in mppUtilArray:
+            # for item in mppUtilArray:
             # Tell systemd watchdog we are still alive
             if args.daemon:
                 systemd.daemon.notify("WATCHDOG=1")

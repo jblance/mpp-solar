@@ -1,6 +1,7 @@
 import logging
 import serial
-import time
+
+# import time
 
 from .baseio import BaseIO
 from ..helpers import get_kwargs
@@ -25,7 +26,9 @@ class VSerialIO(BaseIO):
         # print(full_command)
         # "VEDTEXT"
         responses = b""
-        log.debug(f"port {self._serial_port}, baudrate {self._serial_baud}, records {self._records}")
+        log.debug(
+            f"port {self._serial_port}, baudrate {self._serial_baud}, records {self._records}"
+        )
 
         if full_command == "VEDTEXT":
             # Just grab _records from the serial port
@@ -46,12 +49,17 @@ class VSerialIO(BaseIO):
             except Exception as e:
                 log.warning(f"VSerial read error: {e}")
             log.info(f"Error occured while grabbing data from {self._serial_port}")
-            return {"ERROR": [f"Error occured while grabbing data from {self._serial_port}", ""]}
+            return {
+                "ERROR": [
+                    f"Error occured while grabbing data from {self._serial_port}",
+                    "",
+                ]
+            }
         else:
             # Have a command to send...
             try:
                 with serial.serial_for_url(self._serial_port, self._serial_baud) as s:
-                    log.debug(f"Executing command via vserialio...")
+                    log.debug("Executing command via vserialio...")
                     s.timeout = 1
                     s.write_timeout = 1
                     s.flushInput()
@@ -63,7 +71,9 @@ class VSerialIO(BaseIO):
                     return response_line
             except Exception as e:
                 log.warning(f"VSerial read error: {e}")
-            log.info(f"Error occured while processing command {full_command} on {self._serial_port}")
+            log.info(
+                f"Error occured while processing command {full_command} on {self._serial_port}"
+            )
             return {
                 "ERROR": [
                     f"Error occured while processing command {full_command} on {self._serial_port}",

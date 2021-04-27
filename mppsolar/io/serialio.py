@@ -16,10 +16,12 @@ class SerialIO(BaseIO):
     def send_and_receive(self, *args, **kwargs) -> dict:
         full_command = get_kwargs(kwargs, "full_command")
         response_line = None
-        log.debug(f"send_and_receive: port {self._serial_port}, baudrate {self._serial_baud}")
+        log.debug(
+            f"send_and_receive: port {self._serial_port}, baudrate {self._serial_baud}"
+        )
         try:
             with serial.serial_for_url(self._serial_port, self._serial_baud) as s:
-                log.debug(f"send_and_receive: Executing command via serialio...")
+                log.debug("send_and_receive: Executing command via serialio...")
                 s.timeout = 1
                 s.write_timeout = 1
                 s.flushInput()

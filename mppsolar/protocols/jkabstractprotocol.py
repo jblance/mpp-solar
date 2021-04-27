@@ -162,15 +162,15 @@ class jkAbstractProtocol(AbstractProtocol):
 
         # Check for a stored command definition
         if not command_defn:
-            # No definiution, so just return the data
-            len_command_defn = 0
+            # No definition, so just return the data
+            # len_command_defn = 0
             log.debug(f"decode: No definition for command {command}, raw response returned")
             msgs["ERROR"] = [
                 f"No definition for command {command} in protocol {self._protocol_id}",
                 "",
             ]
         else:
-            len_command_defn = len(command_defn["response"])
+            # len_command_defn = len(command_defn["response"])
             # Decode response based on stored command definition
             responses = self.get_responses(response)
             log.debug(f"decode: Length of responses {len(responses)}")
@@ -297,7 +297,10 @@ class jkAbstractProtocol(AbstractProtocol):
                     v = responses[:4]
                     responses = responses[4:]
                     value = decode4ByteHex(v)
-                    msgs[defn[2]] = [value, f"{v[0]:02x} {v[1]:02x} {v[2]:02x} {v[3]:02x}"]
+                    msgs[defn[2]] = [
+                        value,
+                        f"{v[0]:02x} {v[1]:02x} {v[2]:02x} {v[3]:02x}",
+                    ]
                 elif defn[0] == "loop":
                     log.debug("decode: loop defn")
                     # loop of repeating data, eg cell voltages

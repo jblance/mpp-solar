@@ -149,32 +149,32 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 elif _type == "float":
                     try:
                         value = float(value)
-                    except:
+                    except ValueError:
                         pass
                 elif _type == "dFloat":
                     try:
                         value = float(value) / 10
-                    except:
+                    except ValueError:
                         value = f"{value} * 0.1"
                 elif _type == "cFloat":
                     try:
                         value = float(value) / 100
-                    except:
+                    except ValueError:
                         value = f"{value} * 0.01"
                 elif _type == "mFloat":
                     try:
                         value = float(value) / 1000
-                    except:
+                    except ValueError:
                         value = f"{value}m"
                 elif _type == "hFloat":
                     try:
                         value = float(value) * 100
-                    except:
+                    except ValueError:
                         value = f"{value} * 100"
                 else:
                     try:
                         value = value.decode("utf-8")
-                    except:
+                    except ValueError:
                         pass
                 msgs[key] = [value, units]
         elif response_type == "POSITIONAL":
@@ -232,7 +232,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     value = struct.unpack(">h", result)[0]
                     try:
                         value = float(value) / 1000
-                    except:
+                    except ValueError:
                         value = f"{value} * 0.1"
                     msgs[defn[2]] = [value, defn[3]]
                 elif _type == "2dInt":
@@ -242,7 +242,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     value = struct.unpack(">h", result)[0]
                     try:
                         value = float(value) / 10
-                    except:
+                    except ValueError:
                         value = f"{value} * 0.1"
                     msgs[defn[2]] = [value, defn[3]]
                 elif _type == "2dInt-30k":
@@ -252,7 +252,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     value = struct.unpack(">h", result)[0]
                     try:
                         value = (float(value) - 30000) / 10
-                    except:
+                    except ValueError:
                         value = f"({value} - 30000) * 0.1"
                     msgs[defn[2]] = [value, defn[3]]
                 elif _type == "<hex":
@@ -301,13 +301,13 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 elif resp_format[0] == "float":
                     try:
                         result = float(result)
-                    except ValueError as e:
+                    except ValueError:
                         log.debug(f"Error resolving {result} as float")
                     msgs[key] = [result, resp_format[2]]
                 elif resp_format[0] == "int":
                     try:
                         result = int(result)
-                    except ValueError as e:
+                    except ValueError:
                         log.debug(f"Error resolving {result} as int")
                     msgs[key] = [result, resp_format[2]]
                 elif resp_format[0] == "string":

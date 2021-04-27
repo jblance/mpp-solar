@@ -16,19 +16,19 @@ class TestIO(BaseIO):
         self._device = get_kwargs(kwargs, "device_path")
 
     def send_and_receive(self, *args, **kwargs) -> dict:
-        full_command = get_kwargs(kwargs, "full_command")
+        # full_command = get_kwargs(kwargs, "full_command")
         command_defn = get_kwargs(kwargs, "command_defn")
 
         if command_defn is not None:
             # Have test data defined, so use that
             number_of_test_responses = len(command_defn["test_responses"])
             # have we specified which test response to use?
-            check = re.match("test(\d+)", self._device, flags=re.IGNORECASE)
+            check = re.match("test(\d+)", self._device, flags=re.IGNORECASE)  # noqa: W605
             if check:
                 # use the specified response if that one exists
                 try:
                     desired_test_response = int(check.group(1))
-                except:
+                except ValueError:
                     desired_test_response = 0
                 if desired_test_response < number_of_test_responses:
                     self._test_data = command_defn["test_responses"][desired_test_response]

@@ -3,7 +3,6 @@ import importlib
 import logging
 
 from ..helpers import get_kwargs
-from ..io.testio import TestIO
 
 PORT_TYPE_UNKNOWN = 0
 PORT_TYPE_TEST = 1
@@ -100,7 +99,9 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         protocol_id = protocol.lower()
         # Try to import the protocol module with the supplied name (may not exist)
         try:
-            proto_module = importlib.import_module("mppsolar.protocols." + protocol_id, ".")
+            proto_module = importlib.import_module(
+                "mppsolar.protocols." + protocol_id, "."
+            )
         except ModuleNotFoundError:
             log.error(f"set_protocol: No module found for protocol {protocol_id}")
             self._protocol = None
@@ -110,13 +111,17 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         try:
             self._protocol_class = getattr(proto_module, protocol_id)
         except AttributeError:
-            log.error(f"set_protocol: Module {proto_module} has no attribute {protocol_id}")
+            log.error(
+                f"set_protocol: Module {proto_module} has no attribute {protocol_id}"
+            )
             self._protocol = None
             self._protocol_class = None
             return
         # Instantiate the class
         # TODO: fix protocol instantiate
-        self._protocol = self._protocol_class("init_var", proto_keyword="value", second_keyword=123)
+        self._protocol = self._protocol_class(
+            "init_var", proto_keyword="value", second_keyword=123
+        )
 
     def set_port(self, *args, **kwargs):
         port = get_kwargs(kwargs, "port")
@@ -191,8 +196,12 @@ class AbstractDevice(metaclass=abc.ABCMeta):
     def list_commands(self):
         # print(f"{'Parameter':<30}\t{'Value':<15} Unit")
         if self._protocol is None:
-            log.error("list_commands: Attempted to list commands with no protocol defined")
-            return {"ERROR": ["Attempted to list commands with no protocol defined", ""]}
+            log.error(
+                "list_commands: Attempted to list commands with no protocol defined"
+            )
+            return {
+                "ERROR": ["Attempted to list commands with no protocol defined", ""]
+            }
         result = {}
         result["_command"] = "command help"
         result[

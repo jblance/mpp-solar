@@ -4,8 +4,9 @@ import logging
 import time
 
 import paho.mqtt.client as mqttc
-import paho.mqtt.publish as publish
-import paho.mqtt.subscribe as subscribe
+
+# import paho.mqtt.publish as publish
+# import paho.mqtt.subscribe as subscribe
 
 from ..helpers import get_kwargs
 from .baseio import BaseIO
@@ -28,7 +29,9 @@ class MqttIO(BaseIO):
         self._msg = None
 
     def sub_cb(self, client, userdata, message):
-        log.debug(f"Mqttio sub_cb got msg, topic: {message.topic}, payload: {message.payload}")
+        log.debug(
+            f"Mqttio sub_cb got msg, topic: {message.topic}, payload: {message.payload}"
+        )
         self._msg = message
 
     def send_and_receive(self, *args, **kwargs) -> dict:
@@ -37,7 +40,7 @@ class MqttIO(BaseIO):
         client_id = self.client_id
 
         wait_time = 5
-        response_line = None
+        # response_line = None
         command_topic = f"{client_id}/command"
         result_topic = f"{client_id}/result"
         # print(self.mqtt_broker)
@@ -48,7 +51,9 @@ class MqttIO(BaseIO):
 
         if self.mqtt_user is not None and self.mqtt_pass is not None:
             # auth = {"username": self.mqtt_user, "password": self.mqtt_pass}
-            log.info(f"Using mqtt authentication, username: {self.mqtt_user}, password: [supplied]")
+            log.info(
+                f"Using mqtt authentication, username: {self.mqtt_user}, password: [supplied]"
+            )
             mqtt_client.username_pw_set(self.mqtt_user, password=self.mqtt_pass)
         else:
             log.debug("No mqtt authentication used")

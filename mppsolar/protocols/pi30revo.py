@@ -32,7 +32,11 @@ COMMANDS = {
                     ["option", "Input Range", ["Wide", "Narrow"]],
                     ["option", "Output Voltage", ["220V", "230V", "240V"]],
                     ["option", "Output Frequency", ["50Hz", "60Hz"]],
-                    ["option", "Battery Type", ["Lead Acid", "Lithium", "None", "Custom"]],
+                    [
+                        "option",
+                        "Battery Type",
+                        ["Lead Acid", "Lithium", "None", "Custom"],
+                    ],
                 ],
             ],
             ["float", "Battery Bulk Charge Voltage", "V"],

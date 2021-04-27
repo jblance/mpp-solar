@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import logging
 
-from binascii import unhexlify
+# from binascii import unhexlify
 from struct import unpack
 
 log = logging.getLogger("protocol_helpers")
