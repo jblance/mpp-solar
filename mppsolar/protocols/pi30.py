@@ -53,9 +53,7 @@ COMMANDS = {
         "description": "Set Utility Max Charging Current",
         "help": " -- example: MUCHGC130 (set unit 1 utility max charging current to 30A)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -67,9 +65,7 @@ COMMANDS = {
         "description": "Set Battery re-charge voltage",
         "help": " -- example PBCV44.0 - set re-charge voltage to 44V (12V unit: 11V/11.3V/11.5V/11.8V/12V/12.3V/12.5V/12.8V, 24V unit: 22V/22.5V/23V/23.5V/24V/24.5V/25V/25.5V, 48V unit: 44V/45V/46V/47V/48V/49V/50V/51V)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -81,9 +77,7 @@ COMMANDS = {
         "description": "Set Battery re-discharge voltage",
         "help": " -- example PBDV48.0 - set re-discharge voltage to 48V (12V unit: 00.0V/12V/12.3V/12.5V/12.8V/13V/13.3V/13.5V/13.8V/14V/14.3V/14.5, 24V unit: 00.0V/24V/24.5V/25V/25.5V/26V/26.5V/27V/27.5V/28V/28.5V/29V, 48V unit: 00.0V/48V/49V/50V/51V/52V/53V/54V/55V/56V/57V/58V, 00.0V means battery is full(charging in float mode).)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -95,9 +89,7 @@ COMMANDS = {
         "description": "Set Battery Float Charging Voltage",
         "help": " -- example PBFT58.0 - set battery float charging voltage to 58V (48.0 - 58.4V for 48V unit)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -109,9 +101,7 @@ COMMANDS = {
         "description": "Set Battery Type",
         "help": " -- examples: PBT00 (set battery as AGM), PBT01 (set battery as FLOODED), PBT02 (set battery as USER)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -123,9 +113,7 @@ COMMANDS = {
         "description": "Set Device Charger Priority",
         "help": " -- examples: PCP00 (set utility first), PCP01 (set solar first), PCP02 (HS only: set solar and utility), PCP03 (set solar only charging)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -137,9 +125,7 @@ COMMANDS = {
         "description": "Set Battery C.V. (constant voltage) charging voltage",
         "help": " -- example PCVV48.0 - set charging voltage to 48V (48.0 - 58.4V for 48V unit)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -151,9 +137,7 @@ COMMANDS = {
         "description": "Set the enabled state of an Inverter setting",
         "help": " -- examples: PEa - enable a (buzzer) [a=buzzer, b=overload bypass, j=power saving, K=LCD go to default after 1min, u=overload restart, v=overtemp restart, x=backlight, y=alarm on primary source interrupt, z=fault code record]",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -165,9 +149,7 @@ COMMANDS = {
         "description": "Set the disabled state of an Inverter setting",
         "help": " -- examples: PDa - disable a (buzzer) [a=buzzer, b=overload bypass, j=power saving, K=LCD go to default after 1min, u=overload restart, v=overtemp restart, x=backlight, y=alarm on primary source interrupt, z=fault code record]",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -179,9 +161,7 @@ COMMANDS = {
         "description": "Set Control Parameters to Default Values",
         "help": " -- example PF (reset control parameters to defaults)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -192,9 +172,7 @@ COMMANDS = {
         "description": "Set Grid Working Range",
         "help": " -- examples: PCR00 (set device working range to appliance), PCR01 (set device working range to UPS)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -206,9 +184,7 @@ COMMANDS = {
         "description": "Set Device Output Source Priority",
         "help": " -- examples: POP00 (set utility first), POP01 (set solar first), POP02 (set SBU priority)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -220,9 +196,7 @@ COMMANDS = {
         "description": "Set Device Output Mode (for 4000/5000)",
         "help": " -- examples: POPM01 (set unit 0 to 1 - parallel output), POPM10 (set unit 1 to 0 - single machine output), POPM02 (set unit 0 to 2 - phase 1 of 3), POPM13 (set unit 1 to 3 - phase 2 of 3), POPM24 (set unit 2 to 4 - phase 3 of 3)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -234,9 +208,7 @@ COMMANDS = {
         "description": "Set Parallel Device Charger Priority (for 4000/5000)",
         "help": " -- examples: PPCP000 (set unit 1 to 00 - utility first), PPCP101 (set unit 1 to 01 - solar first), PPCP202 (set unit 2 to 02 - solar and utility), PPCP003 (set unit 0 to 03 - solar only charging)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -248,9 +220,7 @@ COMMANDS = {
         "description": "Set PV OK Condition",
         "help": " -- examples: PPVOKC0 (as long as one unit has connected PV, parallel system will consider PV OK), PPVOKC1 (only if all inverters have connected PV, parallel system will consider PV OK)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -262,9 +232,7 @@ COMMANDS = {
         "description": "Set Battery Cut-off Voltage",
         "help": " -- example PSDV40.0 - set battery cut-off voltage to 40V (40.0 - 48.0V for 48V unit)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -276,9 +244,7 @@ COMMANDS = {
         "description": "Set Solar Power Balance",
         "help": " -- examples: PSPB0 (PV input max current will be the max charged current), PSPB1 (PV input max power will be the sum of the max charge power and loads power)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -626,6 +592,7 @@ COMMANDS = {
         "test_responses": [
             b"(1 92931701100510 B 00 000.0 00.00 230.6 50.00 0275 0141 005 51.4 001 100 083.3 002 00574 00312 003 10100110 1 2 060 120 10 04 000\xcc#\r",
             b"(1 92912102100033 B 00 000.0 00.00 120.1 59.99 0048 0000 000 53.1 000 059 000.0 000 00154 00016 000 00000110 7 1 060 120 030 00 000 000.0 00\xe7c\r",
+            b"QPGS0?\xda\r",
         ],
         "regex": "QPGS(\\d+)$",
     },

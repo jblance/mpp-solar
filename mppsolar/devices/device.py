@@ -99,9 +99,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         protocol_id = protocol.lower()
         # Try to import the protocol module with the supplied name (may not exist)
         try:
-            proto_module = importlib.import_module(
-                "mppsolar.protocols." + protocol_id, "."
-            )
+            proto_module = importlib.import_module("mppsolar.protocols." + protocol_id, ".")
         except ModuleNotFoundError:
             log.error(f"set_protocol: No module found for protocol {protocol_id}")
             self._protocol = None
@@ -111,9 +109,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         try:
             self._protocol_class = getattr(proto_module, protocol_id)
         except AttributeError:
-            log.error(
-                f"set_protocol: Module {proto_module} has no attribute {protocol_id}"
-            )
+            log.error(f"set_protocol: Module {proto_module} has no attribute {protocol_id}")
             self._protocol = None
             self._protocol_class = None
             return
@@ -196,12 +192,8 @@ class AbstractDevice(metaclass=abc.ABCMeta):
     def list_commands(self):
         # print(f"{'Parameter':<30}\t{'Value':<15} Unit")
         if self._protocol is None:
-            log.error(
-                "list_commands: Attempted to list commands with no protocol defined"
-            )
-            return {
-                "ERROR": ["Attempted to list commands with no protocol defined", ""]
-            }
+            log.error("list_commands: Attempted to list commands with no protocol defined")
+            return {"ERROR": ["Attempted to list commands with no protocol defined", ""]}
         result = {}
         result["_command"] = "command help"
         result[
@@ -309,8 +301,18 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         )
         log.debug(f"run_command: Send and Receive Response {raw_response}")
 
-        # Handle errors; dict is returned on exception
+        # Handle errors
         # Maybe there should a decode for ERRORs and WARNINGS...
+        # Some inverters return the command if the command is unknown:
+        if raw_response == full_command:
+            return {
+                "ERROR": [
+                    f"Inverter returned the command string for {command} - the inverter didnt recognise this command",
+                    "",
+                ]
+            }
+        # dict is returned on exception
+
         if isinstance(raw_response, dict):
             return raw_response
 
