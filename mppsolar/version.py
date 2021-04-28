@@ -1,2 +1,2 @@
-__version__ = "0.7.48"
-__version_comment__ = "recent changes: add DALY v1"
+__version__ = "0.7.49"
+__version_comment__ = "recent changes: add DALY cellVoltages"

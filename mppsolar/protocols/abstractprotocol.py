@@ -1,14 +1,13 @@
 import abc
 import logging
 import re
-import struct
 from typing import Tuple
 
 from ..helpers import get_resp_defn
-from .protocol_helpers import Big2ByteHex2Int
-from .protocol_helpers import Little2ByteHex2Int
-from .protocol_helpers import Hex2Int
-from .protocol_helpers import Hex2Str
+from .protocol_helpers import Big2ByteHex2Int  # noqa: F401
+from .protocol_helpers import Little2ByteHex2Int  # noqa: F401
+from .protocol_helpers import Hex2Int  # noqa: F401
+from .protocol_helpers import Hex2Str  # noqa: F401
 from .protocol_helpers import crcPI as crc
 
 log = logging.getLogger("AbstractProtocol")
@@ -76,13 +75,17 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             return False, {"ERROR": ["No response", ""]}
         return True, {}
 
-    def process_response(self, data_name=None, data_type=None, data_units=None, raw_value=None):
+    def process_response(
+        self, data_name=None, data_type=None, data_units=None, raw_value=None, frame_number=0
+    ):
         template = None
         # Check for a format modifying template
         if ":" in data_type:
             data_type, template = data_type.split(":")
             log.info(f"Got template {template} for {data_name} {raw_value}")
-
+        log.debug(
+            f"Processing data_type: {data_type} for data_name: {data_name}, raw_value {raw_value}"
+        )
         if data_type == "lookup":
             log.warn("lookup not implemented...")
             return data_name, None, data_units
@@ -114,9 +117,17 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             r = data_units[key]
             return data_name, r, ""
         format_string = f"{data_type}(raw_value)"
-        r = eval(format_string)
+        log.debug(f"Processing format string {format_string}")
+        try:
+            r = eval(format_string)
+        except TypeError as e:
+            log.warn(f"Failed to eval format {format_string}, error: {e}")
+            return data_name, format_string, data_units
         if template is not None:
             r = eval(template)
+        if "{" in data_name:
+            f = frame_number  # noqa: F841
+            data_name = eval(data_name)
         return data_name, r, data_units
 
     def decode(self, response, command) -> dict:
@@ -169,67 +180,15 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         if "response_type" in command_defn:
             response_type = command_defn["response_type"]
         else:
-            response_type = "default"
+            response_type = "DEFAULT"
         log.info(f"decode: Processing response of type {response_type}")
 
         # Decode response based on stored command definition and type
-
-        # KEYED - responses are determined by a KEY lookup and can be in any order
-        if response_type == "KEYED" or response_type == "POSITIONAL":
-            for i, response in enumerate(responses):
-                if response_type == "KEYED":
-                    log.debug("decode: Processing KEYED type responses")
-                    # example defn ["H1", "Depth of the deepest discharge", "Ah", "mFloat"],
-                    # example response data [b'H1', b'-32914']
-                    if len(response) <= 1:
-                        # Not enough data in response, so ignore
-                        continue
-                    lookup_key = response[0]
-                    raw_value = response[1]
-                    response_defn = get_resp_defn(lookup_key, command_defn["response"])
-                    if response_defn is None:
-                        # No definition for this key, so ignore???
-                        log.warn(f"No definition for {response}")
-                        continue
-                    data_name = response_defn[1]
-                    data_units = response_defn[2]
-                    data_type = response_defn[3]
-                elif response_type == "POSITIONAL":
-                    log.debug("decode: Processing POSITIONAL type responses")
-                    # POSITIONAL - responses are not separated and are determined by the position in the response
-                    # example defn :
-                    #   ["discard", 1, "start flag", ""],
-                    #   ["Big2ByteHex2Int", 2, "Battery Bank Voltage", "V"],
-                    # example response data:
-                    #   [b'\xa5', b'\x01', b'\x90', b'\x08', b'\x01\t', b'\x00\x00', b'u\xcf', b'\x03\x99', b'']
-                    raw_value = response
-                    # Check if we are past the 'known' responses
-                    if i >= len_command_defn:
-                        response_defn = ["str", f"Unknown value in response {i}", ""]
-                    else:
-                        response_defn = command_defn["response"][i]
-                    if response_defn is None:
-                        # No definition for this key, so ignore???
-                        log.warn(f"No definition for {response}")
-                        response_defn = ["str", f"Undefined value in response {i}", ""]
-                    data_name = response_defn[2]
-                    data_units = response_defn[3]
-                    data_type = response_defn[0]
-                # print(data_type, data_name, raw_value)
-                data_name, value, data_units = self.process_response(
-                    data_type=data_type,
-                    data_name=data_name,
-                    data_units=data_units,
-                    raw_value=raw_value,
-                )
-                # print(data_type, data_name, raw_value, value)
-                if data_name is not None:
-                    msgs[data_name] = [value, data_units]
-
-        else:
-            # Responses are determined by the order they are returned
-            log.info("decode: Processing SEQUENCE type responses")
-
+        # process default response type
+        # TODO: fix this - move into new approach
+        # DEFAULT - responses are determined by the order they are returned
+        if response_type == "DEFAULT":
+            log.info("decode: Processing DEFAULT type responses")
             for i, result in enumerate(responses):
                 # decode result
                 if type(result) is bytes:
@@ -325,4 +284,73 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 else:
                     log.info(f"Processing unknown response format {result}")
                     msgs[i] = [result, ""]
+            return msgs
+
+        # Check for multiple frame type responses
+        if response_type == "MULTIFRAME-POSITIONAL":
+            log.debug("decode: Processing MULTIFRAME-POSITIONAL type responses")
+            # MULTIFRAME-POSITIONAL - multiple frames of responses are not separated and are determined by the position in the response
+            # each frame has the same definition
+            frame_count = len(responses)
+            log.debug(f"got {frame_count} frames")
+            # the responses are the frames
+            frames = responses
+        else:
+            frames = [responses]
+            frame_count = 1
+
+        for frame_number, frame in enumerate(frames):
+            for i, response in enumerate(frame):
+                if response_type == "KEYED":
+                    log.debug("decode: Processing KEYED type responses")
+                    # example defn ["H1", "Depth of the deepest discharge", "Ah", "mFloat"],
+                    # example response data [b'H1', b'-32914']
+                    if len(response) <= 1:
+                        # Not enough data in response, so ignore
+                        continue
+                    lookup_key = response[0]
+                    raw_value = response[1]
+                    response_defn = get_resp_defn(lookup_key, command_defn["response"])
+                    if response_defn is None:
+                        # No definition for this key, so ignore???
+                        log.warn(f"No definition for {response}")
+                        continue
+                    data_name = response_defn[1]
+                    data_units = response_defn[2]
+                    data_type = response_defn[3]
+                elif response_type in ["POSITIONAL", "MULTIFRAME-POSITIONAL"]:
+                    log.debug("decode: Processing POSITIONAL type responses")
+                    # POSITIONAL - responses are not separated and are determined by the position in the response
+                    # example defn :
+                    #   ["discard", 1, "start flag", ""],
+                    #   ["Big2ByteHex2Int", 2, "Battery Bank Voltage", "V"],
+                    # example response data:
+                    #   [b'\xa5', b'\x01', b'\x90', b'\x08', b'\x01\t', b'\x00\x00', b'u\xcf', b'\x03\x99', b'']
+                    raw_value = response
+                    # Check if we are past the 'known' responses
+                    if i >= len_command_defn:
+                        response_defn = ["str", f"Unknown value in response {i}", ""]
+                    else:
+                        response_defn = command_defn["response"][i]
+                    if response_defn is None:
+                        # No definition for this key, so ignore???
+                        log.warn(f"No definition for {response}")
+                        response_defn = ["str", f"Undefined value in response {i}", ""]
+                    data_name = response_defn[2]
+                    data_units = response_defn[3]
+                    data_type = response_defn[0]
+                # print(data_type, data_name, raw_value)
+
+                # Process response
+                data_name, value, data_units = self.process_response(
+                    data_name=data_name,
+                    raw_value=raw_value,
+                    data_units=data_units,
+                    data_type=data_type,
+                    frame_number=frame_number,
+                )
+                # print(data_type, data_name, raw_value, value)
+                if data_name is not None:
+                    msgs[data_name] = [value, data_units]
+
         return msgs

@@ -36,8 +36,8 @@ COMMANDS = {
             b"\xa5\x01\x90\x08\x01\t\x00\x00u\xcf\x03\n\x99",
         ],
     },
-    "cellMinMax": {
-        "name": "cellMinMax",
+    "cellMinMaxVoltages": {
+        "name": "cellMinMaxVoltages",
         "description": "Cell Minimum and Maximum Voltages",
         "help": " -- display the cell number and voltage of the cells with the min and max voltages",
         "type": "DALY",
@@ -59,8 +59,8 @@ COMMANDS = {
             b"\xa5\x01\x91\x08\r\x00\x0f\x0c\xfe\x01\x03x\xe1",
         ],
     },
-    "cellTemperatures": {
-        "name": "cellTemperatures",
+    "cellMinMaxTemps": {
+        "name": "cellMinMaxTemps",
         "description": "Cell Minimum and Maximum Temperatures",
         "help": " -- display the cell number and temperature of the cells with the min and max temperatures",
         "type": "DALY",
@@ -127,28 +127,55 @@ COMMANDS = {
             b"\xa5\x01\x94\x08\x10\x01\x00\x00\x00\x00\x03@\x96",
         ],
     },
-    "cellVoltage": {
-        "name": "cellVoltage",
-        "description": "Cell Voltage Information",
+    "cellVoltages": {
+        "name": "cellVoltages",
+        "description": "Cell Voltages Information",
         "help": " -- display the cell voltages",
         "type": "DALY",
         "command_code": "95",
-        "response_type": "MULTIPOSITIONAL",
+        "response_type": "MULTIFRAME-POSITIONAL",
         "response_length": 13,
         "response": [
             ["discard", 1, "start flag", ""],
             ["discard", 1, "module address", ""],
             ["discard", 1, "command id", ""],
             ["discard", 1, "data length", ""],
-            ["hex", 1, "Frame Number", ""],
-            ["hex", 2, "Cell 1 Voltage", "mV"],
-            ["hex", 2, "Cell 2 Voltage", "mV"],
-            ["hex", 2, "Cell 3 Voltage", "mV"],
-            ["hex", 1, "Reserved", ""],
+            ["discard", 1, "f'Frame Number {f:02d}'", ""],
+            ["Big2ByteHex2Int:r/1000", 2, "f'Cell {3*f+1:02d} Voltage'", "V"],
+            ["Big2ByteHex2Int:r/1000", 2, "f'Cell {3*f+2:02d} Voltage'", "V"],
+            ["Big2ByteHex2Int:r/1000", 2, "f'Cell {3*f+3:02d} Voltage'", "V"],
+            ["discard", 1, "Reserved", ""],
             ["discard", 1, "checksum", ""],
         ],
         "test_responses": [
             b"\xa5\x01\x95\x08\x01\x0c\xfd\x0c\xfe\x0c\xfe@\xa1\xa5\x01\x95\x08\x02\x0c\xfe\x0c\xfe\x0c\xfe@\xa3\xa5\x01\x95\x08\x03\x0c\xfe\x0c\xfe\x0c\xfe@\xa4\xa5\x01\x95\x08\x04\x0c\xfe\x0c\xfc\x0c\xfe@\xa3\xa5\x01\x95\x08\x05\x0c\xfe\x0c\xff\x0c\xfe@\xa7\xa5\x01\x95\x08\x06\x0c\xfc\x00\x00\x00\x00@\x91\xa5\x01\x95\x08\x07\x00\x00\x00\x00\x00\x00@\x8a\xa5\x01\x95\x08\x08\x00\x00\x00\x00\x00\x00@\x8b\xa5\x01\x95\x08\t\x00\x00\x00\x00\x00\x00@\x8c\xa5\x01\x95\x08\n\x00\x00\x00\x00\x00\x00@\x8d\xa5\x01\x95\x08\x0b\x00\x00\x00\x00\x00\x00@\x8e\xa5\x01\x95\x08\x0c\x00\x00\x00\x00\x00\x00@\x8f\xa5\x01\x95\x08\r\x00\x00\x00\x00\x00\x00@\x90\xa5\x01\x95\x08\x0e\x00\x00\x00\x00\x00\x00@\x91\xa5\x01\x95\x08\x0f\x00\x00\x00\x00\x00\x00@\x92\xa5\x01\x95\x08\x10\x00\x00\x00\x00\x00\x00@\x93",
+        ],
+    },
+    "cellTemperatures": {
+        "name": "cellTemperatures",
+        "description": "Cell Temperature Information",
+        "help": " -- display the cell temperatures",
+        "type": "DALY",
+        "command_code": "96",
+        "response_type": "MULTIFRAME-POSITIONAL",
+        "response_length": 13,
+        "response": [
+            ["discard", 1, "start flag", ""],
+            ["discard", 1, "module address", ""],
+            ["discard", 1, "command id", ""],
+            ["discard", 1, "data length", ""],
+            ["discard", 1, "f'Frame Number {f:02d}'", ""],
+            ["Hex2Int:r-40", 1, "f'Cell {7*f+1:02d} Temperature'", "°C"],
+            ["Hex2Int:r-40", 1, "f'Cell {7*f+2:02d} Temperature'", "°C"],
+            ["Hex2Int:r-40", 1, "f'Cell {7*f+3:02d} Temperature'", "°C"],
+            ["Hex2Int:r-40", 1, "f'Cell {7*f+4:02d} Temperature'", "°C"],
+            ["Hex2Int:r-40", 1, "f'Cell {7*f+5:02d} Temperature'", "°C"],
+            ["Hex2Int:r-40", 1, "f'Cell {7*f+6:02d} Temperature'", "°C"],
+            ["Hex2Int:r-40", 1, "f'Cell {7*f+7:02d} Temperature'", "°C"],
+            ["discard", 1, "checksum", ""],
+        ],
+        "test_responses": [
+            b"\xa5\x01\x96\x08\x017\x00\x00\x00\x00\x00\x00|\xa5\x01\x96\x08\x02\x00\x00\x00\x00\x00\x00\x00F",
         ],
     },
 }
@@ -241,7 +268,7 @@ class daly(AbstractProtocol):
 
         if (
             self._command_defn is not None
-            and self._command_defn["response_type"] == "MULTIPOSITIONAL"
+            and self._command_defn["response_type"] == "MULTIFRAME-POSITIONAL"
         ):
             # Have multiple frames of positional data
             # Either 1a:Split into frames?,
@@ -253,7 +280,15 @@ class daly(AbstractProtocol):
             log.info(f"Multi frame response with {len(frames)} frames")
             #
             # TODO: so now what????
-            exit()
+            for frame in frames:
+                items = []
+                for defn in self._command_defn["response"]:
+                    size = defn[1]
+                    item = frame[:size]
+                    items.append(item)
+                    frame = frame[size:]
+                responses.append(items)
+            return responses
 
         if self._command_defn is not None and self._command_defn["response_type"] == "POSITIONAL":
             # Have a POSITIONAL type response, so need to break it up...
