@@ -113,7 +113,7 @@ class test_daly_decode(unittest.TestCase):
             "Cell 27 Voltage": [0.0, "V"],
             "Cell 28 Voltage": [0.0, "V"],
             "Cell 29 Voltage": [0.0, "V"],
-            "Cell 30 Voltage": [0.064, "V"],
+            "Cell 30 Voltage": [0.0, "V"],
             "Cell 31 Voltage": [0.0, "V"],
             "Cell 32 Voltage": [0.0, "V"],
             "Cell 33 Voltage": [0.0, "V"],
