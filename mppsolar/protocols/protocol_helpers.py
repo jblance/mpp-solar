@@ -39,7 +39,7 @@ def Hex2Int(hexString):
     Decode the first byte of a hexString to int
     """
     answer = hexString[0]
-    log.info(f"Hex {hexString} decoded to {answer}")
+    log.debug(f"Hex {hexString} decoded to {answer}")
 
     return answer
 
@@ -52,7 +52,7 @@ def Hex2Str(hexString):
     for x in hexString:
         answer += f"{x:02x}"
 
-    log.info(f"Hex {hexString} decoded to {answer}")
+    log.debug(f"Hex {hexString} decoded to {answer}")
 
     return answer
 
@@ -67,7 +67,7 @@ def Little2ByteHex2Int(hexString):
         return 0
 
     answer = unpack("<h", hexString)[0]
-    log.info(f"Hex {hexString} 2 byte decoded to {answer}")
+    log.debug(f"Hex {hexString} 2 byte decoded to {answer}")
     return answer
 
 
@@ -81,7 +81,7 @@ def Big2ByteHex2Int(hexString):
         return 0
 
     answer = unpack(">h", hexString)[0]
-    log.info(f"Hex {hexString} 2 byte decoded to {answer}")
+    log.debug(f"Hex {hexString} 2 byte decoded to {answer}")
     return answer
 
 
@@ -113,7 +113,7 @@ def decode2ByteHex(hexString):
 
     # Use python tools for decode
     answer = unpack("<h", hexString)[0] / 1000
-    log.info(f"Hex {hexString} 2 byte decoded to {answer}")
+    log.debug(f"Hex {hexString} 2 byte decoded to {answer}")
 
     return answer
 
@@ -166,7 +166,7 @@ def decode4ByteHex1000(hexToDecode):
     answer += pos8 * (2 ** 24 / 1000)
 
     log.debug(f"answer after pos8 {answer}")
-    log.info(f"Hex {hexString} 8 byte decoded to {answer}")
+    log.debug(f"Hex {hexString} 8 byte decoded to {answer}")
 
     return answer
 
@@ -188,7 +188,7 @@ def decode4ByteHex(hexToDecode):
 
     # Use python tools for decode
     answer = unpack("<f", hexString)[0]
-    log.info(f"Hex {hexString} 4 byte decoded to {answer}")
+    log.debug(f"Hex {hexString} 4 byte decoded to {answer}")
 
     return answer
 
