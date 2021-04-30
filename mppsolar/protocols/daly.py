@@ -149,6 +149,7 @@ COMMANDS = {
         ],
         "test_responses": [
             b"\xa5\x01\x95\x08\x01\x0c\xfd\x0c\xfe\x0c\xfe@\xa1\xa5\x01\x95\x08\x02\x0c\xfe\x0c\xfe\x0c\xfe@\xa3\xa5\x01\x95\x08\x03\x0c\xfe\x0c\xfe\x0c\xfe@\xa4\xa5\x01\x95\x08\x04\x0c\xfe\x0c\xfc\x0c\xfe@\xa3\xa5\x01\x95\x08\x05\x0c\xfe\x0c\xff\x0c\xfe@\xa7\xa5\x01\x95\x08\x06\x0c\xfc\x00\x00\x00\x00@\x91\xa5\x01\x95\x08\x07\x00\x00\x00\x00\x00\x00@\x8a\xa5\x01\x95\x08\x08\x00\x00\x00\x00\x00\x00@\x8b\xa5\x01\x95\x08\t\x00\x00\x00\x00\x00\x00@\x8c\xa5\x01\x95\x08\n\x00\x00\x00\x00\x00\x00@\x8d\xa5\x01\x95\x08\x0b\x00\x00\x00\x00\x00\x00@\x8e\xa5\x01\x95\x08\x0c\x00\x00\x00\x00\x00\x00@\x8f\xa5\x01\x95\x08\r\x00\x00\x00\x00\x00\x00@\x90\xa5\x01\x95\x08\x0e\x00\x00\x00\x00\x00\x00@\x91\xa5\x01\x95\x08\x0f\x00\x00\x00\x00\x00\x00@\x92\xa5\x01\x95\x08\x10\x00\x00\x00\x00\x00\x00@\x93",
+            b"\xa5\x01\x95\x08\x01\x0c\xa3\x0c\xa7\x0c\xa6\xf9Q\xa5\x01\x95\x08\x02\x0c\xa8\x0c\xa5\x0c\xa4\xf9S\xa5\x01\x95\x08\x03\x0c\xa5\x0c\xa6\x00\x00\xf9\xa2\xa5\x01\x95\x08\x04\x00\x00\x00\x00\x00\x00\xf9@\xa5\x01\x95\x08\x05\x00\x00\x00\x00\x00\x00\xf9A\xa5\x01\x95\x08\x06\x00\x00\x00\x00\x00\x00\xf9B\xa5\x01\x95\x08\x07\x00\x00\x00\x00\x00\x00\xf9C\xa5\x01\x95\x08\x08\x00\x00\x00\x00\x00\x00\xf9D\xa5\x01\x95\x08\t\x00\x00\x00\x00\x00\x00\xf9E\xa5\x01\x95\x08\n\x00\x00\x00\x00\x00\x00\xf9F\xa5\x01\x95\x08\x0b",
         ],
     },
     "cellTemperatures": {
@@ -228,7 +229,7 @@ class daly(AbstractProtocol):
 
     def is_multiframe(self, response) -> bool:
         # startFlag = bytes.fromhex("A5")
-        if response.count(startFlag) > 1:
+        if len(response) > self._command_defn["response_length"]:
             return True
         return False
 
@@ -264,23 +265,21 @@ class daly(AbstractProtocol):
         """
         responses = []
         # remove \n
-        response = response.replace(b"\n", b"")
+        # response = response.replace(b"\n", b"")
 
         if (
             self._command_defn is not None
             and self._command_defn["response_type"] == "MULTIFRAME-POSITIONAL"
         ):
             # Have multiple frames of positional data
-            # Either 1a:Split into frames?,
-            # 1b: Then split frames into responses?
-            # 2: Or combine frames into jumbo frame?
-            _response = response.replace(startFlag, b"#%s" % startFlag)
-            # Ignore the first # as dont want to split there anyway (creates an empty frame)
-            frames = _response[1:].split(b"#")
+            # Split into frames
+            frame_size = self._command_defn["response_length"]
+            frames = [response[i : i + frame_size] for i in range(0, len(response), frame_size)]
             log.info(f"Multi frame response with {len(frames)} frames")
-            #
-            # TODO: so now what????
+            # Loop through each frame and process as per definition
             for frame in frames:
+                if len(frame) == 0:
+                    continue
                 items = []
                 for defn in self._command_defn["response"]:
                     size = defn[1]
@@ -288,6 +287,7 @@ class daly(AbstractProtocol):
                     items.append(item)
                     frame = frame[size:]
                 responses.append(items)
+            # print(responses)
             return responses
 
         if self._command_defn is not None and self._command_defn["response_type"] == "POSITIONAL":

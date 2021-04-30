@@ -27,7 +27,7 @@ setup(
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
     version=__version__,  # noqa: F821
-    description="Package to communicate with MPP Solar PIP-4048MS inverter",
+    description="Package to communicate with Solar inverters and BMSs",
     long_description=long_description,
     long_description_content_type="text/markdown",
     # The project's main homepage.

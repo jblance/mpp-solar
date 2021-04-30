@@ -82,7 +82,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         # Check for a format modifying template
         if ":" in data_type:
             data_type, template = data_type.split(":")
-            log.info(f"Got template {template} for {data_name} {raw_value}")
+            log.debug(f"Got template {template} for {data_name} {raw_value}")
         log.debug(
             f"Processing data_type: {data_type} for data_name: {data_name}, raw_value {raw_value}"
         )

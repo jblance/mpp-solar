@@ -17,7 +17,7 @@ Currently has support for:
   - JK-B1A24S (HW version 3.0)
 - Victron VE Direct Devices:
  - tested on SmartShunt 500A
-- Daly BMS (coming soon)
+- Daly BMS
 
 ## Compute hardware support ##
 The python code is designed to run on Linux type python environments using python 3.6 or newer

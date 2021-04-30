@@ -63,7 +63,7 @@ def Little2ByteHex2Int(hexString):
     """
     # Make sure supplied String is the correct length
     if len(hexString) != 2:
-        log.warning(f"Hex encoded value must be 2 bytes long. Was {len(hexString)} length")
+        log.info(f"Hex encoded value must be 2 bytes long. Was {len(hexString)} length")
         return 0
 
     answer = unpack("<h", hexString)[0]
@@ -77,7 +77,7 @@ def Big2ByteHex2Int(hexString):
     """
     # Make sure supplied String is the correct length
     if len(hexString) != 2:
-        log.warning(f"Hex encoded value must be 2 bytes long. Was {len(hexString)} length")
+        log.info(f"Hex encoded value must be 2 bytes long. Was {len(hexString)} length")
         return 0
 
     answer = unpack(">h", hexString)[0]
