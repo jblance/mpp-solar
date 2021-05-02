@@ -1,2 +1,2 @@
-__version__ = "0.7.51"
-__version_comment__ = "recent changes: add DALY io handler"
+__version__ = "0.7.52"
+__version_comment__ = "recent changes: corrections to DALY protocol"

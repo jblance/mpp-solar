@@ -41,7 +41,6 @@ class test_daly_decode(unittest.TestCase):
             "Maximum Cell Number": [15, ""],
             "Minimum Cell Voltage": [3.326, "V"],
             "Minimum Cell Number": [1, ""],
-            "SOC": [88.8, "%"],
         }
         result = protocol.decode(response, command)
         # print(result)
@@ -58,7 +57,7 @@ class test_daly_decode(unittest.TestCase):
             "raw_response": ["¥\x01\x94\x08\x10\x01\x00\x00\x00\x00\x03@\x96", ""],
             "_command": "status",
             "_command_description": "Status Information",
-            "Battery String": ["10", ""],
+            "Battery String": [16, ""],
             "Temperature": ["01", ""],
             "Charger Status": ["disconnected", ""],
             "Load Status": ["disconnected", ""],
