@@ -12,6 +12,7 @@ PORT_TYPE_SERIAL = 8
 PORT_TYPE_JKBLE = 16
 PORT_TYPE_MQTT = 32
 PORT_TYPE_VSERIAL = 64
+PORT_TYPE_DALYSERIAL = 128
 
 # log = None
 log = logging.getLogger("device")
@@ -74,6 +75,9 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         elif "jkble" in port:
             log.debug("get_port_type: port matches jkble")
             return PORT_TYPE_JKBLE
+        elif "daly" in port:
+            log.debug("get_port_type: port matches daly")
+            return PORT_TYPE_DALYSERIAL
         elif "vserial" in port:
             log.debug("get_port_type: port matches vserial")
             return PORT_TYPE_VSERIAL
@@ -159,6 +163,12 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             from mppsolar.io.serialio import SerialIO
 
             self._port = SerialIO(device_path=port, serial_baud=baud)
+
+        elif port_type == PORT_TYPE_DALYSERIAL:
+            log.info("set_port: Using dalyserialio for communications")
+            from mppsolar.io.dalyserialio import DalySerialIO
+
+            self._port = DalySerialIO(device_path=port, serial_baud=baud)
 
         elif port_type == PORT_TYPE_VSERIAL:
             log.info("set_port: Using vserialio for communications")
