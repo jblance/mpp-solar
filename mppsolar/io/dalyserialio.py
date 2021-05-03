@@ -15,7 +15,7 @@ class DalySerialIO(BaseIO):
 
     def send_and_receive(self, *args, **kwargs) -> dict:
         full_command = get_kwargs(kwargs, "full_command")
-        response_line = None
+        response_line = b""
         log.debug(f"send_and_receive: port {self._serial_port}, baudrate {self._serial_baud}")
         try:
             with serial.serial_for_url(self._serial_port, self._serial_baud) as s:
