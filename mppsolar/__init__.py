@@ -81,7 +81,7 @@ def main():
             type=str,
             help="Specifies the device command and response protocol, (default: JK04)",
             default="JK04",
-            choices=["JK02", "JK04", "JK485"],
+            choices=["JK02", "JK04", "JK232", "JK485"],
         )
     else:
         parser.add_argument(
@@ -201,6 +201,8 @@ def main():
 
     args = parser.parse_args()
     prog_name = parser.prog
+    if prog_name is None:
+        prog_name = "mpp-solar"
     s_prog_name = prog_name.replace("-", "")
     # log_name = s_prog_name.upper()
 
@@ -219,7 +221,8 @@ def main():
     log.info(description)
     if args.version:
         print(description)
-        exit(0)
+        # exit(0)
+        return None
 
     mqtt_broker = args.mqttbroker
     mqtt_port = args.mqttport

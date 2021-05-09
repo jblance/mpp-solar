@@ -34,6 +34,35 @@ def crc8P1(byteData):
     return CRC
 
 
+def crcJK232(byteData):
+    """
+    Generate JK RS232 / RS485 CRC
+    - 2 bytes, the verification field is "command code + length byte + data segment content",
+    the verification method is thesum of the above fields and then the inverse plus 1, the high bit is in the front and the low bit is in the back.
+    """
+    CRC = 0
+    for b in byteData:
+        CRC += b
+    CRC = CRC ^ 0xFFFF
+    CRC += 1
+
+    crc_low = CRC & 0xFF
+    crc_high = (CRC >> 8) & 0xFF
+    return [crc_high, crc_low]
+
+
+def vedHexChecksum(byteData):
+    """
+    Generate VE Direct HEX Checksum
+    - sum of byteData + CS = 0x55
+    """
+    CS = 0x55
+    for b in byteData:
+        CS -= b
+    CS = CS & 0xFF
+    return CS
+
+
 def Hex2Int(hexString):
     """
     Decode the first byte of a hexString to int
@@ -83,18 +112,6 @@ def Big2ByteHex2Int(hexString):
     answer = unpack(">h", hexString)[0]
     log.debug(f"Hex {hexString} 2 byte decoded to {answer}")
     return answer
-
-
-def vedHexChecksum(byteData):
-    """
-    Generate VE Direct HEX Checksum
-     - sum of byteData + CS = 0x55
-    """
-    CS = 0x55
-    for b in byteData:
-        CS -= b
-    CS = CS & 0xFF
-    return CS
 
 
 def decode2ByteHex(hexString):
