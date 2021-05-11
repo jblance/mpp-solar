@@ -50,6 +50,8 @@ COMMANDS = {
             ["Hex2Int", 1, "Number of NTC", ""],
             ["Big2ByteHex2Int:(r-2731)/10", 2, "NTC 1", "°C"],
             ["Big2ByteHex2Int:(r-2731)/10", 2, "NTC 2", "°C"],
+            ["Hex2Str", 2, "Checksum", ""],
+            ["Hex2Str", 1, "End Byte", ""],
         ],
         "test_responses": [
             bytes.fromhex(
@@ -144,6 +146,8 @@ class jk232(AbstractProtocol):
                 item = response[:size]
                 responses.append(item)
                 response = response[size:]
+            if response:
+                responses.append(response)
             log.debug(f"get_responses: responses {responses}")
             return responses
         else:

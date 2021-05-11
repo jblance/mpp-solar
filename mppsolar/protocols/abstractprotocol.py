@@ -329,13 +329,13 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     raw_value = response
                     # Check if we are past the 'known' responses
                     if i >= len_command_defn:
-                        response_defn = ["str", f"Unknown value in response {i}", ""]
+                        response_defn = ["str", 1, f"Unknown value in response {i}", ""]
                     else:
                         response_defn = command_defn["response"][i]
                     if response_defn is None:
                         # No definition for this key, so ignore???
                         log.warn(f"No definition for {response}")
-                        response_defn = ["str", f"Undefined value in response {i}", ""]
+                        response_defn = ["str", 1, f"Undefined value in response {i}", ""]
                     data_name = response_defn[2]
                     data_units = response_defn[3]
                     data_type = response_defn[0]
