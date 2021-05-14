@@ -236,14 +236,20 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 # eg. ['flags', 'Device status', [ 'is_load_on', 'is_charging_on' ...
                 elif resp_format[0] == "flags":
                     for j, flag in enumerate(result):
+                        # if flag != "" and flag != b'':
                         msgs[resp_format[2][j]] = [int(flag), "bool"]
                 # eg. ['stat_flags', 'Warning status', ['Reserved', 'Inver...
                 elif resp_format[0] == "stat_flags":
                     output = ""
                     for j, flag in enumerate(result):
-                        if flag == "1":
-                            output = "{}\n\t- {}".format(output, resp_format[2][j])
-                    msgs[key] = [output, ""]
+                        # only display 'enabled' flags
+                        # if flag == "1" or flag == b"1":
+                        #    output = "{}\n\t- {}".format(output, resp_format[2][j])
+                        # display all flags
+                        key = resp_format[2][j]
+                        output = flag
+                        if key:  # only add msg if key is something
+                            msgs[key] = [output, ""]
                 # eg. ['enflags', 'Device Status', {'a': {'name': 'Buzzer', 'state': 'disabled'},
                 elif resp_format[0] == "enflags":
                     # output = {}

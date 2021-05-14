@@ -747,9 +747,9 @@ COMMANDS = {
         "response": [
             [
                 "stat_flags",
-                "Warning status",
+                "Warning",
                 [
-                    "Reserved",
+                    "",
                     "Inverter fault",
                     "Bus over fault",
                     "Bus under fault",
@@ -779,13 +779,13 @@ COMMANDS = {
                     "MPPT overload fault",
                     "MPPT overload warning",
                     "Battery too low to charge warning",
-                    "Reserved",
-                    "Reserved",
+                    "",
+                    "",
                 ],
             ]
         ],
         "test_responses": [
-            b"(00000100000000000000000000000000\xFE\x82\r",
+            b"(00000100000000001000000000000000\x56\xA6\r",
         ],
     },
     "QVFW": {
