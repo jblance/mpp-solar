@@ -4,7 +4,8 @@ import mppsolar
 from mppsolar.outputs.baseoutput import baseoutput
 from mppsolar.devices.mppsolar import mppsolar as _mppsolar
 from mppsolar.devices.jkbms import jkbms as _jkbms
-from mppsolar.devices.device import AbstractDevice as _abstractdevice
+
+# from mppsolar.devices.device import AbstractDevice as _abstractdevice
 
 
 class test_init(unittest.TestCase):

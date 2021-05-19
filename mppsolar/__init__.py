@@ -2,7 +2,8 @@
 from argparse import ArgumentParser
 import importlib
 import logging
-from sys import exit
+
+# from sys import exit
 
 from .version import __version__, __version_comment__  # noqa: F401
 
@@ -90,7 +91,18 @@ def main():
             type=str,
             help="Specifies the device command and response protocol, (default: PI30)",
             default="PI30",
-            choices=["PI00", "PI16", "PI17", "PI18", "PI30", "PI30REVO", "PI41", "VED", "DALY"],
+            choices=[
+                "PI00",
+                "PI16",
+                "PI17",
+                "PI18",
+                "PI30",
+                "PI30REVO",
+                "PI41",
+                "VED",
+                "DALY",
+                "DALY40",
+            ],
         )
     parser.add_argument(
         "-T",
