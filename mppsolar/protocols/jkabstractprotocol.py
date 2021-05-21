@@ -66,38 +66,34 @@ class jkAbstractProtocol(AbstractProtocol):
         Override the default get_full_command as its different for JK
         """
         # getInfo = b'\xaa\x55\x90\xeb\x97\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11'
-        log.info(
-            f"get_full_command: Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
-        )
+        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
-        log.debug(
-            f"get_full_command: self._command = {self._command}, self._command_defn = {self._command_defn}"
-        )
+        log.debug(f"self._command = {self._command}, self._command_defn = {self._command_defn}")
         # End of required variables setting
         if self._command_defn is None:
             # Maybe return a default here?
-            log.debug("get_full_command: No command_defn found")
+            log.debug("No command_defn found")
             return None
         if "command_code" in self._command_defn:
             # full command is 20 bytes long
             cmd = bytearray(20)
             # starts with \xaa\x55\x90\xeb
             cmd[0:4] = bytes.fromhex("aa5590eb")
-            log.debug(f"get_full_command: cmd with SOR: {cmd}")
+            log.debug(f"cmd with SOR: {cmd}")
             # then has command code
             cmd[4] = int(self._command_defn["command_code"], 16)
-            log.debug(f"get_full_command: cmd with command code: {cmd}")
+            log.debug(f"cmd with command code: {cmd}")
             cmd[-1] = crc8(cmd)
-            log.debug(f"get_full_command: cmd with crc: {cmd}")
+            log.debug(f"cmd with crc: {cmd}")
             return cmd
         return None
 
     def get_command_defn(self, command):
-        log.debug(f"get_command_defn: get_command_defn for: {command}")
+        log.debug(f"get_command_defn for: {command}")
         if command is None:
-            log.debug("get_command_defn: command is None")
+            log.debug("command is None")
             return None
         return super().get_command_defn(command)
 
@@ -109,7 +105,7 @@ class jkAbstractProtocol(AbstractProtocol):
 
     def is_record_start(self, record):
         if record.startswith(SOR):
-            log.debug("get_responses: SOR found in record")
+            log.debug("SOR found in record")
             return True
         return False
 
@@ -117,7 +113,7 @@ class jkAbstractProtocol(AbstractProtocol):
         if len(record) < len(SOR):
             return False
         if record[len(SOR)] == int(type):
-            log.debug(f"is_record_correct_type: Record is type {type}")
+            log.debug(f"Record is type {type}")
             return True
         return False
 
@@ -125,7 +121,7 @@ class jkAbstractProtocol(AbstractProtocol):
         """"""
         # check record starts with 'SOR'
         if not self.is_record_start(record):
-            log.debug("is_record_complete: No SOR found in record looking for completeness")
+            log.debug("No SOR found in record looking for completeness")
             return False
         # check that length one of the valid lengths (300, 320)
         if len(record) == 300 or len(record) == 320:
@@ -134,16 +130,16 @@ class jkAbstractProtocol(AbstractProtocol):
             calcCrc = crc8(record[:-1])
             # print (crc, calcCrc)
             if crc == calcCrc:
-                log.debug("is_record_complete: Record CRC is valid")
+                log.debug("Record CRC is valid")
                 return True
         return False
 
     def decode(self, response, command) -> dict:
         msgs = {}
-        log.info(f"decode: response passed to decode: {response}")
+        log.info(f"response passed to decode: {response}")
         # No response
         if response is None:
-            log.info("decode: No response")
+            log.info("No response")
             msgs["ERROR"] = ["No response", ""]
             return msgs
 
@@ -164,7 +160,7 @@ class jkAbstractProtocol(AbstractProtocol):
         if not command_defn:
             # No definition, so just return the data
             # len_command_defn = 0
-            log.debug(f"decode: No definition for command {command}, raw response returned")
+            log.debug(f"No definition for command {command}, raw response returned")
             msgs["ERROR"] = [
                 f"No definition for command {command} in protocol {self._protocol_id}",
                 "",
@@ -173,10 +169,10 @@ class jkAbstractProtocol(AbstractProtocol):
             # len_command_defn = len(command_defn["response"])
             # Decode response based on stored command definition
             responses = self.get_responses(response)
-            log.debug(f"decode: Length of responses {len(responses)}")
+            log.debug(f"Length of responses {len(responses)}")
 
             for defn in command_defn["response"]:
-                log.debug(f"decode: Processing defn {defn}")
+                log.debug(f"Processing defn {defn}")
                 # ["hex", 4, "Header", ""]
                 # if defn[2] == "":
                 #    log.debug(f"skipping {defn} and no name defined")
@@ -185,21 +181,21 @@ class jkAbstractProtocol(AbstractProtocol):
                     # looks for a columnb based on another
                     # ["int+", 1, "Highest Cell", ""],
                     # ["lookup", "Highest Cell", "Voltage Cell", "Highest Cell Voltage" ],
-                    log.debug("decode: using lookup defn")
+                    log.debug("using lookup defn")
                     lookup_value = msgs[defn[1]][0]
                     key_tofind = f"{defn[2]}{lookup_value:02d}"
                     value = msgs[key_tofind][0]
                     unit = msgs[key_tofind][1]
                     msgs[defn[3]] = [value, unit]
                 elif defn[0] == "hex":
-                    log.debug("decode: hex defn")
+                    log.debug("hex defn")
                     value = ""
                     for x in range(defn[1]):
                         value += f"{responses.pop(0):02x}"
                     if defn[2] != "":
                         msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "ascii":
-                    log.debug("decode: ascii defn")
+                    log.debug("ascii defn")
                     value = ""
                     for x in range(defn[1]):
                         b = responses.pop(0)
@@ -208,12 +204,12 @@ class jkAbstractProtocol(AbstractProtocol):
                         value += f"{b:c}"
                     msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "uptime":
-                    log.debug("decode: uptime defn")
+                    log.debug("uptime defn")
                     value = 0
                     for x in range(defn[1]):
                         b = responses.pop(0)
                         value += b * 256 ** x
-                        log.debug(f"decode: Uptime int value {value} for pos {x}")
+                        log.debug(f"Uptime int value {value} for pos {x}")
                     daysFloat = value / (60 * 60 * 24)
                     days = math.trunc(daysFloat)
                     hoursFloat = (daysFloat - days) * 24
@@ -223,51 +219,51 @@ class jkAbstractProtocol(AbstractProtocol):
                     secondsFloat = (minutesFloat - minutes) * 60
                     seconds = round(secondsFloat)
                     uptime = f"{days}D{hours}H{minutes}M{seconds}S"
-                    log.info(f"decode: Uptime result {uptime}")
+                    log.info(f"Uptime result {uptime}")
                     msgs[defn[2]] = [uptime, defn[3]]
                 elif defn[0] == "discard":
-                    log.debug(f"decode: Discarding {defn[1]} values")
+                    log.debug(f"Discarding {defn[1]} values")
                     value = ""
                     for x in range(defn[1]):
                         value += f"{responses.pop(0):02x}"
-                    log.debug(f"decode: Discarded {value}")
+                    log.debug(f"Discarded {value}")
                     # if defn[2] != "":
                     #    msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "int":
-                    log.debug("decode: int defn")
+                    log.debug("int defn")
                     msgs[defn[2]] = [responses.pop(0), defn[3]]
                 elif defn[0] == "int+":
-                    log.debug("decode: int+ defn")
+                    log.debug("int+ defn")
                     msgs[defn[2]] = [responses.pop(0) + 1, defn[3]]
                 elif defn[0] == "16Int":
-                    log.debug("decode: 16Int defn")
+                    log.debug("16Int defn")
                     value = responses.pop(0) * 256
                     value += responses.pop(0)
                     # print(f"value {value}")
                     msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "16Int100":
-                    log.debug("decode: 16Int100 defn")
+                    log.debug("16Int100 defn")
                     value = responses.pop(0) * 256
                     value += responses.pop(0)
                     value = value / 100
                     # print(f"value {value}")
                     msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "16Int1000":
-                    log.debug("decode: 16Int1000 defn")
+                    log.debug("16Int1000 defn")
                     value = responses.pop(0) * 256
                     value += responses.pop(0)
                     value = value / 1000
                     # print(f"value {value}")
                     msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "2ByteHex":
-                    log.debug("decode: 2ByteHex defn")
+                    log.debug("2ByteHex defn")
                     v = responses[:2]
                     responses = responses[2:]
                     value = decode2ByteHex(v)
                     msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "2ByteHexU":
                     # used for unknow values provides undecoded hex as well
-                    log.debug("decode: 2ByteHexU defn")
+                    log.debug("2ByteHexU defn")
                     v = responses[:2]
                     responses = responses[2:]
                     value = decode2ByteHex(v)
@@ -275,25 +271,25 @@ class jkAbstractProtocol(AbstractProtocol):
                         msgs[defn[2]] = [value, f"{v[0]:02x} {v[1]:02x}"]
                 elif defn[0] == "2ByteHexC":
                     # temperatures seem to be deocded value * 100
-                    log.debug("decode: 2ByteHexC defn")
+                    log.debug("2ByteHexC defn")
                     v = responses[:2]
                     responses = responses[2:]
                     value = decode2ByteHex(v) * 100
                     msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "4ByteHex":
-                    log.debug("decode: 4ByteHex defn")
+                    log.debug("4ByteHex defn")
                     v = responses[:4]
                     responses = responses[4:]
                     value = decode4ByteHex(v)
                     msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "4ByteHex1000":
-                    log.debug("decode: 4ByteHex1000 defn")
+                    log.debug("4ByteHex1000 defn")
                     v = responses[:4]
                     responses = responses[4:]
                     value = decode4ByteHex1000(v)
                     msgs[defn[2]] = [value, defn[3]]
                 elif defn[0] == "4ByteHexU":
-                    log.debug("decode: 4ByteHexU defn")
+                    log.debug("4ByteHexU defn")
                     v = responses[:4]
                     responses = responses[4:]
                     value = decode4ByteHex(v)
@@ -302,7 +298,7 @@ class jkAbstractProtocol(AbstractProtocol):
                         f"{v[0]:02x} {v[1]:02x} {v[2]:02x} {v[3]:02x}",
                     ]
                 elif defn[0] == "loop":
-                    log.debug("decode: loop defn")
+                    log.debug("loop defn")
                     # loop of repeating data, eg cell voltages
                     for x in range(defn[1]):
                         param = f"{defn[2]}{x+1:02d}"
@@ -322,10 +318,10 @@ class jkAbstractProtocol(AbstractProtocol):
                             value = value / 1000
                             msgs[param] = [value, defn[3]]
                 elif defn[0] == "rem":
-                    log.debug(f"decode: {len(responses)} bytes remain: {str(responses)}")
+                    log.debug(f"{len(responses)} bytes remain: {str(responses)}")
                     # msgs["remainder"] = [str(responses), ""]
                     # msgs["len remainder"] = [len(responses), ""]
                     return msgs
                 else:
-                    log.error("decode: undefined type")
+                    log.error("undefined type")
         return msgs

@@ -56,8 +56,8 @@ class mqtt(baseoutput):
         return msgs
 
     def output(self, *args, **kwargs):
-        log.info("output: Using output processor: mqtt")
-        log.debug(f"output: kwargs {kwargs}")
+        log.info("Using output processor: mqtt")
+        log.debug(f"kwargs {kwargs}")
         data = get_kwargs(kwargs, "data")
         if data is None:
             return
@@ -66,7 +66,7 @@ class mqtt(baseoutput):
         try:
             mqtt_port = int(_port)
         except ValueError as e:
-            log.warn(f"output: Unable to cast {_port} to int - check value supplied for mqttport")
+            log.warn(f"Unable to cast {_port} to int - check value supplied for mqttport")
             log.warn(e)
             return
         except Exception as e:
@@ -85,11 +85,9 @@ class mqtt(baseoutput):
 
         if mqtt_user is not None and mqtt_pass is not None:
             auth = {"username": mqtt_user, "password": mqtt_pass}
-            log.info(
-                f"output: Using mqtt authentication, username: {mqtt_user}, password: [supplied]"
-            )
+            log.info(f"Using mqtt authentication, username: {mqtt_user}, password: [supplied]")
         else:
-            log.debug("output: No mqtt authentication used")
+            log.debug("No mqtt authentication used")
             auth = None
 
         msgs = self.build_msgs(**kwargs)
@@ -103,11 +101,11 @@ class mqtt(baseoutput):
                     publish.multiple(msgs, hostname=mqtt_broker, port=mqtt_port, auth=auth)
                 except Exception as e:
                     log.warn(
-                        f"output: Error publishing MQTT messages to broker '{mqtt_broker}' on port '{mqtt_port}' with auth '{auth}'"
+                        f"Error publishing MQTT messages to broker '{mqtt_broker}' on port '{mqtt_port}' with auth '{auth}'"
                     )
                     log.warn(e)
         else:
             if mqtt_broker == "screen":
                 print("MQTT build_msgs returned no messages")
             else:
-                log.warn("output: MQTT build_msgs returned no messages")
+                log.warn("MQTT build_msgs returned no messages")

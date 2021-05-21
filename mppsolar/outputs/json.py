@@ -17,8 +17,8 @@ class json(baseoutput):
         log.debug(f"__init__: kwargs {kwargs}")
 
     def output(self, *args, **kwargs):
-        log.info("output: Using output processor: json")
-        log.debug(f"output: kwargs {kwargs}")
+        log.info("Using output processor: json")
+        log.debug(f"kwargs {kwargs}")
         data = get_kwargs(kwargs, "data")
         keep_case = get_kwargs(kwargs, "keep_case")
         data.pop("raw_response", None)

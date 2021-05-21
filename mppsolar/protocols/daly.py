@@ -204,9 +204,7 @@ class daly(AbstractProtocol):
         """
         Override the default get_full_command as its different for DALY
         """
-        log.info(
-            f"get_full_command: Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
-        )
+        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
@@ -224,7 +222,7 @@ class daly(AbstractProtocol):
 
         checksum = f"{dalyChecksum(cmd):02X}"
         cmd = cmd + bytes.fromhex(checksum) + b"\n"
-        log.debug(f"get_full_command: full command: {cmd}")
+        log.debug(f"full command: {cmd}")
         return cmd
 
     def is_multiframe(self, response) -> bool:

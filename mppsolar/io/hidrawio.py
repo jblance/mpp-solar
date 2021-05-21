@@ -21,33 +21,33 @@ class HIDRawIO(BaseIO):
         try:
             usb0 = os.open(self._device, os.O_RDWR | os.O_NONBLOCK)
         except Exception as e:
-            log.debug("send_and_receive: USB open error: {}".format(e))
+            log.debug("USB open error: {}".format(e))
             return {"ERROR": ["USB open error: {}".format(e), ""]}
         # Send the command to the open usb connection
         to_send = full_command
         try:
-            log.debug(f"send_and_receive: length of to_send: {len(to_send)}")
+            log.debug(f"length of to_send: {len(to_send)}")
         except:  # noqa: E722
             import pdb
 
             pdb.set_trace()
         if len(to_send) <= 8:
             # Send all at once
-            log.debug("send_and_receive: 1 chunk send")
+            log.debug("1 chunk send")
             time.sleep(0.35)
             os.write(usb0, to_send)
         elif len(to_send) > 8 and len(to_send) < 11:
-            log.debug("send_and_receive: 2 chunk send")
+            log.debug("2 chunk send")
             time.sleep(0.35)
             os.write(usb0, to_send[:5])
             time.sleep(0.35)
             os.write(usb0, to_send[5:])
         else:
             while len(to_send) > 0:
-                log.debug("send_and_receive: multiple chunk send")
+                log.debug("multiple chunk send")
                 # Split the byte command into smaller chucks
                 send, to_send = to_send[:8], to_send[8:]
-                log.debug("send_and_receive: send: {}, to_send: {}".format(send, to_send))
+                log.debug("send: {}, to_send: {}".format(send, to_send))
                 time.sleep(0.35)
                 os.write(usb0, send)
         time.sleep(0.25)
@@ -60,12 +60,12 @@ class HIDRawIO(BaseIO):
                 r = os.read(usb0, 256)
                 response_line += r
             except Exception as e:
-                log.debug("send_and_receive: USB read error: {}".format(e))
+                log.debug("USB read error: {}".format(e))
             # Finished is \r is in byte_response
             if bytes([13]) in response_line:
                 # remove anything after the \r
                 response_line = response_line[: response_line.find(bytes([13])) + 1]
                 break
-        log.debug("send_and_receive: usb response was: %s", response_line)
+        log.debug("usb response was: %s", response_line)
         os.close(usb0)
         return response_line

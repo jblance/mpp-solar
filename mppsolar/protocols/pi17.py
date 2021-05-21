@@ -269,9 +269,7 @@ class pi17(AbstractProtocol):
         """
         Override the default get_full_command as its different
         """
-        log.info(
-            f"get_full_command: Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
-        )
+        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
@@ -289,14 +287,14 @@ class pi17(AbstractProtocol):
         else:
             _prefix = f"^S{data_length:03}"
         _pre_cmd = bytes(_prefix, "utf-8") + _cmd
-        log.debug(f"get_full_command: _pre_cmd: {_pre_cmd}")
+        log.debug(f"_pre_cmd: {_pre_cmd}")
         # calculate the CRC
         crc_high, crc_low = crc(_pre_cmd)
         # combine byte_cmd, CRC , return
         # PI18 full command "^P005GS\x..\x..\r"
         # _crc = bytes([crc_high, crc_low, 13])
         full_command = _pre_cmd + bytes([13])  # + _crc
-        log.debug(f"get_full_command: full command: {full_command}")
+        log.debug(f"full command: {full_command}")
         return full_command
 
     def get_responses(self, response):

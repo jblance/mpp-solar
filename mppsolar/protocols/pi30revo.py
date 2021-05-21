@@ -329,7 +329,7 @@ class pi30revo(AbstractProtocol):
         """
         crc_high, crc_low = crc(response[:-3])
         if response[-3:-1] == bytes([crc_high, crc_low]):
-            log.debug("check_response_valid: CRCs match")
+            log.debug("CRCs match")
             return True
         return False
 
@@ -339,7 +339,7 @@ class pi30revo(AbstractProtocol):
         """
         checksum = chk(response[:-2])
         if response[-2:-1] == bytes([checksum]):
-            log.debug("check_response_valid: Checksums match")
+            log.debug("Checksums match")
             return True
         return False
 
@@ -377,9 +377,7 @@ class pi30revo(AbstractProtocol):
         """
         Override the default get_full_command as its different for PI30REVO
         """
-        log.info(
-            f"get_full_command: Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
-        )
+        log.info(f"sing protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
@@ -393,7 +391,7 @@ class pi30revo(AbstractProtocol):
         ):
             log.debug(f"Using CHK checksum approach for command {self._command}")
             checksum = chk(byte_cmd)
-            log.debug(f"get_full_command: checksum {checksum}")
+            log.debug(f"checksum {checksum}")
             full_command = byte_cmd + bytes([checksum]) + bytes([13])
         else:
             log.debug(f"Using PI30 CRC checksum approach for command {self._command}")
@@ -402,5 +400,5 @@ class pi30revo(AbstractProtocol):
             # combine byte_cmd, CRC , return
             full_command = byte_cmd + bytes([crc_high, crc_low, 13])
 
-        log.debug(f"get_full_command: full command: {full_command}")
+        log.debug(f"full command: {full_command}")
         return full_command

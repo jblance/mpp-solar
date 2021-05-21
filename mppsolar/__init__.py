@@ -10,6 +10,8 @@ from .version import __version__, __version_comment__  # noqa: F401
 # Set-up logger
 # log = logging.getLogger(log_name)
 log = logging.getLogger("")
+FORMAT = "%(asctime)-15s:%(levelname)s:%(module)s:%(funcName)s@%(lineno)d: %(message)s"
+logging.basicConfig(format=FORMAT)
 
 
 def get_outputs(output_list):
@@ -305,9 +307,7 @@ def main():
                 mqtt_pass=mqtt_pass,
             )
             # build array of commands
-            commands = []
-            for cmd in _command.split(","):
-                commands.append(cmd)
+            commands = _command.split(",")
 
             for command in commands:
                 _commands.append((device, command, tag, outputs, filter, excl_filter))
@@ -369,8 +369,7 @@ def main():
             # run the command
             commands.append("")
         else:
-            for cmd in args.command.split(","):
-                commands.append(cmd)
+            commands = args.command.split(",")
 
         outputs = args.output
         for command in commands:

@@ -28,14 +28,12 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         self._protocol = None
         self._protocol_class = None
         self._port = None
-        log.debug(f"{self._classname} __init__ args {args}")
-        log.debug(f"{self._classname} __init__ kwargs {kwargs}")
+        log.debug(f"__init__ args {args}")
+        log.debug(f"__init__ kwargs {kwargs}")
         self._name = get_kwargs(kwargs, "name")
         self.set_port(**kwargs)
         self.set_protocol(**kwargs)
-        log.debug(
-            f"{self._classname} __init__ name {self._name}, port {self._port}, protocol {self._protocol}"
-        )
+        log.debug(f"__init__ name {self._name}, port {self._port}, protocol {self._protocol}")
 
     def __str__(self):
         """
@@ -50,42 +48,42 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         port = port.lower()
         # check for test type port
         if "test" in port:
-            log.debug("get_port_type: port matches test")
+            log.debug("port matches test")
             return PORT_TYPE_TEST
         # mqtt
         elif "mqtt" in port:
-            log.debug("get_port_type: port matches mqtt")
+            log.debug("port matches mqtt")
             return PORT_TYPE_MQTT
         # USB type ports
         elif "hidraw" in port:
-            log.debug("get_port_type: port matches hidraw")
+            log.debug("port matches hidraw")
             return PORT_TYPE_USB
         elif "mppsolar" in port:
-            log.debug("get_port_type: port matches mppsolar")
+            log.debug("port matches mppsolar")
             return PORT_TYPE_USB
         # ESP type ports
         elif "esp" in port:
-            log.debug("get_port_type: port matches esp")
+            log.debug("port matches esp")
             return PORT_TYPE_ESP32
         # JKBLE type ports
         elif ":" in port:
             # all mac addresses currently return as JKBLE
-            log.debug("get_port_type: port matches jkble ':'")
+            log.debug("port matches jkble ':'")
             return PORT_TYPE_JKBLE
         elif "jkble" in port:
-            log.debug("get_port_type: port matches jkble")
+            log.debug("port matches jkble")
             return PORT_TYPE_JKBLE
         elif "daly" in port:
-            log.debug("get_port_type: port matches daly")
+            log.debug("port matches daly")
             return PORT_TYPE_DALYSERIAL
         elif "vserial" in port:
-            log.debug("get_port_type: port matches vserial")
+            log.debug("port matches vserial")
             return PORT_TYPE_VSERIAL
         elif "serial" in port:
-            log.debug("get_port_type: port matches serial")
+            log.debug("port matches serial")
             return PORT_TYPE_SERIAL
         elif "ttyusb" in port:
-            log.debug("get_port_type: port matches ttyusb")
+            log.debug("port matches ttyusb")
             return PORT_TYPE_SERIAL
         else:
             return PORT_TYPE_UNKNOWN
@@ -95,7 +93,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         Set the protocol for this device
         """
         protocol = get_kwargs(kwargs, "protocol")
-        log.debug(f"set_protocol: Protocol {protocol}")
+        log.debug(f"Protocol {protocol}")
         if protocol is None:
             self._protocol = None
             self._protocol_class = None
@@ -105,7 +103,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         try:
             proto_module = importlib.import_module("mppsolar.protocols." + protocol_id, ".")
         except ModuleNotFoundError:
-            log.error(f"set_protocol: No module found for protocol {protocol_id}")
+            log.error(f"No module found for protocol {protocol_id}")
             self._protocol = None
             self._protocol_class = None
             return
@@ -113,7 +111,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         try:
             self._protocol_class = getattr(proto_module, protocol_id)
         except AttributeError:
-            log.error(f"set_protocol: Module {proto_module} has no attribute {protocol_id}")
+            log.error(f"Module {proto_module} has no attribute {protocol_id}")
             self._protocol = None
             self._protocol_class = None
             return
@@ -129,49 +127,49 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         porttype = get_kwargs(kwargs, "porttype")
 
         if porttype:
-            log.info(f"set_port: Port overide - using port '{porttype}'")
+            log.info(f"Port overide - using port '{porttype}'")
             port_type = self.get_port_type(porttype)
         else:
             port_type = self.get_port_type(port)
 
         if port_type == PORT_TYPE_TEST:
-            log.info("set_port: Using testio for communications")
+            log.info("Using testio for communications")
             from mppsolar.io.testio import TestIO
 
             self._port = TestIO(device_path=port)
 
         elif port_type == PORT_TYPE_USB:
-            log.info("set_port: Using hidrawio for communications")
+            log.info("Using hidrawio for communications")
             from mppsolar.io.hidrawio import HIDRawIO
 
             self._port = HIDRawIO(device_path=port)
 
         elif port_type == PORT_TYPE_ESP32:
-            log.info("set_port: Using esp32io for communications")
+            log.info("Using esp32io for communications")
             from mppsolar.io.esp32io import ESP32IO
 
             self._port = ESP32IO(device_path=port)
 
         elif port_type == PORT_TYPE_JKBLE:
-            log.info("set_port: Using jkbleio for communications")
+            log.info("Using jkbleio for communications")
             from mppsolar.io.jkbleio import JkBleIO
 
             self._port = JkBleIO(device_path=port)
 
         elif port_type == PORT_TYPE_SERIAL:
-            log.info("set_port: Using serialio for communications")
+            log.info("Using serialio for communications")
             from mppsolar.io.serialio import SerialIO
 
             self._port = SerialIO(device_path=port, serial_baud=baud)
 
         elif port_type == PORT_TYPE_DALYSERIAL:
-            log.info("set_port: Using dalyserialio for communications")
+            log.info("Using dalyserialio for communications")
             from mppsolar.io.dalyserialio import DalySerialIO
 
             self._port = DalySerialIO(device_path=port, serial_baud=baud)
 
         elif port_type == PORT_TYPE_VSERIAL:
-            log.info("set_port: Using vserialio for communications")
+            log.info("Using vserialio for communications")
             from mppsolar.io.vserialio import VSerialIO
 
             self._port = VSerialIO(device_path=port, serial_baud=baud, records=30)
@@ -183,7 +181,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             mqtt_user = get_kwargs(kwargs, "mqtt_user")
             mqtt_pass = get_kwargs(kwargs, "mqtt_pass")
             log.info(
-                f"set_port: Using mqttio for communications broker {mqtt_broker}, port {mqtt_port}, user {mqtt_user}, pass {mqtt_pass}"
+                f"Using mqttio for communications broker {mqtt_broker}, port {mqtt_port}, user {mqtt_user}, pass {mqtt_pass}"
             )
 
             from mppsolar.io.mqttio import MqttIO
@@ -202,7 +200,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
     def list_commands(self):
         # print(f"{'Parameter':<30}\t{'Value':<15} Unit")
         if self._protocol is None:
-            log.error("list_commands: Attempted to list commands with no protocol defined")
+            log.error("Attempted to list commands with no protocol defined")
             return {"ERROR": ["Attempted to list commands with no protocol defined", ""]}
         result = {}
         result["_command"] = "command help"
@@ -262,7 +260,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         """
         generic method for running a 'raw' command
         """
-        log.info(f"run_command: Running command {command}")
+        log.info(f"Running command {command}")
         if command == "list_commands":
             return self.list_commands()
         if command == "list_outputs":
@@ -275,12 +273,10 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             command = self._protocol.DEFAULT_COMMAND
 
         if self._protocol is None:
-            log.error("run_command: Attempted to run command with no protocol defined")
+            log.error("Attempted to run command with no protocol defined")
             return {"ERROR": ["Attempted to run command with no protocol defined", ""]}
         if self._port is None:
-            log.error(
-                f"run_command: No communications port defined - unable to run command {command}"
-            )
+            log.error(f"No communications port defined - unable to run command {command}")
             return {
                 "ERROR": [
                     f"No communications port defined - unable to run command {command}",
@@ -290,7 +286,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
 
         # Send command and receive data
         full_command = self._protocol.get_full_command(command)
-        log.info(f"run_command: full command {full_command} for command {command}")
+        log.info(f"full command {full_command} for command {command}")
         if full_command is None:
             log.error(
                 f"full_command not found for {command} in protocol {self._protocol._protocol_id}"
@@ -309,7 +305,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             protocol=self._protocol,
             command_defn=self._protocol.get_command_defn(command),
         )
-        log.debug(f"run_command: Send and Receive Response {raw_response}")
+        log.debug(f"Send and Receive Response {raw_response}")
 
         # Handle errors
         # Maybe there should a decode for ERRORs and WARNINGS...
@@ -328,7 +324,7 @@ class AbstractDevice(metaclass=abc.ABCMeta):
 
         # Decode response
         decoded_response = self._protocol.decode(raw_response, command)
-        log.info(f"run_command: Decoded response {decoded_response}")
+        log.info(f"Decoded response {decoded_response}")
 
         return decoded_response
 

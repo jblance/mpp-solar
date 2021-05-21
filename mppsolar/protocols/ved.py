@@ -139,9 +139,7 @@ class ved(AbstractProtocol):
         """
         Override the default get_full_command as its different for VEDirect
         """
-        log.info(
-            f"get_full_command: Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
-        )
+        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
@@ -160,7 +158,7 @@ class ved(AbstractProtocol):
         cmd_type = self._command_defn["type"]
         if cmd_type == "VEDTEXT":
             # Just listen - dont need to send a command
-            log.debug(f"get_full_command: command is VEDTEXT type so returning {cmd_type}")
+            log.debug(f"command is VEDTEXT type so returning {cmd_type}")
             return cmd_type
         elif cmd_type == "VEDGET":
             ID = self._command_defn["command_code"]
@@ -170,9 +168,9 @@ class ved(AbstractProtocol):
             _r = bytes.fromhex(_r)
             checksum = vedHexChecksum(_r)
             cmd = f":{cmd}{checksum:02X}\n"
-            log.debug(f"get_full_command: full command: {cmd}")
+            log.debug(f"full command: {cmd}")
             return cmd
-        log.warn("get_full_command: unable to generate full command - is the definition wrong?")
+        log.warn("unable to generate full command - is the definition wrong?")
         return None
 
     def check_response_valid(self, response) -> Tuple[bool, dict]:

@@ -16,8 +16,8 @@ class screen(baseoutput):
         log.debug(f"processor.screen __init__ kwargs {kwargs}")
 
     def output(self, *args, **kwargs):
-        log.info("output: Using output processor: screen")
-        log.debug(f"output: kwargs {kwargs}")
+        log.info("Using output processor: screen")
+        log.debug(f"kwargs {kwargs}")
         data = get_kwargs(kwargs, "data")
         if data is None:
             return

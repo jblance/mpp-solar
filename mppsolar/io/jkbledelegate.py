@@ -24,21 +24,15 @@ class jkBleDelegate(btle.DefaultDelegate):
     def handleNotification(self, handle, data):
         # handle is the handle of the characteristic / descriptor that posted the notification
         # data is the data in this notification - may take multiple notifications to get all of a message
-        log.debug(
-            "handleNotification: From handle: {:#04x} Got {} bytes of data".format(handle, len(data))
-        )
+        log.debug("From handle: {:#04x} Got {} bytes of data".format(handle, len(data)))
         self.notificationData += bytearray(data)
         if not self._protocol.is_record_start(self.notificationData):
-            log.debug(
-                f"handleNotification: Not valid start of record - wiping data {self.notificationData}"
-            )
+            log.debug(f"Not valid start of record - wiping data {self.notificationData}")
             self.notificationData = bytearray()
         if not self._protocol.is_record_correct_type(self.notificationData, self._record_type):
-            log.debug(
-                f"handleNotification: Not expected type of record - wiping data {self.notificationData}"
-            )
+            log.debug(f"Not expected type of record - wiping data {self.notificationData}")
             # self.notificationData = bytearray()
         if self._protocol.is_record_complete(self.notificationData):
             self._jkbleio.record = self.notificationData
-            log.debug("handleNotification: record complete")
+            log.debug("record complete")
             self.notificationData = bytearray()

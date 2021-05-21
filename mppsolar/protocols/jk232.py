@@ -79,9 +79,7 @@ class jk232(AbstractProtocol):
         """
         Override the default get_full_command as its different
         """
-        log.info(
-            f"get_full_command: Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
-        )
+        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
@@ -98,7 +96,7 @@ class jk232(AbstractProtocol):
 
             # start bit  0xDD
             cmd[0] = 0xDD
-            log.debug(f"get_full_command: cmd with start bit: {cmd}")
+            log.debug(f"cmd with start bit: {cmd}")
 
             # status 0xA5 means read, status 0x5A means write.
             if self._command_defn["type"] == "SETTER":
@@ -120,7 +118,7 @@ class jk232(AbstractProtocol):
                 cmd[5] = crc_low
                 cmd[6] = 0x77
 
-            log.debug(f"get_full_command: cmd with crc: {cmd}")
+            log.debug(f"cmd with crc: {cmd}")
             return cmd
 
     def get_responses(self, response):

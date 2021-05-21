@@ -840,5 +840,5 @@ class pi30(AbstractProtocol):
             crc_high, crc_low = crc(response[:-3])
             if response[-3:-1] != bytes([crc_high, crc_low]):
                 return False, {"ERROR": ["Invalid response CRC", ""]}
-        log.debug("check_response_valid: CRCs match")
+        log.debug("CRCs match")
         return True, {}

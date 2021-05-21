@@ -71,9 +71,7 @@ class jk485(jkAbstractProtocol):
         """
         Override the default get_full_command as its different for JK485
         """
-        log.info(
-            f"get_full_command: Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
-        )
+        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
@@ -87,16 +85,16 @@ class jk485(jkAbstractProtocol):
             # 55 AA 01 FF 00 00 FF
             # frame header  0x55 0xaa
             cmd[0:2] = bytes.fromhex("55aa")
-            log.debug(f"get_full_command: cmd with header: {cmd}")
+            log.debug(f"cmd with header: {cmd}")
             # slave address 0x01
             cmd[2] = 0x01
-            log.debug(f"get_full_command: cmd with header + slave address: {cmd}")
+            log.debug(f"cmd with header + slave address: {cmd}")
             # command code  0xff
             cmd[3] = int(self._command_defn["command_code"], 16)
             # frame data    0x0000
             cmd[4:6] = bytes.fromhex("0000")
-            log.debug(f"get_full_command: cmd with command code and frame data: {cmd}")
+            log.debug(f"cmd with command code and frame data: {cmd}")
             # checksum      0xff
             cmd[-1] = crc8(cmd)
-            log.debug(f"get_full_command: cmd with crc: {cmd}")
+            log.debug(f"cmd with crc: {cmd}")
             return cmd

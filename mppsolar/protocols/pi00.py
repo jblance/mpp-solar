@@ -69,9 +69,7 @@ class pi00(AbstractProtocol):
         """
         Override the default get_full_command as its different for PI00
         """
-        log.info(
-            f"get_full_command: Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
-        )
+        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
@@ -79,7 +77,7 @@ class pi00(AbstractProtocol):
         cmd = bytes(self._command, "utf-8")
         # combine byte_cmd, return
         full_command = cmd + bytes([13])
-        log.debug(f"get_full_command: full command: {full_command}")
+        log.debug(f"full command: {full_command}")
         return full_command
 
     def get_responses(self, response):

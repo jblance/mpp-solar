@@ -27,35 +27,33 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         return self._protocol_id
 
     def get_full_command(self, command) -> bytes:
-        log.info(
-            f"get_full_command: Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
-        )
+        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
 
         byte_cmd = bytes(command, "utf-8")
         # calculate the CRC
         crc_high, crc_low = crc(byte_cmd)
         # combine byte_cmd, CRC , return
         full_command = byte_cmd + bytes([crc_high, crc_low, 13])
-        log.debug(f"get_full_command: full command: {full_command}")
+        log.debug(f"full command: {full_command}")
         return full_command
 
     def get_command_defn(self, command) -> dict:
-        log.debug(f"get_command_defn: Processing command '{command}'")
+        log.debug(f"Processing command '{command}'")
         if command in self.COMMANDS and "regex" not in self.COMMANDS[command]:
-            log.debug(f"get_command_defn: Found command {command} in protocol {self._protocol_id}")
+            log.debug(f"Found command {command} in protocol {self._protocol_id}")
             return self.COMMANDS[command]
         for _command in self.COMMANDS:
             if "regex" in self.COMMANDS[_command] and self.COMMANDS[_command]["regex"]:
-                log.debug(f"get_command_defn: Regex commands _command: {_command}")
+                log.debug(f"Regex commands _command: {_command}")
                 _re = re.compile(self.COMMANDS[_command]["regex"])
                 match = _re.match(command)
                 if match:
                     log.debug(
-                        f"get_command_defn: Matched: {command} to: {self.COMMANDS[_command]['name']} value: {match.group(1)}"
+                        f"Matched: {command} to: {self.COMMANDS[_command]['name']} value: {match.group(1)}"
                     )
                     self._command_value = match.group(1)
                     return self.COMMANDS[_command]
-        log.info(f"get_command_defn: No command_defn found for {command}")
+        log.info(f"No command_defn found for {command}")
         return None
 
     def get_responses(self, response) -> list:
@@ -99,7 +97,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             r = responses[response_id]
             return data_name, r, ""
         if data_type == "keyed":
-            log.debug("decode: keyed defn")
+            log.debug("keyed defn")
             # [
             #     "keyed",
             #     1,
@@ -135,7 +133,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         Take the raw response and turn it into a dict of name: value, unit entries
         """
 
-        log.info(f"decode: response passed to decode: {response}")
+        log.info(f"response passed to decode: {response}")
 
         valid, msgs = self.check_response_valid(response)
         if not valid:
@@ -162,9 +160,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         else:
             # No definiution, so just return the data
             len_command_defn = 0
-            log.debug(
-                f"decode: No definition for command {command}, (splitted) raw response returned"
-            )
+            log.debug(f"No definition for command {command}, (splitted) raw response returned")
             msgs["WARNING"] = [
                 f"No definition for command {command} in protocol {self._protocol_id}",
                 "",
@@ -174,21 +170,21 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
         # Split the response into individual responses
         responses = self.get_responses(response)
-        log.debug(f"decode: trimmed and split responses: {responses}")
+        log.debug(f"trimmed and split responses: {responses}")
 
         # Determine the type of response
         if "response_type" in command_defn:
             response_type = command_defn["response_type"]
         else:
             response_type = "DEFAULT"
-        log.info(f"decode: Processing response of type {response_type}")
+        log.info(f"Processing response of type {response_type}")
 
         # Decode response based on stored command definition and type
         # process default response type
         # TODO: fix this - move into new approach
         # DEFAULT - responses are determined by the order they are returned
         if response_type == "DEFAULT":
-            log.info("decode: Processing DEFAULT type responses")
+            log.info("Processing DEFAULT type responses")
             for i, result in enumerate(responses):
                 # decode result
                 if type(result) is bytes:
@@ -294,7 +290,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
         # Check for multiple frame type responses
         if response_type == "MULTIFRAME-POSITIONAL":
-            log.debug("decode: Processing MULTIFRAME-POSITIONAL type responses")
+            log.debug("Processing MULTIFRAME-POSITIONAL type responses")
             # MULTIFRAME-POSITIONAL - multiple frames of responses are not separated and are determined by the position in the response
             # each frame has the same definition
             frame_count = len(responses)
@@ -308,7 +304,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         for frame_number, frame in enumerate(frames):
             for i, response in enumerate(frame):
                 if response_type == "KEYED":
-                    log.debug("decode: Processing KEYED type responses")
+                    log.debug("Processing KEYED type responses")
                     # example defn ["H1", "Depth of the deepest discharge", "Ah", "mFloat"],
                     # example response data [b'H1', b'-32914']
                     if len(response) <= 1:
@@ -325,7 +321,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     data_units = response_defn[2]
                     data_type = response_defn[3]
                 elif response_type in ["POSITIONAL", "MULTIFRAME-POSITIONAL"]:
-                    log.debug("decode: Processing POSITIONAL type responses")
+                    log.debug("Processing POSITIONAL type responses")
                     # POSITIONAL - responses are not separated and are determined by the position in the response
                     # example defn :
                     #   ["discard", 1, "start flag", ""],

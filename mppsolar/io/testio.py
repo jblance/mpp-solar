@@ -48,5 +48,5 @@ class TestIO(BaseIO):
             # No test responses defined
             log.warn("Testing a command with no test responses defined")
         response = self._test_data
-        log.debug(f"send_and_receive: Raw response {response}")
+        log.debug(f"Raw response {response}")
         return response
