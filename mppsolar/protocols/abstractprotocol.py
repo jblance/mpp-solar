@@ -5,6 +5,7 @@ from typing import Tuple
 
 from ..helpers import get_resp_defn
 from .protocol_helpers import Big2ByteHex2Int  # noqa: F401
+from .protocol_helpers import Big4ByteHex2Int  # noqa: F401
 from .protocol_helpers import Little2ByteHex2Int  # noqa: F401
 from .protocol_helpers import Hex2Int  # noqa: F401
 from .protocol_helpers import Hex2Str  # noqa: F401
