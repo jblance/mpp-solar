@@ -675,7 +675,7 @@ COMMANDS = {
             ["float", "Battery Under Voltage", "V"],
             ["float", "Battery Bulk Charge Voltage", "V"],
             ["float", "Battery Float Charge Voltage", "V"],
-            ["option", "Battery Type", ["AGM", "Flooded", "User"]],
+            ["option", "Battery Type", ["AGM", "Flooded", "User", "Pylontech", "WECO", "LIb-protocol compatible", "3rd party Lithium"]],
             ["int", "Max AC Charging Current", "A"],
             ["int", "Max Charging Current", "A"],
             ["option", "Input Voltage Range", ["Appliance", "UPS"]],
