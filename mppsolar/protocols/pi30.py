@@ -675,7 +675,7 @@ COMMANDS = {
             ["float", "Battery Under Voltage", "V"],
             ["float", "Battery Bulk Charge Voltage", "V"],
             ["float", "Battery Float Charge Voltage", "V"],
-            ["option", "Battery Type", ["AGM", "Flooded", "User", "Pylontech", "WECO", "LIb-protocol compatible", "3rd party Lithium"]],
+            ["option", "Battery Type", ["AGM", "Flooded", "User", "TBD", "Pylontech", "WECO", "Soltaro", "LIb-protocol compatible", "3rd party Lithium"]],
             ["int", "Max AC Charging Current", "A"],
             ["int", "Max Charging Current", "A"],
             ["option", "Input Voltage Range", ["Appliance", "UPS"]],
@@ -737,6 +737,7 @@ COMMANDS = {
             b"(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1\x6F\x7E\r",
             b"(120.0 25.0 120.0 60.0 25.0 3000 3000 48.0 46.0 44.0 58.4 54.4 2 30 060 1 2 0 9 01 0 6 54.0 0 1 000 0\x8f\xed\r",
             b"(230.0 13.0 230.0 50.0 13.0 3000 2400 24.0 23.0 21.0 28.2 27.0 0 30 50 0 2 1 - 01 1 0 26.0 0 0\xb9\xbd\r",
+            b'(230.0 21.7 230.0 50.0 21.7 5000 5000 48.0 47.0 46.5 57.6 57.6 5 30 080 0 1 2 1 01 0 0 52.0 0 1\x03$\r'
         ],
     },
     "QPIWS": {
