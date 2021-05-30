@@ -267,16 +267,24 @@ def main():
 
         log.debug(f"args.configfile is true: {args.configfile}")
         config = configparser.ConfigParser()
-        config.read(args.configfile)
+        try:
+            config.read(args.configfile)
+        except configparser.DuplicateSectionError as e:
+            log.error(f"Config File '{args.configfile}' has duplicate sections")
+            log.error(e)
+            exit(1)
         sections = config.sections()
+        # Check setup section exists
+        if "SETUP" not in config:
+            log.error(f"Config File '{args.configfile}' is missing the required 'SETUP' section")
+            exit(1)
         # Process setup section
-        if "SETUP" in config:
-            pause = config["SETUP"].getint("pause", fallback=60)
-            mqtt_broker = config["SETUP"].get("mqtt_broker", fallback="localhost")
-            mqtt_port = config["SETUP"].get("mqtt_port", fallback=1883)
-            mqtt_user = config["SETUP"].get("mqtt_user", fallback=None)
-            mqtt_pass = config["SETUP"].get("mqtt_pass", fallback=None)
-            sections.remove("SETUP")
+        pause = config["SETUP"].getint("pause", fallback=60)
+        mqtt_broker = config["SETUP"].get("mqtt_broker", fallback="localhost")
+        mqtt_port = config["SETUP"].get("mqtt_port", fallback=1883)
+        mqtt_user = config["SETUP"].get("mqtt_user", fallback=None)
+        mqtt_pass = config["SETUP"].get("mqtt_pass", fallback=None)
+        sections.remove("SETUP")
         # Process 'command' sections
         for section in sections:
             name = section
