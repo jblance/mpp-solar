@@ -253,6 +253,15 @@ COMMANDS = {
             b"",
         ],
     },
+    "PE": {
+        "name": "PE",
+        "description": "Set the enabled state of an Inverter setting",
+        "help": " -- examples: PEA - enable A (Mute buzzer beep) [A - Mute buzzer beep, B - Mute buzzer beep in standby mode, C - Mute buzzer beep only on battery discharged status, D - Generator as AC input, E - Wide AC input range, F - N/G relay function]",
+        "type": "SETTER",
+        "response": [["ack", "Command execution", {"0": "Failed", "1": "Successful"}]],
+        "test_responses": [],
+        "regex": "PE([ABCEDF])$",
+    },
 }
 
 

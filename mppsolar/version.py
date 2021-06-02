@@ -1,2 +1,2 @@
-__version__ = "0.7.60"
-__version_comment__ = "update dalyserialio to improve performance"
+__version__ = "0.7.61"
+__version_comment__ = "first try at pi17 setter"
