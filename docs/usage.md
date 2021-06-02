@@ -18,6 +18,9 @@
 * Run 'getInfo' command against jkbms BMS with bluetooth MAC '3C:A5:09:0A:AA:AA'
   * `$ jkbms -p 3C:A5:09:0A:AA:AA -c getInfo`
 
+* Display info from a Victron Smart Shunt connected to the serial port on ttyUSB0
+  * `mpp-solar -p /dev/ttyUSB0 -P VED -c vedtext --porttype vserial -b 19200`
+
 ## Troubleshooting / Notes ##
 - The commands default to using `/dev/ttyUSB0` if you are using direct USB connection try adding `-p /dev/hidraw0` to the commands
 - if you have other USB devices connected the inverter might show up as `/dev/hidraw1` or `/dev/hidraw2`
