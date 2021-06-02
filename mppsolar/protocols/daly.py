@@ -97,7 +97,7 @@ COMMANDS = {
             ["Hex2Str", 1, "Charging MOS Tube Status", ""],
             ["Hex2Str", 1, "Discharging MOS Tube Status", ""],
             ["Hex2Int", 1, "BMS Life", "cycles"],
-            ["Hex2Str", 4, "Residual Capacity (TODO)", "(HEX) mAH"],
+            ["Big4ByteHex2Int:r/1000", 4, "Residual Capacity", "AH"],
             ["discard", 1, "checksum", ""],
         ],
         "test_responses": [b"\xa5\x01\x93\x08\x02\x01\x01x\x00\x03\xcb@\xcb"],
@@ -114,8 +114,8 @@ COMMANDS = {
             ["discard", 1, "module address", ""],
             ["discard", 1, "command id", ""],
             ["discard", 1, "data length", ""],
-            ["Hex2Int", 1, "Battery String", ""],
-            ["Hex2Str", 1, "Temperature", ""],
+            ["Hex2Int", 1, "Number of Cells", ""],
+            ["Hex2Str", 1, "Number of Temperature Sensors", ""],
             ["option", 1, "Charger Status", ["disconnected", "connected"]],
             ["option", 1, "Load Status", ["disconnected", "connected"]],
             ["Hex2Str", 1, "Flags (TODO)", ""],
@@ -191,6 +191,7 @@ class daly(AbstractProtocol):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"DALY"
+        self.module_address = bytes.fromhex("80")
         self.COMMANDS = COMMANDS
         self.STATUS_COMMANDS = [
             "SOC",
@@ -202,7 +203,7 @@ class daly(AbstractProtocol):
 
     def get_full_command(self, command) -> bytes:
         """
-        Override the default get_full_command as its different for DALY
+        Override the default get_full_command as its different
         """
         log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
         # These need to be set to allow other functions to work`
@@ -214,11 +215,10 @@ class daly(AbstractProtocol):
 
         # DALY
         # startFlag = bytes.fromhex("A5")
-        moduleAddress = bytes.fromhex("80")
         commandID = bytes.fromhex(self._command_defn["command_code"])
         dataLength = bytes.fromhex("08")
         data = bytes.fromhex("00" * 8)
-        cmd = startFlag + moduleAddress + commandID + dataLength + data
+        cmd = startFlag + self.module_address + commandID + dataLength + data
 
         checksum = f"{dalyChecksum(cmd):02X}"
         cmd = cmd + bytes.fromhex(checksum) + b"\n"
