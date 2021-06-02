@@ -20,21 +20,20 @@ class DalySerialIO(BaseIO):
         try:
             with serial.serial_for_url(self._serial_port, self._serial_baud) as s:
                 log.debug("Executing command via dalyserialio...")
-                s.timeout = 1
+                s.timeout = 0.5
                 s.write_timeout = 1
-                s.flushInput()
-                s.flushOutput()
+                s.reset_input_buffer()
+                s.reset_output_buffer()
                 s.write(full_command)
                 # read until no more data
-                for _ in range(10):
-                    time.sleep(0.1)  # give serial port time to receive the data
-                    _line = s.readline()
-                    if _line != "":
-                        # got some data
-                        response_line += _line
-                    else:
-                        # data finished
+                time.sleep(0.1)  # give serial port time to receive the data
+                while True:
+                    to_read = s.in_waiting
+                    log.debug(f"bytes waiting {to_read}")
+                    if to_read == 0:
                         break
+                    # got some data to read
+                    response_line += s.read(to_read)
 
                 log.debug("serial response was: %s", response_line)
                 return response_line
