@@ -208,7 +208,14 @@ class AbstractDevice(metaclass=abc.ABCMeta):
             "_command_description"
         ] = f"List available commands for protocol {str(self._protocol._protocol_id, 'utf-8')}"
         for command in self._protocol.COMMANDS:
-            result[command] = [self._protocol.COMMANDS[command]["description"], ""]
+            if "help" in self._protocol.COMMANDS[command]:
+                info = (
+                    self._protocol.COMMANDS[command]["description"]
+                    + self._protocol.COMMANDS[command]["help"]
+                )
+            else:
+                info = self._protocol.COMMANDS[command]["description"]
+            result[command] = [info, ""]
         return result
 
     def list_outputs(self):
