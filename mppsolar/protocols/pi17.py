@@ -258,8 +258,11 @@ COMMANDS = {
         "description": "Set the enabled state of an Inverter setting",
         "help": " -- examples: PEA - enable A (Mute buzzer beep) [A - Mute buzzer beep, B - Mute buzzer beep in standby mode, C - Mute buzzer beep only on battery discharged status, D - Generator as AC input, E - Wide AC input range, F - N/G relay function]",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"0": "Failed", "1": "Successful"}]],
-        "test_responses": [],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
         "regex": "PE([ABCEDF])$",
     },
 }
@@ -314,6 +317,10 @@ class pi17(AbstractProtocol):
         if responses[0] == b"^0\x1b\xe3\r":
             # is a reject response
             return ["NAK"]
+        if responses[0] == b"^1\x0b\xc2\r": 
+            # is a successful acknowledgement response
+            return ["ACK"]
+        
 
         # Drop ^Dxxx from first response
         responses[0] = responses[0][5:]
