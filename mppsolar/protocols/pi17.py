@@ -16,7 +16,7 @@ COMMANDS = {
         "type": "QUERY",
         "response": [["string", "Protocol Version", ""]],
         "test_responses": [
-            b"",
+            b"^D00517\xca\xec\r",
         ],
     },
     "ID": {
@@ -27,7 +27,7 @@ COMMANDS = {
         "type": "QUERY",
         "response": [["string", "Serial Number", ""]],
         "test_responses": [
-            b"",
+            b"^D0251496161704100242000000le\r",
         ],
     },
     "VFW": {
@@ -38,7 +38,7 @@ COMMANDS = {
         "type": "QUERY",
         "response": [["float", "CPU Version", ""]],
         "test_responses": [
-            b"",
+            b"^D017VERFW:00001.01VW\r",
         ],
     },
     "VFW2": {
@@ -49,7 +49,7 @@ COMMANDS = {
         "type": "QUERY",
         "response": [["float", "CPU 2 Version", ""]],
         "test_responses": [
-            b"",
+            b"^D018VERFW2:00001.01\x99\xc3\r",
         ],
     },
     "MD": {
@@ -76,7 +76,7 @@ COMMANDS = {
             ["int", "Battery standard voltage per unit", "0.1V"],
         ],
         "test_responses": [
-            b"",
+            b"^D037000,010000,99,3,3,2300,2300,04,120U\x82\r",
         ],
     },
     "PIRI": {
@@ -107,7 +107,7 @@ COMMANDS = {
             ["option", "Parallel for output", ["disabled", "enabled"]],
         ],
         "test_responses": [
-            b"",
+            b"^D0452400,500,0416,2400,0416,0187,0480,2,10,0,1\xbcs\r",
         ],
     },
     "GS": {
@@ -148,7 +148,7 @@ COMMANDS = {
             ],
         ],
         "test_responses": [
-            b"",
+            b"^D1100000,0000,0000,0000,0394,000,+00000,2389,2427,2459,5002,0000,0000,0000,2378,2434,2455,5001,,,,029,029,000,0\xf8n\r",
         ],
     },
     "PS": {
@@ -207,17 +207,18 @@ COMMANDS = {
             ],
         ],
         "test_responses": [
-            b"",
+            b"^D00505\xd9\x9f\r",
         ],
     },
     "WS": {
         "name": "WS",
+        "prefix": "^P003",
         "description": "Warning status inquiry",
         "help": " -- queries any active warnings flags from the Inverter",
         "type": "QUERY",
         "response": [
             [
-                "stat_flags",
+                "flags",
                 "Warning status",
                 [
                     "Solar input 1 loss",
@@ -250,20 +251,352 @@ COMMANDS = {
             ],
         ],
         "test_responses": [
-            b"",
+            b"^D0471,1,0,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,\x14\x9c\r",
         ],
     },
-    "PE": {
-        "name": "PE",
-        "description": "Set the enabled state of an Inverter setting",
-        "help": " -- examples: PEA - enable A (Mute buzzer beep) [A - Mute buzzer beep, B - Mute buzzer beep in standby mode, C - Mute buzzer beep only on battery discharged status, D - Generator as AC input, E - Wide AC input range, F - N/G relay function]",
+    "FLAG": {
+        "name": "FLAG",
+        "prefix": "^P005",
+        "description": "Query enable/disable flag status",
+        "help": " -- queries enable/disable flag status from the Inverter",
+        "type": "QUERY",
+        "response": [
+            ["option", "Mute buzzer beep", ["Disabled", "Enabled"]],
+            ["option", "Mute buzzer beep in standby mode", ["Disabled", "Enabled"]],
+            [
+                "option",
+                "Mute buzzer beep only on battery discharged status",
+                ["Disabled", "Enabled"],
+            ],
+            ["option", "Generator as AC input", ["Disabled", "Enabled"]],
+            ["option", "Wide AC input range", ["Disabled", "Enabled"]],
+            ["option", "N/G relay function", ["Disabled", "Enabled"]],
+        ],
+        "test_responses": [
+            b"^D0120,0,1,0,1\xd8\xf2\r",
+        ],
+    },
+    "T": {
+        "name": "T",
+        "prefix": "^P002",
+        "description": "Query current time",
+        "help": " -- queries current time from the Inverter",
+        "type": "QUERY",
+        "response": [
+            ["string", "DateTime", "YYYYMMDDHHMMSS"],
+        ],
+        "test_responses": [
+            b"^D01720210521234743\x0eR\r",
+        ],
+    },
+    "ET": {
+        "name": "ET",
+        "prefix": "^P003",
+        "description": "Query total generated energy",
+        "help": " -- queries total generated energy from the Inverter",
+        "type": "QUERY",
+        "response": [
+            ["int", "Generated energy", "kWh"],
+        ],
+        "test_responses": [
+            b"^D01100006591\xba\x10\r",
+        ],
+    },
+    "BATS": {
+        "name": "BATS",
+        "description": "Query battery setting",
+        "help": " -- queries battery setting",
+        "type": "QUERY",
+        "response": [
+            ["int", "Battery maximum charge current", "0.1A"],
+            ["int", "Battery constant charge voltage(C.V.)", "0.1V"],
+            ["int", "Battery floating charge voltage", "0.1V"],
+            ["int", "Battery stop charger current level in floating charging", "0.1A"],
+            [
+                "int",
+                "Keep charged time of battery catch stopped charging current level",
+                "Minutes",
+            ],
+            [
+                "int",
+                "Battery voltage of recover to charge when battery stop charger in floating charging",
+                "0.1V",
+            ],
+            ["int", "Battery under voltage", "0.1V"],
+            ["int", "Battery under voltage release", "0.1V"],
+            ["int", "Battery weak voltage in hybrid mode", "0.1V"],
+            ["int", "Battery weak voltage release in hybrid mode", "0.1V"],
+            ["option", "Battery Type", ["Ordinary", "Li-Fe"]],
+            ["string", "Reserved", ""],
+            ["string", "Battery install date", "YYYYMMDDHHMMSS"],
+            [
+                "option",
+                "AC charger keep battery voltage function enable/diable",
+                ["Disabled", "Enabled"],
+            ],
+            ["int", "AC charger keep battery voltage", "0.1V"],
+            ["int", "Battery temperature sensor compensation", "0.m1V"],
+            ["int", "Max. AC charging current", "0.1A"],
+            ["int", "Battery discharge max current in hybrid mode", "A"],
+            ["option", "Enable/Disable EPS function", ["Disabled", "Enabled"]],
+            ["int", "Battery voltage of cut-off Main output in battery mode(", "0.1V"],
+            ["int", "Battery voltage of re-connecting Main output in battery mode", "0.1V"],
+        ],
+        "test_responses": [
+            b"^D0762000,0584,0576,0000,000,0576,0460,0510,0460,0510,1,,,1,0540,000,2000,0250\x85Y\r",
+        ],
+    },
+    "LON": {
+        "name": "LON",
+        "description": "Set enable/disable machine supply power to the loads",
+        "help": " -- examples: LON1 (0: disable, 1: enable)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
         "test_responses": [
             b"^1\x0b\xc2\r",
             b"^0\x1b\xe3\r",
         ],
-        "regex": "PE([ABCEDF])$",
+        "regex": "LST((0[123])|([12]0))$",
+    },
+    "PA": {
+        "name": "PA",
+        "description": "Mute buzzer beep",
+        "help": " -- examples: PA1 (1: enable, 0: disable)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "PA([01])$",
+    },
+    "PB": {
+        "name": "PB",
+        "description": "Mute buzzer beep in standby mode",
+        "help": " -- examples: PB1 (1: enable, 0: disable)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "PB([01])$",
+    },
+    "PC": {
+        "name": "PC",
+        "description": "Mute buzzer beep only on battery discharged status",
+        "help": " -- examples: PC1 (1: enable, 0: disable)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "PC([01])$",
+    },
+    "PD": {
+        "name": "PD",
+        "description": "Generator as AC input",
+        "help": " -- examples: PD1 (1: enable, 0: disable)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "PD([01])$",
+    },
+    "PE": {
+        "name": "PE",
+        "description": "Wide AC input range",
+        "help": " -- examples: PE1 (1: enable, 0: disable)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "PE([01])$",
+    },
+    "PF": {
+        "name": "PF",
+        "description": "N/G relay function",
+        "help": " -- examples: PF1 (1: enable, 0: disable)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "PF([01])$",
+    },
+    "DAT": {
+        "name": "DAT",
+        "description": "Set date time",
+        "help": " -- examples: DAT190518224530 (1: enable, 0: disable)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "DAT\d\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])(2[0-3]|[01]?[0-9])([0-5]?[0-9])([0-5]?[0-9])$",
+    },
+    "LST": {
+        "name": "LST",
+        "description": "Set LCD sleep wait time",
+        "help": " -- examples: LSTnn (nn: 00, 01, 02, 10, 20 for selection, unit : 30second.00 means LCD always light)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "LST((0[123])|([12]0))$",
+    },
+    "EDA": {
+        "name": "EDA",
+        "description": "Enable/disable solar charge battery",
+        "help": " -- examples: EDA1 (1: enable, 0: disable)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "EDA([01])$",
+    },
+    "EDB": {
+        "name": "EDB",
+        "description": "Enable/disable AC charge battery",
+        "help": " -- examples: EDB1 (1: enable, 0: disable)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "EDB([01])$",
+    },
+    "EDC": {
+        "name": "EDC",
+        "description": "Enable/disable feed power to utility",
+        "help": " -- examples: EDC1 (1: enable, 0: disable)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "EDC([01])$",
+    },
+    "EDD": {
+        "name": "EDD",
+        "description": "Enable/disable battery discharge to loads when solar input normal",
+        "help": " -- examples: EDD1 (1: enable, 0: disable)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "EDD([01])$",
+    },
+    "EDE": {
+        "name": "EDE",
+        "description": "Enable/disable battery discharge to loads when solar input loss",
+        "help": " -- examples: EDE1 (1: enable, 0: disable)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "EDE([01])$",
+    },
+    "EDF": {
+        "name": "EDF",
+        "description": "Enable/disable battery discharge to feed power to utility when solar input normal",
+        "help": " -- examples: EDF1 (1: enable, 0: disable)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "EDF([01])$",
+    },
+    "EDG": {
+        "name": "EDG",
+        "description": "Enable/disable battery discharge to feed power to utility whensolar input loss",
+        "help": " -- examples: EDG1 (1: enable, 0: disable)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "EDG([01])$",
+    },
+    "BT": {
+        "name": "BT",
+        "description": "Set battery type",
+        "help": " -- examples: EDG1 (1: Li-Fe, 0: Ordinary)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "BT([01])$",
+    },
+    "ACCT": {
+        "name": "ACCT",
+        "description": "Set AC charge time range",
+        "help": " -- examples: ACCT2200-0259 (Sets time range from 22:00 to 02:59. End minute is inclusive)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "ACCT(2[0-3]|[01]?[0-9])([0-5]?[0-9])-(2[0-3]|[01]?[0-9])([0-5]?[0-9])$",
     },
 }
 
@@ -274,7 +607,21 @@ class pi17(AbstractProtocol):
         self._protocol_id = b"PI17"
         self.COMMANDS = COMMANDS
         self.STATUS_COMMANDS = []
-        self.SETTINGS_COMMANDS = ["PI", "ID", "VFW", "VFW2", "MD", "PIRI", "GS", "PS", "MOD", "WS"]
+        self.SETTINGS_COMMANDS = [
+            "PI",
+            "ID",
+            "VFW",
+            "VFW2",
+            "MD",
+            "PIRI",
+            "GS",
+            "PS",
+            "MOD",
+            "WS",
+            "FLAG",
+            "T",
+            "ET",
+        ]
         self.DEFAULT_COMMAND = "PI"
 
     def get_full_command(self, command) -> bytes:
@@ -291,7 +638,6 @@ class pi17(AbstractProtocol):
 
         _cmd = bytes(self._command, "utf-8")
         _type = self._command_defn["type"]
-
         # No CRC in PI17 commands?
         data_length = len(_cmd) + 1
         if _type == "QUERY":
@@ -317,10 +663,9 @@ class pi17(AbstractProtocol):
         if responses[0] == b"^0\x1b\xe3\r":
             # is a reject response
             return ["NAK"]
-        if responses[0] == b"^1\x0b\xc2\r": 
+        elif responses[0] == b"^1\x0b\xc2\r":
             # is a successful acknowledgement response
             return ["ACK"]
-        
 
         # Drop ^Dxxx from first response
         responses[0] = responses[0][5:]
