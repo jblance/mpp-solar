@@ -58,6 +58,7 @@ COMMANDS = {
         "description": "Battery information query",
         "help": " -- Query device for battery information",
         "type": "QUERY",
+        "response_type": "SEQUENTIAL",
         "response": [
             ["int", "unknown", ""],
             ["int", "Number of batteries", "#"],
@@ -74,6 +75,7 @@ COMMANDS = {
         "description": "General status query",
         "help": " -- Query general status information",
         "type": "QUERY",
+        "response_type": "SEQUENTIAL",
         "response": [
             ["float", "Grid voltage", "V"],
             ["int", "Output power", "W"],
@@ -96,7 +98,7 @@ COMMANDS = {
             ["float", "PV2 input voltage", "V"],
             ["float", "PV3 input voltage", "V"],
             ["float", "Max temperature", "°C"],
-            ["string", "status TODO", ""],
+            ["bytes.decode", "status TODO", ""],
         ],
         "test_responses": [
             b"(224.6 000000 49.9 0006.8 232.4 01594 49.9 006.8 029 415.0 415.0 057.9 ---.- 100 00000 00000 ----- 000.0 000.0 ---.- 035.0 D---110001k\xdb\r",
@@ -108,7 +110,8 @@ COMMANDS = {
         "description": "Device Protocol Version inquiry",
         "help": " -- queries the device protocol version",
         "type": "QUERY",
-        "response": [["string", "Protocol Version", ""]],
+        "response_type": "SEQUENTIAL",
+        "response": [["bytes.decode", "Protocol Version", ""]],
         "test_responses": [
             b"(PI16\x9c\xaf\r",
         ],
@@ -118,6 +121,7 @@ COMMANDS = {
         "description": "Device rating inquiry",
         "help": " -- queries the Inverter ratings",
         "type": "QUERY",
+        "response_type": "SEQUENTIAL",
         "response": [
             ["float", "Grid Input Voltage Rating", "V"],
             ["float", "Grid Input Frequency Rating", "Hz"],
@@ -128,7 +132,7 @@ COMMANDS = {
             ["float", "Battery Voltage Rating", "V"],
             ["int", "Number of MPP trackers", ""],
             [
-                "keyed",
+                "str_keyed",
                 "Machine Type",
                 {"00": "Grid tie", "01": "Off Grid", "10": "Hybrid"},
             ],

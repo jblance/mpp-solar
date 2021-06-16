@@ -156,6 +156,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.debug(f"Processing format string {format_string}")
         try:
             r = eval(format_string)
+        except ValueError as e:
+            log.warning(f"Failed to eval format {format_string} (returning 0), error: {e}")
+            return data_name, 0, data_units
         except TypeError as e:
             log.warning(f"Failed to eval format {format_string}, error: {e}")
             return data_name, format_string, data_units
