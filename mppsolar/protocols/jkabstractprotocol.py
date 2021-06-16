@@ -17,20 +17,22 @@ COMMANDS = {
         "description": "BLE Device Information inquiry",
         "help": " -- queries the ble device information",
         "type": "QUERY",
+        "response_type": "POSITIONAL",
         "response": [
-            ["hex", 4, "Header", ""],
-            ["hex", 1, "Record Type", ""],
-            ["int", 1, "Record Counter", ""],
-            ["ascii", 10, "Device Model", ""],
-            ["ascii", 10, "Hardware Version", ""],
-            ["ascii", 10, "Software Version", ""],
+            ["Hex2Str", 4, "Header", ""],
+            ["Hex2Str", 1, "Record Type", ""],
+            ["Hex2Int", 1, "Record Counter", ""],
+            ["Hex2Ascii", 10, "Device Model", ""],
+            ["Hex2Ascii", 10, "Hardware Version", ""],
+            ["Hex2Ascii", 10, "Software Version", ""],
             ["discard", 10, "", ""],
-            ["ascii", 16, "Device Name", ""],
-            ["ascii", 10, "Device Passcode", ""],
-            ["ascii", 14, "Manufacturing Date", ""],
-            ["ascii", 14, "Serial Number", ""],
-            ["ascii", 16, "User Data", ""],
-            ["ascii", 16, "Settings Passcode?", ""],
+            ["Hex2Ascii", 16, "Device Name", ""],
+            ["Hex2Ascii", 10, "Device Passcode", ""],
+            ["Hex2Ascii", 14, "Manufacturing Date", ""],
+            ["Hex2Ascii", 14, "Serial Number", ""],
+            ["Hex2Ascii", 16, "User Data", ""],
+            ["Hex2Ascii", 16, "Settings Passcode?", ""],
+            ["discard", 672, "unknown", ""],
         ],
         "test_responses": [
             bytes.fromhex(
@@ -101,7 +103,28 @@ class jkAbstractProtocol(AbstractProtocol):
         """
         Override the default get_responses as its different for JK
         """
-        return bytearray(response)
+        responses = []
+        if self._command_defn is not None and self._command_defn["response_type"] == "POSITIONAL":
+            # Have a POSITIONAL type response, so need to break it up...
+            # example defn :
+            # "response": [
+            #   ["discard", 1, "start flag", ""],
+            #   ["discard", 1, "module address", ""],
+            #   ["discard", 1, "command id", ""],
+            #   ["discard", 1, "data length", ""],
+            # ]
+            # example response data b"\xa5\x01\x90\x08\x02\x10\x00\x00uo\x03\xbc\xf3",
+            for defn in self._command_defn["response"]:
+                log.debug(f"Got defn: {defn}")
+                size = defn[1]
+                item = response[:size]
+                responses.append(item)
+                response = response[size:]
+            if len(response) > 0:
+                responses.append(response)
+            return responses
+        else:
+            return bytearray(response)
 
     def is_record_start(self, record):
         if record.startswith(SOR):
@@ -165,7 +188,21 @@ class jkAbstractProtocol(AbstractProtocol):
                 f"No definition for command {command} in protocol {self._protocol_id}",
                 "",
             ]
+            return msgs
+
+        # Determine the type of response
+        if "response_type" in command_defn:
+            response_type = command_defn["response_type"]
         else:
+            response_type = "JKDEFAULT"
+        log.info(f"Processing response of type {response_type}")
+
+        if response_type != "JKDEFAULT":
+            # All processing should be migrated to the abstractprotocol decode..
+            return super().decode(response, command)
+        else:
+            # TODO - remove this processing
+            #
             # len_command_defn = len(command_defn["response"])
             # Decode response based on stored command definition
             responses = self.get_responses(response)

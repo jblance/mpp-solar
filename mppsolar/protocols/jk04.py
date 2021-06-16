@@ -13,6 +13,7 @@ NEW_COMMANDS = {
         "description": "BLE Cell Data inquiry",
         "help": " -- queries the ble device for the cell data",
         "type": "QUERY",
+        "response_type": "JKDEFAULT",
         "response": [
             ["hex", 4, "Header", ""],
             ["hex", 1, "Record Type", ""],

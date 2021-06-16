@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import logging
+import math
 
 # from binascii import unhexlify
 from struct import unpack
@@ -63,6 +64,30 @@ def vedHexChecksum(byteData):
     return CS
 
 
+def uptime(byteData):
+    """
+    Decode 3 hex bytes to a JKBMS uptime
+    """
+    # Make sure supplied String is the correct length
+    log.debug("uptime defn")
+    value = 0
+    for x, b in enumerate(byteData):
+        # b = byteData.pop(0)
+        value += b * 256 ** x
+        log.debug(f"Uptime int value {value} for pos {x}")
+    daysFloat = value / (60 * 60 * 24)
+    days = math.trunc(daysFloat)
+    hoursFloat = (daysFloat - days) * 24
+    hours = math.trunc(hoursFloat)
+    minutesFloat = (hoursFloat - hours) * 60
+    minutes = math.trunc(minutesFloat)
+    secondsFloat = (minutesFloat - minutes) * 60
+    seconds = round(secondsFloat)
+    uptime = f"{days}D{hours}H{minutes}M{seconds}S"
+    log.info(f"Uptime result {uptime}")
+    return uptime
+
+
 def Hex2Int(hexString):
     """
     Decode the first byte of a hexString to int
@@ -75,7 +100,7 @@ def Hex2Int(hexString):
 
 def Hex2Str(hexString):
     """
-    Return the hexString as ASCII representation of hex
+    Return the hexString as ASCII representation of hex, ie 0x4a -> 4a
     """
     answer = ""
     for x in hexString:
@@ -86,7 +111,22 @@ def Hex2Str(hexString):
     return answer
 
 
-def Little2ByteHex2Int(hexString):
+def Hex2Ascii(hexString):
+    """
+    Return the hexString as ASCII, ie 0x4a -> J
+    """
+    answer = ""
+    for x in hexString:
+        if x != 0:
+            # Ignore 0x00 results
+            answer += f"{x:c}"
+
+    log.debug(f"Hex {hexString} decoded to {answer}")
+
+    return answer
+
+
+def LittleHex2Short(hexString):
     """
     Decode a 2 byte hexString to int (little endian coded)
     """
@@ -94,13 +134,12 @@ def Little2ByteHex2Int(hexString):
     if len(hexString) != 2:
         log.info(f"Hex encoded value must be 2 bytes long. Was {len(hexString)} length")
         return 0
-
     answer = unpack("<h", hexString)[0]
     log.debug(f"Hex {hexString} 2 byte decoded to {answer}")
     return answer
 
 
-def Big2ByteHex2Int(hexString):
+def BigHex2Short(hexString):
     """
     Decode a 2 byte hexString to int (big endian coded)
     """
@@ -108,13 +147,12 @@ def Big2ByteHex2Int(hexString):
     if len(hexString) != 2:
         log.info(f"Hex encoded value must be 2 bytes long. Was {len(hexString)} length")
         return 0
-
     answer = unpack(">h", hexString)[0]
     log.debug(f"Hex {hexString} 2 byte decoded to {answer}")
     return answer
 
 
-def Big4ByteHex2Int(hexString):
+def BigHex2Float(hexString):
     """
     Decode a 4 byte hexString to int (big endian coded)
     """
@@ -123,8 +161,36 @@ def Big4ByteHex2Int(hexString):
         log.info(f"Hex encoded value must be 4 bytes long. Was {len(hexString)} length")
         return 0
 
-    # answer = unpack(">f", hexString)[0]
-    answer = int(hexString.hex(), 16)
+    answer = unpack(">I", hexString)[0]
+    # answer = int(hexString.hex(), 16)
+    log.debug(f"Hex {hexString} 4 byte decoded to {answer}")
+    return answer
+
+
+def LittleHex2Float(hexString):
+    """
+    Decode a 4 byte hexString to int (little endian coded)
+    """
+    # Make sure supplied String is the correct length
+    if len(hexString) != 4:
+        log.info(f"Hex encoded value must be 4 bytes long. Was {len(hexString)} length")
+        return 0
+
+    answer = unpack("<f", hexString)[0]
+    log.debug(f"Hex {hexString} 4 byte decoded to {answer}")
+    return answer
+
+
+def LittleHex2UInt(hexString):
+    """
+    Decode a 4 byte hexString to Uint (little endian coded)
+    """
+    # Make sure supplied String is the correct length
+    if len(hexString) != 4:
+        log.info(f"Hex encoded value must be 4 bytes long. Was {len(hexString)} length")
+        return 0
+
+    answer = unpack("<I", hexString)[0]
     log.debug(f"Hex {hexString} 4 byte decoded to {answer}")
     return answer
 

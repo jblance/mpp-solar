@@ -4,11 +4,10 @@ import re
 from typing import Tuple
 
 from ..helpers import get_resp_defn
-from .protocol_helpers import Big2ByteHex2Int  # noqa: F401
-from .protocol_helpers import Big4ByteHex2Int  # noqa: F401
-from .protocol_helpers import Little2ByteHex2Int  # noqa: F401
-from .protocol_helpers import Hex2Int  # noqa: F401
-from .protocol_helpers import Hex2Str  # noqa: F401
+from .protocol_helpers import BigHex2Short, BigHex2Float  # noqa: F401
+from .protocol_helpers import LittleHex2Float, LittleHex2UInt, LittleHex2Short  # noqa: F401
+from .protocol_helpers import Hex2Ascii, Hex2Int, Hex2Str  # noqa: F401
+from .protocol_helpers import uptime  # noqa: F401
 from .protocol_helpers import crcPI as crc
 
 log = logging.getLogger("AbstractProtocol")
@@ -86,7 +85,10 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             f"Processing data_type: {data_type} for data_name: {data_name}, raw_value {raw_value}"
         )
         if data_type == "lookup":
-            log.warn("lookup not implemented...")
+            log.warning("lookup not implemented...")
+            return data_name, None, data_units
+        if data_type == "loop":
+            log.warning("loop not implemented...")
             return data_name, None, data_units
         if data_type == "exclude" or data_type == "discard":
             # Just ignore these ones
@@ -120,7 +122,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         try:
             r = eval(format_string)
         except TypeError as e:
-            log.warn(f"Failed to eval format {format_string}, error: {e}")
+            log.warning(f"Failed to eval format {format_string}, error: {e}")
             return data_name, format_string, data_units
         if template is not None:
             r = eval(template)
@@ -159,7 +161,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             msgs["_command_description"] = command_defn["description"]
             len_command_defn = len(command_defn["response"])
         else:
-            # No definiution, so just return the data
+            # No definition, so just return the data
             len_command_defn = 0
             log.debug(f"No definition for command {command}, (splitted) raw response returned")
             msgs["WARNING"] = [
@@ -169,16 +171,16 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             msgs["response"] = [raw_response, ""]
             return msgs
 
-        # Split the response into individual responses
-        responses = self.get_responses(response)
-        log.debug(f"trimmed and split responses: {responses}")
-
         # Determine the type of response
         if "response_type" in command_defn:
             response_type = command_defn["response_type"]
         else:
             response_type = "DEFAULT"
         log.info(f"Processing response of type {response_type}")
+
+        # Split the response into individual responses
+        responses = self.get_responses(response)
+        log.debug(f"trimmed and split responses: {responses}")
 
         # Decode response based on stored command definition and type
         # process default response type
@@ -326,7 +328,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     # POSITIONAL - responses are not separated and are determined by the position in the response
                     # example defn :
                     #   ["discard", 1, "start flag", ""],
-                    #   ["Big2ByteHex2Int", 2, "Battery Bank Voltage", "V"],
+                    #   ["BigHex2Short", 2, "Battery Bank Voltage", "V"],
                     # example response data:
                     #   [b'\xa5', b'\x01', b'\x90', b'\x08', b'\x01\t', b'\x00\x00', b'u\xcf', b'\x03\x99', b'']
                     raw_value = response

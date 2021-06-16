@@ -107,7 +107,7 @@ COMMANDS = {
                     "04": "Parameter Error",
                 },
             ],
-            ["Little2ByteHex2Int", 2, "Battery Capacity", "Ah"],
+            ["LittleHex2Short", 2, "Battery Capacity", "Ah"],
             ["discard", 1, "checksum", ""],
         ],
         "test_responses": [
