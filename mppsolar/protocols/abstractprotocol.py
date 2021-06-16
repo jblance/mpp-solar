@@ -84,9 +84,6 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.debug(
             f"Processing data_type: {data_type} for data_name: {data_name}, raw_value {raw_value}"
         )
-        if data_type == "lookup":
-            log.warning("lookup not implemented...")
-            return data_name, None, data_units
         if data_type == "loop":
             log.warning("loop not implemented...")
             return data_name, None, data_units
@@ -392,19 +389,33 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         # No definition for this key, so ignore???
                         log.warn(f"No definition for {response}")
                         response_defn = ["str", 1, f"Undefined value in response {i}", ""]
+                    log.debug(f"Got defn {response_defn}")
                     data_name = response_defn[2]
                     data_units = response_defn[3]
                     data_type = response_defn[0]
                 # print(data_type, data_name, raw_value)
 
-                # Process response
-                data_name, value, data_units = self.process_response(
-                    data_name=data_name,
-                    raw_value=raw_value,
-                    data_units=data_units,
-                    data_type=data_type,
-                    frame_number=frame_number,
-                )
+                # Check for lookup
+                if data_type.startswith("lookup"):
+                    log.debug("processing lookup...")
+                    print(
+                        f"Processing data_type: '{data_type}' for data_name: '{data_name}', raw_value '{raw_value}'"
+                    )
+                    m = msgs
+                    template = data_type.split(":", 1)[1]
+                    log.debug(f"Got template {template} for {data_name} {raw_value}")
+                    lookup = eval(template)
+                    log.debug(f"looking up values for: {lookup}")
+                    value, data_units = m[lookup]
+                else:
+                    # Process response
+                    data_name, value, data_units = self.process_response(
+                        data_name=data_name,
+                        raw_value=raw_value,
+                        data_units=data_units,
+                        data_type=data_type,
+                        frame_number=frame_number,
+                    )
                 # print(data_type, data_name, raw_value, value)
                 if data_name is not None:
                     msgs[data_name] = [value, data_units]

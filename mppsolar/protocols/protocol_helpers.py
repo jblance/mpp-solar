@@ -216,7 +216,7 @@ def decode2ByteHex(hexString):
     return answer
 
 
-def decode4ByteHex1000(hexToDecode):
+def _decode4ByteHex1000(hexToDecode):
     """
     Code a 4 byte hexString  per jkbms approach (blackbox determined)
     - need to decode as 8 hex chars
@@ -269,7 +269,7 @@ def decode4ByteHex1000(hexToDecode):
     return answer
 
 
-def decode4ByteHex(hexToDecode):
+def _decode4ByteHex(hexToDecode):
     """
     Code a 4 byte hexString to volts as per jkbms approach (blackbox determined)
     """

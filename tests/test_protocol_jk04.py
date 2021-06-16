@@ -3,6 +3,8 @@ from mppsolar.protocols.jk04 import jk04 as pi
 
 
 class test_jk04_decode(unittest.TestCase):
+    maxDiff = None
+
     def test_getInfo(self):
         """ test the decode of a getInfo response"""
         protocol = pi()
@@ -109,6 +111,7 @@ class test_jk04_decode(unittest.TestCase):
             "Highest Cell Voltage": [2.367180585861206, "V"],
             "Lowest Cell Voltage": [2.186809778213501, "V"],
         }
+
         protocol.get_full_command(command)
         result = protocol.decode(response, command)
         # print(result)

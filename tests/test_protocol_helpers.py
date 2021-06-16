@@ -1,6 +1,6 @@
 import unittest
 from mppsolar.protocols.protocol_helpers import Hex2Int, Hex2Str
-from mppsolar.protocols.protocol_helpers import decode4ByteHex1000, BigHex2Float
+from mppsolar.protocols.protocol_helpers import BigHex2Float
 
 
 class test_protocol_helpers(unittest.TestCase):
@@ -15,14 +15,6 @@ class test_protocol_helpers(unittest.TestCase):
         """ test the Hex2Str"""
         result = Hex2Str(bytes.fromhex("AE0212"))
         expected = "ae0212"
-        # print(result)
-        self.assertEqual(result, expected)
-
-    def test_decode4ByteHex1000(self):
-        """ test decode4ByteHex1000 """
-        hexString = b"\xbc\xd1\x00\x00"
-        result = decode4ByteHex1000(hexString)
-        expected = 53.69200000000001
         # print(result)
         self.assertEqual(result, expected)
 
