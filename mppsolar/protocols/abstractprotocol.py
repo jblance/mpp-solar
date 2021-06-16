@@ -95,9 +95,18 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             log.debug(f"Discarding {data_name}:{raw_value}")
             return None, raw_value, data_units
         if data_type == "option":
-            response_id = int(raw_value[0])
-            responses = data_units
-            r = responses[response_id]
+            key = int(raw_value)
+            if key < len(data_units):
+                r = data_units[key]
+            else:
+                r = f"Invalid option: {key}"
+            return data_name, r, ""
+        if data_type == "hex_option":
+            key = int(raw_value[0])
+            if key < len(data_units):
+                r = data_units[key]
+            else:
+                r = f"Invalid hex_option: {key}"
             return data_name, r, ""
         if data_type == "keyed":
             log.debug("keyed defn")
@@ -115,7 +124,33 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             key = ""
             for x in raw_value:
                 key += f"{x:02x}"
-            r = data_units[key]
+            if key in data_units:
+                r = data_units[key]
+            else:
+                r = f"Invalid key: {key}"
+            return data_name, r, ""
+        if data_type == "str_keyed":
+            log.debug("str_keyed defn")
+            # [
+            #     "str_keyed",
+            #     "Device Mode",
+            #     {
+            #         "B": "Inverter (Battery) Mode",
+            #         "C": "PV charging Mode",
+            #         "D": "Shutdown Mode",
+            #         "F": "Fault Mode",
+            #         "G": "Grid Mode",
+            #         "L": "Line Mode",
+            #         "P": "Power on Mode",
+            #         "S": "Standby Mode",
+            #         "Y": "Bypass Mode",
+            #     },
+            # ]
+            key = raw_value.decode()
+            if key in data_units:
+                r = data_units[key]
+            else:
+                r = f"Invalid key: {key}"
             return data_name, r, ""
         format_string = f"{data_type}(raw_value)"
         log.debug(f"Processing format string {format_string}")
@@ -308,7 +343,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             for i, response in enumerate(frame):
                 if response_type == "KEYED":
                     log.debug("Processing KEYED type responses")
-                    # example defn ["H1", "Depth of the deepest discharge", "Ah", "mFloat"],
+                    # example defn ["V", "Main or channel 1 (battery) voltage", "V", "float:r/1000"]
                     # example response data [b'H1', b'-32914']
                     if len(response) <= 1:
                         # Not enough data in response, so ignore
@@ -323,6 +358,19 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     data_name = response_defn[1]
                     data_units = response_defn[2]
                     data_type = response_defn[3]
+                elif response_type == "SEQUENTIAL":
+                    log.debug("Processing SEQUENTIAL type responses")
+                    # example ["int", "Energy produced", "Wh"]
+
+                    # Check if we are past the 'known' responses
+                    if i >= len_command_defn:
+                        response_defn = ["str", 1, f"Unknown value in response {i}", ""]
+                    else:
+                        response_defn = command_defn["response"][i]
+                    raw_value = response
+                    data_name = response_defn[1]
+                    data_units = response_defn[2]
+                    data_type = response_defn[0]
                 elif response_type in ["POSITIONAL", "MULTIFRAME-POSITIONAL"]:
                     log.debug("Processing POSITIONAL type responses")
                     # POSITIONAL - responses are not separated and are determined by the position in the response
