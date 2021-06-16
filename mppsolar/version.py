@@ -1,2 +1,2 @@
-__version__ = "0.7.66"
-__version_comment__ = "start move of pi16 to new processing"
+__version__ = "0.7.67"
+__version_comment__ = "move jk04 to new processing, add lookup functionality"
