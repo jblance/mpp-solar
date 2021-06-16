@@ -1,2 +1,2 @@
-__version__ = "0.7.65"
-__version_comment__ = "tidy protocol handling / rename formatting functions"
+__version__ = "0.7.66"
+__version_comment__ = "start move of pi16 to new processing"
