@@ -3,6 +3,8 @@ from mppsolar.protocols.jk485 import jk485 as pi
 
 
 class test_jk04_decode(unittest.TestCase):
+    maxDiff = None
+
     def test_getBalancerData(self):
         """ test the decode of a getBalancerData response"""
         protocol = pi()
@@ -60,6 +62,7 @@ class test_jk04_decode(unittest.TestCase):
             "Temperature": [22, "°C"],
             "Checksum": ["6f", ""],
         }
+        protocol.get_full_command(command)
         result = protocol.decode(response, command)
         # print(result)
         self.assertEqual(result, expected)

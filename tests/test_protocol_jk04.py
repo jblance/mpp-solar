@@ -30,6 +30,7 @@ class test_jk04_decode(unittest.TestCase):
             "User Data": ["", ""],
             "Settings Passcode?": ["", ""],
         }
+        protocol.get_full_command(command)
         result = protocol.decode(response, command)
         # print(result)
         self.assertEqual(result, expected)
@@ -108,6 +109,7 @@ class test_jk04_decode(unittest.TestCase):
             "Highest Cell Voltage": [2.367180585861206, "V"],
             "Lowest Cell Voltage": [2.186809778213501, "V"],
         }
+        protocol.get_full_command(command)
         result = protocol.decode(response, command)
         # print(result)
         self.assertEqual(result, expected)

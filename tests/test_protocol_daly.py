@@ -58,7 +58,7 @@ class test_daly_decode(unittest.TestCase):
             "_command": "status",
             "_command_description": "Status Information",
             "Number of Cells": [16, ""],
-            "Number of Temperature Sensors": ["01", ""],
+            "Number of Temperature Sensors": [1, ""],
             "Charger Status": ["disconnected", ""],
             "Load Status": ["disconnected", ""],
             "Flags (TODO)": ["00", ""],

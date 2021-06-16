@@ -3,6 +3,8 @@ from mppsolar.protocols.jk02 import jk02 as pi
 
 
 class test_jk02_decode(unittest.TestCase):
+    maxDiff = None
+
     def test_getInfo(self):
         """ test the decode of a getInfo response"""
         protocol = pi()
@@ -30,6 +32,7 @@ class test_jk02_decode(unittest.TestCase):
             "User Data": ["", ""],
             "Settings Passcode?": ["", ""],
         }
+        protocol.get_full_command(command)
         result = protocol.decode(response, command)
         # print(result)
         self.assertEqual(result, expected)
@@ -102,18 +105,22 @@ class test_jk02_decode(unittest.TestCase):
             "Resistance_Cell22": [0.0, "Ohm"],
             "Resistance_Cell23": [0.0, "Ohm"],
             "Resistance_Cell24": [0.0, "Ohm"],
-            "Battery_Voltage": [53.69200000000001, "V"],
-            "Battery_T1": [28.599999999999998, "°C"],
-            "Battery_T2": [27.800000000000004, "°C"],
+            "Battery_Voltage": [53.692, "V"],
+            "Battery_Power": [0.0, "W"],
+            "Charge_Current": [0.0, "A"],
+            "Battery_T1": [28.6, "°C"],
+            "Battery_T2": [27.8, "°C"],
             "MOS_Temp": [31.6, "°C"],
             "Percent_Remain": [99, ""],
             "Capacity_Remain": [199.787, ""],
             "Nominal_Capacity": [200.0, ""],
+            "Cycle_Count": ["00000000", ""],
             "Capacity_Cycle": [85.468, ""],
             "Time": ["16D18H39M52S", ""],
             "Current_Charge": [0.004, ""],
             "Current_Discharge": [0.0, ""],
         }
+        protocol.get_full_command(command)
         result = protocol.decode(response, command)
         # print(result)
         self.assertEqual(result, expected)
