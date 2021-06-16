@@ -16,6 +16,7 @@ COMMANDS = {
         "help": " -- Query device for energy produced in the specific day at date in YYYYMMDD format",
         "type": "QUERY",
         "checksum_required": "True",
+        "response_type": "SEQUENTIAL",
         "response": [
             ["int", "Energy produced", "Wh"],
         ],
@@ -29,9 +30,10 @@ COMMANDS = {
         "description": "Operational mode query",
         "help": " -- Query device for actual operational mode",
         "type": "QUERY",
+        "response_type": "SEQUENTIAL",
         "response": [
             [
-                "keyed",
+                "str_keyed",
                 "Device Mode",
                 {
                     "B": "Inverter (Battery) Mode",
@@ -64,7 +66,7 @@ COMMANDS = {
             ["int", "Battery remaining time", "min"],
         ],
         "test_responses": [
-            b"",
+            b"(0 6 1234 12 43\xb7\x6c\r",
         ],
     },
     "QPIGS": {
