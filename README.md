@@ -16,7 +16,7 @@ Currently has support for:
   - JK-B2A24S (HW version 3.0)
   - JK-B1A24S (HW version 3.0)
 - Victron VE Direct Devices:
- - tested on SmartShunt 500A
+  - tested on SmartShunt 500A
 - Daly BMS
 
 ## Compute hardware support ##
