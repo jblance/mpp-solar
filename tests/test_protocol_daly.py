@@ -6,7 +6,7 @@ class test_daly_decode(unittest.TestCase):
     maxDiff = 9999
 
     def test_daly_SOC(self):
-        """ test the decode of a SOC response"""
+        """test the decode of a SOC response"""
         protocol = pi()
 
         response = b"\xa5\x01\x90\x08\x02\x14\x00\x00uE\x03x\x89"
@@ -27,7 +27,7 @@ class test_daly_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_daly_cellMinMaxVoltages(self):
-        """ test the decode of a cellMinMaxVoltages response"""
+        """test the decode of a cellMinMaxVoltages response"""
         protocol = pi()
         response = b"\xa5\x01\x91\x08\r\x00\x0f\x0c\xfe\x01\x03x\xe1"
         command = "cellMinMaxVoltages"
@@ -47,7 +47,7 @@ class test_daly_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_daly_status(self):
-        """ test the decode of a status response"""
+        """test the decode of a status response"""
         protocol = pi()
         response = b"\xa5\x01\x94\x08\x10\x01\x00\x00\x00\x00\x03@\x96"
         command = "status"
@@ -69,8 +69,29 @@ class test_daly_decode(unittest.TestCase):
         # print(result)
         self.assertEqual(result, expected)
 
+    def test_daly_mosStatus(self):
+        """test the decode of a mosStatus response"""
+        protocol = pi()
+        response = b"\xa5\x01\x93\x08\x00\x01\x01\x9a\x00\x02\xa2\xd8Y"
+        command = "mosStatus"
+        # needed to initialise variables
+        protocol.get_full_command(command)
+        expected = {
+            "raw_response": ["¥\x01\x93\x08\x00\x01\x01\x9a\x00\x02¢ØY", ""],
+            "_command": "mosStatus",
+            "_command_description": "mosStatus",
+            "Charge Status": ["stationary", ""],
+            "Charging MOS Tube Status": ["01", ""],
+            "Discharging MOS Tube Status": ["01", ""],
+            "BMS Life": [154, "cycles"],
+            "Residual Capacity": [172.76, "AH"],
+        }
+        result = protocol.decode(response, command)
+        # print(result)
+        self.assertEqual(result, expected)
+
     def test_daly_cellVoltages(self):
-        """ test the decode of a cellVoltages response"""
+        """test the decode of a cellVoltages response"""
         protocol = pi()
         response = b"\xa5\x01\x95\x08\x01\x0c\xfd\x0c\xfe\x0c\xfe@\xa1\xa5\x01\x95\x08\x02\x0c\xfe\x0c\xfe\x0c\xfe@\xa3\xa5\x01\x95\x08\x03\x0c\xfe\x0c\xfe\x0c\xfe@\xa4\xa5\x01\x95\x08\x04\x0c\xfe\x0c\xfc\x0c\xfe@\xa3\xa5\x01\x95\x08\x05\x0c\xfe\x0c\xff\x0c\xfe@\xa7\xa5\x01\x95\x08\x06\x0c\xfc\x00\x00\x00\x00@\x91\xa5\x01\x95\x08\x07\x00\x00\x00\x00\x00\x00@\x8a\xa5\x01\x95\x08\x08\x00\x00\x00\x00\x00\x00@\x8b\xa5\x01\x95\x08\t\x00\x00\x00\x00\x00\x00@\x8c\xa5\x01\x95\x08\n\x00\x00\x00\x00\x00\x00@\x8d\xa5\x01\x95\x08\x0b\x00\x00\x00\x00\x00\x00@\x8e\xa5\x01\x95\x08\x0c\x00\x00\x00\x00\x00\x00@\x8f\xa5\x01\x95\x08\r\x00\x00\x00\x00\x00\x00@\x90\xa5\x01\x95\x08\x0e\x00\x00\x00\x00\x00\x00@\x91\xa5\x01\x95\x08\x0f\x00\x00\x00\x00\x00\x00@\x92\xa5\x01\x95\x08\x10\x00\x00\x00\x00\x00\x00@\x93"
         command = "cellVoltages"

@@ -154,7 +154,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         try:
             r = eval(format_string)
         except ValueError as e:
-            log.warning(f"Failed to eval format {format_string} (returning 0), error: {e}")
+            log.info(f"Failed to eval format {format_string} (returning 0), error: {e}")
             return data_name, 0, data_units
         except TypeError as e:
             log.warning(f"Failed to eval format {format_string}, error: {e}")
@@ -398,7 +398,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 # Check for lookup
                 if data_type.startswith("lookup"):
                     log.debug("processing lookup...")
-                    print(
+                    log.info(
                         f"Processing data_type: '{data_type}' for data_name: '{data_name}', raw_value '{raw_value}'"
                     )
                     m = msgs
