@@ -364,13 +364,15 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
                     # Check if we are past the 'known' responses
                     if i >= len_command_defn:
-                        response_defn = ["str", 1, f"Unknown value in response {i}", ""]
+                        response_defn = ["str", f"Unknown value in response {i}", ""]
                     else:
                         response_defn = command_defn["response"][i]
                     raw_value = response
+                    log.debug(f"Got defn {response_defn}")
                     data_name = response_defn[1]
                     data_units = response_defn[2]
                     data_type = response_defn[0]
+                    # print(f"{data_type=}, {data_name=}, {raw_value=}")
                 elif response_type in ["POSITIONAL", "MULTIFRAME-POSITIONAL"]:
                     log.debug("Processing POSITIONAL type responses")
                     # POSITIONAL - responses are not separated and are determined by the position in the response
@@ -393,7 +395,6 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     data_name = response_defn[2]
                     data_units = response_defn[3]
                     data_type = response_defn[0]
-                # print(data_type, data_name, raw_value)
 
                 # Check for lookup
                 if data_type.startswith("lookup"):
