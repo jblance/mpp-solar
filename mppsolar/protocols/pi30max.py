@@ -34,9 +34,8 @@ QUERY_COMMANDS = {
         "help": " -- queries the device serial number (length greater than 14)",
         "type": "QUERY",
         "response": [["string", "Serial Number", ""]],
-        "test_responses": [
-        ],
-    },	
+        "test_responses": [],
+    },
     "QVFW": {
         "name": "QVFW",
         "description": "Main CPU firmware version inquiry",
@@ -53,18 +52,16 @@ QUERY_COMMANDS = {
         "help": " -- queries the CPU firmware version of the remote panel",
         "type": "QUERY",
         "response": [["string", "Remote CPU firmware version", ""]],
-        "test_responses": [
-        ],
-    },	
+        "test_responses": [],
+    },
     "VERFW": {
         "name": "VERFW",
         "description": "Bluetooth version inquiry",
         "help": " -- queries the bluetooth version",
         "type": "QUERY",
         "response": [["string", "Bluetooth version", ""]],
-        "test_responses": [
-        ],
-    },	
+        "test_responses": [],
+    },
     "QPIRI": {
         "name": "QPIRI",
         "description": "Current Settings inquiry",
@@ -135,7 +132,7 @@ QUERY_COMMANDS = {
                     "Phase 3 of 3 Phase output",
                     "Phase 1 of 2 phase output",
                     "Phase 2 of 2 phase output (120°)",
-					"Phase 2 of 2 phase output (180°)",
+                    "Phase 2 of 2 phase output (180°)",
                     "unknown output",
                 ],
             ],
@@ -156,12 +153,11 @@ QUERY_COMMANDS = {
                     "PV input max power will be the sum of the max charged power and loads power",
                 ],
             ],
-			["int", "Max charging time for CV stage","min"],
-			["option", "Operation Logic", ["Automatic mode", "On-line mode", "ECO mode"]],
-			["int", "Max discharging current","A"],
+            ["int", "Max charging time for CV stage", "min"],
+            ["option", "Operation Logic", ["Automatic mode", "On-line mode", "ECO mode"]],
+            ["int", "Max discharging current", "A"],
         ],
-        "test_responses": [
-        ],
+        "test_responses": [],
     },
     "QFLAG": {
         "name": "QFLAG",
@@ -188,9 +184,8 @@ QUERY_COMMANDS = {
                 },
             ]
         ],
-        "test_responses": [
-        ],	
-	},
+        "test_responses": [],
+    },
     "QPIGS": {
         "name": "QPIGS",
         "description": "General Status Parameters inquiry",
@@ -235,35 +230,33 @@ QUERY_COMMANDS = {
                 "Device Status2",
                 ["Is Charging to Float", "Is Switched On", "Is Dustproof Installed"],
             ],
-			["option", "Solar Feed to Grid", ["Disabled", "Enabled"]],
-			[
+            ["option", "Solar Feed to Grid", ["Disabled", "Enabled"]],
+            [
                 "keyed",
                 "Country",
                 {
                     "00": "India",
                     "01": "Germany",
                     "02": "South America",
-				}
-			],
-			["int", "Solar Feed to Grid Power", "W"],
+                },
+            ],
+            ["int", "Solar Feed to Grid Power", "W"],
         ],
-        "test_responses": [
-        ],
+        "test_responses": [],
     },
-	"QPIGS2": {
+    "QPIGS2": {
         "name": "QPIGS2",
         "description": "General Status Parameters inquiry 2",
         "help": " -- queries the value of various metrics from the Inverter 2",
         "type": "QUERY",
         "response": [
             ["float", "PV2 Input Current", "A"],
-			["float", "PV2 Input Voltage", "V"],
-			["int", "PV2 Charging Power", "W"],
-		],
-		"test_responses": [
+            ["float", "PV2 Input Voltage", "V"],
+            ["int", "PV2 Charging Power", "W"],
         ],
-	},
-	"QPGS": {
+        "test_responses": [],
+    },
+    "QPGS": {
         "name": "QPGS",
         "description": "Parallel Information inquiry",
         "help": " -- example: QPGS1 queries the values of various metrics from instance 1 of parallel setup Inverters (numbers from 0)",
@@ -281,7 +274,7 @@ QUERY_COMMANDS = {
                     "B": "Battery Mode",
                     "F": "Fault Mode",
                     "H": "Power Saving Mode",
-					"D": "Shutdown Mode",
+                    "D": "Shutdown Mode",
                 },
             ],
             [
@@ -298,10 +291,10 @@ QUERY_COMMANDS = {
                     "07": "Over load time out",
                     "08": "Bus voltage is too high",
                     "09": "Bus soft start failed",
-					"10": "PV over current",
+                    "10": "PV over current",
                     "11": "PV over voltage",
-					"12": "DC over current",
-					"13": "Battery discharge over current",
+                    "12": "DC over current",
+                    "13": "Battery discharge over current",
                     "51": "Over current inverter",
                     "52": "Bus voltage too low",
                     "53": "Inverter soft start failed",
@@ -378,14 +371,15 @@ QUERY_COMMANDS = {
             ["float", "Unknown float", ""],
             ["string", "Unknown flags?", ""],
         ],
-        "test_responses": [
-        ],
+        "test_responses": [],
         "regex": "QPGS(\\d+)$",
     },
 }
 
-SETTER_COMMANDS = {
-}
+SETTER_COMMANDS = {}
+COMMANDS = QUERY_COMMANDS
+COMMANDS.update(SETTER_COMMANDS)
+
 
 class pi30max(AbstractProtocol):
     def __init__(self, *args, **kwargs) -> None:
