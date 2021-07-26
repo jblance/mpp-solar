@@ -99,6 +99,7 @@ def main():
                 "PI17",
                 "PI18",
                 "PI30",
+                "PI30MAX",
                 "PI30REVO",
                 "PI41",
                 "VED",
