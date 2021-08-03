@@ -39,10 +39,11 @@ def get_resp_defn(key, defns):
     # print(key, defns)
     if not key:
         return None
-    try:
-        key = key.decode("utf-8")
-    except UnicodeDecodeError:
-        log.info(f"key decode error for {key}")
+    if type(key) is bytes:
+        try:
+            key = key.decode("utf-8")
+        except UnicodeDecodeError:
+            log.info(f"key decode error for {key}")
     for defn in defns:
         if key == defn[0]:
             # print(key, defn)

@@ -341,11 +341,6 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             frame_count = 1
 
         for frame_number, frame in enumerate(frames):
-            # check for extra definitions...
-            extra_responses_needed = len(command_defn["response"]) - len(frame)
-            if extra_responses_needed > 0:
-                for _ in range(extra_responses_needed):
-                    frame.append("extra")
 
             for i, response in enumerate(frame):
                 if response_type == "KEYED":
@@ -369,6 +364,11 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
                 elif response_type == "SEQUENTIAL":
                     log.debug("Processing SEQUENTIAL type responses")
+                    # check for extra definitions...
+                    extra_responses_needed = len(command_defn["response"]) - len(frame)
+                    if extra_responses_needed > 0:
+                        for _ in range(extra_responses_needed):
+                            frame.append("extra")
                     # example ["int", "Energy produced", "Wh"]
 
                     # Check if we are past the 'known' responses
@@ -386,6 +386,11 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     # print(f"{data_type=}, {data_name=}, {raw_value=}")
                 elif response_type in ["POSITIONAL", "MULTIFRAME-POSITIONAL"]:
                     log.debug("Processing POSITIONAL type responses")
+                    # check for extra definitions...
+                    extra_responses_needed = len(command_defn["response"]) - len(frame)
+                    if extra_responses_needed > 0:
+                        for _ in range(extra_responses_needed):
+                            frame.append("extra")
                     # POSITIONAL - responses are not separated and are determined by the position in the response
                     # example defn :
                     #   ["discard", 1, "start flag", ""],
@@ -411,7 +416,6 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 # Check for lookup
                 if data_type.startswith("lookup"):
                     log.debug("processing lookup...")
-                    print(f"{i=} {response=} {len(command_defn['response'])}")
                     log.info(
                         f"Processing data_type: '{data_type}' for data_name: '{data_name}', raw_value '{raw_value}'"
                     )
