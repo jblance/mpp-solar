@@ -1,4 +1,5 @@
 import abc
+import calendar  # noqa: F401
 import logging
 import re
 from typing import Tuple
@@ -79,7 +80,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         template = None
         # Check for a format modifying template
         if ":" in data_type:
-            data_type, template = data_type.split(":")
+            data_type, template = data_type.split(":", 1)
             log.debug(f"Got template {template} for {data_name} {raw_value}")
         log.debug(
             f"Processing data_type: {data_type} for data_name: {data_name}, raw_value {raw_value}"
@@ -340,6 +341,12 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             frame_count = 1
 
         for frame_number, frame in enumerate(frames):
+            # check for extra definitions...
+            extra_responses_needed = len(command_defn["response"]) - len(frame)
+            if extra_responses_needed > 0:
+                for _ in range(extra_responses_needed):
+                    frame.append("extra")
+
             for i, response in enumerate(frame):
                 if response_type == "KEYED":
                     log.debug("Processing KEYED type responses")
@@ -355,9 +362,11 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         # No definition for this key, so ignore???
                         log.warn(f"No definition for {response}")
                         continue
-                    data_name = response_defn[1]
-                    data_units = response_defn[2]
-                    data_type = response_defn[3]
+                    # key = response_defn[0] #0
+                    data_type = response_defn[3]  # 1
+                    data_name = response_defn[1]  # 2
+                    data_units = response_defn[2]  # 3
+
                 elif response_type == "SEQUENTIAL":
                     log.debug("Processing SEQUENTIAL type responses")
                     # example ["int", "Energy produced", "Wh"]
@@ -367,11 +376,13 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         response_defn = ["str", f"Unknown value in response {i}", ""]
                     else:
                         response_defn = command_defn["response"][i]
-                    raw_value = response
                     log.debug(f"Got defn {response_defn}")
-                    data_name = response_defn[1]
-                    data_units = response_defn[2]
-                    data_type = response_defn[0]
+                    raw_value = response
+                    # spacer = response_defn[0] #0
+                    data_type = response_defn[0]  # 1
+                    data_name = response_defn[1]  # 2
+                    data_units = response_defn[2]  # 3
+
                     # print(f"{data_type=}, {data_name=}, {raw_value=}")
                 elif response_type in ["POSITIONAL", "MULTIFRAME-POSITIONAL"]:
                     log.debug("Processing POSITIONAL type responses")
@@ -392,13 +403,15 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         log.warn(f"No definition for {response}")
                         response_defn = ["str", 1, f"Undefined value in response {i}", ""]
                     log.debug(f"Got defn {response_defn}")
-                    data_name = response_defn[2]
-                    data_units = response_defn[3]
-                    data_type = response_defn[0]
+                    # length = response_defn[1] #0
+                    data_type = response_defn[0]  # 1
+                    data_name = response_defn[2]  # 2
+                    data_units = response_defn[3]  # 3
 
                 # Check for lookup
                 if data_type.startswith("lookup"):
                     log.debug("processing lookup...")
+                    print(f"{i=} {response=} {len(command_defn['response'])}")
                     log.info(
                         f"Processing data_type: '{data_type}' for data_name: '{data_name}', raw_value '{raw_value}'"
                     )
@@ -408,6 +421,15 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     lookup = eval(template)
                     log.debug(f"looking up values for: {lookup}")
                     value, data_units = m[lookup]
+                elif data_type.startswith("info"):
+                    log.debug("processing info...")
+                    print(
+                        f"Processing {data_type=} for {data_name=}, {data_units=} {response=} {command=} {self._command_value=}"
+                    )
+                    template = data_type.split(":", 1)[1]
+                    # Provide cv as shortcut to self._command_value for info fields
+                    cv = self._command_value  # noqa: F841
+                    value = eval(template)
                 else:
                     # Process response
                     data_name, value, data_units = self.process_response(
@@ -420,5 +442,6 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 # print(data_type, data_name, raw_value, value)
                 if data_name is not None:
                     msgs[data_name] = [value, data_units]
+            # print(f"{i=} {response=} {len(command_defn['response'])}")
 
         return msgs

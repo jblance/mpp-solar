@@ -33,7 +33,9 @@ QUERY_COMMANDS = {
         "help": " -- queries the device serial number (length greater than 14)",
         "type": "QUERY",
         "response": [["string", "Serial Number", ""]],
-        "test_responses": [],
+        "test_responses": [
+            b"(1492932105105335005535\x94\x0e\r",
+        ],
     },
     "QVFW": {
         "name": "QVFW",
@@ -42,6 +44,7 @@ QUERY_COMMANDS = {
         "response": [["string", "Main CPU firmware version", ""]],
         "test_responses": [
             b"(VERFW:00072.70\x53\xA7\r",
+            b"(VERFW:00046.05\xbe\xb6\r",
         ],
     },
     "QVFW3": {
@@ -236,7 +239,9 @@ QUERY_COMMANDS = {
             ],
             ["int", "Solar Feed to Grid Power", "W"],
         ],
-        "test_responses": [],
+        "test_responses": [
+            b"(227.2 50.0 230.3 50.0 0829 0751 010 447 54.50 020 083 0054 02.7 323.6 00.00 00000 00010110 00 00 00879 010\xf1\x8c\r",
+        ],
     },
     "QPIGS2": {
         "name": "QPIGS2",
@@ -247,7 +252,9 @@ QUERY_COMMANDS = {
             ["float", "PV2 Input Voltage", "V"],
             ["int", "PV2 Charging Power", "W"],
         ],
-        "test_responses": [],
+        "test_responses": [
+            b"(03.1 327.3 01026 \xc9\x8b\r",
+        ],
     },
     "QPGS": {
         "name": "QPGS",
@@ -389,6 +396,7 @@ QUERY_COMMANDS = {
         ],
         "test_responses": [
             b"(S\x64\x39\r",
+            b"(B\xe7\xc9\r",
         ],
     },
     "QPIWS": {
@@ -441,6 +449,7 @@ QUERY_COMMANDS = {
         ],
         "test_responses": [
             b"(00000100000000001000000000000000\x56\xA6\r",
+            b"(000000000000000000000000000000000000<\x8e\r",
         ],
     },
     "QDI": {
@@ -531,7 +540,9 @@ QUERY_COMMANDS = {
             ["int", "Max Charging Time at CV", "min"],
             ["int", "Max Discharging current", "A"],
         ],
-        "test_responses": [],
+        "test_responses": [
+            b"(230.0 50.0 0030 44.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 1 0 1 0 54.0 0 1 224\xeb\xbc\r",
+        ],
     },
     "QMCHGCR": {
         "name": "QMCHGCR",
@@ -539,7 +550,7 @@ QUERY_COMMANDS = {
         "type": "QUERY",
         "response": [["string", "Max Charging Current", "A"]],
         "test_responses": [
-            b"",
+            b"(010 020 030 040 050 060 070 080 090 100 110 120\x0c\xcb\r",
         ],
     },
     "QMUCHGCR": {
@@ -548,34 +559,335 @@ QUERY_COMMANDS = {
         "type": "QUERY",
         "response": [["string", "Max Utility Charging Current", "A"]],
         "test_responses": [
-            b"",
+            b"(002 010 020 030 040 050 060 070 080 090 100 110 120\xca#\r",
         ],
     },
     "QOPPT": {
         "name": "QOPPT",
         "description": "Device Output Source Priority Time Order Inquiry",
         "type": "QUERY",
-        "response": [["string", "Device Output Source Priority Time Order", ""]],
+        "response": [["bytes.decode", "Device Output Source Priority Time Order", ""]],
         "test_responses": [
-            b"",
+            b"(2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 0 2 1>>\r",
         ],
     },
     "QCHPT": {
         "name": "QCHPT",
         "description": "Device Charger Source Priority Time Order Inquiry",
         "type": "QUERY",
-        "response": [["string", "Device Charger Source Priority Time Order", ""]],
+        "response_type": "SEQUENTIAL",
+        "response": [
+            [
+                "option",
+                "Charger Source Priority 00 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 01 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 02 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 03 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 04 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 05 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 06 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 07 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 08 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 09 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 10 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 11 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 12 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 13 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 14 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 15 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 16 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 17 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 18 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 19 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 20 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 21 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 22 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Charger Source Priority 23 hours",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Device Charger Source Priority",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Selection of Charger Source Priority Order 1",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Selection of Charger Source Priority Order 2",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+            [
+                "option",
+                "Selection of Charger Source Priority Order 3",
+                ["undefined", "Solar first", "Solar + Utility", "Only Solar"],
+            ],
+        ],
         "test_responses": [
-            b"",
+            b"(3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 0 0 0\xd0\x8b\r",
         ],
     },
     "QT": {
         "name": "QT",
         "description": "Device Time Inquiry",
         "type": "QUERY",
-        "response": [["string", "Device Time", ""]],
+        "response_type": "SEQUENTIAL",
+        "response": [["bytes.decode", "Device Time", ""]],
         "test_responses": [
-            b"",
+            b"(20210726122606JF\r",
+        ],
+    },
+    "QBEQI": {
+        "name": "QBEQI",
+        "description": "Battery Equalization Status Parameters Inquiry",
+        "type": "QUERY",
+        "response_type": "SEQUENTIAL",
+        "response": [
+            ["option", "Equalization Enabled", ["Disabled", "Enabled"]],
+            ["int", "Equalization Time", "min"],
+            ["int", "Equalization Period", "day"],
+            ["int", "Equalization Max Current", "A"],
+            ["bytes.decode", "Reserved1", ""],
+            ["float", "Equalization Voltage", "V"],
+            ["bytes.decode", "Reserved2", ""],
+            ["int", "Equalization Over Time", "min"],
+            ["option", "Equalization Active", ["Inactive", "Active"]],
+            ["int", "Equalization Elasped Time", "hour"],
+        ],
+        "test_responses": [
+            b"(1 030 030 080 021 55.40 224 030 0 0234y?\r",
+        ],
+    },
+    "QMN": {
+        "name": "QMN",
+        "description": "Model Name Inquiry",
+        "type": "QUERY",
+        "response_type": "SEQUENTIAL",
+        "response": [["bytes.decode", "Model Name", ""]],
+        "test_responses": [
+            b"(MKS2-8000\xb2\x8d\r",
+        ],
+    },
+    "QET": {
+        "name": "QET",
+        "description": "Total PV Generated Energy Inquiry",
+        "type": "QUERY",
+        "response_type": "SEQUENTIAL",
+        "response": [["int", "Total PV Generated Energy", "Wh"]],
+        "test_responses": [
+            b"(00238800!J\r",
+        ],
+    },
+    "QEY": {
+        "name": "QEY",
+        "description": "Yearly PV Generated Energy Inquiry",
+        "type": "QUERY",
+        "response_type": "SEQUENTIAL",
+        "response": [
+            ["int", "PV Generated Energy for Year", "Wh"],
+            ["info:cv", "Year", ""],
+        ],
+        "test_responses": [
+            b"(00238800!J\r",
+        ],
+        "regex": "QEY(\\d\\d\\d\\d)$",
+    },
+    "QEM": {
+        "name": "QEM",
+        "description": "Monthly PV Generated Energy Inquiry",
+        "type": "QUERY",
+        "response_type": "SEQUENTIAL",
+        "response": [
+            ["int", "PV Generated Energy for Month", "Wh"],
+            ["info:cv[:4]", "Year", ""],
+            ["info:calendar.month_name[int(cv[4:])]", "Month", ""],
+        ],
+        "test_responses": [
+            b"(00238800!J\r",
+        ],
+        "regex": "QEM(\\d\\d\\d\\d\\d\\d)$",
+    },
+    "QED": {
+        "name": "QED",
+        "description": "Daily PV Generated Energy Inquiry",
+        "type": "QUERY",
+        "response_type": "SEQUENTIAL",
+        "response": [
+            ["int", "PV Generated Energy for Day", "Wh"],
+            ["info:cv[:4]", "Year", ""],
+            ["info:calendar.month_name[int(cv[4:6])]", "Month", ""],
+            ["info:cv[6:]", "Day", ""],
+        ],
+        "test_responses": [
+            b"(00238800!J\r",
+        ],
+        "regex": "QED(\\d\\d\\d\\d\\d\\d\\d\\d)$",
+    },
+    "QLT": {
+        "name": "QLT",
+        "description": "Total Output Load Energy Inquiry",
+        "type": "QUERY",
+        "response_type": "SEQUENTIAL",
+        "response": [["int", "Total Output Load Energy", "Wh"]],
+        "test_responses": [
+            b"(00238800!J\r",
+        ],
+    },
+    "QLY": {
+        "name": "QLY",
+        "description": "Yearly Output Load Energy Inquiry",
+        "type": "QUERY",
+        "response_type": "SEQUENTIAL",
+        "response": [
+            ["int", "Output Load Energy for Year", "Wh"],
+            ["info:cv", "Year", ""],
+        ],
+        "test_responses": [
+            b"(00238800!J\r",
+        ],
+        "regex": "QLY(\\d\\d\\d\\d)$",
+    },
+    "QLM": {
+        "name": "QLM",
+        "description": "Monthly Output Load Energy Inquiry",
+        "type": "QUERY",
+        "response_type": "SEQUENTIAL",
+        "response": [
+            ["int", "Output Load Energy for Month", "Wh"],
+            ["info:cv[:4]", "Year", ""],
+            ["info:calendar.month_name[int(cv[4:])]", "Month", ""],
+        ],
+        "test_responses": [
+            b"(00238800!J\r",
+        ],
+        "regex": "QLM(\\d\\d\\d\\d\\d\\d)$",
+    },
+    "QLD": {
+        "name": "QLD",
+        "description": "Daily Output Load Energy Inquiry",
+        "type": "QUERY",
+        "response_type": "SEQUENTIAL",
+        "response": [
+            ["int", "Output Load Energy for Day", "Wh"],
+            ["info:cv[:4]", "Year", ""],
+            ["info:calendar.month_name[int(cv[4:6])]", "Month", ""],
+            ["info:cv[6:]", "Day", ""],
+        ],
+        "test_responses": [
+            b"(00238800!J\r",
+        ],
+        "regex": "QLD(\\d\\d\\d\\d\\d\\d\\d\\d)$",
+    },
+    "QLED": {
+        "name": "QLED",
+        "description": "LED Status Parameters Inquiry",
+        "type": "QUERY",
+        "response_type": "SEQUENTIAL",
+        "response": [
+            ["option", "LED Enabled", ["Disabled", "Enabled"]],
+            ["option", "LED Speed", ["Low", "Medium", "Fast"]],
+            ["option", "LED Effect", ["Breathing", "Unknown", "Solid", "Right Scrolling"]],
+            ["int", "LED Brightness", ""],
+            ["int", "LED Number of Colors", ""],
+            ["bytes.decode", "RGB", ""],
+        ],
+        "test_responses": [
+            b"(1 1 2 5 3 148000211255255255000255255\xdaj\r",
         ],
     },
 }
