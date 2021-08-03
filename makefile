@@ -2,7 +2,11 @@ format:
 	flake8 setup.py mppsolar tests
 
 test: tests/*.py
-	python3 -m unittest -v
+	# python3 -m unittest -v
+	coverage run -m unittest
+	coverage report -m
+	coverage html
+
 
 pypi:
 	sudo rm -rf dist/*
