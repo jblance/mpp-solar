@@ -427,9 +427,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     value, data_units = m[lookup]
                 elif data_type.startswith("info"):
                     log.debug("processing info...")
-                    print(
-                        f"Processing {data_type=} for {data_name=}, {data_units=} {response=} {command=} {self._command_value=}"
-                    )
+                    # print(
+                    #    f"Processing {data_type=} for {data_name=}, {data_units=} {response=} {command=} {self._command_value=}"
+                    # )
                     template = data_type.split(":", 1)[1]
                     # Provide cv as shortcut to self._command_value for info fields
                     cv = self._command_value  # noqa: F841

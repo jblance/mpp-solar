@@ -1,2 +1,2 @@
-__version__ = "0.7.74"
-__version_comment__ = "add rest of query COMMANDS to PI30MAX"
+__version__ = "0.7.75"
+__version_comment__ = "remove print with f string"
