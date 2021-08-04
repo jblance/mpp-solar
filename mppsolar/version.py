@@ -1,2 +1,2 @@
-__version__ = "0.7.75"
-__version_comment__ = "remove print with f string"
+__version__ = "0.7.76"
+__version_comment__ = "remove brackets in ved protocol"
