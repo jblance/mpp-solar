@@ -195,6 +195,20 @@ def LittleHex2UInt(hexString):
     return answer
 
 
+def LittleHex2Int(hexString):
+    """
+    Decode a 4 byte hexString to int (little endian coded)
+    """
+    # Make sure supplied String is the correct length
+    if len(hexString) != 4:
+        log.info(f"Hex encoded value must be 4 bytes long. Was {len(hexString)} length")
+        return 0
+
+    answer = unpack("<i", hexString)[0]
+    log.debug(f"Hex {hexString} 4 byte decoded to {answer}")
+    return answer
+
+
 def decode2ByteHex(hexString):
     """
     Code a 2 byte hexString to volts as per jkbms approach (blackbox determined)

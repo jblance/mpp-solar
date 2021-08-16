@@ -1,2 +1,2 @@
-__version__ = "0.7.76"
-__version_comment__ = "remove brackets in ved protocol"
+__version__ = "0.7.77"
+__version_comment__ = "jk02 changes"
