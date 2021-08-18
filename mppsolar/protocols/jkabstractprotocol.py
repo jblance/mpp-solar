@@ -1,4 +1,5 @@
 import logging
+import struct
 
 from .abstractprotocol import AbstractProtocol
 from .protocol_helpers import crc8
@@ -52,7 +53,7 @@ class jkAbstractProtocol(AbstractProtocol):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
-        self._protocol_id = b"JK02"
+        self._protocol_id = b"JK"
         self.COMMANDS = COMMANDS
         self.STATUS_COMMANDS = [
             "",
@@ -86,6 +87,11 @@ class jkAbstractProtocol(AbstractProtocol):
             log.debug(f"cmd with SOR: {cmd}")
             # then has command code
             cmd[4] = int(self._command_defn["command_code"], 16)
+            if self._command_defn["type"] == "SETTER":
+                cmd[5] = 0x04
+                value = struct.pack("<h", int(float(self._command_value) * 1000))
+                cmd[6] = value[0]
+                cmd[7] = value[1]
             log.debug(f"cmd with command code: {cmd}")
             cmd[-1] = crc8(cmd)
             log.debug(f"cmd with crc: {cmd}")
