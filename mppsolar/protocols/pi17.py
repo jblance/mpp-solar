@@ -346,6 +346,38 @@ COMMANDS = {
             b"^D0762000,0584,0576,0000,000,0576,0460,0510,0460,0510,1,,,1,0540,000,2000,0250\x85Y\r",
         ],
     },
+    "HECS": {
+        "name": "HECS",
+        "prefix": "^P005",
+        "description": "Query energy control status",
+        "help": " -- queries the device energy distribution",
+        "type": "QUERY",
+        "response": [
+            [
+                "keyed",
+                "Solar Energy Distribution Priority",
+                {
+                    "00": "Battery-Load-Grid",
+                    "01": "Load-Battery-Grid",
+                    "02": "Load-Grid-Battery",
+                },
+                "flags",
+                [
+                    "Solar charge battery",
+                    "AC charge battery",
+                    "Feed power to utility",
+                    "Battery discharge to loads when solar input normal",
+                    "Battery discharge to loads when solar input loss",                    
+                    "Battery discharge to feed grid when solar input normal",
+                    "Battery discharge to feed grid when solar input loss",
+                    "Reserved",
+                ],
+            ],
+        ],
+        "test_responses": [
+            b"^D019\xd9\x9f,0,0,0,0,0,0,0,0\r",
+        ],
+    },
     "LON": {
         "name": "LON",
         "description": "Set enable/disable machine supply power to the loads",
@@ -358,7 +390,7 @@ COMMANDS = {
             b"^1\x0b\xc2\r",
             b"^0\x1b\xe3\r",
         ],
-        "regex": "LST((0[123])|([12]0))$",
+        "regex": "LON([01])$",
     },
     "PA": {
         "name": "PA",
@@ -584,6 +616,20 @@ COMMANDS = {
         ],
         "regex": "BT([01])$",
     },
+    "MCHGV": {
+        "name": "MCHGV",
+        "description": "Set battery charge voltages",
+        "help": " -- examples: MCHGV0576,0566 (CV voltage in 0.1V xxxx, Float voltage xxxx in 0.1V)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "MCHGV(05\d\d,05\d\d)$",
+    },
     "ACCT": {
         "name": "ACCT",
         "description": "Set AC charge time range",
@@ -597,6 +643,62 @@ COMMANDS = {
             b"^0\x1b\xe3\r",
         ],
         "regex": "ACCT(2[0-3]|[01]?[0-9])([0-5]?[0-9])-(2[0-3]|[01]?[0-9])([0-5]?[0-9])$",
+    },
+    "ACCB": {
+        "name": "ACCB",
+        "description": "AC Charger  keep  battery voltage",
+        "help": " -- examples: ACCB1,0450 (1: enable, 0: disable),(400-600) 0.1V",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ], 
+        "regex": "ACCB([01],0[456]\d\d)$",
+    },
+    "MUCHGC": {
+        "name": "MUCHGC",
+        "description": "Set battery charge current",
+        "help": " -- examples: MUCHGC0600 (Current in mA xxxx)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "MUCHGC([012]\d\d\d)$",
+    },
+    "SEP": {
+        "name": "SEP",
+        "description": "Set solar energy distribution priority",
+        "help": " -- examples: SEP(00-BLG; 01-LBG; 02-LGB)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "SEP(0[012])$",
+    },
+    "BDCM": {
+        "name": "BDCM",
+        "description": "Battery discharge max current in hybrid mode",
+        "help": " -- examples: (BDCMxxxx, 0.1A)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "BDCM(0[1-2]\d\d)$",
     },
 }
 
@@ -621,6 +723,7 @@ class pi17(AbstractProtocol):
             "FLAG",
             "T",
             "ET",
+            "HECS",
         ]
         self.DEFAULT_COMMAND = "PI"
 
