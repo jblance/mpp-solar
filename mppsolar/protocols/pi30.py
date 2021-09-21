@@ -254,7 +254,7 @@ COMMANDS = {
     "PBATCD": {
         "name": "PBATCD",
         "description": "Battery charge/discharge controlling command",
-        "help": " -- examples: PBATCDxxx "please read description, use carefully",
+        "help": " -- examples: PBATCDxxx (please read description, use carefully)",
         "type": "SETTER",
         "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
@@ -278,7 +278,7 @@ COMMANDS = {
      "PBATMAXDISC": {
         "name": "PBATMAXDISC",
         "description": "Battery max discharge current",
-        "help": " -- examples: PBATMAXDISCxxx "000- disable or 030-150A",
+        "help": " -- examples: PBATMAXDISCxxx (000- disable or 030-150A)",
         "type": "SETTER",
         "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
