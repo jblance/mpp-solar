@@ -266,14 +266,14 @@ COMMANDS = {
     "DAT": {
         "name": "DAT",
         "description": "Set Date Time",
-        "help": " -- examples: DATYYYYMMDDHHMMSS (14 digits after DAT),
+        "help": " -- examples: DATYYMMDDHHMMSS (12 digits after DAT),
         "type": "SETTER",
         "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
         ],
-        "regex": "DAT(\d\d\d\d\d\d\d\d\d\d\d\d\d\d)$",
+        "regex": "DAT(\d\d\d\d\d\d\d\d\d\d\d\d)$",
     },
      "PBATMAXDISC": {
         "name": "PBATMAXDISC",
