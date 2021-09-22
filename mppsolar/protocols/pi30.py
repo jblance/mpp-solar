@@ -251,6 +251,42 @@ COMMANDS = {
         ],
         "regex": "PSPB([01])$",
     },
+    "PBATCD": {
+        "name": "PBATCD",
+        "description": "Battery charge/discharge controlling command",
+        "help": " -- examples: PBATCDxxx (please read description, use carefully)",
+        "type": "SETTER",
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "PBATCD([01][01][01])$",
+    },
+    "DAT": {
+        "name": "DAT",
+        "description": "Set Date Time",
+        "help": " -- examples: DATYYYYMMDDHHMMSS (14 digits after DAT),
+        "type": "SETTER",
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "DAT(\d\d\d\d\d\d\d\d\d\d\d\d\d\d)$",
+    },
+     "PBATMAXDISC": {
+        "name": "PBATMAXDISC",
+        "description": "Battery max discharge current",
+        "help": " -- examples: PBATMAXDISCxxx (000- disable or 030-150A)",
+        "type": "SETTER",
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "PBATMAXDISC([01]\d\d)$",
+    },
     "Q1": {
         "name": "Q1",
         "description": "Q1 query",
