@@ -266,7 +266,7 @@ COMMANDS = {
     "DAT": {
         "name": "DAT",
         "description": "Set Date Time",
-        "help": " -- examples: DATYYYYMMDDHHMMSS (14 digits after DAT),
+        "help": " -- examples: DATYYYYMMDDHHMMSS (14 digits after DAT)",
         "type": "SETTER",
         "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
@@ -275,7 +275,7 @@ COMMANDS = {
         ],
         "regex": "DAT(\d\d\d\d\d\d\d\d\d\d\d\d\d\d)$",
     },
-     "PBATMAXDISC": {
+    "PBATMAXDISC": {
         "name": "PBATMAXDISC",
         "description": "Battery max discharge current",
         "help": " -- examples: PBATMAXDISCxxx (000- disable or 030-150A)",
