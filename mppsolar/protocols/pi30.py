@@ -285,7 +285,7 @@ COMMANDS = {
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
         ],
-        "regex": "DAT(\d\d\d\d\d\d\d\d\d\d\d\d\d\d)$",
+        "regex": "DAT(\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d)$",
     },
     "PBATMAXDISC": {
         "name": "PBATMAXDISC",
@@ -297,7 +297,7 @@ COMMANDS = {
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
         ],
-        "regex": "PBATMAXDISC([01]\d\d)$",
+        "regex": "PBATMAXDISC([01]\\d\\d)$",
     },
     "Q1": {
         "name": "Q1",
