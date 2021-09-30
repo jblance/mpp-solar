@@ -19,9 +19,12 @@ class MqttIO(BaseIO):
         # self._serial_port = device_path
         # self._serial_baud = serial_baud
         self.mqtt_broker = get_kwargs(kwargs, "mqtt_broker", "localhost")
-        self.mqtt_port = get_kwargs(kwargs, "mqtt_port", 1883)
-        self.mqtt_user = get_kwargs(kwargs, "mqtt_user")
-        self.mqtt_pass = get_kwargs(kwargs, "mqtt_pass")
+        self.mqtt_port = self.mqtt_broker.port
+        self.mqtt_user = self.mqtt_broker.username
+        self.mqtt_pass = self.mqtt_broker.password
+        # self.mqtt_port = get_kwargs(kwargs, "mqtt_port", 1883)
+        # self.mqtt_user = get_kwargs(kwargs, "mqtt_user")
+        # self.mqtt_pass = get_kwargs(kwargs, "mqtt_pass")
         self.client_id = get_kwargs(kwargs, "client_id")
         log.info(
             f"__init__: client_id: {self.client_id}, mqtt_broker: {self.mqtt_broker}, port: {self.mqtt_port}, user: {self.mqtt_user}, pass: {self.mqtt_pass}"
@@ -29,9 +32,7 @@ class MqttIO(BaseIO):
         self._msg = None
 
     def sub_cb(self, client, userdata, message):
-        log.debug(
-            f"Mqttio sub_cb got msg, topic: {message.topic}, payload: {message.payload}"
-        )
+        log.debug(f"Mqttio sub_cb got msg, topic: {message.topic}, payload: {message.payload}")
         self._msg = message
 
     def send_and_receive(self, *args, **kwargs) -> dict:

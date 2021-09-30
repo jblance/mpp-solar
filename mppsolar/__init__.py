@@ -1,57 +1,16 @@
 # !/usr/bin/python3
-from argparse import ArgumentParser
-import importlib
 import logging
+from argparse import ArgumentParser
 
-# from sys import exit
+from .lib.mqttbroker import MqttBroker
 
+from .helpers import get_device_class, get_outputs
 from .version import __version__, __version_comment__  # noqa: F401
 
 # Set-up logger
-# log = logging.getLogger(log_name)
 log = logging.getLogger("")
 FORMAT = "%(asctime)-15s:%(levelname)s:%(module)s:%(funcName)s@%(lineno)d: %(message)s"
 logging.basicConfig(format=FORMAT)
-
-
-def get_outputs(output_list):
-    """
-    Take a comma separated list of output names
-    attempt to find and instantiate the corresponding module
-    return array of modules
-    """
-    ops = []
-    outputs = output_list.split(",")
-    for output in outputs:
-        log.info(f"attempting to create output processor: {output}")
-        try:
-            output_module = importlib.import_module("mppsolar.outputs." + output, ".")
-            output_class = getattr(output_module, output)
-            ops.append(output_class())
-        except ModuleNotFoundError:
-            # perhaps raise a Powermon exception here??
-            # maybe warn and keep going, only error if no outputs found?
-            log.critical(f"No module found for output processor {output}")
-    return ops
-
-
-def get_device_class(device_type=None):
-    """
-    Take a device type string
-    attempt to find and instantiate the corresponding module
-    return class if found, otherwise return None
-    """
-    if device_type is None:
-        return None
-    device_type = device_type.lower()
-    try:
-        device_module = importlib.import_module("mppsolar.devices." + device_type, ".")
-    except ModuleNotFoundError as e:
-        # perhaps raise a mppsolar exception here??
-        log.critical(f"Error loading device {device_type}: {e}")
-        return None
-    device_class = getattr(device_module, device_type)
-    return device_class
 
 
 def main():
@@ -236,16 +195,14 @@ def main():
     log.info(description)
     if args.version:
         print(description)
-        # exit(0)
         return None
 
-    mqtt_broker = args.mqttbroker
-    mqtt_port = args.mqttport
-    mqtt_topic = args.mqtttopic
-    if mqtt_topic is None:
-        mqtt_topic = prog_name
-    mqtt_user = args.mqttuser
-    mqtt_pass = args.mqttpass
+    mqtt_broker = MqttBroker(
+        name=args.mqttbroker, port=args.mqttport, username=args.mqttuser, password=args.mqttpass
+    )
+    mqtt_broker.set("results_topic", (args.mqtttopic if args.mqtttopic is not None else prog_name))
+    print(mqtt_broker)
+    ##
     filter = args.filter
     excl_filter = args.exclfilter
     keep_case = args.keepcase
@@ -281,16 +238,18 @@ def main():
             exit(1)
         # Process setup section
         pause = config["SETUP"].getint("pause", fallback=60)
-        mqtt_broker = config["SETUP"].get("mqtt_broker", fallback="localhost")
-        mqtt_port = config["SETUP"].get("mqtt_port", fallback=1883)
-        mqtt_user = config["SETUP"].get("mqtt_user", fallback=None)
-        mqtt_pass = config["SETUP"].get("mqtt_pass", fallback=None)
+        # Overide mqtt_broker settings
+        mqtt_broker.update("name", config["SETUP"].get("mqtt_broker", fallback=None))
+        mqtt_broker.update("port", config["SETUP"].get("mqtt_port", fallback=None))
+        mqtt_broker.update("username", config["SETUP"].get("mqtt_user", fallback=None))
+        mqtt_broker.update("password", config["SETUP"].get("mqtt_pass", fallback=None))
         sections.remove("SETUP")
+
         # Process 'command' sections
         for section in sections:
             name = section
             protocol = config[section].get("protocol", fallback=None)
-            type = config[section].get("type", fallback="mppsolar")
+            _type = config[section].get("type", fallback="mppsolar")
             port = config[section].get("port", fallback="/dev/ttyUSB0")
             baud = config[section].get("baud", fallback=2400)
             _command = config[section].get("command")
@@ -300,7 +259,7 @@ def main():
             filter = config[section].get("filter", fallback=None)
             excl_filter = config[section].get("exclfilter", fallback=None)
             #
-            device_class = get_device_class(type)
+            device_class = get_device_class(_type)
             log.debug(f"device_class {device_class}")
             # The device class __init__ will instantiate the port communications and protocol classes
             device = device_class(
@@ -311,9 +270,9 @@ def main():
                 baud=baud,
                 porttype=porttype,
                 mqtt_broker=mqtt_broker,
-                mqtt_port=mqtt_port,
-                mqtt_user=mqtt_user,
-                mqtt_pass=mqtt_pass,
+                # mqtt_port=mqtt_port,
+                # mqtt_user=mqtt_user,
+                # mqtt_pass=mqtt_pass,
             )
             # build array of commands
             commands = _command.split(",")
@@ -325,12 +284,12 @@ def main():
             if args.daemon:
                 print(f"Config file: {args.configfile}")
                 print(f"Config setting - pause: {pause}")
-                print(f"Config setting - mqtt_broker: {mqtt_broker}, port: {mqtt_port}")
+                # print(f"Config setting - mqtt_broker: {mqtt_broker}, port: {mqtt_port}")
                 print(f"Config setting - command sections found: {len(sections)}")
             else:
                 log.info(f"Config file: {args.configfile}")
                 log.info(f"Config setting - pause: {pause}")
-                log.info(f"Config setting - mqtt_broker: {mqtt_broker}, port: {mqtt_port}")
+                # log.info(f"Config setting - mqtt_broker: {mqtt_broker}, port: {mqtt_port}")
                 log.info(f"Config setting - command sections found: {len(sections)}")
 
     else:
@@ -349,9 +308,9 @@ def main():
             baud=args.baud,
             porttype=args.porttype,
             mqtt_broker=mqtt_broker,
-            mqtt_port=mqtt_port,
-            mqtt_user=mqtt_user,
-            mqtt_pass=mqtt_pass,
+            # mqtt_port=mqtt_port,
+            # mqtt_user=mqtt_user,
+            # mqtt_pass=mqtt_pass,
         )
         #
 
@@ -417,10 +376,10 @@ def main():
                     data=results,
                     tag=_tag,
                     mqtt_broker=mqtt_broker,
-                    mqtt_port=mqtt_port,
-                    mqtt_user=mqtt_user,
-                    mqtt_pass=mqtt_pass,
-                    mqtt_topic=mqtt_topic,
+                    # mqtt_port=mqtt_port,
+                    # mqtt_user=mqtt_user,
+                    # mqtt_pass=mqtt_pass,
+                    # mqtt_topic=mqtt_topic,
                     filter=filter,
                     excl_filter=excl_filter,
                     keep_case=keep_case,

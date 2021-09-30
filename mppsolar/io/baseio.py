@@ -1,12 +1,11 @@
-# shamelessly stolen from ccrisan https://github.com/qtoggle/qtoggleserver-mppsolar/blob/master/qtoggleserver/mppsolar/io.py
-import abc
+from abc import ABC, abstractmethod
 import logging
 
 # from time import sleep
 log = logging.getLogger("BaseIO")
 
 
-class BaseIO(metaclass=abc.ABCMeta):
-    @abc.abstractmethod
+class BaseIO(ABC):
+    @abstractmethod
     def send_and_receive(self, *args, **kwargs) -> dict:
         raise NotImplementedError

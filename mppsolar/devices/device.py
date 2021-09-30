@@ -1,6 +1,6 @@
-import abc
 import importlib
 import logging
+from abc import ABC
 
 from ..helpers import get_kwargs
 
@@ -18,7 +18,7 @@ PORT_TYPE_DALYSERIAL = 128
 log = logging.getLogger("device")
 
 
-class AbstractDevice(metaclass=abc.ABCMeta):
+class AbstractDevice(ABC):
     """
     Abstract device class
     """
@@ -177,21 +177,19 @@ class AbstractDevice(metaclass=abc.ABCMeta):
         elif port_type == PORT_TYPE_MQTT:
 
             mqtt_broker = get_kwargs(kwargs, "mqtt_broker", "localhost")
-            mqtt_port = get_kwargs(kwargs, "mqtt_port", 1883)
-            mqtt_user = get_kwargs(kwargs, "mqtt_user")
-            mqtt_pass = get_kwargs(kwargs, "mqtt_pass")
-            log.info(
-                f"Using mqttio for communications broker {mqtt_broker}, port {mqtt_port}, user {mqtt_user}, pass {mqtt_pass}"
-            )
+            # mqtt_port = get_kwargs(kwargs, "mqtt_port", 1883)
+            # mqtt_user = get_kwargs(kwargs, "mqtt_user")
+            # mqtt_pass = get_kwargs(kwargs, "mqtt_pass")
+            log.info(f"Using mqttio for communications broker {mqtt_broker}")
 
             from mppsolar.io.mqttio import MqttIO
 
             self._port = MqttIO(
                 client_id=self._name,
                 mqtt_broker=mqtt_broker,
-                mqtt_port=mqtt_port,
-                mqtt_user=mqtt_user,
-                mqtt_pass=mqtt_pass,
+                # mqtt_port=mqtt_port,
+                # mqtt_user=mqtt_user,
+                # mqtt_pass=mqtt_pass,
             )
 
         else:

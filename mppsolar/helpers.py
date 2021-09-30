@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import logging
-
-# import re
+import importlib
 
 log = logging.getLogger("helpers")
 
@@ -51,3 +50,43 @@ def get_resp_defn(key, defns):
     # did not find definition for this key
     log.info(f"No defn found for {key} key")
     return [key, key, "", ""]
+
+
+def get_outputs(output_list):
+    """
+    Take a comma separated list of output names
+    attempt to find and instantiate the corresponding module
+    return array of modules
+    """
+    ops = []
+    outputs = output_list.split(",")
+    for output in outputs:
+        log.info(f"attempting to create output processor: {output}")
+        try:
+            output_module = importlib.import_module("mppsolar.outputs." + output, ".")
+            output_class = getattr(output_module, output)
+            ops.append(output_class())
+        except ModuleNotFoundError:
+            # perhaps raise a Powermon exception here??
+            # maybe warn and keep going, only error if no outputs found?
+            log.critical(f"No module found for output processor {output}")
+    return ops
+
+
+def get_device_class(device_type=None):
+    """
+    Take a device type string
+    attempt to find and instantiate the corresponding module
+    return class if found, otherwise return None
+    """
+    if device_type is None:
+        return None
+    device_type = device_type.lower()
+    try:
+        device_module = importlib.import_module("mppsolar.devices." + device_type, ".")
+    except ModuleNotFoundError as e:
+        # perhaps raise a mppsolar exception here??
+        log.critical(f"Error loading device {device_type}: {e}")
+        return None
+    device_class = getattr(device_module, device_type)
+    return device_class
