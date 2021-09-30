@@ -10,7 +10,6 @@ log = logging.getLogger("pi18")
 COMMANDS = {
     "ET": {
         "name": "ET",
-        "prefix": "^P005",
         "description": "Total Generated Energy query",
         "help": " -- Query total generated energy",
         "type": "QUERY",
@@ -21,7 +20,6 @@ COMMANDS = {
     },
     "GS": {
         "name": "GS",
-        "prefix": "^P005",
         "description": "General status query",
         "help": " -- Query general status information",
         "type": "QUERY",
@@ -74,7 +72,6 @@ COMMANDS = {
     },
     "MOD": {
         "name": "MOD",
-        "prefix": "^P006",
         "description": "Working mode query",
         "help": " -- Query the working mode",
         "type": "QUERY",
@@ -98,7 +95,6 @@ COMMANDS = {
     },
     "PI": {
         "name": "PI",
-        "prefix": "^P005",
         "description": "Device Protocol Version inquiry",
         "help": " -- queries the device protocol version",
         "type": "QUERY",
