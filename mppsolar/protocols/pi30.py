@@ -191,6 +191,18 @@ COMMANDS = {
         ],
         "regex": "POP(0[012])$",
     },
+    "POPLG": {
+        "name": "POPLG",
+        "description": "Set Device Operation Logic",
+        "help": " -- examples: POPLG00 (set Auto mode), POPLG01 (set Online mode), POPLG02 (set ECO mode)",
+        "type": "SETTER",
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "POPLG(0[012])$",
+    },
     "POPM": {
         "name": "POPM",
         "description": "Set Device Output Mode (for 4000/5000)",
@@ -266,16 +278,16 @@ COMMANDS = {
     "DAT": {
         "name": "DAT",
         "description": "Set Date Time",
-        "help": " -- examples: DATYYMMDDHHMMSS (12 digits after DAT),
+        "help": " -- examples: DATYYYYMMDDHHMMSS (14 digits after DAT)",
         "type": "SETTER",
         "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
         ],
-        "regex": "DAT(\d\d\d\d\d\d\d\d\d\d\d\d)$",
+        "regex": "DAT(\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d)$",
     },
-     "PBATMAXDISC": {
+    "PBATMAXDISC": {
         "name": "PBATMAXDISC",
         "description": "Battery max discharge current",
         "help": " -- examples: PBATMAXDISCxxx (000- disable or 030-150A)",
@@ -285,7 +297,7 @@ COMMANDS = {
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
         ],
-        "regex": "PBATMAXDISC([01]\d\d)$",
+        "regex": "PBATMAXDISC([01]\\d\\d)$",
     },
     "Q1": {
         "name": "Q1",
@@ -783,6 +795,8 @@ COMMANDS = {
                     "PV input max power will be the sum of the max charged power and loads power",
                 ],
             ],
+            ["int", "Max charging time for CV stage", "min"],
+            ["option", "Operation Logic", ["Automatic mode", "On-line mode", "ECO mode"]],
         ],
         "test_responses": [
             b"(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1\x6F\x7E\r",

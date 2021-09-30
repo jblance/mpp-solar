@@ -6,7 +6,7 @@ class test_jk02_decode(unittest.TestCase):
     maxDiff = None
 
     def test_getInfo(self):
-        """ test the decode of a getInfo response"""
+        """test the decode of a getInfo response"""
         protocol = pi()
         response = bytes.fromhex(
             "55aaeb9003f14a4b2d42324132345300000000000000332e300000000000332e322e330000000876450004000000506f7765722057616c6c203100000000313233340000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c2"
@@ -38,7 +38,7 @@ class test_jk02_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_getCellData(self):
-        """ test the decode of a getCellData response"""
+        """test the decode of a getCellData response"""
         protocol = pi()
         response = bytes.fromhex(
             "55aaeb9002b52e0d280dfa0c2e0d2f0d220d220d130d190d1d0d1d0d170d1f0d160dfb0c1f0d00000000000000000000000000000000ffff00001c0d350004029b00c600a000b300bc00cc00be00b100b4002d013d01b000a100ab00b200ad0000000000000000000000000000000000000000000000bcd1000000000000000000001e0116013c010000000000636b0c0300400d030000000000dc4d010064000000781e16000101480a000000000000000000000000070101000000980400000000260141400000000037feffff00000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080"
@@ -106,16 +106,16 @@ class test_jk02_decode(unittest.TestCase):
             "Resistance_Cell23": [0.0, "Ohm"],
             "Resistance_Cell24": [0.0, "Ohm"],
             "Battery_Voltage": [53.692, "V"],
-            "Battery_Power": [0.0, "W"],
-            "Charge_Current": [0.0, "A"],
+            "Battery_Power": [0, "W"],
+            "Balance_Current": [0.0, "A"],
             "Battery_T1": [28.6, "°C"],
             "Battery_T2": [27.8, "°C"],
             "MOS_Temp": [31.6, "°C"],
-            "Percent_Remain": [99, ""],
-            "Capacity_Remain": [199.787, ""],
-            "Nominal_Capacity": [200.0, ""],
-            "Cycle_Count": ["00000000", ""],
-            "Capacity_Cycle": [85.468, ""],
+            "Percent_Remain": [99, "%"],
+            "Capacity_Remain": [199.787, "Ah"],
+            "Nominal_Capacity": [200.0, "Ah"],
+            "Cycle_Count": [0, ""],
+            "Cycle_Capacity": [85.468, "Ah"],
             "Time": ["16D18H39M52S", ""],
             "Current_Charge": [0.004, ""],
             "Current_Discharge": [0.0, ""],

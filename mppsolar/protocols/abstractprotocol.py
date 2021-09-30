@@ -89,15 +89,18 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         if data_type == "loop":
             log.warning("loop not implemented...")
             return data_name, None, data_units
-        if data_type == "exclude" or data_type == "discard":
+        if data_type == "exclude" or data_type == "discard" or raw_value == "extra":
             # Just ignore these ones
             log.debug(f"Discarding {data_name}:{raw_value}")
             return None, raw_value, data_units
         if data_type == "option":
-            key = int(raw_value)
-            if key < len(data_units):
+            try:
+                key = int(raw_value)
                 r = data_units[key]
-            else:
+            except ValueError:
+                r = f"Unable to process to int: {raw_value}"
+                return None, r, ""
+            except IndexError:
                 r = f"Invalid option: {key}"
             return data_name, r, ""
         if data_type == "hex_option":

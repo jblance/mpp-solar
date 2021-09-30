@@ -858,6 +858,3 @@ class pi17(AbstractProtocol):
         responses[-1] = responses[-1][:-3]
         return responses
     
-
-
-

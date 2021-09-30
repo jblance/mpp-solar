@@ -61,20 +61,12 @@ class mqtt(baseoutput):
         data = get_kwargs(kwargs, "data")
         if data is None:
             return
-        mqtt_broker = get_kwargs(kwargs, "mqtt_broker", "localhost")
-        _port = get_kwargs(kwargs, "mqtt_port", 1883)
-        try:
-            mqtt_port = int(_port)
-        except ValueError as e:
-            log.warn(f"Unable to cast {_port} to int - check value supplied for mqttport")
-            log.warn(e)
+        mqtt_broker = get_kwargs(kwargs, "mqtt_broker")
+        if mqtt_broker is None:
             return
-        except Exception as e:
-            log.warn(e)
-            return
-
-        mqtt_user = get_kwargs(kwargs, "mqtt_user")
-        mqtt_pass = get_kwargs(kwargs, "mqtt_pass")
+        mqtt_port = mqtt_broker.port
+        mqtt_user = mqtt_broker.username
+        mqtt_pass = mqtt_broker.password
 
         filter = get_kwargs(kwargs, "filter")
         if filter is not None:
@@ -93,19 +85,19 @@ class mqtt(baseoutput):
         msgs = self.build_msgs(**kwargs)
         log.debug(f"mqtt.output msgs {msgs}")
         if msgs:
-            if mqtt_broker == "screen":
+            if mqtt_broker.name == "screen":
                 for msg in msgs:
                     print(msg)
             else:
                 try:
-                    publish.multiple(msgs, hostname=mqtt_broker, port=mqtt_port, auth=auth)
+                    publish.multiple(msgs, hostname=mqtt_broker.name, port=mqtt_port, auth=auth)
                 except Exception as e:
-                    log.warn(
-                        f"Error publishing MQTT messages to broker '{mqtt_broker}' on port '{mqtt_port}' with auth '{auth}'"
+                    log.warning(
+                        f"Error publishing MQTT messages to broker '{mqtt_broker.name}' on port '{mqtt_port}' with auth '{auth}'"
                     )
-                    log.warn(e)
+                    log.warning(e)
         else:
             if mqtt_broker == "screen":
                 print("MQTT build_msgs returned no messages")
             else:
-                log.warn("MQTT build_msgs returned no messages")
+                log.warning("MQTT build_msgs returned no messages")
