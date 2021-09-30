@@ -1,7 +1,8 @@
 import logging
 
 from .abstractprotocol import AbstractProtocol
-from .protocol_helpers import crcPI as crc
+
+# from .protocol_helpers import crcPI as crc
 
 # from .pi30 import COMMANDS
 
@@ -367,7 +368,7 @@ COMMANDS = {
                     "AC charge battery",
                     "Feed power to utility",
                     "Battery discharge to loads when solar input normal",
-                    "Battery discharge to loads when solar input loss",                    
+                    "Battery discharge to loads when solar input loss",
                     "Battery discharge to feed grid when solar input normal",
                     "Battery discharge to feed grid when solar input loss",
                     "Reserved",
@@ -390,7 +391,7 @@ COMMANDS = {
         "test_responses": [
             b"^D01100006591\xba\x10\r",
         ],
-        "regex": "EY(\d\d\d\d)$",
+        "regex": "EY(\\d\\d\\d\\d)$",
     },
     "EM": {
         "name": "EM",
@@ -404,7 +405,7 @@ COMMANDS = {
         "test_responses": [
             b"^D01000006591\xba\x10\r",
         ],
-            "regex": "EM(\d\d\d\d\d\d)$",
+        "regex": "EM(\\d\\d\\d\\d\\d\\d)$",
     },
     "ED": {
         "name": "ED",
@@ -418,7 +419,7 @@ COMMANDS = {
         "test_responses": [
             b"^D009000091\xba\x10\r",
         ],
-        "regex": "ED(\d\d\d\d\d\d\d\d)$",
+        "regex": "ED(\\d\\d\\d\\d\\d\\d\\d\\d)$",
     },
     "EH": {
         "name": "EH",
@@ -432,7 +433,7 @@ COMMANDS = {
         "test_responses": [
             b"^D008000001\xba\x10\r",
         ],
-        "regex": "EH(\d\d\d\d\d\d\d\d\d\d)$",
+        "regex": "EH(\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d)$",
     },
     "LON": {
         "name": "LON",
@@ -544,7 +545,7 @@ COMMANDS = {
             b"^1\x0b\xc2\r",
             b"^0\x1b\xe3\r",
         ],
-        "regex": "DAT(\d\d\d\d\d\d\d\d\d\d\d\d)$",
+        "regex": "DAT(\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d)$",
     },
     "LST": {
         "name": "LST",
@@ -684,7 +685,7 @@ COMMANDS = {
             b"^1\x0b\xc2\r",
             b"^0\x1b\xe3\r",
         ],
-        "regex": "MCHGV(05\d\d,05\d\d)$",
+        "regex": "MCHGV(05\\d\\d,05\\d\\d)$",
     },
     "ACCT": {
         "name": "ACCT",
@@ -711,8 +712,8 @@ COMMANDS = {
         "test_responses": [
             b"^1\x0b\xc2\r",
             b"^0\x1b\xe3\r",
-        ], 
-        "regex": "ACCB([01],0[456]\d\d)$",
+        ],
+        "regex": "ACCB([01],0[456]\\d\\d)$",
     },
     "MUCHGC": {
         "name": "MUCHGC",
@@ -726,7 +727,7 @@ COMMANDS = {
             b"^1\x0b\xc2\r",
             b"^0\x1b\xe3\r",
         ],
-        "regex": "MUCHGC([012]\d\d\d)$",
+        "regex": "MUCHGC([012]\\d\\d\\d)$",
     },
     "SEP": {
         "name": "SEP",
@@ -754,7 +755,7 @@ COMMANDS = {
             b"^1\x0b\xc2\r",
             b"^0\x1b\xe3\r",
         ],
-        "regex": "BDCM(0[1-2]\d\d)$",
+        "regex": "BDCM(0[1-2]\\d\\d)$",
     },
 }
 
@@ -785,6 +786,7 @@ class pi17(AbstractProtocol):
             "HECS",
         ]
         self.DEFAULT_COMMAND = "PI"
+
     def get_full_command(self, command) -> bytes:
         """
         Override the default get_full_command as its different
@@ -807,24 +809,24 @@ class pi17(AbstractProtocol):
             log.debug(f"_pre_cmd: {_pre_cmd}")
             log.debug(f"_prefix: {_prefix}")
             # calculate the CRC
-            #crc_high; crc_low = crc(_pre_cmd)
+            # crc_high; crc_low = crc(_pre_cmd)
             # combine byte_cmd, CRC , return
             # PI18 full command "^P005GS\x..\x..\r"
             # _crc = bytes([crc_high, crc_low, 13])
             full_command = _pre_cmd + bytes([13])  # + _crc
             log.debug(f"full command: {full_command}")
-            return full_command 
+            return full_command
         elif _type == "QUERYEN":
             data_length1 = len(_cmd) + 4
             _prefix = f"^P{data_length1:03}"
             log.debug(f"_prefix: {_prefix}")
-            intermedstr =_prefix+self._command
-            _numb0 = sum(bytearray(intermedstr,'utf-8')) & 255
+            intermedstr = _prefix + self._command
+            _numb0 = sum(bytearray(intermedstr, "utf-8")) & 255
             _numb = f"{_numb0:03d}"
             log.debug(f"_numb: {_numb}")
             _pre_cmd = intermedstr + str(_numb)
             log.debug(f"_pre_cmd: {_pre_cmd}")
-            full_command = bytes(_pre_cmd, 'utf-8') + bytes([13])  
+            full_command = bytes(_pre_cmd, "utf-8") + bytes([13])
             log.debug(f"full command: {full_command}")
             return full_command
         else:
@@ -832,7 +834,7 @@ class pi17(AbstractProtocol):
             _pre_cmd = bytes(_prefix, "utf-8") + _cmd
             log.debug(f"_pre_cmd: {_pre_cmd}")
             # calculate the CRC
-            #crc_high; crc_low = crc(_pre_cmd)
+            # crc_high; crc_low = crc(_pre_cmd)
             # combine byte_cmd, CRC , return
             # PI18 full command "^P005GS\x..\x..\r"
             # _crc = bytes([crc_high, crc_low, 13])
@@ -857,4 +859,3 @@ class pi17(AbstractProtocol):
         # Remove CRC of last response
         responses[-1] = responses[-1][:-3]
         return responses
-    
