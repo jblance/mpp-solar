@@ -2,7 +2,7 @@
 import logging
 from argparse import ArgumentParser
 
-from .lib.mqttbroker import MqttBroker
+from .libs.mqttbroker import MqttBroker
 
 from .helpers import get_device_class, get_outputs
 from .version import __version__, __version_comment__  # noqa: F401

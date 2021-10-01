@@ -3,7 +3,7 @@ import unittest
 import paho.mqtt.client as mqttclient
 
 from mppsolar.helpers import get_outputs
-from mppsolar.lib.mqttbroker import MqttBroker
+from mppsolar.libs.mqttbroker import MqttBroker
 from mppsolar.outputs.mqtt import mqtt as mqtt
 
 
