@@ -191,7 +191,7 @@ def main():
         log.setLevel(logging.WARNING)
     logging.basicConfig()
 
-    # Display verison if asked
+    # Display version if asked
     log.info(description)
     if args.version:
         print(description)
