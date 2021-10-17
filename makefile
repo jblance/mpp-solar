@@ -8,7 +8,7 @@ test: tests/*.py
 	coverage html
 
 
-pypi:
+pypi-t:
 	sudo rm -rf dist/*
 	sudo python3 -m build 
 	ls -l dist/
