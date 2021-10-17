@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
+import paho.mqtt.client as mqtt_client
+
 
 @dataclass
 class MqttBroker:
@@ -19,6 +21,10 @@ class MqttBroker:
     #     self.mqtt_user = args.mqttuser
     #     self.mqtt_pass = args.mqttpass
 
+    def connect(self):
+        mqttc = mqtt_client.Client()
+        mqttc.connect(self.name, self.port, keepalive=60)
+
     def set(self, variable, value):
         setattr(self, variable, value)
 
@@ -27,6 +33,14 @@ class MqttBroker:
         if value is None:
             return
         setattr(self, variable, value)
+
+    def subscribe(self, topic, callback):
+        # subscribe to mqtt topic
+        # check if connected, connect if not
+        # subscribe
+        # register callback
+        pass
+        callback("client", "userdata", "msg")
 
 
 if __name__ == "__main__":

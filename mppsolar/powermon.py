@@ -1,9 +1,10 @@
 # !/usr/bin/python3
 import configparser
 import logging
+import io
 from argparse import ArgumentParser
 
-# from .libs.mqttbroker import MqttBroker
+from .libs.mqttbroker import MqttBroker
 
 # from .helpers import get_device_class, get_outputs
 from .version import __version__  # noqa: F401
@@ -24,8 +25,11 @@ sample_config = """
     mqttbroker_pass =
     commands = QPIGS,QPIRI
     command_topic = test/topic
-
     """
+
+
+def mqtt_callback(client, userdata, msg):
+    print(f"Received `{msg}` from `{client}` topic")
 
 
 def main():
@@ -34,14 +38,21 @@ def main():
 
     parser.add_argument(
         "-C",
-        "--configfile",
+        "--configFile",
         nargs="?",
         type=str,
-        help="Full location of config file (default /etc/mpp-solar/powermon.conf, auto generated if -C supplied)",
+        help="Full location of config file (default /etc/mpp-solar/powermon.conf)",
         const=None,
         default="/etc/mpp-solar/powermon.conf",
     )
-    parser.add_argument("-v", "--version", action="store_true", help="Display the version")
+    parser.add_argument(
+        "-v", "--version", action="store_true", help="Display the version"
+    )
+    parser.add_argument(
+        "--generateConfigFile",
+        action="store_true",
+        help="Print a new config file based on options supplied (including the existing config file)",
+    )
     parser.add_argument(
         "-D",
         "--debug",
@@ -72,24 +83,38 @@ def main():
         print(description)
         return None
 
-    # read config
-    log.info(f"Using config file:{args.configfile}")
-    # overide from command line
+    # Build configuration from defaults, config file and command line overrides
+    log.info(f"Using config file:{args.configFile}")
     # build config - start with defaults
     config = configparser.ConfigParser()
     config.read_string(sample_config)
-    # add config file details
-    if args.configfile is not None:
-        config.read(args.configfile)
-    # command line overide
+    # build config - update with details from config file
+    if args.configFile is not None:
+        config.read(args.configFile)
+    # build config - override with any command line arguments
+    # TODO: command line overrides
 
-    # print for debug
-    for section in config.sections():
-        for key in config[section]:
-            print(key, config[section][key])
+    # if generateConfigFile is true then print config out
+    if args.generateConfigFile:
+        # must be a better way
+        with io.StringIO() as ss:
+            config.write(ss)
+            ss.seek(0)  # rewind
+            print(ss.read())
+        return
 
+    # Build mqtt broker
+    mqtt_client = MqttBroker(
+        name=config.get("CONFIG", "mqttbroker_name"),
+        port=config.getint("CONFIG", "mqttbroker_port"),
+        username=config.get("CONFIG", "mqttbroker_user"),
+        password=config.get("CONFIG", "mqttbroker_pass"),
+    )
+    print(mqtt_client)
     # sub to command topic
+    mqtt_client.subscribe("topic", mqtt_callback)
     # connect to port
+
     # loop
     #   loop commands
     #     loop any adhoc commands
@@ -97,3 +122,8 @@ def main():
     #     get result
     #     post result
     #     pause
+
+    # print for debug
+    for section in config.sections():
+        for key in config[section]:
+            print(key, config[section][key])
