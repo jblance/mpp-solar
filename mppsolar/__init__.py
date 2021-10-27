@@ -201,7 +201,7 @@ def main():
         name=args.mqttbroker, port=args.mqttport, username=args.mqttuser, password=args.mqttpass
     )
     mqtt_broker.set("results_topic", (args.mqtttopic if args.mqtttopic is not None else prog_name))
-    print(mqtt_broker)
+    log.debug(mqtt_broker)
     ##
     filter = args.filter
     excl_filter = args.exclfilter
