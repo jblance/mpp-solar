@@ -52,25 +52,25 @@ def get_resp_defn(key, defns):
     return [key, key, "", ""]
 
 
-def get_outputs(output_list):
-    """
-    Take a comma separated list of output names
-    attempt to find and instantiate the corresponding module
-    return array of modules
-    """
-    ops = []
-    outputs = output_list.split(",")
-    for output in outputs:
-        log.info(f"attempting to create output processor: {output}")
-        try:
-            output_module = importlib.import_module("mppsolar.outputs." + output, ".")
-            output_class = getattr(output_module, output)
-            ops.append(output_class())
-        except ModuleNotFoundError:
-            # perhaps raise a Powermon exception here??
-            # maybe warn and keep going, only error if no outputs found?
-            log.critical(f"No module found for output processor {output}")
-    return ops
+# def get_outputs(output_list):
+#     """
+#     Take a comma separated list of output names
+#     attempt to find and instantiate the corresponding module
+#     return array of modules
+#     """
+#     ops = []
+#     outputs = output_list.split(",")
+#     for output in outputs:
+#         log.info(f"attempting to create output processor: {output}")
+#         try:
+#             output_module = importlib.import_module("mppsolar.outputs." + output, ".")
+#             output_class = getattr(output_module, output)
+#             ops.append(output_class())
+#         except ModuleNotFoundError:
+#             # perhaps raise a Powermon exception here??
+#             # maybe warn and keep going, only error if no outputs found?
+#             log.critical(f"No module found for output processor {output}")
+#     return ops
 
 
 def get_device_class(device_type=None):

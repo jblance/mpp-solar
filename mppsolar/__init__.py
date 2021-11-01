@@ -2,9 +2,9 @@
 import logging
 from argparse import ArgumentParser
 
+from .helpers import get_device_class
 from .libs.mqttbroker import MqttBroker
-
-from .helpers import get_device_class, get_outputs
+from .outputs import get_outputs, list_outputs
 from .version import __version__, __version_comment__  # noqa: F401
 
 # Set-up logger
@@ -211,6 +211,7 @@ def main():
     # Initialize Daemon
     if args.daemon:
         import time
+
         import systemd.daemon
 
         # Tell systemd that our service is ready
@@ -321,12 +322,14 @@ def main():
             commands.append("list_commands")
         elif args.output == "help":
             commands.append("list_outputs")
+
             keep_case = True
-            args.output = "screen"
+            op = get_outputs("screen")[0]
+            op.output(data=list_outputs())
             # print("Available output modules:")
             # for result in results:
             #    print(result)
-            # exit()
+            exit()
         elif args.getstatus:
             # use get_status helper
             commands.append("get_status")
