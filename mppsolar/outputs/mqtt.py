@@ -75,7 +75,7 @@ class mqtt(baseoutput):
         if excl_filter is not None:
             excl_filter = re.compile(excl_filter)
 
-        if mqtt_user is not None and mqtt_pass is not None:
+        if mqtt_user and mqtt_pass:
             auth = {"username": mqtt_user, "password": mqtt_pass}
             log.info(f"Using mqtt authentication, username: {mqtt_user}, password: [supplied]")
         else:
