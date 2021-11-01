@@ -1,13 +1,16 @@
 # !/usr/bin/python3
 import configparser
-import logging
 import io
+import logging
 from argparse import ArgumentParser
+from collections import deque
+from time import sleep
 
-from .libs.mqttbroker import MqttBroker
-
-# from .helpers import get_device_class, get_outputs
-from .version import __version__  # noqa: F401
+from mppsolar.io import get_port
+from mppsolar.libs.mqttbroker import MqttBroker
+from mppsolar.outputs import output_results
+from mppsolar.protocols import get_protocol
+from mppsolar.version import __version__  # noqa: F401
 
 # Set-up logger
 log = logging.getLogger("")
@@ -17,19 +20,30 @@ logging.basicConfig(format=FORMAT)
 sample_config = """
     [CONFIG]
     port = /dev/ttyUSB0
-    porttype = serial
+    porttype = test
+    portbaud = 2400
     protocol = PI30
     mqttbroker_name = localhost
     mqttbroker_port = 1883
     mqttbroker_user =
     mqttbroker_pass =
+    split_token = ,
     commands = QPIGS,QPIRI
-    command_topic = test/topic
+    outputs = screen,mqtt
+    tag = sample
+    filter =
+    command_topic = test/command_topic
+    command_pause = 5
     """
+
+ADHOC_COMMANDS = deque([])
+SPLIT_TOKEN = ","
 
 
 def mqtt_callback(client, userdata, msg):
-    print(f"Received `{msg}` from `{client}` topic")
+    print(f"Received `{msg.payload}` on topic `{msg.topic}`")
+    newCommand = msg.payload
+    ADHOC_COMMANDS.append(newCommand)
 
 
 def main():
@@ -45,13 +59,16 @@ def main():
         const=None,
         default="/etc/mpp-solar/powermon.conf",
     )
-    parser.add_argument(
-        "-v", "--version", action="store_true", help="Display the version"
-    )
+    parser.add_argument("-v", "--version", action="store_true", help="Display the version")
     parser.add_argument(
         "--generateConfigFile",
         action="store_true",
         help="Print a new config file based on options supplied (including the existing config file)",
+    )
+    parser.add_argument(
+        "--once",
+        action="store_true",
+        help="Only loop through config once",
     )
     parser.add_argument(
         "-D",
@@ -96,34 +113,78 @@ def main():
 
     # if generateConfigFile is true then print config out
     if args.generateConfigFile:
-        # must be a better way
+        # FIXME must be a better way
         with io.StringIO() as ss:
             config.write(ss)
             ss.seek(0)  # rewind
             print(ss.read())
         return
 
+    # split token
+    SPLIT_TOKEN = config.get("CONFIG", "split_token")
+    print(SPLIT_TOKEN)
+
     # Build mqtt broker
-    mqtt_client = MqttBroker(
+    mqtt_broker = MqttBroker(
         name=config.get("CONFIG", "mqttbroker_name"),
         port=config.getint("CONFIG", "mqttbroker_port"),
         username=config.get("CONFIG", "mqttbroker_user"),
         password=config.get("CONFIG", "mqttbroker_pass"),
     )
-    print(mqtt_client)
+    log.debug(mqtt_broker)
     # sub to command topic
-    mqtt_client.subscribe("topic", mqtt_callback)
-    # connect to port
+    mqtt_broker.connect()
+    mqtt_broker.subscribe(config.get("CONFIG", "command_topic"), mqtt_callback)
+    # connect to mqtt
+    mqtt_broker.start()
 
-    # loop
-    #   loop commands
-    #     loop any adhoc commands
-    #     send command
-    #     get result
-    #     post result
-    #     pause
+    # get port
+    port = get_port(
+        port=config.get("CONFIG", "port"),
+        porttype=config.get("CONFIG", "porttype"),
+        baud=config.get("CONFIG", "portbaud"),
+    )
 
-    # print for debug
-    for section in config.sections():
-        for key in config[section]:
-            print(key, config[section][key])
+    # get protocol handler
+    protocol = get_protocol(protocol=config.get("CONFIG", "protocol"))
+
+    loop = True
+
+    try:
+        # connect to port
+        port.connect()
+        while loop:
+            # loop through command list
+            for command in config.get("CONFIG", "commands").split(SPLIT_TOKEN):
+                # process any adhoc commands first
+                print(f"{ADHOC_COMMANDS}")
+                while len(ADHOC_COMMANDS) > 0:
+                    adhoc_command = ADHOC_COMMANDS.popleft().decode()  # FIXME: decode to str #
+                    log.info(f"Processing command: {adhoc_command}")
+                    results = port.process_command(command=adhoc_command, protocol=protocol)
+                    log.debug(f"results {results}")
+                    # send to output processor(s)
+                    output_results(results=results, config=config, mqtt_broker=mqtt_broker)
+                # process 'normal' commands
+                log.info(f"Processing command: {command}")
+                results = port.process_command(command=command, protocol=protocol)
+                log.debug(f"results {results}")
+                # send to output processor(s)
+                output_results(results=results, config=config, mqtt_broker=mqtt_broker)
+                # pause
+                pause_time = config.getint("CONFIG", "command_pause")
+                log.debug(f"Sleeping for {pause_time}secs")
+            sleep(pause_time)
+            if args.once:
+                loop = False
+    except KeyboardInterrupt:
+        print("KeyboardInterrupt")
+    finally:
+        # Disconnect port
+        port.disconnect()
+        # Disconnect mqtt
+        mqtt_broker.stop()
+        # print for debug
+        for section in config.sections():
+            for key in config[section]:
+                print(key, config[section][key])
