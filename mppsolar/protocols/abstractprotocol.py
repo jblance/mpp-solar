@@ -30,7 +30,6 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
     def get_full_command(self, command) -> bytes:
         log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
-
         byte_cmd = bytes(command, "utf-8")
         # calculate the CRC
         crc_high, crc_low = crc(byte_cmd)
