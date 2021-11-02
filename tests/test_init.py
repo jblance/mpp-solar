@@ -10,7 +10,7 @@ from mppsolar.devices.jkbms import jkbms as _jkbms
 
 class test_init(unittest.TestCase):
     def test_get_outputs(self):
-        """ test the get_outputs command"""
+        """test the get_outputs command"""
         list_of_outputs = (
             "hass_mqtt,influx_mqtt,influx2_mqtt,json_mqtt,json,mqtt,raw,screen,tag_mqtt"
         )
@@ -25,7 +25,7 @@ class test_init(unittest.TestCase):
         self.assertEqual(len(outputs), number_in_list)
 
     def test_get_device_class(self):
-        """ test get_device_class"""
+        """test get_device_class"""
         device_class = mppsolar.get_device_class("mppsolar")
         self.assertEqual(device_class, _mppsolar)
         self.assertEqual(device_class, type(_mppsolar()))
@@ -35,3 +35,6 @@ class test_init(unittest.TestCase):
         self.assertEqual(device_class, type(_jkbms()))
 
         # print(mppsolar.main())
+
+    # def test_get_main(self):
+    #     print(mppsolar.main())

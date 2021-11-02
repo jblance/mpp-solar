@@ -120,9 +120,14 @@ def main():
             print(ss.read())
         return
 
+    # debug dump config
+    for section in config.sections():
+        log.debug(f"config section [{section}]")
+        for key in config[section]:
+            print(f"{key} = {config[section][key]}")
+
     # split token
     SPLIT_TOKEN = config.get("CONFIG", "split_token")
-    print(SPLIT_TOKEN)
 
     # Build mqtt broker
     mqtt_broker = MqttBroker(
@@ -184,7 +189,3 @@ def main():
         port.disconnect()
         # Disconnect mqtt
         mqtt_broker.stop()
-        # print for debug
-        for section in config.sections():
-            for key in config[section]:
-                print(key, config[section][key])

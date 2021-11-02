@@ -1,9 +1,10 @@
-import importlib
+# import importlib
 import logging
 from abc import ABC
 
 from mppsolar.helpers import get_kwargs
 from mppsolar.io import get_port
+from mppsolar.protocols import get_protocol
 
 PORT_TYPE_UNKNOWN = 0
 PORT_TYPE_TEST = 1
@@ -26,14 +27,14 @@ class AbstractDevice(ABC):
 
     def __init__(self, *args, **kwargs):
         global log
-        self._protocol = None
-        self._protocol_class = None
+        # self._protocol = None
+        # self._protocol_class = None
         # self._port = None
         log.debug(f"__init__ args {args}")
         log.debug(f"__init__ kwargs {kwargs}")
         self._name = get_kwargs(kwargs, "name")
         self._port = get_port(**kwargs)
-        self.set_protocol(**kwargs)
+        self._protocol = get_protocol(get_kwargs(kwargs, "protocol"))
         log.debug(f"__init__ name {self._name}, port {self._port}, protocol {self._protocol}")
 
     def __str__(self):
@@ -89,38 +90,38 @@ class AbstractDevice(ABC):
     #     else:
     #         return PORT_TYPE_UNKNOWN
 
-    def set_protocol(self, *args, **kwargs):
-        """
-        Set the protocol for this device
-        """
-        protocol = get_kwargs(kwargs, "protocol")
-        log.debug(f"Protocol {protocol}")
-        if protocol is None:
-            self._protocol = None
-            self._protocol_class = None
-            return
-        protocol_id = protocol.lower()
-        # Try to import the protocol module with the supplied name (may not exist)
-        try:
-            proto_module = importlib.import_module("mppsolar.protocols." + protocol_id, ".")
-        except ModuleNotFoundError:
-            log.error(f"No module found for protocol {protocol_id}")
-            self._protocol = None
-            self._protocol_class = None
-            return
-        # Find the protocol class - classname must be the same as the protocol_id
-        try:
-            self._protocol_class = getattr(proto_module, protocol_id)
-        except AttributeError:
-            log.error(f"Module {proto_module} has no attribute {protocol_id}")
-            self._protocol = None
-            self._protocol_class = None
-            return
-        # Instantiate the class
-        # TODO: fix protocol instantiate
-        self._protocol = self._protocol_class(
-            "init_var", proto_keyword="value", second_keyword=123
-        )
+    # def set_protocol(self, *args, **kwargs):
+    #     """
+    #     Set the protocol for this device
+    #     """
+    #     protocol = get_kwargs(kwargs, "protocol")
+    #     log.debug(f"Protocol {protocol}")
+    #     if protocol is None:
+    #         self._protocol = None
+    #         self._protocol_class = None
+    #         return
+    #     protocol_id = protocol.lower()
+    #     # Try to import the protocol module with the supplied name (may not exist)
+    #     try:
+    #         proto_module = importlib.import_module("mppsolar.protocols." + protocol_id, ".")
+    #     except ModuleNotFoundError:
+    #         log.error(f"No module found for protocol {protocol_id}")
+    #         self._protocol = None
+    #         self._protocol_class = None
+    #         return
+    #     # Find the protocol class - classname must be the same as the protocol_id
+    #     try:
+    #         self._protocol_class = getattr(proto_module, protocol_id)
+    #     except AttributeError:
+    #         log.error(f"Module {proto_module} has no attribute {protocol_id}")
+    #         self._protocol = None
+    #         self._protocol_class = None
+    #         return
+    #     # Instantiate the class
+    #     # TODO: fix protocol instantiate
+    #     self._protocol = self._protocol_class(
+    #         "init_var", proto_keyword="value", second_keyword=123
+    #     )
 
     # def set_port(self, *args, **kwargs):
     #     port = get_kwargs(kwargs, "port")
@@ -196,26 +197,26 @@ class AbstractDevice(ABC):
     #     else:
     #         self._port = None
 
-    def list_commands(self):
-        # print(f"{'Parameter':<30}\t{'Value':<15} Unit")
-        if self._protocol is None:
-            log.error("Attempted to list commands with no protocol defined")
-            return {"ERROR": ["Attempted to list commands with no protocol defined", ""]}
-        result = {}
-        result["_command"] = "command help"
-        result[
-            "_command_description"
-        ] = f"List available commands for protocol {str(self._protocol._protocol_id, 'utf-8')}"
-        for command in self._protocol.COMMANDS:
-            if "help" in self._protocol.COMMANDS[command]:
-                info = (
-                    self._protocol.COMMANDS[command]["description"]
-                    + self._protocol.COMMANDS[command]["help"]
-                )
-            else:
-                info = self._protocol.COMMANDS[command]["description"]
-            result[command] = [info, ""]
-        return result
+    # def list_commands(self):
+    #     # print(f"{'Parameter':<30}\t{'Value':<15} Unit")
+    #     if self._protocol is None:
+    #         log.error("Attempted to list commands with no protocol defined")
+    #         return {"ERROR": ["Attempted to list commands with no protocol defined", ""]}
+    #     result = {}
+    #     result["_command"] = "command help"
+    #     result[
+    #         "_command_description"
+    #     ] = f"List available commands for protocol {str(self._protocol._protocol_id, 'utf-8')}"
+    #     for command in self._protocol.COMMANDS:
+    #         if "help" in self._protocol.COMMANDS[command]:
+    #             info = (
+    #                 self._protocol.COMMANDS[command]["description"]
+    #                 + self._protocol.COMMANDS[command]["help"]
+    #             )
+    #         else:
+    #             info = self._protocol.COMMANDS[command]["description"]
+    #         result[command] = [info, ""]
+    #     return result
 
     # def list_outputs(self):
     #     import pkgutil
@@ -268,16 +269,6 @@ class AbstractDevice(ABC):
         generic method for running a 'raw' command
         """
         log.info(f"Running command {command}")
-        if command == "list_commands":
-            return self.list_commands()
-        if command == "list_outputs":
-            return self.list_outputs()
-        if command == "get_status":
-            return self.get_status()
-        if command == "get_settings":
-            return self.get_settings()
-        if not command:
-            command = self._protocol.DEFAULT_COMMAND
 
         if self._protocol is None:
             log.error("Attempted to run command with no protocol defined")
@@ -290,6 +281,17 @@ class AbstractDevice(ABC):
                     "",
                 ]
             }
+
+        if command == "list_commands":
+            return self._protocol.list_commands()
+        if command == "list_outputs":
+            return self.list_outputs()
+        if command == "get_status":
+            return self.get_status()
+        if command == "get_settings":
+            return self.get_settings()
+        if not command:
+            command = self._protocol.DEFAULT_COMMAND
 
         # Send command and receive data
         full_command = self._protocol.get_full_command(command)

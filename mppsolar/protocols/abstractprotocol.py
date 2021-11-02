@@ -25,6 +25,24 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         self.DEFAULT_COMMAND = None
         self._protocol_id = None
 
+    def list_commands(self):
+        # print(f"{'Parameter':<30}\t{'Value':<15} Unit")
+        if self._protocol_id is None:
+            log.error("Attempted to list commands with no protocol defined")
+            return {"ERROR": ["Attempted to list commands with no protocol defined", ""]}
+        result = {}
+        result["_command"] = "command help"
+        result[
+            "_command_description"
+        ] = f"List available commands for protocol {str(self._protocol_id, 'utf-8')}"
+        for command in self.COMMANDS:
+            if "help" in self.COMMANDS[command]:
+                info = self.COMMANDS[command]["description"] + self.COMMANDS[command]["help"]
+            else:
+                info = self.COMMANDS[command]["description"]
+            result[command] = [info, ""]
+        return result
+
     def get_protocol_id(self) -> bytes:
         return self._protocol_id
 

@@ -7,6 +7,8 @@ test: tests/*.py
 	coverage report -m
 	coverage html
 
+t: tests/*.py
+	python3 -m unittest -v
 
 pypi-t:
 	sudo rm -rf dist/*
