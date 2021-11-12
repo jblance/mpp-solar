@@ -62,7 +62,7 @@ class mqtt(baseoutput):
         if data is None:
             return
         mqtt_broker = get_kwargs(kwargs, "mqtt_broker")
-        if mqtt_broker is None:
+        if mqtt_broker is None or not mqtt_broker.name:
             return
         mqtt_port = mqtt_broker.port
         mqtt_user = mqtt_broker.username

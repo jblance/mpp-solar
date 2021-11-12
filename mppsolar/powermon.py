@@ -23,7 +23,7 @@ sample_config = """
     porttype = test
     portbaud = 2400
     protocol = PI30
-    mqttbroker_name = localhost
+    mqttbroker_name =
     mqttbroker_port = 1883
     mqttbroker_user =
     mqttbroker_pass =
@@ -154,7 +154,6 @@ def main():
     protocol = get_protocol(protocol=config.get("CONFIG", "protocol"))
 
     loop = True
-
     try:
         # connect to port
         port.connect()
@@ -179,9 +178,10 @@ def main():
                 # pause
                 pause_time = config.getint("CONFIG", "command_pause")
                 log.debug(f"Sleeping for {pause_time}secs")
-            sleep(pause_time)
             if args.once:
                 loop = False
+            else:
+                sleep(pause_time)
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
     finally:

@@ -46,16 +46,21 @@ class MqttBroker:
         self._isConnected = False
 
     def connect(self):
+
         self.mqttc.on_connect = self.on_connect
         self.mqttc.on_disconnect = self.on_disconnect
-        self.mqttc.connect(self.name, self.port, keepalive=60)
+        # if a name is supplied, connect
+        if self.name:
+            self.mqttc.connect(self.name, self.port, keepalive=60)
 
     def start(self):
-        self.mqttc.loop_start()
+        if self._isConnected:
+            self.mqttc.loop_start()
 
     def stop(self):
         self.mqttc.loop_stop()
-        self.mqttc.disconnect
+        if self._isConnected:
+            self.mqttc.disconnect
 
     def set(self, variable, value):
         setattr(self, variable, value)
@@ -75,8 +80,9 @@ class MqttBroker:
             self.connect
         # Register callback
         self.mqttc.on_message = callback
-        # Subscribe to command topic
-        self.mqttc.subscribe(topic, qos=0)
+        if self._isConnected:
+            # Subscribe to command topic
+            self.mqttc.subscribe(topic, qos=0)
 
 
 if __name__ == "__main__":

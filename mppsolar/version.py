@@ -1,2 +1,2 @@
-__version__ = "0.9.01"
-__version_comment__ = "add powermon, migrate functions to inits"
+__version__ = "0.9.02"
+__version_comment__ = ""
