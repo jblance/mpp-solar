@@ -10,7 +10,7 @@ test: tests/*.py
 t: tests/*.py
 	python3 -m unittest -v
 
-pypi-t:
+pypi:
 	sudo rm -rf dist/*
 	sudo python3 -m build 
 	ls -l dist/
