@@ -16,7 +16,7 @@ for when you want to keep the install and dependencies separate from the rest of
 see worked example [here](docs/venv.md)
 
 ### Install development version from github ###
-`sudo pip install -e "git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar"`
+`sudo pip install -e "git+https://github.com/jblance/mpp-solar.git#egg=mppsolar"`
 
 ### Ubuntu Install example ###
 [Documented Ubuntu Install](docs/ubuntu_install.md)
