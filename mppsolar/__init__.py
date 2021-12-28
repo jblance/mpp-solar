@@ -212,10 +212,10 @@ def main():
     if args.daemon:
         import time
 
-        import systemd.daemon
+        from systemd.daemon import notify, Notification
 
         # Tell systemd that our service is ready
-        systemd.daemon.notify("READY=1")
+        notify(Notification.READY)
         print("Service Initializing ...")
         # set some default-defaults
         pause = 60
@@ -259,6 +259,7 @@ def main():
             porttype = config[section].get("porttype", fallback=None)
             filter = config[section].get("filter", fallback=None)
             excl_filter = config[section].get("exclfilter", fallback=None)
+            pause_loops = config[section].get("pause_loops", fallback=0)
             #
             device_class = get_device_class(_type)
             log.debug(f"device_class {device_class}")
@@ -274,6 +275,7 @@ def main():
                 # mqtt_port=mqtt_port,
                 # mqtt_user=mqtt_user,
                 # mqtt_pass=mqtt_pass,
+                pause_loops=pause_loops,
             )
             # build array of commands
             commands = _command.split(",")
@@ -359,7 +361,7 @@ def main():
             # for item in mppUtilArray:
             # Tell systemd watchdog we are still alive
             if args.daemon:
-                systemd.daemon.notify("WATCHDOG=1")
+                notify(Notification.WATCHDOG)
                 print(
                     f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
                 )
@@ -389,7 +391,7 @@ def main():
                 )
                 # Tell systemd watchdog we are still alive
         if args.daemon:
-            systemd.daemon.notify("WATCHDOG=1")
+            notify(Notification.WATCHDOG)
             print(f"Sleeping for {pause} sec")
             time.sleep(pause)
         else:

@@ -1,2 +1,2 @@
-__version__ = "0.9.03"
-__version_comment__ = "add results_topic to json_mqtt output"
+__version__ = "0.9.04"
+__version_comment__ = "Adding config for complex scheduling"
