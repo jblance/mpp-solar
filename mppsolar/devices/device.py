@@ -2,6 +2,8 @@
 import logging
 from abc import ABC
 
+import paho.mqtt.client as mqtt
+
 from mppsolar.helpers import get_kwargs
 from mppsolar.io import get_port
 from mppsolar.protocols import get_protocol
@@ -30,8 +32,9 @@ class AbstractDevice(ABC):
         # self._protocol = None
         # self._protocol_class = None
         # self._port = None
-        log.debug(f"__init__ args {args}")
-        log.debug(f"__init__ kwargs {kwargs}")
+        print(f"__init__ args {args}")
+        print(f"__init__ kwargs {kwargs}")
+        self.command_requests = []
         self._name = get_kwargs(kwargs, "name")
         self._port = get_port(**kwargs)
         self._protocol = get_protocol(get_kwargs(kwargs, "protocol"))
@@ -41,7 +44,29 @@ class AbstractDevice(ABC):
         else:
             self._pause_loops = int(pause_loops)
         self._current_loop = 0
+
+        self.commands = get_kwargs(kwargs, "commands")
+        self.outputs = get_kwargs(kwargs, "outputs")
+        self.filter = get_kwargs(kwargs, "filter")
+        self.excl_filter = get_kwargs(kwargs, "excl_filter")
+        self.mqtt_broker = get_kwargs(kwargs, "mqtt_broker")
+        self.commands_topic = get_kwargs(kwargs, "commands_topic")
+
+        if(self.mqtt_broker is not None and self.commands_topic is not None):
+            print('Setup mqtt client')
+            self.client = mqtt.Client()
+            self.client.username_pw_set(self.mqtt_broker.username, self.mqtt_broker.password)
+            self.client.connect(self.mqtt_broker.name, self.mqtt_broker.port)
+            self.client.subscribe((self.commands_topic, 2))
+            self.client.on_message = self.receive_command_request
+            self.client.loop_start()
+
         log.debug(f"__init__ name {self._name}, port {self._port}, protocol {self._protocol}, loops {self._pause_loops}")
+
+    def receive_command_request(self, client, userdata, message):
+        command = str(message.payload.decode("utf-8"))
+        print(f"received command request: {command}")
+        self.command_requests.append(command)
 
     def __str__(self):
         """
@@ -49,6 +74,12 @@ class AbstractDevice(ABC):
         """
         return f"{self._classname} device - name: {self._name}, port: {self._port}, protocol: {self._protocol}, pause_loops: {self._pause_loops}"
 
+
+    def get_commands(self):
+        all_commands = self.commands + self.command_requests
+        self.command_requests.clear()
+        print(all_commands)
+        return all_commands
 
     def run_command(self, command) -> dict:
         """

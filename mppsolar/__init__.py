@@ -1,5 +1,6 @@
 # !/usr/bin/python3
 import logging
+import time
 from argparse import ArgumentParser
 
 from .helpers import get_device_class
@@ -207,11 +208,9 @@ def main():
     excl_filter = args.exclfilter
     keep_case = args.keepcase
 
-    _commands = []
+    _devices = []
     # Initialize Daemon
     if args.daemon:
-        import time
-
         from systemd.daemon import notify, Notification
 
         # Tell systemd that our service is ready
@@ -259,30 +258,32 @@ def main():
             porttype = config[section].get("porttype", fallback=None)
             filter = config[section].get("filter", fallback=None)
             excl_filter = config[section].get("exclfilter", fallback=None)
+            commands_topic = config[section].get("commands_topic", fallback=None)
             pause_loops = config[section].get("pause_loops", fallback=0)
             #
             device_class = get_device_class(_type)
             log.debug(f"device_class {device_class}")
+
+            # build array of commands
+            commands = _command.split(",")
+
             # The device class __init__ will instantiate the port communications and protocol classes
             device = device_class(
                 name=name,
                 port=port,
                 protocol=protocol,
+                commands=commands,
                 outputs=outputs,
-                baud=baud,
-                porttype=porttype,
-                mqtt_broker=mqtt_broker,
-                # mqtt_port=mqtt_port,
-                # mqtt_user=mqtt_user,
-                # mqtt_pass=mqtt_pass,
+                baud=baud, #not used?
+                porttype=porttype, #not used?
+                filter=filter,
+                excl_filter=excl_filter,
+                mqtt_broker=mqtt_broker, #not used?
+                commands_topic=commands_topic,
                 pause_loops=pause_loops,
             )
-            # build array of commands
-            commands = _command.split(",")
 
-            for command in commands:
-                _commands.append((device, command, tag, outputs, filter, excl_filter))
-            log.debug(f"Commands from config file {_commands}")
+            _devices.append(device)
 
             if args.daemon:
                 print(f"Config file: {args.configfile}")
@@ -301,21 +302,6 @@ def main():
         log.info(
             f'Creating device "{args.name}" (type: "{s_prog_name}") on port "{args.port} (porttype={args.porttype})" using protocol "{args.protocol}"'
         )
-        device_class = get_device_class(s_prog_name)
-        log.debug(f"device_class {device_class}")
-        # The device class __init__ will instantiate the port communications and protocol classes
-        device = device_class(
-            name=args.name,
-            port=args.port,
-            protocol=args.protocol,
-            baud=args.baud,
-            porttype=args.porttype,
-            mqtt_broker=mqtt_broker,
-            # mqtt_port=mqtt_port,
-            # mqtt_user=mqtt_user,
-            # mqtt_pass=mqtt_pass,
-        )
-        #
 
         # determine whether to run command or call helper function
         commands = []
@@ -344,57 +330,72 @@ def main():
         else:
             commands = args.command.split(",")
 
-        outputs = args.output
-        for command in commands:
-            if args.tag:
-                tag = args.tag
-            else:
-                tag = command
-            _commands.append((device, command, tag, outputs, filter, excl_filter))
-        log.debug(f"Commands {_commands}")
+        device_class = get_device_class(s_prog_name)
+        log.debug(f"device_class {device_class}")
+        # The device class __init__ will instantiate the port communications and protocol classes
+        device = device_class(
+            name=args.name,
+            port=args.port,
+            protocol=args.protocol,
+            commands=commands,
+            outputs=args.output,
+            baud=args.baud,
+            porttype=args.porttype,
+            filter=filter,
+            excl_filter=excl_filter,
+            mqtt_broker=mqtt_broker,
+            commands_topic=None,
+            pause_loops=0,
+        )
+
+        _devices.append(device)
+
+        log.debug(f"Devices {_devices}")
 
     while True:
+        startCommands = time.perf_counter()
         # Loop through the configured commands
         if not args.daemon:
-            log.info(f"Looping {len(_commands)} commands")
-        for _device, _command, _tag, _outputs, filter, excl_filter in _commands:
+            log.info(f"Looping {len(_devices)} devices")
+        #for _device, _command, _tag, _outputs, filter, excl_filter in _commands:
+        for device in _devices:
             # for item in mppUtilArray:
             # Tell systemd watchdog we are still alive
             if args.daemon:
                 notify(Notification.WATCHDOG)
                 print(
-                    f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
+                    f"Getting results from device: {device}"
                 )
             else:
                 log.info(
-                    f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
+                    f"Getting results from device: {device}"
                 )
-            results = _device.run_command(command=_command)
-            log.debug(f"results: {results}")
-            # send to output processor(s)
-            outputs = get_outputs(_outputs)
-            for op in outputs:
-                # maybe include the command and what the command is im the output
-                # eg QDI run, Display Inverter Default Settings
-                log.debug(f"Using output filter: {filter}")
-                op.output(
-                    data=results,
-                    tag=_tag,
-                    mqtt_broker=mqtt_broker,
-                    # mqtt_port=mqtt_port,
-                    # mqtt_user=mqtt_user,
-                    # mqtt_pass=mqtt_pass,
-                    # mqtt_topic=mqtt_topic,
-                    filter=filter,
-                    excl_filter=excl_filter,
-                    keep_case=keep_case,
-                )
-                # Tell systemd watchdog we are still alive
+            for command in device.get_commands():
+                results = device.run_command(command)
+                log.debug(f"results: {results}")
+                # send to output processor(s)
+                outputs = get_outputs(device.outputs)
+                for op in outputs:
+                    # maybe include the command and what the command is im the output
+                    # eg QDI run, Display Inverter Default Settings
+                    print(op)
+                    log.debug(f"Using output filter: {filter}")
+                    op.output(
+                        data=results,
+                        tag=command, #not sure how tags are supposed to work
+                        mqtt_broker=mqtt_broker,
+                        filter=device.filter,
+                        excl_filter=device.excl_filter,
+                        keep_case=keep_case,
+                    )
+
+        endCommands = time.perf_counter()
+        runTime = endCommands - startCommands
         if args.daemon:
             notify(Notification.WATCHDOG)
-            print(f"Sleeping for {pause} sec")
-            time.sleep(pause)
+            print(f"Commands took {runTime} seconds to complete. Sleeping for {pause-runTime} sec")
+            time.sleep(pause-runTime)
         else:
             # Dont loop unless running as daemon
-            log.debug("Not daemon, so not looping")
+            log.debug(f"Commands took {runTime} seconds to complete. Not daemon, so not looping")
             break
