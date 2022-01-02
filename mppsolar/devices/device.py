@@ -32,8 +32,8 @@ class AbstractDevice(ABC):
         # self._protocol = None
         # self._protocol_class = None
         # self._port = None
-        print(f"__init__ args {args}")
-        print(f"__init__ kwargs {kwargs}")
+        log.debug(f"__init__ args {args}")
+        log.debug(f"__init__ kwargs {kwargs}")
         self.command_requests = []
         self._name = get_kwargs(kwargs, "name")
         self._port = get_port(**kwargs)
@@ -45,7 +45,8 @@ class AbstractDevice(ABC):
             self._pause_loops = int(pause_loops)
         self._current_loop = 0
 
-        self.commands = get_kwargs(kwargs, "commands")
+        self.commands = list(filter(None, get_kwargs(kwargs, "commands")))
+        self.mqtt_output_topic = get_kwargs(kwargs, "mqtt_output_topic")
         self.outputs = get_kwargs(kwargs, "outputs")
         self.filter = get_kwargs(kwargs, "filter")
         self.excl_filter = get_kwargs(kwargs, "excl_filter")
@@ -53,7 +54,7 @@ class AbstractDevice(ABC):
         self.commands_topic = get_kwargs(kwargs, "commands_topic")
 
         if(self.mqtt_broker is not None and self.commands_topic is not None):
-            print('Setup mqtt client')
+            log.debug('Setup mqtt client')
             self.client = mqtt.Client()
             self.client.username_pw_set(self.mqtt_broker.username, self.mqtt_broker.password)
             self.client.connect(self.mqtt_broker.name, self.mqtt_broker.port)
@@ -65,8 +66,17 @@ class AbstractDevice(ABC):
 
     def receive_command_request(self, client, userdata, message):
         command = str(message.payload.decode("utf-8"))
-        print(f"received command request: {command}")
+        log.debug(f"received command request: {command}")
         self.command_requests.append(command)
+
+    def get_mqtt_output_topic(self):
+        return self.mqtt_output_topic
+
+    def get_filter(self):
+        return self.filter
+
+    def get_excl_filter(self):
+        return self.excl_filter
 
     def __str__(self):
         """
@@ -78,7 +88,6 @@ class AbstractDevice(ABC):
     def get_commands(self):
         all_commands = self.commands + self.command_requests
         self.command_requests.clear()
-        print(all_commands)
         return all_commands
 
     def run_command(self, command) -> dict:

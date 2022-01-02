@@ -253,6 +253,7 @@ def main():
             port = config[section].get("port", fallback="/dev/ttyUSB0")
             baud = config[section].get("baud", fallback=2400)
             _command = config[section].get("command")
+            mqtt_output_topic = config[section].get("mqtt_output_topic")
             tag = config[section].get("tag")
             outputs = config[section].get("outputs", fallback="screen")
             porttype = config[section].get("porttype", fallback=None)
@@ -279,6 +280,7 @@ def main():
                 filter=filter,
                 excl_filter=excl_filter,
                 mqtt_broker=mqtt_broker, #not used?
+                mqtt_output_topic=mqtt_output_topic,
                 commands_topic=commands_topic,
                 pause_loops=pause_loops,
             )
@@ -383,9 +385,10 @@ def main():
                     op.output(
                         data=results,
                         tag=command, #not sure how tags are supposed to work
+                        mqtt_topic=device.get_mqtt_output_topic(),
                         mqtt_broker=mqtt_broker,
-                        filter=device.filter,
-                        excl_filter=device.excl_filter,
+                        filter=device.get_filter(),
+                        excl_filter=device.get_excl_filter(),
                         keep_case=keep_case,
                     )
 
@@ -394,7 +397,9 @@ def main():
         if args.daemon:
             notify(Notification.WATCHDOG)
             print(f"Commands took {runTime} seconds to complete. Sleeping for {pause-runTime} sec")
-            time.sleep(pause-runTime)
+            sleepTime = pause-runTime
+            if sleepTime > 0:
+                time.sleep(pause-runTime)
         else:
             # Dont loop unless running as daemon
             log.debug(f"Commands took {runTime} seconds to complete. Not daemon, so not looping")

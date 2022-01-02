@@ -20,11 +20,8 @@ class json_mqtt(mqtt):
         data = get_kwargs(kwargs, "data")
         tag = get_kwargs(kwargs, "tag")
         keep_case = get_kwargs(kwargs, "keep_case")
-        mqtt_broker = get_kwargs(kwargs, "mqtt_broker")
-        if mqtt_broker is not None:
-            topic = mqtt_broker.results_topic
-        else:
-            topic = get_kwargs(kwargs, "mqtt_topic", default="mpp-solar")
+
+        topic = get_kwargs(kwargs, "mqtt_topic", default="mpp-solar/")
         filter = get_kwargs(kwargs, "filter")
         if filter is not None:
             filter = re.compile(filter)
@@ -43,6 +40,8 @@ class json_mqtt(mqtt):
         data.pop("raw_response", None)
         if tag is None:
             tag = cmd
+        topic = topic + tag
+
         output = {}
         # Loop through responses
         for key in data:
