@@ -484,6 +484,7 @@ COMMANDS = {
                     "B": "Battery",
                     "F": "Fault",
                     "H": "Power saving",
+                    "E": "Eco"
                 },
             ]
         ],
