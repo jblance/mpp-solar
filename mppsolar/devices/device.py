@@ -3,6 +3,7 @@ import logging
 from abc import ABC
 
 import paho.mqtt.client as mqtt
+import json
 
 from mppsolar.helpers import get_kwargs
 from mppsolar.io import get_port
@@ -45,8 +46,12 @@ class AbstractDevice(ABC):
             self._pause_loops = int(pause_loops)
         self._current_loop = 0
 
-        self.commands = list(filter(None, get_kwargs(kwargs, "commands")))
+        self._commands = list(filter(None, get_kwargs(kwargs, "commands")))
         self.mqtt_output_topic = get_kwargs(kwargs, "mqtt_output_topic")
+        self.commands = []
+        for command in self._commands:
+            self.commands.append({"command":command, 
+                                  "topic":self.mqtt_output_topic}) 
         self.outputs = get_kwargs(kwargs, "outputs")
         self.filter = get_kwargs(kwargs, "filter")
         self.excl_filter = get_kwargs(kwargs, "excl_filter")
@@ -65,9 +70,16 @@ class AbstractDevice(ABC):
         log.debug(f"__init__ name {self._name}, port {self._port}, protocol {self._protocol}, loops {self._pause_loops}")
 
     def receive_command_request(self, client, userdata, message):
-        command = str(message.payload.decode("utf-8"))
+        commandJson = str(message.payload.decode("utf-8"))
+        command = json.loads(commandJson)
         log.debug(f"received command request: {command}")
-        self.command_requests.append(command)
+        if command.get("command") is not None:
+            if command["topic"] is None:
+                command["topic"] = self.mqtt_output_topic
+            self.command_requests.append(command)
+        else:
+            log.error(f"Invalid command {commandJson}")
+            print(f"Invalid command {commandJson}")
 
     def get_mqtt_output_topic(self):
         return self.mqtt_output_topic
