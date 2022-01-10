@@ -1,39 +1,48 @@
 # !/usr/bin/python3
-import configparser
-import io
 import logging
 from argparse import ArgumentParser
 from collections import deque
 from time import sleep
 
-from mppsolar.io import get_port
+import yaml
+
 from mppsolar.libs.mqttbroker import MqttBroker
 from mppsolar.outputs import output_results
+from mppsolar.ports import get_port
 from mppsolar.protocols import get_protocol
 from mppsolar.version import __version__  # noqa: F401
+
+# from mppsolar.io import get_port
+
 
 # Set-up logger
 log = logging.getLogger("")
 FORMAT = "%(asctime)-15s:%(levelname)s:%(module)s:%(funcName)s@%(lineno)d: %(message)s"
 logging.basicConfig(format=FORMAT)
 
+
+class ConfigError(Exception):
+    pass
+
+
 sample_config = """
-    [CONFIG]
-    port = /dev/ttyUSB0
-    porttype = test
-    portbaud = 2400
-    protocol = PI30
-    mqttbroker_name =
-    mqttbroker_port = 1883
-    mqttbroker_user =
-    mqttbroker_pass =
-    split_token = ,
-    commands = QPIGS,QPIRI
-    outputs = screen,mqtt
-    tag = sample
-    filter =
-    command_topic = test/command_topic
-    command_pause = 5
+    port:
+        path: /dev/ttyUSB0
+        type: test
+        baud: 2400
+    protocol: PI30
+    mqttbroker:
+        name: null
+        port: 1883
+        user: null
+        pass: null
+    split_token: ','
+    commands: QPIGS,QPIRI
+    outputs: screen,mqtt
+    tag: sample
+    filter: null
+    command_topic: test/command_topic
+    command_pause: 5
     """
 
 ADHOC_COMMANDS = deque([])
@@ -55,9 +64,9 @@ def main():
         "--configFile",
         nargs="?",
         type=str,
-        help="Full location of config file (default /etc/mpp-solar/powermon.conf)",
-        const=None,
-        default="/etc/mpp-solar/powermon.conf",
+        help="Full location of config file",
+        const="/etc/mpp-solar/powermon.yml",
+        default=None,
     )
     parser.add_argument("-v", "--version", action="store_true", help="Display the version")
     parser.add_argument(
@@ -103,55 +112,55 @@ def main():
     # Build configuration from defaults, config file and command line overrides
     log.info(f"Using config file:{args.configFile}")
     # build config - start with defaults
-    config = configparser.ConfigParser()
-    config.read_string(sample_config)
+    config = yaml.safe_load(sample_config)
     # build config - update with details from config file
     if args.configFile is not None:
-        config.read(args.configFile)
+        with open("args.configFile", "r") as stream:
+            try:
+                config.update(yaml.safe_load(stream))
+            except yaml.YAMLError as exc:
+                print(exc)
     # build config - override with any command line arguments
     # TODO: command line overrides
 
     # if generateConfigFile is true then print config out
     if args.generateConfigFile:
-        # FIXME must be a better way
-        with io.StringIO() as ss:
-            config.write(ss)
-            ss.seek(0)  # rewind
-            print(ss.read())
+        print("# yaml config for powermon")
+        print("# default location /etc/mpp-solar/powermon.yml")
+        print(yaml.dump(config))
         return
 
     # debug dump config
-    for section in config.sections():
-        log.debug(f"config section [{section}]")
-        for key in config[section]:
-            print(f"{key} = {config[section][key]}")
+    log.debug(config)
 
     # split token
-    SPLIT_TOKEN = config.get("CONFIG", "split_token")
+    SPLIT_TOKEN = config["split_token"]
 
     # Build mqtt broker
     mqtt_broker = MqttBroker(
-        name=config.get("CONFIG", "mqttbroker_name"),
-        port=config.getint("CONFIG", "mqttbroker_port"),
-        username=config.get("CONFIG", "mqttbroker_user"),
-        password=config.get("CONFIG", "mqttbroker_pass"),
+        name=config["mqttbroker"]["name"],
+        port=config["mqttbroker"]["port"],
+        username=config["mqttbroker"]["user"],
+        password=config["mqttbroker"]["pass"],
     )
     log.debug(mqtt_broker)
+
     # sub to command topic
     mqtt_broker.connect()
-    mqtt_broker.subscribe(config.get("CONFIG", "command_topic"), mqtt_callback)
+    mqtt_broker.subscribe(config["command_topic"], mqtt_callback)
     # connect to mqtt
     mqtt_broker.start()
 
     # get port
-    port = get_port(
-        port=config.get("CONFIG", "port"),
-        porttype=config.get("CONFIG", "porttype"),
-        baud=config.get("CONFIG", "portbaud"),
-    )
+    portconfig = config["port"].copy()
+    port = get_port(portconfig)
+    # port = get_port(porttype=porttype)
+    if not port:
+        log.error(f"No port for config '{portconfig}' found")
+        raise ConfigError(f"No port for config '{portconfig}' found")
 
     # get protocol handler
-    protocol = get_protocol(protocol=config.get("CONFIG", "protocol"))
+    protocol = get_protocol(protocol=config["protocol"])
 
     loop = True
     try:
@@ -159,9 +168,9 @@ def main():
         port.connect()
         while loop:
             # loop through command list
-            for command in config.get("CONFIG", "commands").split(SPLIT_TOKEN):
+            for command in config["commands"].split(SPLIT_TOKEN):
                 # process any adhoc commands first
-                print(f"{ADHOC_COMMANDS}")
+                log.debug(f"adhoc command list: {ADHOC_COMMANDS}")
                 while len(ADHOC_COMMANDS) > 0:
                     adhoc_command = ADHOC_COMMANDS.popleft().decode()  # FIXME: decode to str #
                     log.info(f"Processing command: {adhoc_command}")
@@ -176,7 +185,7 @@ def main():
                 # send to output processor(s)
                 output_results(results=results, config=config, mqtt_broker=mqtt_broker)
                 # pause
-                pause_time = config.getint("CONFIG", "command_pause")
+                pause_time = config["command_pause"]
                 log.debug(f"Sleeping for {pause_time}secs")
             if args.once:
                 loop = False

@@ -47,7 +47,7 @@ def get_outputs(output_list):
 
 
 def output_results(results, config, mqtt_broker):
-    outputs = get_outputs(config.get("CONFIG", "outputs"))
+    outputs = get_outputs(config["outputs"])
     for op in outputs:
         # maybe include the command and what the command is im the output
         # eg QDI run, Display Inverter Default Settings
