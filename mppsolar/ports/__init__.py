@@ -20,14 +20,14 @@ log = logging.getLogger("ports")
 
 def get_port(config):
     log.info(f"Geting port for config '{config}'")
-    porttype=config.pop("type", None)
+    porttype = config.pop("type", None)
 
     # return None if port type is not defined
     if config["type"] is None:
         return None
 
-    # check for 
-    porttype_id = .lower()
+    # check for
+    porttype_id = porttype.s.lower()
     # Try to import the porttype module with the supplied name (may not exist)
     try:
         port_module = importlib.import_module("mppsolar.ports." + porttype_id, ".")

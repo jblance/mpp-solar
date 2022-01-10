@@ -1,10 +1,12 @@
 # shamelessly stolen from ccrisan https://github.com/qtoggle/qtoggleserver-mppsolar/blob/master/qtoggleserver/mppsolar/io.py
 import logging
-import random
-import re
+
+# import random
+# import re
 
 from .port import Port
-from ..helpers import get_kwargs
+
+# from ..helpers import get_kwargs
 
 log = logging.getLogger("Test")
 
