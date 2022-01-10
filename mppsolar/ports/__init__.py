@@ -23,11 +23,11 @@ def get_port(config):
     porttype = config.pop("type", None)
 
     # return None if port type is not defined
-    if config["type"] is None:
+    if porttype is None:
         return None
 
     # check for
-    porttype_id = porttype.s.lower()
+    porttype_id = porttype.lower()
     # Try to import the porttype module with the supplied name (may not exist)
     try:
         port_module = importlib.import_module("mppsolar.ports." + porttype_id, ".")

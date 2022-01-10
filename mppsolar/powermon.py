@@ -26,24 +26,34 @@ class ConfigError(Exception):
 
 
 sample_config = """
-    port:
-        path: /dev/ttyUSB0
-        type: test
-        baud: 2400
-    protocol: PI30
-    mqttbroker:
-        name: null
-        port: 1883
-        user: null
-        pass: null
-    split_token: ','
-    commands: QPIGS,QPIRI
-    outputs: screen,mqtt
-    tag: sample
-    filter: null
-    command_topic: test/command_topic
-    command_pause: 5
-    """
+  port:
+    path: /dev/ttyUSB0
+    type: test
+    baud: 2400
+  protocol: PI30
+  mqttbroker:
+    name: null
+    port: 1883
+    user: null
+    pass: null
+  adhoc_commands:
+    topic: test/command_topic
+    outputs:
+      - name: screen
+      - name: mqtt
+  commands:
+    - command: QPIGS
+      gap: 10s
+      outputs:
+      - name: screen
+      - name: mqtt
+    - command: QPIRI
+      gap: 1m
+      outputs:
+      - name: screen
+        tag: testtag
+        filter: volt
+"""
 
 ADHOC_COMMANDS = deque([])
 SPLIT_TOKEN = ","
@@ -133,10 +143,8 @@ def main():
     # debug dump config
     log.debug(config)
 
-    # split token
-    SPLIT_TOKEN = config["split_token"]
-
     # Build mqtt broker
+    # TODO disable if not defined
     mqtt_broker = MqttBroker(
         name=config["mqttbroker"]["name"],
         port=config["mqttbroker"]["port"],
@@ -146,13 +154,16 @@ def main():
     log.debug(mqtt_broker)
 
     # sub to command topic
+    # TODO disable if not defined
+    # TODO disable if mqttbroker is null
     mqtt_broker.connect()
-    mqtt_broker.subscribe(config["command_topic"], mqtt_callback)
+    mqtt_broker.subscribe(config["adhoc_commands"]["topic"], mqtt_callback)
     # connect to mqtt
     mqtt_broker.start()
 
     # get port
     portconfig = config["port"].copy()
+    log.debug("portconfig", portconfig)
     port = get_port(portconfig)
     # port = get_port(porttype=porttype)
     if not port:
@@ -168,7 +179,7 @@ def main():
         port.connect()
         while loop:
             # loop through command list
-            for command in config["commands"].split(SPLIT_TOKEN):
+            for command in config["commands"]:
                 # process any adhoc commands first
                 log.debug(f"adhoc command list: {ADHOC_COMMANDS}")
                 while len(ADHOC_COMMANDS) > 0:
@@ -177,13 +188,16 @@ def main():
                     results = port.process_command(command=adhoc_command, protocol=protocol)
                     log.debug(f"results {results}")
                     # send to output processor(s)
-                    output_results(results=results, config=config, mqtt_broker=mqtt_broker)
+                    # TODO sort outputs
+                    output_results(
+                        results=results, outputs=config["adhoc_commands"], mqtt_broker=mqtt_broker
+                    )
                 # process 'normal' commands
                 log.info(f"Processing command: {command}")
-                results = port.process_command(command=command, protocol=protocol)
+                results = port.process_command(command=command["command"], protocol=protocol)
                 log.debug(f"results {results}")
                 # send to output processor(s)
-                output_results(results=results, config=config, mqtt_broker=mqtt_broker)
+                output_results(results=results, outputs=command, mqtt_broker=mqtt_broker)
                 # pause
                 pause_time = config["command_pause"]
                 log.debug(f"Sleeping for {pause_time}secs")

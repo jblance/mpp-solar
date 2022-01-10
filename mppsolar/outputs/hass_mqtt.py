@@ -55,7 +55,7 @@ class hass_mqtt(mqtt):
                 topic = f"homeassistant/sensor/mpp_{tag}_{key}/config"
                 topic = topic.replace(" ", "_")
                 name = f"{tag} {_key}"
-                if unit=="W":
+                if unit == "W":
                     payload = f'{{"name": "{name}", "state_topic": "homeassistant/sensor/mpp_{tag}_{key}/state", "unit_of_measurement": "{unit}", "unique_id": "mpp_{tag}_{key}", "state_class": "measurement", "device_class": "power"  }}'
                 else:
                     payload = f'{{"name": "{name}", "state_topic": "homeassistant/sensor/mpp_{tag}_{key}/state", "unit_of_measurement": "{unit}", "unique_id": "mpp_{tag}_{key}"  }}'
