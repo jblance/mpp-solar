@@ -57,18 +57,16 @@ class domoticz_mqtt(mqtt):
                 topic = topic.replace(" ", "_")
                 name = f"{tag} {_key}"
                 if unit == "W":
-                    payload = f'{{"name": "{name}", "state_topic": "{state_topic}", "unit_of_measurement": "{unit}", "unique_id": "mpp_{tag}_{key}", "state_class": "measurement", "device_class": "power"  }}'
+                    payload = f'{{"name": "{name}", "stat_t": "{state_topic}", "unit_of_meas": "{unit}", "uniq_id": "mpp_{tag}_{key}", "stat_cla": "measurement", "device_class": "power"  }}'
                 else:
-                    payload = f'{{"name": "{name}", "state_topic": "{state_topic}", "unit_of_measurement": "{unit}", "unique_id": "mpp_{tag}_{key}"  }}'
+                    payload = f'{{"name": "{name}", "stat_t": "{state_topic}", "unit_of_meas": "{unit}", "uniq_id": "mpp_{tag}_{key}"  }}'
                 # msg = {"topic": topic, "payload": payload, "retain": True}
                 msg = {"topic": topic, "payload": payload}
                 msgs.append(msg)
                 #
                 # VALUE SETTING
                 #
-                payload = (
-                    f'{{"unique_id": "mpp_{tag}_{key}", "nvalue":  "0", "svalue": "{value}" }}'
-                )
+                payload = value
                 msg = {"topic": state_topic, "payload": payload}
                 msgs.append(msg)
         return msgs
