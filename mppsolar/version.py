@@ -1,2 +1,2 @@
-__version__ = "0.9.07"
-__version_comment__ = "change domoticz output topic"
+__version__ = "0.9.08"
+__version_comment__ = "separate domoticz autodiscovery config"
