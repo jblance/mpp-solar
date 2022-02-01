@@ -5,10 +5,10 @@ from .mqtt import mqtt
 from ..helpers import get_kwargs
 from ..helpers import key_wanted
 
-log = logging.getLogger("domoticz_mqtt")
+log = logging.getLogger("domoticz_autodiscover")
 
 
-class domoticz_mqtt(mqtt):
+class domoticz_autodiscover(mqtt):
     def __str__(self):
         return """outputs the to the supplied mqtt broker in hass format: eg "homeassistant/sensor/mpp_{tag}_{key}/state" """
 
