@@ -39,7 +39,7 @@ class domoticz_mqtt(mqtt):
         # Loop through responses
         for _key in data:
             value = data[_key][0]
-            # unit = data[_key][1]
+            unit = data[_key][1]
             # remove spaces
             key = _key.replace(" ", "_")
             if not keep_case:
@@ -68,7 +68,10 @@ class domoticz_mqtt(mqtt):
                 #
                 # VALUE SETTING
                 #
-                payload = value
+                if unit in ("A", "V", "%", "W"):
+                    payload = f"{value} {unit}"
+                else:
+                    payload = value
                 msg = {"topic": state_topic, "payload": payload}
                 msgs.append(msg)
         return msgs
