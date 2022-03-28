@@ -1,2 +1,2 @@
-__version__ = "0.9.09"
-__version_comment__ = "domoticz_mqtt: add units to A, V, W, % value messages"
+__version__ = "0.9.10"
+__version_comment__ = "PI18 ammendments from preussal"
