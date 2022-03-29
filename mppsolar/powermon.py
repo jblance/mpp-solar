@@ -125,7 +125,7 @@ def main():
     config = yaml.safe_load(sample_config)
     # build config - update with details from config file
     if args.configFile is not None:
-        with open("args.configFile", "r") as stream:
+        with open(args.configFile, "r") as stream:
             try:
                 config.update(yaml.safe_load(stream))
             except yaml.YAMLError as exc:
