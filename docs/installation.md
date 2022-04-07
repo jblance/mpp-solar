@@ -3,7 +3,7 @@
 ## Latest Stable Version ##
 note this version might lag behind current development changes
 
-`sudo pip install mpp-solar`
+`sudo pip install mppsolar`
 
 ## venv Install - recommended if testing new features / release ##
 for when you want to keep the install and dependencies separate from the rest of the environment
