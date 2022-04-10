@@ -73,7 +73,7 @@ setup(
     # for example:
     # $ pip install -e .[dev,test]
     extras_require={
-        "dev": ["check-manifest", "flake8"],
+        "dev": ["check-manifest", "flake8", "build", "twine"],
         "test": ["coverage"],
     },
     # To provide executable scripts, use entry points in preference to the
