@@ -1,6 +1,22 @@
+[tool.poetry]
+name = "mpp-solar"
+version = "0.1.0"
+description = ""
+authors = ["volker <volker.jaenisch@inqbus.de>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pyserial = "*"
+paho-mqtt = "*"
+bluepy = "*"
+
+[tool.poetry.dev-dependencies]
+
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+mpp-solar = "mppsolar:main"
+jkbms = "mppsolar:main"
+powermon= "mppsolar.powermon:main"

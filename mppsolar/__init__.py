@@ -175,8 +175,8 @@ def main():
 
     args = parser.parse_args()
     prog_name = parser.prog
-    if prog_name is None:
-        prog_name = "mpp-solar"
+#    if prog_name is None:
+    prog_name = "mpp-solar"
     s_prog_name = prog_name.replace("-", "")
     # log_name = s_prog_name.upper()
 
@@ -396,3 +396,7 @@ def main():
             # Dont loop unless running as daemon
             log.debug("Not daemon, so not looping")
             break
+
+
+if __name__ == '__main__':
+    main()
