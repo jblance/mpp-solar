@@ -357,6 +357,22 @@ COMMANDS = {
         "regex": "PSP([01])$",
     },
 
+    "MCHGV": {
+        "name": "MCHGV",
+        "prefix": "^S015",
+        "description": "Set battery charge voltages",
+        "help": " -- examples: MCHGV552,540 (CV voltage in 0.1V xxx, Float voltage xxx in 0.1V)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "MCHGV([4-5]\\d\\d,[4-5]\\d\\d)$",
+    },
+
 }
 
 
@@ -386,6 +402,7 @@ class pi18(AbstractProtocol):
             "POP"
             #"PCP",
             "PSP",
+            "MCHGV",
         ]
         self.DEFAULT_COMMAND = "PI"
 
