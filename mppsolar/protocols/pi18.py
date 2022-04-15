@@ -357,6 +357,21 @@ COMMANDS = {
         "regex": "PSP([01])$",
     },
 
+    "MUCHGC": {
+        "name": "MUCHGC",
+        "prefix": "^S014",
+        "description": "Set battery maximum AC Charging Current",
+        "help": " -- example: MUCHGC0,030 (set unit 0 [0-9] utility charging current to 30A [002 010 020 030 040 050 060 070 080])",
+        "type": "SETTER",
+        "response": [
+             ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
+        "test_responses": [
+            b"",
+        ],
+        "regex": "MUCHGC([0-9]),(002|0[1-8]0)$",
+    },
+
     "MCHGV": {
         "name": "MCHGV",
         "prefix": "^S015",
@@ -370,8 +385,8 @@ COMMANDS = {
             b"^1\x0b\xc2\r",
             b"^0\x1b\xe3\r",
         ],
-#        "regex": "MCHGV([4-5]\\d\\d,[4-5]\\d\\d)$",
-        # Regex 480 - 584 Volt 
+        #"regex": "MCHGV([4-5]\\d\\d,[4-5]\\d\\d)$",
+        # Regex 480 - 584 Volt
         "regex": "MCHGV(4[8-9][0-9]|5[0-7][0-9]|58[0-5]),(4[8-9][0-9]|5[0-7][0-9]|58[0-4])$",
     },
 
@@ -405,6 +420,7 @@ class pi18(AbstractProtocol):
             #"PCP",
             "PSP",
             "MCHGV",
+            "MUCHGC",
         ]
         self.DEFAULT_COMMAND = "PI"
 
