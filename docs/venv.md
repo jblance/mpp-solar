@@ -48,22 +48,27 @@ pi@batteryshed:~ $ source ~/venv/mppsolar/bin/activate
 ### Install mpp-solar using PIP
 
 ```
-(mppsolar) pi@batteryshed:~ $ pip install -e "git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar"
+(mppsolar) pi@batteryshed:~ $ pip install -e "git+https://github.com/jblance/mpp-solar.git#egg=mppsolar"
 Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
-Obtaining mpp-solar from git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar
-  Updating ./venv/mppsolar/src/mpp-solar clone
-Collecting pyserial (from mpp-solar)
-  Downloading https://files.pythonhosted.org/packages/07/bc/587a445451b253b285629263eb51c2d8e9bcea4fc97826266d186f96f558/pyserial-3.5-py2.py3-none-any.whl (90kB)
-    100% |████████████████████████████████| 92kB 444kB/s
-Installing collected packages: pyserial, mpp-solar
-  Running setup.py develop for mpp-solar
-Successfully installed mpp-solar pyserial-3.5
+Obtaining mppsolar from git+https://github.com/jblance/mpp-solar.git#egg=mppsolar
+  Cloning https://github.com/jblance/mpp-solar.git to ./venv/mppsolar/src/mppsolar
+  Running command git clone -q https://github.com/jblance/mpp-solar.git /home/pi/venv/mppsolar/src/mppsolar
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+    Preparing wheel metadata ... done
+Collecting paho-mqtt
+  Using cached https://www.piwheels.org/simple/paho-mqtt/paho_mqtt-1.6.1-py3-none-any.whl (75 kB)
+Collecting pyserial
+  Using cached https://www.piwheels.org/simple/pyserial/pyserial-3.5-py2.py3-none-any.whl (90 kB)
+Installing collected packages: pyserial, paho-mqtt, mppsolar
+  Running setup.py develop for mppsolar
+Successfully installed mppsolar paho-mqtt-1.6.1 pyserial-3.5
 ```
 
 ### Run mpp-solar
 ```
 (mppsolar) pi@batteryshed:~ $ mpp-solar -v
-MPP Solar Command Utility, version: 0.7.0, First refactor version - under development
+Solar Device Command Utility, version: 0.9.10, PI18 ammendments from preussal
 ```
 ```
 (mppsolar) pi@batteryshed:~ $ mpp-solar -c QID
@@ -74,18 +79,22 @@ serial_number                 	92000000000666
 ### Update to latest from github
 make sure you have activated the virtual environment beforehand
 ```
-(mppsolar) pi@batteryshed:~ $ pip install -e "git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar"
-Obtaining mpp-solar from git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar
-  Updating ./venv/mppsolar/src/mpp-solar clone
+(mppsolar) pi@batteryshed:~ $  pip install -e "git+https://github.com/jblance/mpp-solar.git#egg=mppsolar"
+Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
+Obtaining mppsolar from git+https://github.com/jblance/mpp-solar.git#egg=mppsolar
+  Updating ./venv/mppsolar/src/mppsolar clone
   Running command git fetch -q --tags
-  Running command git reset --hard -q 071ca0cd9feea458b1e36dc020aa704b2000e431
-Requirement already satisfied: pyserial in ./venv/mppsolar/lib/python3.8/site-packages (from mpp-solar) (3.5)
-Installing collected packages: mpp-solar
-  Attempting uninstall: mpp-solar
-    Found existing installation: mpp-solar 0.7.3
-    Uninstalling mpp-solar-0.7.3:
-      Successfully uninstalled mpp-solar-0.7.3
-  Running setup.py develop for mpp-solar
-Successfully installed mpp-solar
-
+  Running command git reset --hard -q 88b0d406c31094380532bb22d6a1f975374a5930
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+    Preparing wheel metadata ... done
+Requirement already satisfied: paho-mqtt in ./venv/mppsolar/lib/python3.9/site-packages (from mppsolar) (1.6.1)
+Requirement already satisfied: pyserial in ./venv/mppsolar/lib/python3.9/site-packages (from mppsolar) (3.5)
+Installing collected packages: mppsolar
+  Attempting uninstall: mppsolar
+    Found existing installation: mppsolar 0.9.10
+    Uninstalling mppsolar-0.9.10:
+      Successfully uninstalled mppsolar-0.9.10
+  Running setup.py develop for mppsolar
+Successfully installed mppsolar
 ```

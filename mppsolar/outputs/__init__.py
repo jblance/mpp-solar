@@ -25,6 +25,23 @@ def list_outputs():
     return result
 
 
+def get_output(output):
+    """
+    Take an output name
+    attempt to find and instantiate the corresponding module
+    """
+    log.info(f"attempting to create output processor: {output}")
+    try:
+        output_module = importlib.import_module("mppsolar.outputs." + output, ".")
+        output_class = getattr(output_module, output)
+        return output_class()
+    except ModuleNotFoundError:
+        # perhaps raise a Powermon exception here??
+        # maybe warn and keep going, only error if no outputs found?
+        log.critical(f"No module found for output processor {output}")
+    return None
+
+
 def get_outputs(output_list):
     """
     Take a comma separated list of output names
@@ -34,28 +51,24 @@ def get_outputs(output_list):
     ops = []
     outputs = output_list.split(",")
     for output in outputs:
-        log.info(f"attempting to create output processor: {output}")
-        try:
-            output_module = importlib.import_module("mppsolar.outputs." + output, ".")
-            output_class = getattr(output_module, output)
-            ops.append(output_class())
-        except ModuleNotFoundError:
-            # perhaps raise a Powermon exception here??
-            # maybe warn and keep going, only error if no outputs found?
-            log.critical(f"No module found for output processor {output}")
+        op = get_output(output)
+        if op is not None:
+            ops.append(op)
     return ops
 
 
-def output_results(results, config, mqtt_broker):
-    outputs = get_outputs(config["outputs"])
+def output_results(results, outputs, mqtt_broker):
+    print(outputs)
+
     for op in outputs:
         # maybe include the command and what the command is im the output
         # eg QDI run, Display Inverter Default Settings
-        filter = config.get("CONFIG", "filter")
-        log.debug(f"Using output filter: {filter}")
-        op.output(
+        # filter = config.get("CONFIG", "filter")
+        # log.debug(f"Using output filter: {filter}")
+        output = get_output(op["name"])
+        output.output(
             data=dict(results),
-            tag=config.get("CONFIG", "tag"),
+            # tag=config.get("CONFIG", "tag"),
             mqtt_broker=mqtt_broker,
             # filter=filter,
             # excl_filter=excl_filter,

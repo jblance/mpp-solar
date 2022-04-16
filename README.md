@@ -25,7 +25,7 @@ The python code is designed to run on Linux type python environments using pytho
 [Hardware that has been known to work](https://github.com/jblance/mpp-solar/blob/master/docs/hardware.md)
 
 ## Installation ##
-* to get the latest stable version: `sudo pip install mpp-solar`
+* to get the latest stable version: `sudo pip install mppsolar`
 * [more installation options](https://github.com/jblance/mpp-solar/blob/master/docs/installation.md)
 
 ## Usage ###
