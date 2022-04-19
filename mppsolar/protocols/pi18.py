@@ -431,7 +431,7 @@ COMMANDS = {
         "name": "MCHGV",
         "prefix": "^S015",
         "description": "Set Battery Bulk,Float charge voltages 		     (Maunal Option 17,18)",
-        "help": " -- example: MCHGV552,540 	(set Bulk\CV voltage [480~584] in 0.1V xxx, Float voltage [480~584] in 0.1V yyy)",
+        "help": " -- example: MCHGV552,540 	(set Bulk - CV voltage [480~584] in 0.1V xxx, Float voltage [480~584] in 0.1V yyy)",
         "type": "SETTER",
         "response": [
             ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
