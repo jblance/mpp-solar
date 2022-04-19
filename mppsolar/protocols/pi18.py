@@ -98,6 +98,7 @@ COMMANDS = {
         ],
         "test_responses": [
             b"^D0882300,217,2300,500,217,5000,5000,480,500,540,450,552,545,2,10,060,1,1,1,9,1,0,0,0,1,00\r",
+            b"^D0882300,217,2300,500,217,5000,5000,480,500,540,450,560,560,2,02,060,1,0,1,9,1,0,0,0,1,00\xe9\r",
         ],
     },
     "GS": {
@@ -250,7 +251,7 @@ COMMANDS = {
         "name": "PI",
         "prefix": "^P005",
         "description": "Device Protocol Version inquiry",
-        "help": " -- queries the device protocol version",
+        "help": " -- queries the device protocol version \n",
         "type": "QUERY",
         "response":[
             ["string",	"Protocol Version",			""]
@@ -265,7 +266,7 @@ COMMANDS = {
 #        "name": "LON",
 #        "prefix": "^S007",
 #        "description": "Set enable/disable machine supply power to the loads",
-#        "help": " -- examples: LON1 (0: disable, 1: enable)",
+#        "help": " -- example: LON1 (0: disable, 1: enable)",
 #        "type": "SETTER",
 #        "response": [
 #            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
@@ -280,8 +281,8 @@ COMMANDS = {
     "POP": {
         "name": "POP",
         "prefix": "^S007",
-        "description": "Set output souce priority",
-        "help": " -- examples: POP (0: Solar-Utility-Battery, 1: Solar-Battery-Utility)",
+        "description": "Set output souce priority 				(Maunal Option 01)",
+        "help": " -- example: POP0 		(set Output POP0 [0: Solar-Utility-Batter],  POP1 [1: Solar-Battery-Utility]",
         "type": "SETTER",
         "response": [
             ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
@@ -293,11 +294,28 @@ COMMANDS = {
         "regex": "POP([01])$",
     },
 
+    "PSP": {
+        "name": "PSP",
+        "prefix": "^S007",
+        "description": "Set solar power priority 				(Maunal Option 05)",
+        "help": " -- example: PSP0 		(set Priority PSP0 [0: Battery-Load-Utiliy (+AC Charge)],  PSP1 [1: Load-Battery-Utiliy]",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "PSP([01])$",
+    },
+
+
     "PEI": {
         "name": "PEI",
         "prefix": "^S006",
-        "description": "Machine type, enable: Grid-Tie (Maunal Option 9)",
-        "help": " -- examples: PEI (enable Grid-Tie)",
+        "description": "Set Machine type,  enable: Grid-Tie 			(Maunal Option 09)",
+        "help": " -- example: PEI 		(set enable Grid-Tie)",
         "type": "SETTER",
         "response": [
             ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
@@ -311,8 +329,8 @@ COMMANDS = {
     "PDI": {
         "name": "PDI",
         "prefix": "^S006",
-        "description": "Machine type, disable: Grid-Tie do Off-Grid Tie (Maunal Option 9)",
-        "help": " -- examples: PDI (disable Grid-Tie)",
+        "description": "Set Machine type, disable: Grid-Tie 			(Maunal Option 09)",
+        "help": " -- example: PDI 		(set disable Grid-Tie)",
         "type": "SETTER",
         "response": [
             ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
@@ -323,29 +341,73 @@ COMMANDS = {
         ],
     },
 
+    "PCP": {
+        "name": "PCP",
+        "prefix": "^S009",
+        "description": "Set charging source priority 				(Maunal Option 10)",
+        "help": " -- example: PCP0,1 		(set unit 0 [0-9] to 0: Solar first, 1: Solar and Utility, 2: Only solar)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "PCP([0-9],[012])$",
+    },
 
-# Not working "Command PCP01 was rejected"
-#    "PCP": {
-#        "name": "PCP",
-#        "prefix": "^S009",
-#        "description": "Set charging source priority",
-#        "help": " -- examples: PCP01 (Parallel machine ID (0-9) + 0: Solar first, 1: Solar and Utility, 2: Only solar)",
-#        "type": "SETTER",
-#        "response": [
-#            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
-#        ],
-#        "test_responses": [
-#            b"^1\x0b\xc2\r",
-#            b"^0\x1b\xe3\r",
-#        ],
-#        "regex": "PCP([0-9][012])$",
-#    },
 
-    "PSP": {
-        "name": "PSP",
+    "MCHGC": {
+        "name": "MCHGC",
+        "prefix": "^S013",
+        "description": "Set Battery Max Charging Current Solar + AC 		(Maunal Option 11)",
+        "help": " -- example: MCHGC0,030 	(set unit 0 [0-9] to max charging current of  30A [    010 020 030 040 050 060 070 080])",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "MCHGC([0-9],0[1-8]0)$",
+    },
+
+    "MUCHGC": {
+        "name": "MUCHGC",
+        "prefix": "^S014",
+        "description": "Set Battery Max AC Charging Current 			(Maunal Option 13)",
+        "help": " -- example: MUCHGC0,030 	(set unit 0 [0-9] utility charging current to 30A [002 010 020 030 040 050 060 070 080])",
+        "type": "SETTER",
+        "response": [
+             ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
+        "test_responses": [
+            b"",
+        ],
+        "regex": "MUCHGC([0-9]),(002|0[1-8]0)$",
+    },
+
+    "PBT": {
+        "name": "PBT",
         "prefix": "^S007",
-        "description": "Set solar power priority",
-        "help": " -- examples: PSP0 (0: Battery-Load-Utiliy (+AC Charge), 1: Load-Battery-Utiliy)",
+        "description": "Set Battery Type 					(Maunal Option 14)",
+        "help": " -- example: PBT0 		(set battery as PBT0 [0: AGM], PBT1 [1: FLOODED], PBT2 [2: USER])",
+        "type": "SETTER",
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "PBT([012])$",
+    },
+
+    "MCHGV": {
+        "name": "MCHGV",
+        "prefix": "^S015",
+        "description": "Set Battery Bulk,Float charge voltages 		     (Maunal Option 17,18)",
+        "help": " -- example: MCHGV552,540 	(set Bulk\CV voltage [480~584] in 0.1V xxx, Float voltage [480~584] in 0.1V yyy)",
         "type": "SETTER",
         "response": [
             ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
@@ -354,8 +416,39 @@ COMMANDS = {
             b"^1\x0b\xc2\r",
             b"^0\x1b\xe3\r",
         ],
-        "regex": "PSP([01])$",
+        # Regex 480 - 584 Volt
+        "regex": "MCHGV(4[8-9][0-9]|5[0-7][0-9]|58[0-5]),(4[8-9][0-9]|5[0-7][0-9]|58[0-4])$",
     },
+
+    "PSDV": {
+        "name": "PSDV",
+        "prefix": "^S010",
+        "description": "Set Battery Cut-off Voltage	 			(Maunal Option 19)",
+        "help": " -- example: PSDV450 		(set battery cut-off voltage to 45V [400~480V] for 48V unit)",
+        "type": "SETTER",
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "PSDV(4[0-7][0-9]|480)$",
+    },
+
+
+    "BUCD": {
+        "name": "BUCD",
+        "prefix": "^S014",
+        "description": "Set Battery Stop dis,charging when Grid is available (Maunal Option 20,21)",
+        "help": " -- example: BUCD44,48	(set Stop discharge Voltate [440~510] in 0.1V xxx, Stop Charge Voltage [000(Full) or 480~580] in 0.1V yyy)",
+        "type": "SETTER",
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "BUCD(4[4-9]0|5[0-1]0,000|4[8-9]0|5[0-8]0)$",
+    },
+
 
 }
 
@@ -386,6 +479,8 @@ class pi18(AbstractProtocol):
             "POP"
             #"PCP",
             "PSP",
+            "MCHGV",
+            "MUCHGC",
         ]
         self.DEFAULT_COMMAND = "PI"
 
