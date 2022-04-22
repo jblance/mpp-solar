@@ -137,6 +137,12 @@ def main():
         help="Specifies the password to use for authenticated mqtt broker publishing",
         default=None,
     )
+    parser.add_argument(
+        "--udpport",
+        type=str,
+        help="Specifies the UDP port if needed (default: 5555)",
+        default=5555,
+    )
     parser.add_argument("-c", "--command", nargs="?", const="help", help="Command to run")
     if parser.prog == "jkbms":
         parser.add_argument(
@@ -202,6 +208,7 @@ def main():
     )
     mqtt_broker.set("results_topic", (args.mqtttopic if args.mqtttopic is not None else prog_name))
     log.debug(mqtt_broker)
+    udp_port = args.udpport
     ##
     filter = args.filter
     excl_filter = args.exclfilter
@@ -244,6 +251,7 @@ def main():
         mqtt_broker.update("port", config["SETUP"].get("mqtt_port", fallback=None))
         mqtt_broker.update("username", config["SETUP"].get("mqtt_user", fallback=None))
         mqtt_broker.update("password", config["SETUP"].get("mqtt_pass", fallback=None))
+        udp_port.update("udp_port", config["SETUP"].get("udp_port", fallback=None))
         sections.remove("SETUP")
 
         # Process 'command' sections
@@ -271,9 +279,7 @@ def main():
                 baud=baud,
                 porttype=porttype,
                 mqtt_broker=mqtt_broker,
-                # mqtt_port=mqtt_port,
-                # mqtt_user=mqtt_user,
-                # mqtt_pass=mqtt_pass,
+                udp_port=udp_port,
             )
             # build array of commands
             commands = _command.split("#")
@@ -309,9 +315,7 @@ def main():
             baud=args.baud,
             porttype=args.porttype,
             mqtt_broker=mqtt_broker,
-            # mqtt_port=mqtt_port,
-            # mqtt_user=mqtt_user,
-            # mqtt_pass=mqtt_pass,
+            udp_port=udp_port,
         )
         #
 
@@ -379,6 +383,7 @@ def main():
                     data=results,
                     tag=_tag,
                     mqtt_broker=mqtt_broker,
+                    udp_port=udp_port,
                     # mqtt_port=mqtt_port,
                     # mqtt_user=mqtt_user,
                     # mqtt_pass=mqtt_pass,
@@ -396,3 +401,4 @@ def main():
             # Dont loop unless running as daemon
             log.debug("Not daemon, so not looping")
             break
+

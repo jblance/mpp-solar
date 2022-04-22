@@ -12,7 +12,7 @@ class test_init(unittest.TestCase):
     def test_get_outputs(self):
         """test the get_outputs command"""
         list_of_outputs = (
-            "hass_mqtt,influx_mqtt,influx2_mqtt,json_mqtt,json,mqtt,raw,screen,tag_mqtt"
+            "hass_mqtt,influx_mqtt,influx2_mqtt,json_mqtt,json,mqtt,raw,screen,tag_mqtt,json_udp"
         )
         outputs = mppsolar.get_outputs(list_of_outputs)
 
