@@ -21,10 +21,7 @@ class json_udp(baseoutput):
         data = get_kwargs(kwargs, "data")
         tag = get_kwargs(kwargs, "tag")
         keep_case = get_kwargs(kwargs, "keep_case")
-        udp_port = get_kwargs(kwargs, "udp_port")
-        if udp_port is not None:
-            print("UDP port not setup, using default 5555")
-            udp_port = 5555
+        udp_port = get_kwargs(kwargs, "udp_port", 5555)
         filter = get_kwargs(kwargs, "filter")
         if filter is not None:
             filter = re.compile(filter)
@@ -55,7 +52,10 @@ class json_udp(baseoutput):
                 output[key] = value
 
         payload = js.dumps(output)
+        log.debug(payload)
         msgs.append(payload)
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP datagram
-        sock.sendto(bytes(payload, "utf-8"), ("localhost", udp_port))
+        for msg in msgs:
+            count = sock.sendto(bytes(msg, "utf-8"), ("localhost", udp_port))
+        log.debug(f"Udp sent response {count}")
         return msgs

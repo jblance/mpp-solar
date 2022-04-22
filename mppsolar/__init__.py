@@ -139,7 +139,7 @@ def main():
     )
     parser.add_argument(
         "--udpport",
-        type=str,
+        type=int,
         help="Specifies the UDP port if needed (default: 5555)",
         default=5555,
     )
@@ -209,6 +209,7 @@ def main():
     mqtt_broker.set("results_topic", (args.mqtttopic if args.mqtttopic is not None else prog_name))
     log.debug(mqtt_broker)
     udp_port = args.udpport
+    log.debug(f"udp port {udp_port}")
     ##
     filter = args.filter
     excl_filter = args.exclfilter
