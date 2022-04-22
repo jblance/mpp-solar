@@ -139,9 +139,9 @@ def main():
     )
     parser.add_argument(
         "--udpport",
-        type=int,
+        type=str,
         help="Specifies the UDP port if needed (default: 5555)",
-        default=5555,
+        default="5555",
     )
     parser.add_argument("-c", "--command", nargs="?", const="help", help="Command to run")
     if parser.prog == "jkbms":
@@ -252,7 +252,6 @@ def main():
         mqtt_broker.update("port", config["SETUP"].get("mqtt_port", fallback=None))
         mqtt_broker.update("username", config["SETUP"].get("mqtt_user", fallback=None))
         mqtt_broker.update("password", config["SETUP"].get("mqtt_pass", fallback=None))
-        udp_port.update("udp_port", config["SETUP"].get("udp_port", fallback=None))
         sections.remove("SETUP")
 
         # Process 'command' sections
@@ -268,6 +267,7 @@ def main():
             porttype = config[section].get("porttype", fallback=None)
             filter = config[section].get("filter", fallback=None)
             excl_filter = config[section].get("exclfilter", fallback=None)
+            udp_port = config[section].get("udpport", fallback=None)
             #
             device_class = get_device_class(_type)
             log.debug(f"device_class {device_class}")
@@ -402,4 +402,3 @@ def main():
             # Dont loop unless running as daemon
             log.debug("Not daemon, so not looping")
             break
-

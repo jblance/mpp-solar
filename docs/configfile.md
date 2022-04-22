@@ -32,6 +32,7 @@ outputs=screen    # required - comma separated list of outputs (default: screen)
 porttype=serial   # optional - used to override the automatic port type determination
 filter=^voltage   # optional - if defined only field names that match the filter will be output (uses python re format)
 excl_filter=test  # optional - if defined any field names that match the filter will be excluded from the output (uses python re format)
+udpport=5566      # optional - redefines UDP publish port (default: 5555)
 ```
 
 [list of outputs](usage.md#List-available-output-processors)
