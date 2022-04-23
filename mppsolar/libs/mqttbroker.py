@@ -58,9 +58,10 @@ class MqttBroker:
             self.mqttc.loop_start()
 
     def stop(self):
-        self.mqttc.loop_stop()
-        if self._isConnected:
-            self.mqttc.disconnect
+        if self.name:
+            self.mqttc.loop_stop()
+            if self._isConnected:
+                self.mqttc.disconnect
 
     def set(self, variable, value):
         setattr(self, variable, value)
@@ -73,7 +74,8 @@ class MqttBroker:
 
     def subscribe(self, topic, callback):
         # subscribe to mqtt topic
-
+        if not self.name:
+            return
         # check if connected, connect if not
         if not self._isConnected:
             log.debug("Not connected, connecting")

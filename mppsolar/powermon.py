@@ -16,7 +16,7 @@ from mppsolar.version import __version__  # noqa: F401
 
 
 # Set-up logger
-log = logging.getLogger("")
+log = logging.getLogger("powermon")
 FORMAT = "%(asctime)-15s:%(levelname)s:%(module)s:%(funcName)s@%(lineno)d: %(message)s"
 logging.basicConfig(format=FORMAT)
 
@@ -38,9 +38,6 @@ sample_config = """
     pass: null
   adhoc_commands:
     topic: test/command_topic
-    outputs:
-      - name: screen
-      - name: mqtt
   commands:
     - command: QPIGS
       gap: 10s
@@ -61,6 +58,7 @@ SPLIT_TOKEN = ","
 
 def mqtt_callback(client, userdata, msg):
     print(f"Received `{msg.payload}` on topic `{msg.topic}`")
+    # TODO: define message format and extract command and config
     newCommand = msg.payload
     ADHOC_COMMANDS.append(newCommand)
 
@@ -78,7 +76,9 @@ def main():
         const="/etc/mpp-solar/powermon.yml",
         default=None,
     )
-    parser.add_argument("-v", "--version", action="store_true", help="Display the version")
+    parser.add_argument(
+        "-v", "--version", action="store_true", help="Display the version"
+    )
     parser.add_argument(
         "--generateConfigFile",
         action="store_true",
@@ -125,7 +125,7 @@ def main():
     config = yaml.safe_load(sample_config)
     # build config - update with details from config file
     if args.configFile is not None:
-        with open("args.configFile", "r") as stream:
+        with open(args.configFile, "r") as stream:
             try:
                 config.update(yaml.safe_load(stream))
             except yaml.YAMLError as exc:
@@ -144,22 +144,23 @@ def main():
     log.debug(config)
 
     # Build mqtt broker
-    # TODO disable if not defined
     mqtt_broker = MqttBroker(
         name=config["mqttbroker"]["name"],
         port=config["mqttbroker"]["port"],
         username=config["mqttbroker"]["user"],
         password=config["mqttbroker"]["pass"],
     )
-    log.debug(mqtt_broker)
+    # sub to command topic if defined
+    adhoc_commands_topic = config["adhoc_commands"]["topic"]
+    if adhoc_commands_topic is not None:
+        # TODO: move to mqttbroker -
+        mqtt_broker.connect()
+        mqtt_broker.subscribe(adhoc_commands_topic, mqtt_callback)
+        # connect to mqtt
+        # TODO: move to mqttbroker -
+        mqtt_broker.start()
 
-    # sub to command topic
-    # TODO disable if not defined
-    # TODO disable if mqttbroker is null
-    mqtt_broker.connect()
-    mqtt_broker.subscribe(config["adhoc_commands"]["topic"], mqtt_callback)
-    # connect to mqtt
-    mqtt_broker.start()
+    log.debug(mqtt_broker)
 
     # get port
     portconfig = config["port"].copy()
@@ -183,21 +184,31 @@ def main():
                 # process any adhoc commands first
                 log.debug(f"adhoc command list: {ADHOC_COMMANDS}")
                 while len(ADHOC_COMMANDS) > 0:
-                    adhoc_command = ADHOC_COMMANDS.popleft().decode()  # FIXME: decode to str #
+                    adhoc_command = (
+                        ADHOC_COMMANDS.popleft().decode()
+                    )  # FIXME: decode to str #
                     log.info(f"Processing command: {adhoc_command}")
-                    results = port.process_command(command=adhoc_command, protocol=protocol)
+                    results = port.process_command(
+                        command=adhoc_command, protocol=protocol
+                    )
                     log.debug(f"results {results}")
                     # send to output processor(s)
                     # TODO sort outputs
                     output_results(
-                        results=results, outputs=config["adhoc_commands"], mqtt_broker=mqtt_broker
+                        results=results,
+                        outputs=config["adhoc_commands"],
+                        mqtt_broker=mqtt_broker,
                     )
                 # process 'normal' commands
                 log.info(f"Processing command: {command}")
-                results = port.process_command(command=command["command"], protocol=protocol)
+                results = port.process_command(
+                    command=command["command"], protocol=protocol
+                )
                 log.debug(f"results {results}")
                 # send to output processor(s)
-                output_results(results=results, outputs=command, mqtt_broker=mqtt_broker)
+                output_results(
+                    results=results, outputs=command["outputs"], mqtt_broker=mqtt_broker
+                )
                 # pause
                 pause_time = config["command_pause"]
                 log.debug(f"Sleeping for {pause_time}secs")

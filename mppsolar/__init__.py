@@ -276,7 +276,7 @@ def main():
                 # mqtt_pass=mqtt_pass,
             )
             # build array of commands
-            commands = _command.split(",")
+            commands = _command.split("#")
 
             for command in commands:
                 _commands.append((device, command, tag, outputs, filter, excl_filter))
@@ -340,7 +340,7 @@ def main():
             # run the command
             commands.append("")
         else:
-            commands = args.command.split(",")
+            commands = args.command.split("#")
 
         outputs = args.output
         for command in commands:
