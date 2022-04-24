@@ -143,7 +143,7 @@ def main():
         help="Specifies the UDP port if needed (default: 5555)",
         default="5555",
     )
-    parser.add_argument("-c", "--command", nargs="?", const="help", help="Command to run")
+    parser.add_argument("-c", "--command", nargs="?", const="help", help="Command to run; or list of hash separated commands to run")
     if parser.prog == "jkbms":
         parser.add_argument(
             "-C",
