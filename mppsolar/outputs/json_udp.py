@@ -1,30 +1,27 @@
 import json as js
 import logging
 import re
+import socket
 
-from .mqtt import mqtt
+from .baseoutput import baseoutput
 from ..helpers import get_kwargs
 from ..helpers import key_wanted
 
-log = logging.getLogger("json_mqtt")
+log = logging.getLogger("json_udp")
 
 
-class json_mqtt(mqtt):
+class json_udp(baseoutput):
     def __str__(self):
-        return "outputs all the results to the supplied mqtt broker in a single message formatted as json: eg "
+        return "outputs all the results to tcp UDP datagram packet in JSON format"
 
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"__init__: kwargs {kwargs}")
 
-    def build_msgs(self, *args, **kwargs):
+    def output(self, *args, **kwargs):
         data = get_kwargs(kwargs, "data")
         tag = get_kwargs(kwargs, "tag")
         keep_case = get_kwargs(kwargs, "keep_case")
-        mqtt_broker = get_kwargs(kwargs, "mqtt_broker")
-        if mqtt_broker is not None:
-            topic = mqtt_broker.results_topic
-        else:
-            topic = get_kwargs(kwargs, "mqtt_topic", default="mpp-solar")
+        udp_port = get_kwargs(kwargs, "udp_port", "5555")
         filter = get_kwargs(kwargs, "filter")
         if filter is not None:
             filter = re.compile(filter)
@@ -32,10 +29,6 @@ class json_mqtt(mqtt):
         if excl_filter is not None:
             excl_filter = re.compile(excl_filter)
 
-        # Build array of Influx Line Protocol II messages
-        # Message format is: mpp-solar,command=QPGS0 max_charger_range=120.0
-        #                    mpp-solar,command=inverter2 parallel_instance_number="valid"
-        #                    measurement,tag_set field_set
         msgs = []
         # Remove command and _command_description
         cmd = data.pop("_command", None)
@@ -59,9 +52,10 @@ class json_mqtt(mqtt):
                 output[key] = value
 
         payload = js.dumps(output)
-        msg = {
-            "topic": topic,
-            "payload": payload,
-        }
-        msgs.append(msg)
+        log.debug(payload)
+        msgs.append(payload)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP datagram
+        for msg in msgs:
+            count = sock.sendto(bytes(msg, "utf-8"), ("localhost", int(udp_port)))
+        log.debug(f"Udp sent response {count}")
         return msgs

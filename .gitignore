@@ -102,3 +102,5 @@ ENV/
 
 *.local
 .vscode/
+.idea/
+mppsolar/.idea/

@@ -114,8 +114,8 @@ COMMANDS = {
     "GS": {
         "name": "GS",
         "prefix": "^P003",
-        "description": "Device rated information",
-        "help": " -- queries rated information",
+        "description": "Query general status",
+        "help": " -- queries general status",
         "type": "QUERY",
         "response": [
             ["int", "Solar input voltage 1", "0.1V"],
