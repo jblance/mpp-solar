@@ -178,15 +178,16 @@ COMMANDS = {
             b'^D0301,10000,00005,00010,00000,1\xad\xc4\r'
         ]
     },
-    "AA,B,C,D,E,F,G,H,I": {
-        "name": "AA,B,C,D,E,F,G,H,I",
-        "prefix": "^D019",
-        "description": "",
-        "help": "",
-        "type": "QUERYD",
-        "response": [],
-        "test_responses": []
-    },
+
+    # "AA,B,C,D,E,F,G,H,I": {   # defined in spec, but does not seems to work
+    #     "name": "AA,B,C,D,E,F,G,H,I",
+    #     "prefix": "^D019",
+    #     "description": "",
+    #     "help": "",
+    #     "type": "QUERYD",
+    #     "response": [],
+    #     "test_responses": []
+    # },
     "PIRI": {
         "name": "PIRI",
         "prefix": "^P005",
