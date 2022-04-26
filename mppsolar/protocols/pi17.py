@@ -80,6 +80,113 @@ COMMANDS = {
             b"^D037000,010000,99,3,3,2300,2300,04,120U\x82\r",
         ],
     },
+    "DI": {
+        "name": "DI",
+        "prefix": "^P003",
+        "description": "Query default value of changeable parameters",
+        "help": "",
+        "type": "QUERY",
+        "response": [
+            ["int", "AC input highest voltage for feed power", "0.1V"],
+            ["int", "AC input lowest voltage for feed power", "0.1V"],
+            ["int", "AC input highest frequency for feed power", "0.01Hz"],
+            ["int", "AC input lowest frequency for feed power", "0.01Hz"],
+            ["int", "Solar input highest MPPT voltage", "0.1V"],
+            ["int", "Solar input lowest MPPT voltage", "0.1V"],
+            ["int", "Solar input highest voltage", "0.1V"],
+            ["int", "Solar input lowest voltage", "0.1V"],
+            ["int", "Solar input highest average voltage", "0.1V"],
+            ["int", "LCD sleep wait time", "30secs"],
+            ["int", "Battery maximum charge current", "0.1A"],
+            ["int", "Battery constant charge voltage CV", "0.1V"],
+            ["int", "Battery float charge voltage", "0.1V"],
+            ["int", "The wait time for feed power", "sec"],
+            ["string", "Start time for support loads", "HHMM"],
+            ["string", "Ending time for support loads", "HHMM"],
+            ["string", "Start time for AC charger", "HHMM"],
+            ["string", "Ending time for AC charger", "HHMM"],
+            ["int", "Battery under voltage", "0.1V"],
+            ["int", "Battery under back voltage", "0.1V"],
+            ["int", "Battery weak voltage in hybrid mode", "0.1V"],
+            ["int", "Battery weak back voltage in hybrid mode", "0.1V"],
+            ["int", "Battery stop charge current level in floating charging", "0.1A"],
+            ["int", "Keep charged time of battery catch stop charger current level", "0.1A"],
+            ["int", "Battery voltage of recover to charge when battery stop charger in floating charging", "0.1V"]
+        ],
+        "test_responses": []
+    },
+    "DM": {
+        "name": "DM",
+        "prefix": "^P003",
+        "description": "Query machine model",
+        "help": "For outputs interpretation see documentations",
+        "type": "QUERY",
+        "response": [
+            ["string", "model_code", ""]
+        ],
+        "test_response": [
+            b'^D006050h\xdb\r'
+        ]
+    },
+    "INGS": {
+        "name": "INGS",
+        "prefix": "^P004",
+        "description": "",
+        "help": "",
+        "type": "QUERY",
+        "response": [
+            ["int", "Input current R", "0.1V"],
+            ["int", "Input current S", "0.1V"],
+            ["int", "Input current T", "0.1V"],
+            ["int", "Output current R", "0.1V"],
+            ["int", "Output current S", "0.1V"],
+            ["int", "Output current T", "0.1V"],
+            ["int", "PBusVolt", "0.1V"],
+            ["int", "NBusVolt", "0.1V"],
+            ["int", "PBusAvgV", "0.1V"],
+            ["int", "NBusAvgV", "0.1V"],
+            ["int", "NLintCur", "0.1A"],
+        ],
+        "test_responses": [
+            b'^D0560020,0019,0021,0002,0004,0005,3809,3809,3810,3807,000\xf1\x1e\r'
+        ]
+    },
+    "RTCP": {
+        "name": "RTCP",
+        "prefix": "^P004",
+        "description": "",
+        "help": "",
+        "type": "QUERY",
+        "response": [],
+        "test_responses": []
+    },
+    "EMINFO": {
+        "name": "EMINFO",
+        "prefix": "^P005",
+        "description": "",
+        "help": "",
+        "type": "QUERY",
+        "response": [
+            ["int", "EMFirst", ""],
+            ["int", "DefFeed-InPow", ""],
+            ["int", "ActPvPow", ""],
+            ["int", "ActFeedPow", ""],
+            ["int", "ReservPow", ""],
+            ["int", "EMLast", ""]
+        ],
+        "test_responses": [
+            b'^D0301,10000,00005,00010,00000,1\xad\xc4\r'
+        ]
+    },
+    "AA,B,C,D,E,F,G,H,I": {
+        "name": "AA,B,C,D,E,F,G,H,I",
+        "prefix": "^D019",
+        "description": "",
+        "help": "",
+        "type": "QUERYD",
+        "response": [],
+        "test_responses": []
+    },
     "PIRI": {
         "name": "PIRI",
         "prefix": "^P005",
@@ -386,7 +493,7 @@ COMMANDS = {
         "help": " -- queries generated energy for the year YYYY from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated energy", "kWh"],
+            ["int", "Generated energy", "Wh"],
         ],
         "test_responses": [
             b"^D01100006591\xba\x10\r",
@@ -400,7 +507,7 @@ COMMANDS = {
         "help": " -- queries generated energy for the month YYYYMM from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated energy", "kWh"],
+            ["int", "Generated energy", "Wh"],
         ],
         "test_responses": [
             b"^D01000006591\xba\x10\r",
@@ -414,7 +521,7 @@ COMMANDS = {
         "help": " -- queries generated energy for the day YYYYMMDD from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated energy", "kWh"],
+            ["int", "Generated energy", "Wh"],
         ],
         "test_responses": [
             b"^D009000091\xba\x10\r",
@@ -428,7 +535,7 @@ COMMANDS = {
         "help": " -- queries generated energy for the hour YYYYMMDDHH from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated energy", "kWh"],
+            ["int", "Generated energy", "Wh"],
         ],
         "test_responses": [
             b"^D008000001\xba\x10\r",
@@ -805,6 +912,19 @@ class pi17(AbstractProtocol):
         data_length = len(_cmd) + 1
         if _type == "QUERY":
             _prefix = f"^P{data_length:03}"
+            _pre_cmd = bytes(_prefix, "utf-8") + _cmd
+            log.debug(f"_pre_cmd: {_pre_cmd}")
+            log.debug(f"_prefix: {_prefix}")
+            # calculate the CRC
+            # crc_high; crc_low = crc(_pre_cmd)
+            # combine byte_cmd, CRC , return
+            # PI18 full command "^P005GS\x..\x..\r"
+            # _crc = bytes([crc_high, crc_low, 13])
+            full_command = _pre_cmd + bytes([13])  # + _crc
+            log.debug(f"full command: {full_command}")
+            return full_command
+        elif _type == "QUERYD":
+            _prefix = self._command_defn["prefix"]
             _pre_cmd = bytes(_prefix, "utf-8") + _cmd
             log.debug(f"_pre_cmd: {_pre_cmd}")
             log.debug(f"_prefix: {_prefix}")
