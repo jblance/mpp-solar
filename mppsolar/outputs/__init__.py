@@ -35,10 +35,10 @@ def get_output(output):
         output_module = importlib.import_module("mppsolar.outputs." + output, ".")
         output_class = getattr(output_module, output)
         return output_class()
-    except ModuleNotFoundError:
+    except ModuleNotFoundError as e:
         # perhaps raise a Powermon exception here??
         # maybe warn and keep going, only error if no outputs found?
-        log.critical(f"No module found for output processor {output}")
+        log.critical(f"No module found for output processor {output} Error: {e}")
     return None
 
 

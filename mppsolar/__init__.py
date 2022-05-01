@@ -143,6 +143,17 @@ def main():
         help="Specifies the UDP port if needed (default: 5555)",
         default="5555",
     )
+    parser.add_argument(
+        "--mongo_url",
+        type=str,
+        help="Mongo connection url, example mongodb://user:password@ip:port/admindb",
+    )
+    parser.add_argument(
+        "--mongo_db",
+        type=str,
+        help="Mongo db name (default: mppsolar)",
+        default="mppsolar",
+    )
     parser.add_argument("-c", "--command", nargs="?", const="help", help="Command to run; or list of hash separated commands to run")
     if parser.prog == "jkbms":
         parser.add_argument(
@@ -210,6 +221,9 @@ def main():
     log.debug(mqtt_broker)
     udp_port = args.udpport
     log.debug(f"udp port {udp_port}")
+    mongo_url = args.mongo_url
+    mongo_db = args.mongo_db
+    log.debug(f"Using Mongo {mongo_url} with {mongo_db}")
     ##
     filter = args.filter
     excl_filter = args.exclfilter
@@ -268,6 +282,8 @@ def main():
             filter = config[section].get("filter", fallback=None)
             excl_filter = config[section].get("exclfilter", fallback=None)
             udp_port = config[section].get("udpport", fallback=None)
+            mongo_url = config[section].get("mongo_url", fallback=None)
+            mongo_db = config[section].get("mongo_db", fallback=None)
             #
             device_class = get_device_class(_type)
             log.debug(f"device_class {device_class}")
@@ -281,6 +297,8 @@ def main():
                 porttype=porttype,
                 mqtt_broker=mqtt_broker,
                 udp_port=udp_port,
+                mongo_url=mongo_url,
+                mongo_db=mongo_db,
             )
             # build array of commands
             commands = _command.split("#")
@@ -317,6 +335,8 @@ def main():
             porttype=args.porttype,
             mqtt_broker=mqtt_broker,
             udp_port=udp_port,
+            mongo_url=mongo_url,
+            mongo_db=mongo_db,
         )
         #
 
@@ -385,6 +405,8 @@ def main():
                     tag=_tag,
                     mqtt_broker=mqtt_broker,
                     udp_port=udp_port,
+                    mongo_url=mongo_url,
+                    mongo_db=mongo_db,
                     # mqtt_port=mqtt_port,
                     # mqtt_user=mqtt_user,
                     # mqtt_pass=mqtt_pass,
