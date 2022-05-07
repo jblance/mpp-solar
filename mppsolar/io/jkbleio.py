@@ -60,6 +60,7 @@ class JkBleIO(BaseIO):
                 return connected
             try:
                 self._device.connect(mac)
+                self._device.setMTU(130)
                 connected = True
             except Exception:
                 continue
@@ -88,7 +89,7 @@ class JkBleIO(BaseIO):
 
         # Get the handles that we need to talk to
         # Read
-        characteristicReadUuid = "ffe3"
+        characteristicReadUuid = "ffe1"
         characteristicRead = serviceNotify.getCharacteristics(characteristicReadUuid)[0]
         handleRead = characteristicRead.getHandle()
         log.info("Read characteristic: {}, handle {:x}".format(characteristicRead, handleRead))
