@@ -60,7 +60,7 @@ class JkBleIO(BaseIO):
                 return connected
             try:
                 self._device.connect(mac)
-                self._device.setMTU(130)
+                self._device.setMTU(330)
                 connected = True
             except Exception:
                 continue
