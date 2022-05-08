@@ -2,6 +2,7 @@ import json as js
 import logging
 import re
 
+from . import to_json
 from .mqtt import mqtt
 from ..helpers import get_kwargs
 from ..helpers import key_wanted
@@ -43,20 +44,7 @@ class json_mqtt(mqtt):
         data.pop("raw_response", None)
         if tag is None:
             tag = cmd
-        output = {}
-        # Loop through responses
-        for key in data:
-            value = data[key]
-            if isinstance(value, list):
-                value = data[key][0]
-            # unit = data[key][1]
-            # remove spaces
-            key = key.replace(" ", "_")
-            if not keep_case:
-                # make lowercase
-                key = key.lower()
-            if key_wanted(key, filter, excl_filter):
-                output[key] = value
+        output = to_json(data, keep_case, excl_filter, filter)
 
         payload = js.dumps(output)
         msg = {

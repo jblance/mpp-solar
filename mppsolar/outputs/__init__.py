@@ -2,11 +2,12 @@ import logging
 import importlib
 import pkgutil
 
+from ..helpers import key_wanted
+
 log = logging.getLogger("helpers")
 
 
 def list_outputs():
-
     print("outputs list outputs")
     pkgpath = __file__
     pkgpath = pkgpath[: pkgpath.rfind("/")]
@@ -74,3 +75,21 @@ def output_results(results, outputs, mqtt_broker):
             # excl_filter=excl_filter,
             # keep_case=keep_case,
         )
+
+
+def to_json(data, keep_case, excl_filter, filter):
+    output = {}
+    # Loop through responses
+    for key in data:
+        value = data[key]
+        if isinstance(value, list):
+            value = data[key][0]
+        # unit = data[key][1]
+        # remove spaces
+        key = key.replace(" ", "_")
+        if not keep_case:
+            # make lowercase
+            key = key.lower()
+        if key_wanted(key, filter, excl_filter):
+            output[key] = value
+    return output
