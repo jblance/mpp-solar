@@ -60,13 +60,15 @@ class mongo(baseoutput):
         log.debug(output)
         msgs.append(output)
         inserted = 0
-        for msg in msgs:
-            col = msg.pop("_command")
-            msg['updated'] = datetime.datetime.now()
-            result = db[col].insert_one(msg)
-            if result is not None:
-                log.debug(result.inserted_id)
-                inserted += 1
-        log.debug(f"inserted {inserted} docs")
-
+        try:
+            for msg in msgs:
+                col = msg.pop("_command")
+                msg['updated'] = datetime.datetime.now()
+                result = db[col].insert_one(msg)
+                if result is not None:
+                    log.debug(result.inserted_id)
+                    inserted += 1
+            log.debug(f"inserted {inserted} docs")
+        except pymongo.errors.ServerSelectionTimeoutError as dbe:
+            log.error(f"Mongo error {dbe}")
         return msgs
