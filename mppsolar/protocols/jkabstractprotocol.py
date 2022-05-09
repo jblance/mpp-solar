@@ -22,16 +22,18 @@ COMMANDS = {
             ["Hex2Str", 4, "Header", ""],
             ["Hex2Str", 1, "Record Type", ""],
             ["Hex2Int", 1, "Record Counter", ""],
-            ["Hex2Ascii", 10, "Device Model", ""],
-            ["Hex2Ascii", 10, "Hardware Version", ""],
-            ["Hex2Ascii", 10, "Software Version", ""],
-            ["discard", 10, "", ""],
+            ["Hex2Ascii", 16, "Device Model", ""],
+            ["Hex2Ascii", 8, "Hardware Version", ""],
+            ["Hex2Ascii", 8, "Software Version", ""],
+            ["uptime", 4, "Up Time", ""],
+            ["Hex2Int", 4, "Power-on Times", ""],
             ["Hex2Ascii", 16, "Device Name", ""],
-            ["Hex2Ascii", 10, "Device Passcode", ""],
-            ["Hex2Ascii", 14, "Manufacturing Date", ""],
-            ["Hex2Ascii", 14, "Serial Number", ""],
+            ["Hex2Ascii", 16, "Device Passcode", ""],
+            ["Hex2Ascii", 8, "Manufacturing Date", ""],
+            ["Hex2Ascii", 11, "Serial Number", ""],
+            ["Hex2Ascii", 5, "Passcode", ""],
             ["Hex2Ascii", 16, "User Data", ""],
-            ["Hex2Ascii", 16, "Settings Passcode?", ""],
+            ["Hex2Ascii", 16, "Setup Passcode", ""],
             ["discard", 672, "unknown", ""],
         ],
         "test_responses": [
@@ -158,7 +160,7 @@ class jkAbstractProtocol(AbstractProtocol):
         # check that length one of the valid lengths (300, 320)
         if len(record) == 300 or len(record) == 320:
             # check the crc/checksum is correct for the record data
-            crc = ord(record[-1:])
+            crc = record[299]
             calcCrc = crc8(record[:-1])
             # print (crc, calcCrc)
             if crc == calcCrc:

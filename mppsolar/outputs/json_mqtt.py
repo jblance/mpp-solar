@@ -45,7 +45,6 @@ class json_mqtt(mqtt):
         if tag is None:
             tag = cmd
         output = to_json(data, keep_case, excl_filter, filter)
-
         payload = js.dumps(output)
         msg = {
             "topic": topic,

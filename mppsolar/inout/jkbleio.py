@@ -8,7 +8,9 @@ from .jkbledelegate import jkBleDelegate
 
 log = logging.getLogger("JkBleIO")
 
-getInfo = b"\xaa\x55\x90\xeb\x97\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11"
+getInfo = (
+    b"\xaa\x55\x90\xeb\x97\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11"
+)
 # getInfo = b"\xaa\x55\x90\xeb\x97\x00\xdf\x52\x88\x67\x9d\x0a\x09\x6b\x9a\xf6\x70\x9a\x17\xfd"
 
 
@@ -56,10 +58,13 @@ class JkBleIO(BaseIO):
         while not connected:
             attempts += 1
             if attempts > self.maxConnectionAttempts:
-                log.warning(f"Cannot connect to mac {mac} - exceeded {attempts - 1} attempts")
+                log.warning(
+                    f"Cannot connect to mac {mac} - exceeded {attempts - 1} attempts"
+                )
                 return connected
             try:
                 self._device.connect(mac)
+                self._device.setMTU(330)
                 connected = True
             except Exception:
                 continue
@@ -88,17 +93,30 @@ class JkBleIO(BaseIO):
 
         # Get the handles that we need to talk to
         # Read
-        characteristicReadUuid = "ffe3"
+        # characteristicReadUuid = "ffe3"  #old version
+        characteristicReadUuid = (
+            "ffe1"  # TODO: need to validate this works for older bms
+        )
         characteristicRead = serviceNotify.getCharacteristics(characteristicReadUuid)[0]
         handleRead = characteristicRead.getHandle()
-        log.info("Read characteristic: {}, handle {:x}".format(characteristicRead, handleRead))
+        log.info(
+            "Read characteristic: {}, handle {:x}".format(
+                characteristicRead, handleRead
+            )
+        )
 
         # ## TODO sort below
         # Need to dynamically find this handle....
-        log.info("Enable 0x0b handle", self._device.writeCharacteristic(0x0B, b"\x01\x00"))
-        log.info("Enable read handle", self._device.writeCharacteristic(handleRead, b"\x01\x00"))
         log.info(
-            "Write getInfo to read handle", self._device.writeCharacteristic(handleRead, getInfo)
+            "Enable 0x0b handle", self._device.writeCharacteristic(0x0B, b"\x01\x00")
+        )
+        log.info(
+            "Enable read handle",
+            self._device.writeCharacteristic(handleRead, b"\x01\x00"),
+        )
+        log.info(
+            "Write getInfo to read handle",
+            self._device.writeCharacteristic(handleRead, getInfo),
         )
         secs = 0
         while True:
