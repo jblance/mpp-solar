@@ -49,10 +49,14 @@ class influx_mqtt(mqtt):
             # Message format is: tag, tag,setting=total_ac_output_apparent_power value=1577.0,unit="VA"
             if key_wanted(key, filter, excl_filter):
                 if not unit:
-                    unit = ""
-                msg = {
-                    "topic": topic,
-                    "payload": f"{tag},setting={key} value={value},unit={unit}",
-                }
+                    msg = {
+                        "topic": topic,
+                        "payload": f"{tag},setting={key} value={value}",
+                    }
+                else:
+                    msg = {
+                        "topic": topic,
+                        "payload": f"{tag},setting={key} value={value},unit={unit}",
+                    }
                 msgs.append(msg)
         return msgs
