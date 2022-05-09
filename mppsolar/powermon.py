@@ -12,7 +12,7 @@ from mppsolar.ports import get_port
 from mppsolar.protocols import get_protocol
 from mppsolar.version import __version__  # noqa: F401
 
-# from mppsolar.io import get_port
+# from mppsolar.inout import get_port
 
 
 # Set-up logger

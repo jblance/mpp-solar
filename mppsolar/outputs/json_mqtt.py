@@ -38,11 +38,12 @@ class json_mqtt(mqtt):
         #                    measurement,tag_set field_set
         msgs = []
         # Remove command and _command_description
-        cmd = data.pop("_command", None)
-        data.pop("_command_description", None)
-        data.pop("raw_response", None)
-        if tag is None:
-            tag = cmd
+        if tag is not None:
+            data.pop("_command", None)
+            data.pop("_command_description", None)
+            data.pop("raw_response", None)
+
+        data['tag'] = tag
         output = {}
         # Loop through responses
         for key in data:

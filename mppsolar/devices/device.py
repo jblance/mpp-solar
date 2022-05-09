@@ -3,7 +3,7 @@ import logging
 from abc import ABC
 
 from mppsolar.helpers import get_kwargs
-from mppsolar.io import get_port
+from mppsolar.inout import get_port
 from mppsolar.protocols import get_protocol
 
 PORT_TYPE_UNKNOWN = 0
@@ -139,43 +139,43 @@ class AbstractDevice(ABC):
 
     #     if port_type == PORT_TYPE_TEST:
     #         log.info("Using testio for communications")
-    #         from mppsolar.io.testio import TestIO
+    #         from mppsolar.inout.testio import TestIO
 
     #         self._port = TestIO(device_path=port)
 
     #     elif port_type == PORT_TYPE_USB:
     #         log.info("Using hidrawio for communications")
-    #         from mppsolar.io.hidrawio import HIDRawIO
+    #         from mppsolar.inout.hidrawio import HIDRawIO
 
     #         self._port = HIDRawIO(device_path=port)
 
     #     elif port_type == PORT_TYPE_ESP32:
     #         log.info("Using esp32io for communications")
-    #         from mppsolar.io.esp32io import ESP32IO
+    #         from mppsolar.inout.esp32io import ESP32IO
 
     #         self._port = ESP32IO(device_path=port)
 
     #     elif port_type == PORT_TYPE_JKBLE:
     #         log.info("Using jkbleio for communications")
-    #         from mppsolar.io.jkbleio import JkBleIO
+    #         from mppsolar.inout.jkbleio import JkBleIO
 
     #         self._port = JkBleIO(device_path=port)
 
     #     elif port_type == PORT_TYPE_SERIAL:
     #         log.info("Using serialio for communications")
-    #         from mppsolar.io.serialio import SerialIO
+    #         from mppsolar.inout.serialio import SerialIO
 
     #         self._port = SerialIO(device_path=port, serial_baud=baud)
 
     #     elif port_type == PORT_TYPE_DALYSERIAL:
     #         log.info("Using dalyserialio for communications")
-    #         from mppsolar.io.dalyserialio import DalySerialIO
+    #         from mppsolar.inout.dalyserialio import DalySerialIO
 
     #         self._port = DalySerialIO(device_path=port, serial_baud=baud)
 
     #     elif port_type == PORT_TYPE_VSERIAL:
     #         log.info("Using vserialio for communications")
-    #         from mppsolar.io.vserialio import VSerialIO
+    #         from mppsolar.inout.vserialio import VSerialIO
 
     #         self._port = VSerialIO(device_path=port, serial_baud=baud, records=30)
 
@@ -187,7 +187,7 @@ class AbstractDevice(ABC):
     #         # mqtt_pass = get_kwargs(kwargs, "mqtt_pass")
     #         log.info(f"Using mqttio for communications broker {mqtt_broker}")
 
-    #         from mppsolar.io.mqttio import MqttIO
+    #         from mppsolar.inout.mqttio import MqttIO
 
     #         self._port = MqttIO(
     #             client_id=self._name,
