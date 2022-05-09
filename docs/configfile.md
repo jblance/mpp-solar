@@ -26,12 +26,13 @@ protocol=PI30     # required - protocol to use to decode command and response (d
 type=mppsolar     # required - type of device (default: mppsolar)
 port=/dev/ttyUSB0 # required - port used to communicate with device (default: /dev/ttyUSB0)
 baud=2400         # optional - baud rate of port communications (default: 2400)
-command=QPI       # required - comma separated list of commands to execute
+command=QPI       # required - hash separated list of commands to execute
 tag=TagName       # optional - used in various ways in the outputs (see output list)
 outputs=screen    # required - comma separated list of outputs (default: screen)
 porttype=serial   # optional - used to override the automatic port type determination
 filter=^voltage   # optional - if defined only field names that match the filter will be output (uses python re format)
 excl_filter=test  # optional - if defined any field names that match the filter will be excluded from the output (uses python re format)
+udpport=5566      # optional - redefines UDP publish port (default: 5555)
 ```
 
 [list of outputs](usage.md#List-available-output-processors)

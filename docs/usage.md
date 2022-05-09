@@ -61,7 +61,7 @@ optional arguments:
   --mqttuser MQTTUSER   Specifies the username to use for authenticated mqtt broker publishing
   --mqttpass MQTTPASS   Specifies the password to use for authenticated mqtt broker publishing
   -c [COMMAND], --command [COMMAND]
-                        Command to run
+                        Command to run; or list of hash separated commands to run
   -C [CONFIGFILE], --configfile [CONFIGFILE]
                         Full location of config file (default None, /etc/mpp-solar/mpp-solar.conf if -C supplied)
   --daemon              Run as daemon
@@ -197,7 +197,7 @@ optional arguments:
   --mqttuser MQTTUSER   Specifies the username to use for authenticated mqtt broker publishing
   --mqttpass MQTTPASS   Specifies the password to use for authenticated mqtt broker publishing
   -c [COMMAND], --command [COMMAND]
-                        Command to run
+                        Command to run; or list of hash separated commands to run
   -C CONFIGFILE, --configfile CONFIGFILE
                         Full location of config file
   --daemon              Run as daemon

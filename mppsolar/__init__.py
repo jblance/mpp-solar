@@ -140,8 +140,12 @@ def main():
         default=None,
     )
     parser.add_argument(
-        "-c", "--command", nargs="?", const="help", help="Command to run"
+        "--udpport",
+        type=str,
+        help="Specifies the UDP port if needed (default: 5555)",
+        default="5555",
     )
+    parser.add_argument("-c", "--command", nargs="?", const="help", help="Command to run; or list of hash separated commands to run")
     if parser.prog == "jkbms":
         parser.add_argument(
             "-C",
@@ -215,6 +219,8 @@ def main():
         "results_topic", (args.mqtttopic if args.mqtttopic is not None else prog_name)
     )
     log.debug(mqtt_broker)
+    udp_port = args.udpport
+    log.debug(f"udp port {udp_port}")
     ##
     filter = args.filter
     excl_filter = args.exclfilter
@@ -274,6 +280,7 @@ def main():
             porttype = config[section].get("porttype", fallback=None)
             filter = config[section].get("filter", fallback=None)
             excl_filter = config[section].get("exclfilter", fallback=None)
+            udp_port = config[section].get("udpport", fallback=None)
             #
             device_class = get_device_class(_type)
             log.debug(f"device_class {device_class}")
@@ -286,9 +293,7 @@ def main():
                 baud=baud,
                 porttype=porttype,
                 mqtt_broker=mqtt_broker,
-                # mqtt_port=mqtt_port,
-                # mqtt_user=mqtt_user,
-                # mqtt_pass=mqtt_pass,
+                udp_port=udp_port,
             )
             # build array of commands
             commands = _command.split("#")
@@ -324,9 +329,7 @@ def main():
             baud=args.baud,
             porttype=args.porttype,
             mqtt_broker=mqtt_broker,
-            # mqtt_port=mqtt_port,
-            # mqtt_user=mqtt_user,
-            # mqtt_pass=mqtt_pass,
+            udp_port=udp_port,
         )
         #
 
@@ -394,6 +397,7 @@ def main():
                     data=results,
                     tag=_tag,
                     mqtt_broker=mqtt_broker,
+                    udp_port=udp_port,
                     # mqtt_port=mqtt_port,
                     # mqtt_user=mqtt_user,
                     # mqtt_pass=mqtt_pass,
