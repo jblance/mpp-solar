@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mppsolar"
-version = "0.9.13"
+version = "0.12.2"
 description = "Package to communicate with Solar inverters and BMSs"
 authors = ["John Blance"]
 
@@ -9,6 +9,7 @@ python = "^3.6"
 pyserial = "*"
 paho-mqtt = "*"
 bluepy = "*"
+pymongo = "*"
 
 [tool.poetry.dev-dependencies]
 check-manifest = "*"

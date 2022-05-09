@@ -38,7 +38,7 @@ class jkBleDelegate(btle.DefaultDelegate):
             log.debug(
                 f"Not expected type of record - wiping data {self.notificationData}"
             )
-            # self.notificationData = bytearray()
+            self.notificationData = bytearray()
         if self._protocol.is_record_complete(self.notificationData):
             self._jkbleio.record = self.notificationData
             log.debug("record complete")
