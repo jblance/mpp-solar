@@ -14,7 +14,9 @@ logging.basicConfig(format=FORMAT)
 
 
 def main():
-    description = f"Solar Device Command Utility, version: {__version__}, {__version_comment__}"
+    description = (
+        f"Solar Device Command Utility, version: {__version__}, {__version_comment__}"
+    )
     parser = ArgumentParser(description=description)
     parser.add_argument(
         "-n",
@@ -137,7 +139,9 @@ def main():
         help="Specifies the password to use for authenticated mqtt broker publishing",
         default=None,
     )
-    parser.add_argument("-c", "--command", nargs="?", const="help", help="Command to run")
+    parser.add_argument(
+        "-c", "--command", nargs="?", const="help", help="Command to run"
+    )
     if parser.prog == "jkbms":
         parser.add_argument(
             "-C",
@@ -160,9 +164,13 @@ def main():
         )
     parser.add_argument("--daemon", action="store_true", help="Run as daemon")
     parser.add_argument("--getstatus", action="store_true", help="Get Inverter Status")
-    parser.add_argument("--getsettings", action="store_true", help="Get Inverter Settings")
+    parser.add_argument(
+        "--getsettings", action="store_true", help="Get Inverter Settings"
+    )
 
-    parser.add_argument("-v", "--version", action="store_true", help="Display the version")
+    parser.add_argument(
+        "-v", "--version", action="store_true", help="Display the version"
+    )
     parser.add_argument(
         "-D",
         "--debug",
@@ -175,8 +183,8 @@ def main():
 
     args = parser.parse_args()
     prog_name = parser.prog
-#    if prog_name is None:
-    prog_name = "mpp-solar"
+    if prog_name is None:
+        prog_name = "mpp-solar"
     s_prog_name = prog_name.replace("-", "")
     # log_name = s_prog_name.upper()
 
@@ -198,9 +206,14 @@ def main():
         return None
 
     mqtt_broker = MqttBroker(
-        name=args.mqttbroker, port=args.mqttport, username=args.mqttuser, password=args.mqttpass
+        name=args.mqttbroker,
+        port=args.mqttport,
+        username=args.mqttuser,
+        password=args.mqttpass,
     )
-    mqtt_broker.set("results_topic", (args.mqtttopic if args.mqtttopic is not None else prog_name))
+    mqtt_broker.set(
+        "results_topic", (args.mqtttopic if args.mqtttopic is not None else prog_name)
+    )
     log.debug(mqtt_broker)
     ##
     filter = args.filter
@@ -235,7 +248,9 @@ def main():
         sections = config.sections()
         # Check setup section exists
         if "SETUP" not in config:
-            log.error(f"Config File '{args.configfile}' is missing the required 'SETUP' section")
+            log.error(
+                f"Config File '{args.configfile}' is missing the required 'SETUP' section"
+            )
             exit(1)
         # Process setup section
         pause = config["SETUP"].getint("pause", fallback=60)
@@ -398,5 +413,5 @@ def main():
             break
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
