@@ -1,2 +1,3 @@
 git+https://github.com/jblance/mpp-solar.git#egg=mpp-solar
 pymongo
+psycopg2

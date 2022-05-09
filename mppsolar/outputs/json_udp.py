@@ -37,7 +37,7 @@ class json_udp(baseoutput):
         data.pop("raw_response", None)
         if tag is None:
             tag = cmd
-        output = to_json(data, keep_case, excl_filter)
+        output = to_json(data, keep_case, excl_filter, filter)
 
         payload = js.dumps(output)
         log.debug(payload)
