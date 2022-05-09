@@ -70,7 +70,9 @@ class jkAbstractProtocol(AbstractProtocol):
         Override the default get_full_command as its different for JK
         """
         # getInfo = b'\xaa\x55\x90\xeb\x97\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11'
-        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
+        log.info(
+            f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
+        )
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
@@ -112,7 +114,10 @@ class jkAbstractProtocol(AbstractProtocol):
         Override the default get_responses as its different for JK
         """
         responses = []
-        if self._command_defn is not None and self._command_defn["response_type"] == "POSITIONAL":
+        if (
+            self._command_defn is not None
+            and self._command_defn["response_type"] == "POSITIONAL"
+        ):
             # Have a POSITIONAL type response, so need to break it up...
             # example defn :
             # "response": [
@@ -142,6 +147,13 @@ class jkAbstractProtocol(AbstractProtocol):
             log.debug("SOR found in record")
             return True
         return False
+
+    def wipe_to_start(self, record):
+        sor_loc = record.find(SOR)
+        if sor_loc == -1:
+            log.debug("SOR not found in record")
+            return bytearray()
+        return record[sor_loc:]
 
     def is_record_correct_type(self, record, type):
         if len(record) < len(SOR):
