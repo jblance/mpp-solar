@@ -276,7 +276,7 @@ def main():
         pause = config["SETUP"].getint("pause", fallback=60)
         # Overide mqtt_broker settings
         mqtt_broker.update("name", config["SETUP"].get("mqtt_broker", fallback=None))
-        mqtt_broker.update("port", config["SETUP"].get("mqtt_port", fallback=None))
+        mqtt_broker.update("port", config["SETUP"].getint("mqtt_port", fallback=None))
         mqtt_broker.update("username", config["SETUP"].get("mqtt_user", fallback=None))
         mqtt_broker.update("password", config["SETUP"].get("mqtt_pass", fallback=None))
         sections.remove("SETUP")
