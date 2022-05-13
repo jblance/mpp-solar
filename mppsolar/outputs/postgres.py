@@ -1,16 +1,13 @@
-import datetime
 import logging
-import re
 import time
 
 import psycopg2 as psycopg2
 from psycopg2._json import Json
+from psycopg2.extensions import register_adapter
 
 from . import to_json, get_common_params
 from .baseoutput import baseoutput
 from ..helpers import get_kwargs
-from ..helpers import key_wanted
-from psycopg2.extensions import register_adapter
 
 log = logging.getLogger("postgres")
 
