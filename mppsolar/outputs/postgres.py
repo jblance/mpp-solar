@@ -11,6 +11,28 @@ from ..helpers import get_kwargs
 
 log = logging.getLogger("postgres")
 
+"""
+To use, run `sudo apt-get install libpq-dev`
+
+Creating table in Postgresql in advance:
+
+-- auto-generated definition
+create table mppsolar
+(
+    id      serial
+        constraint mppsolar_pk
+            primary key,
+    command varchar,
+    data    json,
+    updated timestamp
+);
+
+create index mppsolar_command_updated_index
+    on mppsolar (command, updated);
+
+
+"""
+
 
 class postgres(baseoutput):
     def __str__(self):
@@ -19,16 +41,6 @@ class postgres(baseoutput):
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"__init__: kwargs {kwargs}")
         register_adapter(dict, Json)
-
-    # run in advance: sudo apt-get install libpq-dev
-    # create table mppsolar
-    # (
-    #     id      serial
-    #         constraint mppsolar_pk
-    #             primary key,
-    #     data    json,
-    #     command varchar
-    # );
 
     def output(self, *args, **kwargs):
         (data, tag, keep_case, filter_, excl_filter) = get_common_params(kwargs)
@@ -49,14 +61,15 @@ class postgres(baseoutput):
         log.debug(output)
         msgs.append(output)
         inserted = 0
+        now = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.gmtime())
         try:
             for msg in msgs:
                 command = msg.pop("_command")
-                msg['updated'] = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.gmtime())
+                msg['updated'] = now
                 log.debug(conn)
                 cursor = conn.cursor()
                 log.debug(cursor)
-                cursor.execute("insert into mppsolar (command,data) values (%s,%s)", (command, msg))
+                cursor.execute('insert into mppsolar (command,data, updated) values (%s,%s,%s)', (command, msg, now))
                 conn.commit()
                 inserted += 1
                 cursor.close()
