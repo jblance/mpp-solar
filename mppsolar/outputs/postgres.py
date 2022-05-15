@@ -1,5 +1,5 @@
 import logging
-import time
+from datetime import datetime
 
 import psycopg2 as psycopg2
 from psycopg2._json import Json
@@ -61,7 +61,7 @@ class postgres(baseoutput):
         log.debug(output)
         msgs.append(output)
         inserted = 0
-        now = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.gmtime())
+        now = datetime.now().astimezone().replace(microsecond=0).isoformat()
         try:
             for msg in msgs:
                 command = msg.pop("_command")
