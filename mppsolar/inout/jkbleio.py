@@ -79,6 +79,8 @@ class JkBleIO(BaseIO):
     def ble_get_data(self, command=None):
         self.record = None
 
+        log.debug(f"Command: {command}")
+
         if command is None:
             return self.record
 
@@ -126,6 +128,9 @@ class JkBleIO(BaseIO):
             if secs > 5:
                 break
 
+        if command == "getInfo":
+            return self.record[:300]
+
         log.info(
             "Write command to read handle",
             self._device.writeCharacteristic(handleRead, command),
@@ -143,4 +148,4 @@ class JkBleIO(BaseIO):
                 continue
 
         log.debug(f"Record now {self.record} len {len(self.record)}")
-        return self.record[-300:]
+        return self.record[:300]

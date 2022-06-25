@@ -1,2 +1,2 @@
-__version__ = "0.12.4"
-__version_comment__ = "fix config file read of mqtt port"
+__version__ = "0.12.5"
+__version_comment__ = "tweak jkbleio for getInfo and to return first 300 bytes"
