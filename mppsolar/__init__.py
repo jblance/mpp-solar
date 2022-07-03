@@ -146,6 +146,11 @@ def main():
         default="5555",
     )
     parser.add_argument(
+        "--postgres_url",
+        type=str,
+        help="PostgresSQL connection url, example postgresql://user:password@server:5432/postgres",
+    )
+    parser.add_argument(
         "--mongo_url",
         type=str,
         help="Mongo connection url, example mongodb://user:password@ip:port/admindb",
@@ -232,6 +237,8 @@ def main():
     log.debug(mqtt_broker)
     udp_port = args.udpport
     log.debug(f"udp port {udp_port}")
+    postgres_url = args.postgres_url
+    log.debug(f"Using Postgres {postgres_url}")
     mongo_url = args.mongo_url
     mongo_db = args.mongo_db
     log.debug(f"Using Mongo {mongo_url} with {mongo_db}")
@@ -295,6 +302,7 @@ def main():
             filter = config[section].get("filter", fallback=None)
             excl_filter = config[section].get("exclfilter", fallback=None)
             udp_port = config[section].get("udpport", fallback=None)
+            postgres_url = config[section].get("postgres_url", fallback=None)
             mongo_url = config[section].get("mongo_url", fallback=None)
             mongo_db = config[section].get("mongo_db", fallback=None)
             #
@@ -310,6 +318,7 @@ def main():
                 porttype=porttype,
                 mqtt_broker=mqtt_broker,
                 udp_port=udp_port,
+                postgres_url=postgres_url,
                 mongo_url=mongo_url,
                 mongo_db=mongo_db,
             )
@@ -418,6 +427,7 @@ def main():
                     tag=_tag,
                     mqtt_broker=mqtt_broker,
                     udp_port=udp_port,
+                    postgres_url=postgres_url,
                     mongo_url=mongo_url,
                     mongo_db=mongo_db,
                     # mqtt_port=mqtt_port,

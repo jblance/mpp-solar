@@ -66,7 +66,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     # install_requires=["pyserial" "paho-mqtt", "bluepy"],
-    install_requires=["pyserial", "paho-mqtt", "pyyaml", "pymongo"],
+    install_requires=["pyserial", "paho-mqtt", "pyyaml", "pymongo", "psycopg2"],
     # install_requires=[],
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,

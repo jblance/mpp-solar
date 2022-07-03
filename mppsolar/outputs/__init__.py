@@ -1,8 +1,9 @@
 import logging
 import importlib
 import pkgutil
+import re
 
-from ..helpers import key_wanted
+from ..helpers import key_wanted, get_kwargs
 
 log = logging.getLogger("helpers")
 
@@ -93,3 +94,16 @@ def to_json(data, keep_case, excl_filter, filter):
         if key_wanted(key, filter, excl_filter):
             output[key] = value
     return output
+
+
+def get_common_params(kwargs):
+    data = get_kwargs(kwargs, "data")
+    tag = get_kwargs(kwargs, "tag")
+    keep_case = get_kwargs(kwargs, "keep_case")
+    filter_ = get_kwargs(kwargs, "filter")
+    if filter_ is not None:
+        filter_ = re.compile(filter_)
+    excl_filter = get_kwargs(kwargs, "excl_filter")
+    if excl_filter is not None:
+        excl_filter = re.compile(excl_filter)
+    return data, tag, keep_case, filter_, excl_filter
