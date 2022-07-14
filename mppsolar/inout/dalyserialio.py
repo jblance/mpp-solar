@@ -27,7 +27,7 @@ class DalySerialIO(BaseIO):
                 s.write(full_command)
                 # read until no more data
                 while True:
-                    time.sleep(0.25)  # give serial port time to receive the data
+                    time.sleep(0.5)  # give serial port time to receive the data
                     to_read = s.in_waiting
                     log.debug(f"bytes waiting {to_read}")
                     if to_read == 0:
