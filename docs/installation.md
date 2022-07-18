@@ -19,4 +19,4 @@ see worked example [here](venv.md)
 `sudo pip install -e "git+https://github.com/jblance/mpp-solar.git#egg=mppsolar"`
 
 ### Ubuntu Install example ###
-[Documented Ubuntu Install](docs/ubuntu_install.md)
+[Documented Ubuntu Install](ubuntu_install.md)
