@@ -104,3 +104,4 @@ ENV/
 .vscode/
 .idea/
 mppsolar/.idea/
+poetry.lock
