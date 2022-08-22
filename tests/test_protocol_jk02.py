@@ -28,9 +28,12 @@ class test_jk02_decode(unittest.TestCase):
             "Device Name": ["Power Wall 1", ""],
             "Device Passcode": ["1234", ""],
             "Manufacturing Date": ["", ""],
+            "Passcode": ["", ""],
+            "Power-on Times": [4, ""],
             "Serial Number": ["", ""],
+            "Up Time": ["52D16H30M0S", ""],
             "User Data": ["", ""],
-            "Settings Passcode?": ["", ""],
+            "Setup Passcode": ["", ""],
         }
         protocol.get_full_command(command)
         result = protocol.decode(response, command)

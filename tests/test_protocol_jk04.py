@@ -6,7 +6,7 @@ class test_jk04_decode(unittest.TestCase):
     maxDiff = None
 
     def test_getInfo(self):
-        """ test the decode of a getInfo response"""
+        """test the decode of a getInfo response"""
         protocol = pi()
         response = bytes.fromhex(
             "55aaeb9003f14a4b2d42324132345300000000000000332e300000000000332e322e330000000876450004000000506f7765722057616c6c203100000000313233340000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c2"
@@ -30,7 +30,10 @@ class test_jk04_decode(unittest.TestCase):
             "Manufacturing Date": ["", ""],
             "Serial Number": ["", ""],
             "User Data": ["", ""],
-            "Settings Passcode?": ["", ""],
+            "Setup Passcode": ["", ""],
+            "Passcode": ["", ""],
+            "Power-on Times": [4, ""],
+            "Up Time": ["52D16H30M0S", ""],
         }
         protocol.get_full_command(command)
         result = protocol.decode(response, command)
@@ -38,7 +41,7 @@ class test_jk04_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_getCellData(self):
-        """ test the decode of a getCellData response"""
+        """test the decode of a getCellData response"""
         protocol = pi()
         response = b"U\xaa\xeb\x90\x02\xfd\x01\x04\x13@\x81\xbc\x16@E\xd2\x10@\xed\xd4\x16@\xed\xd4\x16@2\x1e\x17@\xa8\x10\x14@\xe3\x7f\x17@\x15\xa4\x16@\xf7)\x16@2\x1e\x17@\xb1\xf4\x0b@2\xa3\x14@\x9eJ\r@\x9e\xc5\x0f@\xa8\x8b\x16@\x9e6\x17@\xc6\x05\x17@\xe3\x7f\x17@Y\xed\x16@\xe3\x7f\x17@\xcf\xdf\x13@Y\xed\x16@2\xa3\x14@\xab\xe5p>Yk2>&\xef\xf6=>\xb84>p\xfc~>\xab9\xbc>\xde\xd3\xb6>25\x80>672>\xaeG\xf7=\x86\xc4\xfa=g,\x02>\xf6&\x02>\x97S\x01>\xd8\x1d\x01>\x94%\x05>JF\x00>\x8f\xd83>\xe0a\x92>\x05\xf2\xaa>\xd2\xbaU>\xad\xc0\xf8=\xee\x88\xf7=\xd5\xa2@>\x00\x00\x00\x00\x92\xf2\x14@P,7>\x00\x00\x00\x00\xff\xff\xff\x00\x07\x0b\x01\x01\x00X\xb6?\x00\x00\x00\x00\x00\x00\x00Z{\xedK@\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x01\x00\x00\xd2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xa0/\x00\x00\x00\x00\x00\x00\x00X*@\x00\x0b"
         command = "getCellData"

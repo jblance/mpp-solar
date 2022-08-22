@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from .helpers import get_device_class
 from .libs.mqttbroker import MqttBroker
 from .outputs import get_outputs, list_outputs
-from .version import __version__, __version_comment__  # noqa: F401
+from .version import __version__  # noqa: F401
 
 # Set-up logger
 log = logging.getLogger("")
@@ -14,9 +14,7 @@ logging.basicConfig(format=FORMAT)
 
 
 def main():
-    description = (
-        f"Solar Device Command Utility, version: {__version__}, {__version_comment__}"
-    )
+    description = f"Solar Device Command Utility, version: {__version__}"
     parser = ArgumentParser(description=description)
     parser.add_argument(
         "-n",
@@ -161,7 +159,13 @@ def main():
         help="Mongo db name (default: mppsolar)",
         default="mppsolar",
     )
-    parser.add_argument("-c", "--command", nargs="?", const="help", help="Command to run; or list of hash separated commands to run")
+    parser.add_argument(
+        "-c",
+        "--command",
+        nargs="?",
+        const="help",
+        help="Command to run; or list of hash separated commands to run",
+    )
     if parser.prog == "jkbms":
         parser.add_argument(
             "-C",
