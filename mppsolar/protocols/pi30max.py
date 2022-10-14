@@ -250,7 +250,16 @@ QUERY_COMMANDS = {
         "response": [
             ["float", "PV2 Input Current", "A"],
             ["float", "PV2 Input Voltage", "V"],
+            ["float", "Battery voltage from SCC 2", "V"],
             ["int", "PV2 Charging Power", "W"],
+            ["string", "Device status", ""],
+            ["float", "AC charging current", "A"],
+            ["int", "AC charging power", "W"],
+            ["float", "PV3 Input Current", "A"],
+            ["float", "PV3 Input Voltage", "V"],
+            ["float", "Battery voltage from SCC 3", "V"],
+            ["int", "PV3 Charging Power", "W"],
+            ["int", "PV total charging power", "W"],
         ],
         "test_responses": [
             b"(03.1 327.3 01026 \xc9\x8b\r",
