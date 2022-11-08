@@ -429,6 +429,7 @@ def main():
                 op.output(
                     data=results,
                     tag=_tag,
+                    name=_device._name,
                     mqtt_broker=mqtt_broker,
                     udp_port=udp_port,
                     postgres_url=postgres_url,

@@ -19,6 +19,7 @@ class hassd_mqtt(mqtt):
         data = get_kwargs(kwargs, "data")
         tag = get_kwargs(kwargs, "tag")
         keep_case = get_kwargs(kwargs, "keep_case")
+        device_name = get_kwargs(kwargs, "name", "mppsolar")
 
         filter = get_kwargs(kwargs, "filter")
         if filter is not None:
@@ -56,12 +57,14 @@ class hassd_mqtt(mqtt):
                 topic = topic.replace(" ", "_")
                 name = f"{tag} {_key}"
                 payload = {"name": f"{name}", "state_topic": f"homeassistant/sensor/mpp_{tag}_{key}/state", "unit_of_measurement": f"{unit}", "unique_id": f"mpp_{tag}_{key}", "force_update": "true"}
-                payload["device"] = {"name": "MPP6048MAX", "identifiers": ["mppsolar"], "model": "PIP6048MAX", "manufacturer": "MPP-Solar"}
+                # payload["device"] = {"name": f"{device_name}", "identifiers": ["mppsolar"], "model": "PIP6048MAX", "manufacturer": "MPP-Solar"}
+                payload["device"] = {"name": f"{device_name}", "identifiers": ["mppsolar"]}
                 if unit == "W":
                     payload.update({"state_class": "measurement", "device_class": "power"})
                 # msg = {"topic": topic, "payload": payload, "retain": True}
-                print(js.dumps(payload))
-                msg = {"topic": topic, "payload": payload}
+                payloads = js.dumps(payload)
+                print(payloads)
+                msg = {"topic": topic, "payload": payloads}
                 msgs.append(msg)
                 #
                 # VALUE SETTING
