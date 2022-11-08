@@ -2,10 +2,9 @@ import json as js
 import logging
 import re
 
+from ..helpers import get_kwargs
 from . import to_json
 from .baseoutput import baseoutput
-from ..helpers import get_kwargs
-from ..helpers import key_wanted
 
 log = logging.getLogger("json")
 

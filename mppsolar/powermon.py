@@ -40,12 +40,13 @@ sample_config = """
     topic: test/command_topic
   commands:
     - command: QPIGS
-      gap: 10s
+      repeat_period: 10s
       outputs:
       - name: screen
       - name: mqtt
+        results_topic: results/qpigs
     - command: QPIRI
-      gap: 1m
+      repeat_period: 1m
       outputs:
       - name: screen
         tag: testtag
