@@ -58,7 +58,7 @@ class hassd_mqtt(mqtt):
                 name = f"{tag} {_key}"
                 payload = {"name": f"{name}", "state_topic": f"homeassistant/sensor/mpp_{tag}_{key}/state", "unit_of_measurement": f"{unit}", "unique_id": f"mpp_{tag}_{key}", "force_update": "true"}
                 # payload["device"] = {"name": f"{device_name}", "identifiers": ["mppsolar"], "model": "PIP6048MAX", "manufacturer": "MPP-Solar"}
-                payload["device"] = {"name": f"{device_name}", "identifiers": ["mppsolar"]}
+                payload["device"] = {"name": f"{device_name}", "identifiers": ["mppsolar"], "manufacturer": "MPP-Solar"}
                 if unit == "W":
                     payload.update({"state_class": "measurement", "device_class": "power"})
                 # msg = {"topic": topic, "payload": payload, "retain": True}
