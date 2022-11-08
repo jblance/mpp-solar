@@ -880,6 +880,9 @@ COMMANDS = {
 
 
 class pi30(AbstractProtocol):
+    def __str__(self):
+        return "PI30 protocol handler"
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"PI30"

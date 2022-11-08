@@ -63,6 +63,9 @@ COMMANDS = {
 
 
 class jk232(AbstractProtocol):
+    def __str__(self):
+        return "JKBMS RS232 serial communication protocol handler"
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"JK232"

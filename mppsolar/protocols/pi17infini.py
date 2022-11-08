@@ -764,10 +764,13 @@ COMMANDS = {
 }
 
 
-class pi17(AbstractProtocol):
+class pi17infini(AbstractProtocol):
+    def __str__(self):
+        return "PI17INFINI protocol handler"
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
-        self._protocol_id = b"PI17"
+        self._protocol_id = b"PI17INFINI"
         self.COMMANDS = COMMANDS
         self.STATUS_COMMANDS = []
         self.SETTINGS_COMMANDS = [

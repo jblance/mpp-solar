@@ -358,6 +358,9 @@ NEW_COMMANDS = {
 
 
 class pi41(pi30):
+    def __str__(self):
+        return "PI41 protocol handler"
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"PI41"

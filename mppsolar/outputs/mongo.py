@@ -7,7 +7,7 @@ import pymongo as pymongo
 from . import to_json
 from .baseoutput import baseoutput
 from ..helpers import get_kwargs
-from ..helpers import key_wanted
+# from ..helpers import key_wanted
 
 log = logging.getLogger("mongo")
 
@@ -21,7 +21,7 @@ class mongo(baseoutput):
 
     def output(self, *args, **kwargs):
         data = get_kwargs(kwargs, "data")
-        tag = get_kwargs(kwargs, "tag")
+        # tag = get_kwargs(kwargs, "tag")
         keep_case = get_kwargs(kwargs, "keep_case")
         filter = get_kwargs(kwargs, "filter")
         if filter is not None:

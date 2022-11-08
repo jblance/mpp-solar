@@ -151,6 +151,8 @@ class jk02(jkAbstractProtocol):
     JK02 - Handler for JKBMS 2 byte data communication
          - e.g. ASAS = ??V
     """
+    def __str__(self):
+        return "JKBMS BLE 2 byte data communication protocol handler"
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()

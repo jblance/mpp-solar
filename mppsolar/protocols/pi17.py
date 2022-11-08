@@ -869,6 +869,9 @@ COMMANDS = {
 
 
 class pi17(AbstractProtocol):
+    def __str__(self):
+        return "PI17 protocol handler"
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"PI17"

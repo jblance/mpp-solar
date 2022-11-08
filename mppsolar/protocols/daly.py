@@ -190,6 +190,8 @@ class daly(AbstractProtocol):
     """
     DALY - Daly BMS protocol handler
     """
+    def __str__(self):
+        return "Daly BMS protocol handler"
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()

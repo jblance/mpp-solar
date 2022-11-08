@@ -17,6 +17,8 @@ class daly40(daly):
     """
     DALY - Daly40 BMS protocol handler
     """
+    def __str__(self):
+        return "Daly40 BMS protocol handler"
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()

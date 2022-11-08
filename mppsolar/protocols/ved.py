@@ -122,6 +122,8 @@ class ved(AbstractProtocol):
     """
     VED - VEDirect protocol handler
     """
+    def __str__(self):
+        return "VED protocol handler for Victron direct SmartShunts"
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()

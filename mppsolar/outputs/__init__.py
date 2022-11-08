@@ -19,8 +19,11 @@ def list_outputs():
     result["_command_description"] = "List available output modules"
     for _, name, _ in pkgutil.iter_modules([pkgpath]):
         # print(name)
-        _module_class = importlib.import_module("mppsolar.outputs." + name, ".")
-        _module = getattr(_module_class, name)
+        try:
+            _module_class = importlib.import_module("mppsolar.outputs." + name, ".")
+            _module = getattr(_module_class, name)
+        except ModuleNotFoundError as e:
+            log.error(f"Error in module {name}: {e}")
         # print(_module())
         result[name] = (str(_module()), "", "")
     # print(result)

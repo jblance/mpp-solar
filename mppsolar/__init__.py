@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 from .helpers import get_device_class
 from .libs.mqttbroker import MqttBroker
 from .outputs import get_outputs, list_outputs
+from .protocols import list_protocols
 from .version import __version__  # noqa: F401
 
 # Set-up logger
@@ -40,31 +41,21 @@ def main():
         parser.add_argument(
             "-P",
             "--protocol",
+            nargs="?",
             type=str,
+            const="help",
             help="Specifies the device command and response protocol, (default: JK04)",
-            default="JK04",
-            choices=["JK02", "JK04", "JK232", "JK485"],
+            default="JK04"
         )
     else:
         parser.add_argument(
             "-P",
             "--protocol",
+            nargs="?",
             type=str,
+            const="help",
             help="Specifies the device command and response protocol, (default: PI30)",
-            default="PI30",
-            choices=[
-                "PI00",
-                "PI16",
-                "PI17",
-                "PI18",
-                "PI30",
-                "PI30MAX",
-                "PI30REVO",
-                "PI41",
-                "VED",
-                "DALY",
-                "DALY40",
-            ],
+            default="PI30"
         )
     parser.add_argument(
         "-T",
@@ -229,6 +220,12 @@ def main():
         print(description)
         return None
 
+    # List available protocols if asked
+    if args.protocol == "help":
+        op = get_outputs("screen")[0]
+        op.output(data=list_protocols())
+        exit()
+
     mqtt_broker = MqttBroker(
         name=args.mqttbroker,
         port=args.mqttport,
@@ -373,7 +370,6 @@ def main():
             commands.append("list_commands")
         elif args.output == "help":
             commands.append("list_outputs")
-
             keep_case = True
             op = get_outputs("screen")[0]
             op.output(data=list_outputs())

@@ -328,6 +328,9 @@ COMMANDS = {
 
 
 class pi30revo(AbstractProtocol):
+    def __str__(self):
+        return "PI30 protocol handler for REVO and similar inverters"
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"PI30REVO"

@@ -78,6 +78,9 @@ COMMANDS = {
 
 
 class jk485(jkAbstractProtocol):
+    def __str__(self):
+        return "JKBMS RS485 serial communication protocol handler"
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"JK485"
