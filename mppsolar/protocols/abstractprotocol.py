@@ -245,6 +245,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         # DEFAULT - responses are determined by the order they are returned
         if response_type == "DEFAULT":
             log.info("Processing DEFAULT type responses")
+            print("Processing DEFAULT type responses")
             for i, result in enumerate(responses):
                 # decode result
                 if type(result) is bytes:
