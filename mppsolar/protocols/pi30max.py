@@ -898,9 +898,6 @@ COMMANDS.update(SETTER_COMMANDS)
 
 
 class pi30max(AbstractProtocol):
-    def __str__(self):
-        return "PI30 protocol handler for LV6048MAX and similar inverters"
-
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"PI30MAX"
