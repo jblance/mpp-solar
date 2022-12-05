@@ -3,7 +3,7 @@ import logging
 from .abstractprotocol import AbstractProtocol
 from .protocol_helpers import crcPI as crc
 
-log = logging.getLogger("pi30mst")
+log = logging.getLogger("pi30max")
 
 QUERY_COMMANDS = {
     "QPI": {
@@ -247,19 +247,11 @@ QUERY_COMMANDS = {
         "name": "QPIGS2",
         "description": "General Status Parameters inquiry 2",
         "type": "QUERY",
+        "response_type": "SEQUENTIAL",
         "response": [
             ["float", "PV2 Input Current", "A"],
             ["float", "PV2 Input Voltage", "V"],
-            ["float", "Battery voltage from SCC 2", "V"],
-            ["int", "PV2 Charging Power", "W"],
-            ["string", "Device status", ""],
-            ["float", "AC charging current", "A"],
-            ["int", "AC charging power", "W"],
-            ["float", "PV3 Input Current", "A"],
-            ["float", "PV3 Input Voltage", "V"],
-            ["float", "Battery voltage from SCC 3", "V"],
-            ["int", "PV3 Charging Power", "W"],
-            ["int", "PV total charging power", "W"],
+            ["int", "PV2 Charging Power", "W", "solar"],
         ],
         "test_responses": [
             b"(03.1 327.3 01026 \xc9\x8b\r",
@@ -906,13 +898,13 @@ COMMANDS = QUERY_COMMANDS
 COMMANDS.update(SETTER_COMMANDS)
 
 
-class pi30mst(AbstractProtocol):
+class pi30max(AbstractProtocol):
     def __str__(self):
-        return "PI30 protocol handler for PIP4048MST with 3 PV and similar inverters"
+        return "PI30 protocol handler for LV6048MAX and similar inverters"
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
-        self._protocol_id = b"PI30MST"
+        self._protocol_id = b"PI30MAX"
         self.COMMANDS = COMMANDS
         self.STATUS_COMMANDS = ["QPIGS", "QPIGS2"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
