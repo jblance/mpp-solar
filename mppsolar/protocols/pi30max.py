@@ -1,6 +1,6 @@
 import logging
 
-from .abstractprotocol import AbstractProtocol
+from .pi30 import pi30
 from .protocol_helpers import crcPI as crc
 
 log = logging.getLogger("pi30max")
@@ -894,18 +894,19 @@ QUERY_COMMANDS = {
 }
 
 SETTER_COMMANDS = {}
-COMMANDS = QUERY_COMMANDS
-COMMANDS.update(SETTER_COMMANDS)
+# COMMANDS = QUERY_COMMANDS
+# COMMANDS.update(SETTER_COMMANDS)
 
 
-class pi30max(AbstractProtocol):
+class pi30max(pi30):
     def __str__(self):
         return "PI30 protocol handler for LV6048MAX and similar inverters"
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"PI30MAX"
-        self.COMMANDS = COMMANDS
+        self.COMMANDS.update(QUERY_COMMANDS)
+        # self.COMMANDS = COMMANDS
         self.STATUS_COMMANDS = ["QPIGS", "QPIGS2"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
