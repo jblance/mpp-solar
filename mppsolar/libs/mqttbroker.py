@@ -27,15 +27,25 @@ class MqttBroker:
     #     self.mqtt_user = args.mqttuser
     #     self.mqtt_pass = args.mqttpass
 
-    # 0: Connection successful
-    # 1: Connection refused - incorrect protocol version
-    # 2: Connection refused - invalid client identifier
-    # 3: Connection refused - server unavailable
-    # 4: Connection refused - bad username or password
-    # 5: Connection refused - not authorised
-    # 6-255: Currently unused.
     def on_connect(self, client, userdata, flags, rc):
-        log.debug(f"MqttBroker connection returned result: {rc}")
+        # 0: Connection successful
+        # 1: Connection refused - incorrect protocol version
+        # 2: Connection refused - invalid client identifier
+        # 3: Connection refused - server unavailable
+        # 4: Connection refused - bad username or password
+        # 5: Connection refused - not authorised
+        # 6-255: Currently unused.
+        connection_result = [
+            "Connection successful",
+            "Connection refused - incorrect protocol version",
+            "Connection refused - invalid client identifier",
+            "Connection refused - server unavailable",
+            "Connection refused - bad username or password",
+            "Connection refused - not authorised",
+        ]
+        log.debug(
+            f"MqttBroker connection returned result: {rc} {connection_result[rc]}"
+        )
         if rc == 0:
             self._isConnected = True
             return

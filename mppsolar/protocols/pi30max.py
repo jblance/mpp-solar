@@ -757,6 +757,7 @@ QUERY_COMMANDS = {
     "QED": {
         "name": "QED",
         "description": "Daily PV Generated Energy Inquiry",
+        "help": " -- display daily generated energy, format is QEDyyyymmdd",
         "type": "QUERY",
         "response_type": "SEQUENTIAL",
         "response": [
