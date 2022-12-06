@@ -847,6 +847,7 @@ QUERY_COMMANDS = {
 SETTER_COMMANDS = {}
 # COMMANDS = QUERY_COMMANDS
 # COMMANDS.update(SETTER_COMMANDS)
+COMMANDS_TO_REMOVE = ["QID", "QVFW3"]
 
 
 class pi30max(pi30):
@@ -858,6 +859,8 @@ class pi30max(pi30):
         self._protocol_id = b"PI30MAX"
         self.COMMANDS.update(QUERY_COMMANDS)
         # self.COMMANDS = COMMANDS
+        for item in COMMANDS_TO_REMOVE:
+            self.COMMANDS.pop(item)
         self.STATUS_COMMANDS = ["QPIGS", "QPIGS2"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
