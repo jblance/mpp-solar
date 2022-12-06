@@ -6,27 +6,6 @@ from .protocol_helpers import crcPI as crc
 log = logging.getLogger("pi30max")
 
 QUERY_COMMANDS = {
-    "QPI": {
-        "name": "QPI",
-        "description": "Protocol ID inquiry",
-        "help": " -- queries the device protocol ID. e.g. PI30 for HS series",
-        "type": "QUERY",
-        "response": [
-            ["string", "Protocol ID", ""],
-        ],
-        "test_responses": [
-            b"(PI30\x9a\x0b\r",
-        ],
-    },
-    "QID": {
-        "name": "QID",
-        "description": "Device Serial Number inquiry",
-        "type": "QUERY",
-        "response": [["string", "Serial Number", ""]],
-        "test_responses": [
-            b"(9293333010501\xBB\x07\r",
-        ],
-    },
     "QSID": {
         "name": "QSID",
         "description": "Device Serial Number inquiry",
@@ -35,16 +14,6 @@ QUERY_COMMANDS = {
         "response": [["string", "Serial Number", ""]],
         "test_responses": [
             b"(1492932105105335005535\x94\x0e\r",
-        ],
-    },
-    "QVFW": {
-        "name": "QVFW",
-        "description": "Main CPU firmware version inquiry",
-        "type": "QUERY",
-        "response": [["string", "Main CPU firmware version", ""]],
-        "test_responses": [
-            b"(VERFW:00072.70\x53\xA7\r",
-            b"(VERFW:00046.05\xbe\xb6\r",
         ],
     },
     "QVFW3": {
@@ -543,24 +512,6 @@ QUERY_COMMANDS = {
         ],
         "test_responses": [
             b"(230.0 50.0 0030 44.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 1 0 1 0 54.0 0 1 224\xeb\xbc\r",
-        ],
-    },
-    "QMCHGCR": {
-        "name": "QMCHGCR",
-        "description": "Max Charging Current Options inquiry",
-        "type": "QUERY",
-        "response": [["string", "Max Charging Current", "A"]],
-        "test_responses": [
-            b"(010 020 030 040 050 060 070 080 090 100 110 120\x0c\xcb\r",
-        ],
-    },
-    "QMUCHGCR": {
-        "name": "QMUCHGCR",
-        "description": "Max Utility Charging Current Options inquiry",
-        "type": "QUERY",
-        "response": [["string", "Max Utility Charging Current", "A"]],
-        "test_responses": [
-            b"(002 010 020 030 040 050 060 070 080 090 100 110 120\xca#\r",
         ],
     },
     "QOPPT": {

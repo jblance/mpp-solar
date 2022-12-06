@@ -465,7 +465,7 @@ COMMANDS = {
         "type": "QUERY",
         "response": [["string", "Max Charging Current", "A"]],
         "test_responses": [
-            b"",
+            b"(010 020 030 040 050 060 070 080 090 100 110 120\x0c\xcb\r",
         ],
     },
     "QMOD": {
@@ -498,7 +498,7 @@ COMMANDS = {
         "type": "QUERY",
         "response": [["string", "Max Utility Charging Current", "A"]],
         "test_responses": [
-            b"",
+            b"(002 010 020 030 040 050 060 070 080 090 100 110 120\xca#\r",
         ],
     },
     "QOPM": {
