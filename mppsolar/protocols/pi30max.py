@@ -69,7 +69,11 @@ QUERY_COMMANDS = {
             [
                 "option",
                 "Output Source Priority",
-                ["Utility Solar Battery", "Solar Utility Battery", "Solar Battery Utility"],
+                [
+                    "Utility Solar Battery",
+                    "Solar Utility Battery",
+                    "Solar Battery Utility",
+                ],
             ],
             [
                 "option",
@@ -121,7 +125,11 @@ QUERY_COMMANDS = {
                 ],
             ],
             ["int", "Max charging time for CV stage", "min"],
-            ["option", "Operation Logic", ["Automatic mode", "On-line mode", "ECO mode"]],
+            [
+                "option",
+                "Operation Logic",
+                ["Automatic mode", "On-line mode", "ECO mode"],
+            ],
             ["int", "Max discharging current", "A"],
         ],
         "test_responses": [],
@@ -834,7 +842,11 @@ QUERY_COMMANDS = {
         "response": [
             ["option", "LED Enabled", ["Disabled", "Enabled"]],
             ["option", "LED Speed", ["Low", "Medium", "Fast"]],
-            ["option", "LED Effect", ["Breathing", "Unknown", "Solid", "Right Scrolling"]],
+            [
+                "option",
+                "LED Effect",
+                ["Breathing", "Unknown", "Solid", "Right Scrolling"],
+            ],
             ["int", "LED Brightness", ""],
             ["int", "LED Number of Colors", ""],
             ["bytes.decode", "RGB", ""],
@@ -845,9 +857,93 @@ QUERY_COMMANDS = {
     },
 }
 
-SETTER_COMMANDS = {}
-# COMMANDS = QUERY_COMMANDS
-# COMMANDS.update(SETTER_COMMANDS)
+SETTER_COMMANDS = {
+    "PLEDE": {
+        "name": "PLEDE",
+        "description": "Enable/disable LED function",
+        "help": " -- examples: PLEDE0 (disable LED), PLEDE1 (enable LED)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "PLEDE([01])$",
+    },
+    "PLEDS": {
+        "name": "PLEDS",
+        "description": "Set LED speed",
+        "help": " -- examples: PLEDS0 (set LED speed low), PLEDS1 (set LED speed medium), PLEDS2 (set LED speed high)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "PLEDS([012])$",
+    },
+    "PLEDM": {
+        "name": "PLEDM",
+        "description": "Set LED effect",
+        "help": " -- examples: PLEDM0 (set LED effect breathing), PLEDM2 (set LED effect solid), PLEDM3 (set LED right scrolling)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "PLEDM([0123])$",
+    },
+    "PLEDB": {
+        "name": "PLEDB",
+        "description": "Set LED brightness",
+        "help": " -- examples: PLEDB1 (set LED brightness low), PLEDB5 (set LED brightness normal), PLEDB9 (set LED brightness high)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "PLEDB([123456789])$",
+    },
+    "PLEDT": {
+        "name": "PLEDT",
+        "description": "Set LED total number of colors",
+        "help": " -- examples: PLEDT2 (set 2 LED colors), PLEDT3 (set 3 LED colors)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "PLEDT([123])$",
+    },
+    "PLEDC": {
+        "name": "PLEDC",
+        "description": "Set LED color",
+        "help": " -- examples: PLEDCnRRRGGGBBB (n: 1 line mode, 2 AVR mode, 3 battery mode)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "PLEDC(\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d)$",
+    },
+}
+
 COMMANDS_TO_REMOVE = ["Q1", "QID", "QVFW3"]
 
 
@@ -858,14 +954,19 @@ class pi30max(pi30):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"PI30MAX"
+        # Add pi30max specific commands to pi30 commands
         self.COMMANDS.update(QUERY_COMMANDS)
-        # self.COMMANDS = COMMANDS
+        # Add pi30max specific setter commands
+        self.COMMANDS.update(SETTER_COMMANDS)
+        # remove and unwanted pi30 commands
         for item in COMMANDS_TO_REMOVE:
             self.COMMANDS.pop(item)
         self.STATUS_COMMANDS = ["QPIGS", "QPIGS2"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
-        # log.info(f'Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands')
+        log.info(
+            f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
+        )
 
     def check_response_valid(self, response):
         if response is None:
