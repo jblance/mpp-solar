@@ -1,0 +1,30 @@
+port:
+  path: /dev/ttyUSB0
+  type: test
+  baud: 2400
+protocol: PI30
+mqttbroker:
+  name: null
+  port: 1883
+  user: null
+  pass: null
+  adhoc_commands:
+    topic: test/command_topic
+commands:
+  - command: QPIGS
+    repeat_period: 10s
+    outputs:
+    - name: screen
+    - name: mqtt
+      results_topic: results/qpigs
+  - command: QED
+    f_command: f'QED{(date.today()-timedelta(days=1)).strftime("%Y%m%d")}'
+    repeat_period: 1h
+    outputs:
+    - name: screen
+  - command: QPIRI
+    repeat_period: 1m
+    outputs:
+    - name: screen
+      tag: testtag
+      filter: volt

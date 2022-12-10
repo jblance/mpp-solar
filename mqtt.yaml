@@ -1,0 +1,12 @@
+port:
+  path: /dev/ttyUSB0
+  type: test
+  baud: 2400
+protocol: PI30
+mqttbroker:
+  name: localhost
+  port: 1883
+  user: null
+  pass: null
+  adhoc_commands:
+    topic: test/command_topic
