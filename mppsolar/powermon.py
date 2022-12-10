@@ -6,7 +6,7 @@ from time import sleep
 
 import yaml
 
-from mppsolar.libs.mqttbroker import MqttBroker
+from mppsolar.libs.mqttbroker import MqttBrokerC as MqttBroker
 from mppsolar.outputs import output_results
 from mppsolar.ports import get_port
 from mppsolar.protocols import get_protocol
@@ -16,7 +16,7 @@ from mppsolar.version import __version__  # noqa: F401
 
 
 # Set-up logger
-log = logging.getLogger("powermon")
+log = logging.getLogger("")
 FORMAT = "%(asctime)-15s:%(levelname)s:%(module)s:%(funcName)s@%(lineno)d: %(message)s"
 logging.basicConfig(format=FORMAT)
 
@@ -31,30 +31,14 @@ sample_config = """
     type: test
     baud: 2400
   protocol: PI30
-  mqttbroker:
-    name: null
-    port: 1883
-    user: null
-    pass: null
-  adhoc_commands:
-    topic: test/command_topic
   commands:
-    - command: QPIGS
-      repeat_period: 10s
+    - command: QPI
       outputs:
       - name: screen
-      - name: mqtt
-        results_topic: results/qpigs
-    - command: QPIRI
-      repeat_period: 1m
-      outputs:
-      - name: screen
-        tag: testtag
-        filter: volt
 """
 
 ADHOC_COMMANDS = deque([])
-SPLIT_TOKEN = ","
+# SPLIT_TOKEN = ","
 
 
 def mqtt_callback(client, userdata, msg):
@@ -62,6 +46,51 @@ def mqtt_callback(client, userdata, msg):
     # TODO: define message format and extract command and config
     newCommand = msg.payload
     ADHOC_COMMANDS.append(newCommand)
+
+
+def readConfigFile(configFile=None):
+    _config = {}
+    if configFile is not None:
+        try:
+            with open(configFile, "r") as stream:
+                _config = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            log.error(f"Error processing config file: {exc}")
+        except FileNotFoundError as exc:
+            log.error(f"Error opening config file: {exc}")
+    return _config
+
+
+def processCommandLineOverrides(args):
+    _config = {}
+    return _config
+
+
+def buildMqttBroker(config):
+    _mqttbroker = MqttBroker(config)
+    if "mqttbroker" not in config:
+        log.debug("No mqttbroker definition in config")
+        return None
+    if "name" not in config["mqttbroker"] or config["mqttbroker"]["name"] is None:
+        log.debug("No mqttbroker name defined in config")
+        return None
+    _mqttbroker = MqttBroker(
+        name=config["mqttbroker"]["name"],
+        port=config["mqttbroker"]["port"],
+        username=config["mqttbroker"]["user"],
+        password=config["mqttbroker"]["pass"],
+    )
+    # sub to command topic if defined
+    if "adhoc_commands" in config and "topic" in config["adhoc_commands"]:
+        adhoc_commands_topic = config["adhoc_commands"]["topic"]
+        if adhoc_commands_topic is not None:
+            # TODO: move to mqttbroker -
+            _mqttbroker.connect()
+            _mqttbroker.subscribe(adhoc_commands_topic, mqtt_callback)
+            # connect to mqtt
+            # TODO: move to mqttbroker -
+            _mqttbroker.start()
+    return _mqttbroker
 
 
 def main():
@@ -86,6 +115,7 @@ def main():
         help="Print a new config file based on options supplied (including the existing config file)",
     )
     parser.add_argument(
+        "-1",
         "--once",
         action="store_true",
         help="Only loop through config once",
@@ -125,14 +155,9 @@ def main():
     # build config - start with defaults
     config = yaml.safe_load(sample_config)
     # build config - update with details from config file
-    if args.configFile is not None:
-        with open(args.configFile, "r") as stream:
-            try:
-                config.update(yaml.safe_load(stream))
-            except yaml.YAMLError as exc:
-                print(exc)
+    config.update(readConfigFile(args.configFile))
     # build config - override with any command line arguments
-    # TODO: command line overrides
+    config.update(processCommandLineOverrides(args))
 
     # if generateConfigFile is true then print config out
     if args.generateConfigFile:
@@ -145,22 +170,12 @@ def main():
     log.debug(config)
 
     # Build mqtt broker
-    mqtt_broker = MqttBroker(
-        name=config["mqttbroker"]["name"],
-        port=config["mqttbroker"]["port"],
-        username=config["mqttbroker"]["user"],
-        password=config["mqttbroker"]["pass"],
-    )
+    mqttconfig = config.get("mqttbroker", {})
+    mqtt_broker = MqttBroker(config=mqttconfig)
     # sub to command topic if defined
-    adhoc_commands_topic = config["adhoc_commands"]["topic"]
-    if adhoc_commands_topic is not None:
-        # TODO: move to mqttbroker -
-        mqtt_broker.connect()
-        mqtt_broker.subscribe(adhoc_commands_topic, mqtt_callback)
-        # connect to mqtt
-        # TODO: move to mqttbroker -
-        mqtt_broker.start()
-
+    mqtt_broker.setAdhocCommands(
+        adhoc_commands=mqttconfig.get("adhoc_commands"), callback=mqtt_callback
+    )
     log.debug(mqtt_broker)
 
     # get port
@@ -211,12 +226,13 @@ def main():
                     results=results, outputs=command["outputs"], mqtt_broker=mqtt_broker
                 )
                 # pause
-                pause_time = config["command_pause"]
-                log.debug(f"Sleeping for {pause_time}secs")
+                # pause_time = config["command_pause"]
+                # log.debug(f"Sleeping for {pause_time}secs")
             if args.once:
                 loop = False
             else:
-                sleep(pause_time)
+                # sleep(pause_time)
+                sleep(5)
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
     finally:
