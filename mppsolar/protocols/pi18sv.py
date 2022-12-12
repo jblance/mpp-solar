@@ -958,9 +958,6 @@ class pi18sv(AbstractProtocol):
             log.debug(f"full command: {full_command}")
             return full_command
         elif _type == "SETTER":
-            print("XO")
-            print (self._command)
-            print (self._command_defn)
             data_length1 = len(_cmd) + 4
             _prefix = '^'+self._command_defn["prefix"]
             log.debug(f"_prefix: {_prefix}")
@@ -970,13 +967,10 @@ class pi18sv(AbstractProtocol):
             log.debug(f"_pre_cmd: {_pre_cmd}")
             crc_high, crc_low = crc(_pre_cmd)
             _crc = bytes([crc_high, crc_low, 13])
-            print(bytes(_pre_cmd))
-            print("OX")
             if self._command_defn["crc"] == False:
                 full_command = _pre_cmd + bytes([13])
             else :
                 full_command = _pre_cmd + _crc
-                print(bytes(full_command))
             return full_command
         else:
             _prefix = f"^S{data_length:03}"
