@@ -1,12 +1,9 @@
 import logging
 
-from .abstractprotocol import AbstractProtocol
-
+from .pi18 import pi18
 from .protocol_helpers import crcPI as crc
 
-# from .pi30 import COMMANDS
-
-log = logging.getLogger("18sv")
+log = logging.getLogger("pi18sv")
 
 COMMANDS = {
     "PI": {
@@ -24,7 +21,7 @@ COMMANDS = {
     "T": {
         "name": "T",
         "prefix": "^P004",
-        "crc": False,        
+        "crc": False,
         "description": "Query current time",
         "help": " -- queries current time from the Inverter",
         "type": "QUERY",
@@ -38,7 +35,7 @@ COMMANDS = {
     "ET": {
         "name": "ET",
         "prefix": "^P005",
-        "crc": False,        
+        "crc": False,
         "description": "Query total generated energy",
         "help": " -- queries total generated energy from the Inverter",
         "type": "QUERY",
@@ -93,7 +90,7 @@ COMMANDS = {
             b"^D01100003537\x89X\r",
         ],
         "regex": "ED(\\d\\d\\d\\d\\d\\d\\d\\d)$",
-    },    
+    },
     "ID": {
         "name": "ID",
         "prefix": "^P005",
@@ -113,56 +110,62 @@ COMMANDS = {
         "description": "Device CPU version inquiry",
         "help": " -- queries the CPU version",
         "type": "QUERY",
-        "response": [["int", "Main CPU Version", ""],
-                     ["int", "Slave 1 CPU version",""],
-                     ["int", "Slave 2 CPU version",""]],
+        "response": [
+            ["int", "Main CPU Version", ""],
+            ["int", "Slave 1 CPU version", ""],
+            ["int", "Slave 2 CPU version", ""],
+        ],
         "test_responses": [
             b"^D02005402,08025,00000)\xc3\x9d\r",
         ],
     },
-    "MCHGCR": { # On my SV IV, this commands returns 12 values, from 10 to 120 amps
+    "MCHGCR": {  # On my SV IV, this commands returns 12 values, from 10 to 120 amps
         "name": "MCHGCR",
         "prefix": "^P009",
         "crc": True,
         "description": "Query Max. charging current selectable values",
         "help": " -- queries the Max. charging current selectable values",
         "type": "QUERY",
-        "response": [["int", "Max. charging current selectable value 1", "A"],
-                     ["int", "Max. charging current selectable value 2", "A"],
-                     ["int", "Max. charging current selectable value 3", "A"],
-                     ["int", "Max. charging current selectable value 4", "A"],
-                     ["int", "Max. charging current selectable value 5", "A"],
-                     ["int", "Max. charging current selectable value 6", "A"],
-                     ["int", "Max. charging current selectable value 7", "A"]],
-#                     ["int", "Max. charging current selectable value 8", "A"]],
-#                     ["int", "Max. charging current selectable value 9", "A"]],
-#                     ["int", "Max. charging current selectable value 10", "A"]],
-#                     ["int", "Max. charging current selectable value 11", "A"]],
-#                     ["int", "Max. charging current selectable value 12", "A"]],                         
+        "response": [
+            ["int", "Max. charging current selectable value 1", "A"],
+            ["int", "Max. charging current selectable value 2", "A"],
+            ["int", "Max. charging current selectable value 3", "A"],
+            ["int", "Max. charging current selectable value 4", "A"],
+            ["int", "Max. charging current selectable value 5", "A"],
+            ["int", "Max. charging current selectable value 6", "A"],
+            ["int", "Max. charging current selectable value 7", "A"],
+        ],
+        #                     ["int", "Max. charging current selectable value 8", "A"]],
+        #                     ["int", "Max. charging current selectable value 9", "A"]],
+        #                     ["int", "Max. charging current selectable value 10", "A"]],
+        #                     ["int", "Max. charging current selectable value 11", "A"]],
+        #                     ["int", "Max. charging current selectable value 12", "A"]],
         "test_responses": [
             b"^D030010,020,030,040,050,060,070\n",
         ],
     },
-    "MUCHGCR": { # On my SV IV, this commands returns 13 values, from 2 to 120 amps
+    "MUCHGCR": {  # On my SV IV, this commands returns 13 values, from 2 to 120 amps
         "name": "MUCHGCR",
         "prefix": "^P010",
         "crc": True,
         "description": "Query Max. AC charging current selectable values",
         "help": " -- queries the Max. AC charging current selectable values",
         "type": "QUERY",
-        "response": [["int", "Max. charging current selectable value 1", "A"],
-                     ["int", "Max. charging current selectable value 2", "A"],
-                     ["int", "Max. charging current selectable value 3", "A"],
-                     ["int", "Max. charging current selectable value 4", "A"],
-                     ["int", "Max. charging current selectable value 5", "A"],
-                     ["int", "Max. charging current selectable value 6", "A"],
-                     ["int", "Max. charging current selectable value 7", "A"]],
-#                     ["int", "Max. charging current selectable value 8", "A"]],
-#                     ["int", "Max. charging current selectable value 9", "A"]],
-#                     ["int", "Max. charging current selectable value 10", "A"]],
-#                     ["int", "Max. charging current selectable value 11", "A"]],
-#                     ["int", "Max. charging current selectable value 12", "A"]],
-#                     ["int", "Max. charging current selectable value 12", "A"]],                                 
+        "response": [
+            ["int", "Max. charging current selectable value 1", "A"],
+            ["int", "Max. charging current selectable value 2", "A"],
+            ["int", "Max. charging current selectable value 3", "A"],
+            ["int", "Max. charging current selectable value 4", "A"],
+            ["int", "Max. charging current selectable value 5", "A"],
+            ["int", "Max. charging current selectable value 6", "A"],
+            ["int", "Max. charging current selectable value 7", "A"],
+        ],
+        #                     ["int", "Max. charging current selectable value 8", "A"]],
+        #                     ["int", "Max. charging current selectable value 9", "A"]],
+        #                     ["int", "Max. charging current selectable value 10", "A"]],
+        #                     ["int", "Max. charging current selectable value 11", "A"]],
+        #                     ["int", "Max. charging current selectable value 12", "A"]],
+        #                     ["int", "Max. charging current selectable value 12", "A"]],
         "test_responses": [
             b"^D030010,020,030,040,050,060,070\n",
         ],
@@ -175,13 +178,27 @@ COMMANDS = {
         "help": " -- queries different rated information of parallel system",
         "type": "QUERYEN",
         "response": [
-            ["option", "Parallel ID connection status", ["Not existent","Existent"]],
+            ["option", "Parallel ID connection status", ["Not existent", "Existent"]],
             ["int", "Serial Number valid length", ""],
             ["string", "Serial Number", ""],
-            ["option", "Charging source priority", ["Solar first","Solar and Utility","Only Solar"]],
+            [
+                "option",
+                "Charging source priority",
+                ["Solar first", "Solar and Utility", "Only Solar"],
+            ],
             ["int", "Max. charging current", "A"],
             ["int", "Max. AC charging current", "A"],
-            ["option", "Output mode setting", ["Single mode", "parallel output", "Phase 1 of 3 phases", "Phase 2 of 3 phases", "Phase 3 of 3 phases"]],
+            [
+                "option",
+                "Output mode setting",
+                [
+                    "Single mode",
+                    "parallel output",
+                    "Phase 1 of 3 phases",
+                    "Phase 2 of 3 phases",
+                    "Phase 3 of 3 phases",
+                ],
+            ],
         ],
         "test_responses": [
             b"^D0401,14,96132206100410000000,2,060,050,1Jl\r",
@@ -196,12 +213,12 @@ COMMANDS = {
         "help": " -- queries  general status of parallel system",
         "type": "QUERYEN",
         "response": [
-            ["option", "Parallel ID connection status", ["Not existent","Existent"]],
+            ["option", "Parallel ID connection status", ["Not existent", "Existent"]],
             ["int", "Work mode", ""],
             ["int", "Fault code", ""],
             ["int", "Grid voltage", "0.1V"],
             ["int", "Grid frequency", "0.1HZ"],
-            ["int", "AC output voltage", "0.1V"],                        
+            ["int", "AC output voltage", "0.1V"],
             ["int", "AC output frequency", "0.1Hz"],
             ["int", "AC output apparent power", "VA"],
             ["int", "AC output active power", "W"],
@@ -218,19 +235,27 @@ COMMANDS = {
             ["int", "PV2 Input power", "W"],
             ["int", "PV1 Input voltage", "0.1V"],
             ["int", "PV2 Input voltage", "0.1V"],
-            ["option", "MPPT1 charger status", ["abnormal", "normal but not charging", "charging"]],
-            ["option", "MPPT2 charger status", ["abnormal", "normal but not charging", "charging"]],
-            ["option", "Load connection", ["disconnect","connect"]],
-            ["option", "Battery power direction", ["donothing","charge","discharge"]],
-            ["option", "DC/AC power direction", ["donothing","AC-DC","DC-AC"]],
+            [
+                "option",
+                "MPPT1 charger status",
+                ["abnormal", "normal but not charging", "charging"],
+            ],
+            [
+                "option",
+                "MPPT2 charger status",
+                ["abnormal", "normal but not charging", "charging"],
+            ],
+            ["option", "Load connection", ["disconnect", "connect"]],
+            ["option", "Battery power direction", ["donothing", "charge", "discharge"]],
+            ["option", "DC/AC power direction", ["donothing", "AC-DC", "DC-AC"]],
             ["option", "Line power direction", ["donothing", "input", "output"]],
-            ["int", "Max Temperature", "°C"],            
+            ["int", "Max Temperature", "°C"],
         ],
         "test_responses": [
             b"^D1131,5,00,2387,499,2387,499,0716,0165,01232,00505,012,004,518,000,015,031,036,1137,0000,2088,0000,2,0,1,1,2,1,037\x8a$\r",
         ],
         "regex": "PGS(\\d)$",
-    },        
+    },
     "FWS": {
         "name": "FWS",
         "prefix": "^P005",
@@ -240,7 +265,7 @@ COMMANDS = {
         "type": "QUERY",
         "response": [
             ["int", "Fault code", ""],
-            ["int", "Line fail", ""],            
+            ["int", "Line fail", ""],
             ["int", "Output circuit short", ""],
             ["int", "Inverter over temperature", ""],
             ["int", "Fan lock", ""],
@@ -255,12 +280,12 @@ COMMANDS = {
             ["int", "MPPT1 overload warning", ""],
             ["int", "MPPT2 overload warning", ""],
             ["int", "Battery too low to charge for SCC1", ""],
-            ["int", "Battery too low to charge for SCC2", ""],                                                
+            ["int", "Battery too low to charge for SCC2", ""],
         ],
         "test_responses": [
             b"^D03900,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\xc2\xb6\x9e\r",
         ],
-    },    
+    },
     "DI": {
         "name": "DI",
         "prefix": "^P005",
@@ -279,22 +304,50 @@ COMMANDS = {
             ["int", "Battery re-discharge voltage", "0.1V"],
             ["int", "Max charging current", "A"],
             ["int", "Max AC charging current", "A"],
-            ["option", "Battery type", ["AGM","Flooded","User"]],
-            ["option", "Output source priority", ["Solar-Utility-Battery","Solar-Battery-Utility"]],
-            ["option", "Charger source priority", ["Solar first", "Solar and Utility", "Only solar"]],
-            ["option", "Solar power priority", ["Battery-Load-Utility","Load-Battery-Utility"]],
-            ["option", "Machine type", ["Off-Grid","Grid-Tie"]],
-            ["option", "Output mode setting", ["Single mode", "parallel output", "Phase 1 of 3 phases", "Phase 2 of 3 phases", "Phase 3 of 3 phases"]],
-            ["option", "Silence buzzer or open buzzer", ["disable","enable"]],
-            ["option", "Overload restart", ["disable","enable"]],
-            ["option", "Over temperature restart", ["disable","enable"]],
-            ["option", "LCD backlight on", ["disable","enable"]],
-            ["option", "Alarm when primary source interrupted", ["disable","enable"]],
-            ["option", "Fault code record", ["disable","enable"]],
-            ["option", "Overload bypass", ["disable","enable"]],
-            ["option", "LCD display escape to default page after timeout", ["disable","enable"]],                                             
+            ["option", "Battery type", ["AGM", "Flooded", "User"]],
+            [
+                "option",
+                "Output source priority",
+                ["Solar-Utility-Battery", "Solar-Battery-Utility"],
+            ],
+            [
+                "option",
+                "Charger source priority",
+                ["Solar first", "Solar and Utility", "Only solar"],
+            ],
+            [
+                "option",
+                "Solar power priority",
+                ["Battery-Load-Utility", "Load-Battery-Utility"],
+            ],
+            ["option", "Machine type", ["Off-Grid", "Grid-Tie"]],
+            [
+                "option",
+                "Output mode setting",
+                [
+                    "Single mode",
+                    "parallel output",
+                    "Phase 1 of 3 phases",
+                    "Phase 2 of 3 phases",
+                    "Phase 3 of 3 phases",
+                ],
+            ],
+            ["option", "Silence buzzer or open buzzer", ["disable", "enable"]],
+            ["option", "Overload restart", ["disable", "enable"]],
+            ["option", "Over temperature restart", ["disable", "enable"]],
+            ["option", "LCD backlight on", ["disable", "enable"]],
+            ["option", "Alarm when primary source interrupted", ["disable", "enable"]],
+            ["option", "Fault code record", ["disable", "enable"]],
+            ["option", "Overload bypass", ["disable", "enable"]],
+            [
+                "option",
+                "LCD display escape to default page after timeout",
+                ["disable", "enable"],
+            ],
         ],
-        "test_responses": ['^D0682300,500,0,408,540,564,460,540,060,30,0,0,1,0,0,0,1,0,0,1,1,0,1,1Q\xc3\xa6\r']
+        "test_responses": [
+            "^D0682300,500,0,408,540,564,460,540,060,30,0,0,1,0,0,0,1,0,0,1,1,0,1,1Q\xc3\xa6\r"
+        ],
     },
     "PIRI": {
         "name": "PIRI",
@@ -307,7 +360,7 @@ COMMANDS = {
             ["int", "AC input rated voltage", "0.1V"],
             ["int", "AC input rated current", "0.1A"],
             ["int", "AC output rated voltage", "0.1V"],
-            ['int', "AC output rated frequency", "0.1HZ"],            
+            ["int", "AC output rated frequency", "0.1HZ"],
             ["int", "AC output rated current", "0.1A"],
             ["int", "AC output rated apparent power", "1VA"],
             ["int", "AC output rated active power", "W"],
@@ -319,25 +372,47 @@ COMMANDS = {
             ["int", "Battery float voltage", "0.1V"],
             ["option", "Battery Type", ["AGM", "Flooded", "User"]],
             ["int", "Max AC charging current", "A"],
-            ["int", "Max charging current", "A"],            
-            ["option", "Input voltage range", ["Appliance","UPS"]],
-            ["option", "Output source priority", ["Solar-Utility-Battery","Solar and Utility"]],
-            ["option", "Charger source priority", ["Solar first","Solar and Utility","Only Solar"]],
+            ["int", "Max charging current", "A"],
+            ["option", "Input voltage range", ["Appliance", "UPS"]],
+            [
+                "option",
+                "Output source priority",
+                ["Solar-Utility-Battery", "Solar and Utility"],
+            ],
+            [
+                "option",
+                "Charger source priority",
+                ["Solar first", "Solar and Utility", "Only Solar"],
+            ],
             ["int", "Parallel max num", ""],
-            ["option", "Machine type", ["Off-grid","Grid-tie"]],
+            ["option", "Machine type", ["Off-grid", "Grid-tie"]],
             ["option", "Topology", ["transformerless", "transformer"]],
-            ["option", "Output model setting", ["Single module","Parallel output","Phase 1 of 3 output","Phase 2 of 3 output","Phase 3 of 3 output"]],
-            ["option", "Solar power priority", ["Battery-Load-Utility", "Load-Battery-Utility"]],
-            ["int", "MPPT string", ""]
+            [
+                "option",
+                "Output model setting",
+                [
+                    "Single module",
+                    "Parallel output",
+                    "Phase 1 of 3 output",
+                    "Phase 2 of 3 output",
+                    "Phase 3 of 3 output",
+                ],
+            ],
+            [
+                "option",
+                "Solar power priority",
+                ["Battery-Load-Utility", "Load-Battery-Utility"],
+            ],
+            ["int", "MPPT string", ""],
         ],
         "test_responses": [
-            b'^D0892300,243,2300,500,243,5600,5600,480,500,530,480,570,544,2,050,060,0,1,2,9,0,0,1,1,1,00\x8e~\r'
+            b"^D0892300,243,2300,500,243,5600,5600,480,500,530,480,570,544,2,050,060,0,1,2,9,0,0,1,1,1,00\x8e~\r"
         ],
     },
     "GS": {
         "name": "GS",
         "prefix": "^P005",
-        "crc": False, # For some strange reason, crc makes this query return only partial infos ?!
+        "crc": False,  # For some strange reason, crc makes this query return only partial infos ?!
         "description": "Query general status",
         "help": " -- queries general status",
         "type": "QUERY",
@@ -351,28 +426,40 @@ COMMANDS = {
             ["int", "AC Output Load", "%"],
             ["int", "Battery Voltage", "0.1V"],
             ["int", "Battery Voltage from SCC", "0.1V"],
-            ["int", "Battery Voltage from SCC2", "0.1V"],                        
+            ["int", "Battery Voltage from SCC2", "0.1V"],
             ["int", "Battery Discharge Current", "A"],
-            ["int", "Battery Charge Current", "A"],            
+            ["int", "Battery Charge Current", "A"],
             ["int", "Battery Capacity", "%"],
             ["int", "Inverter Temperature", "°C"],
             ["int", "MPPT1 Charger Temperature", "°C"],
             ["int", "MPPT2 Charger Temperature", "°C"],
-            ["int", "PV1 Input Power","W"],
-            ["int", "PV2 Input Power","W"],
-            ["int", "PV1 Input Voltage","0.1V"],
-            ["int", "PV2 Input Voltage","0.1V"],
-            ["option", "Setting value configuration state", ["Nothing changed","Something changed"]],
-            ["option", "MPPT1 charger status", ["abnormal","normal but not charged","normal"]],
-            ["option", "MPPT2 charger status", ["abnormal","normal but not charged","normal"]],
-            ["option", "Load connection", ["disconnect","connect"]],
-            ["option", "Battery power direction", ["donothing","charge","discharge"]],
-            ["option", "DC/AC power direction", ["donothing","AC-DC","DC-AC"]],
-            ["option", "Line power direction", ["donothing","input","output"]],
-            ["int", "Local parallel ID", ""]     
-        ],        
+            ["int", "PV1 Input Power", "W"],
+            ["int", "PV2 Input Power", "W"],
+            ["int", "PV1 Input Voltage", "0.1V"],
+            ["int", "PV2 Input Voltage", "0.1V"],
+            [
+                "option",
+                "Setting value configuration state",
+                ["Nothing changed", "Something changed"],
+            ],
+            [
+                "option",
+                "MPPT1 charger status",
+                ["abnormal", "normal but not charged", "normal"],
+            ],
+            [
+                "option",
+                "MPPT2 charger status",
+                ["abnormal", "normal but not charged", "normal"],
+            ],
+            ["option", "Load connection", ["disconnect", "connect"]],
+            ["option", "Battery power direction", ["donothing", "charge", "discharge"]],
+            ["option", "DC/AC power direction", ["donothing", "AC-DC", "DC-AC"]],
+            ["option", "Line power direction", ["donothing", "input", "output"]],
+            ["int", "Local parallel ID", ""],
+        ],
         "test_responses": [
-            b'^D1062336,499,2336,499,0443,0255,007,524,000,000,000,017,042,039,000,000,1326,0000,1907,0000,0,2,0,1,1,2,1,1`\xc3\xaa\r'
+            b"^D1062336,499,2336,499,0443,0255,007,524,000,000,000,017,042,039,000,000,1326,0000,1907,0000,0,2,0,1,1,2,1,1`\xc3\xaa\r"
         ],
     },
     "MOD": {
@@ -410,13 +497,21 @@ COMMANDS = {
         "response": [
             ["option", "Mute buzzer beep", ["Disabled", "Enabled"]],
             ["option", "Overload bypass function", ["Disabled", "Enabled"]],
-            ["option", "LCD Display escape to default page after timeout", ["Disabled", "Enabled"]],
+            [
+                "option",
+                "LCD Display escape to default page after timeout",
+                ["Disabled", "Enabled"],
+            ],
             ["option", "Overload restart", ["Disabled", "Enabled"]],
             ["option", "Over temperature restart", ["Disabled", "Enabled"]],
             ["option", "Backlight on", ["Disabled", "Enabled"]],
-            ["option", "Alarm on when primary source interrupted", ["Disabled", "Enabled"]],
+            [
+                "option",
+                "Alarm on when primary source interrupted",
+                ["Disabled", "Enabled"],
+            ],
             ["option", "Fault code record", ["Disabled", "Enabled"]],
-            ["option", "Reserved", ["Disabled", "Enabled"]],                                                                        
+            ["option", "Reserved", ["Disabled", "Enabled"]],
         ],
         "test_responses": [
             b"'^D0201,0,1,0,0,1,1,0,0\xc3\x85\xa0\r'",
@@ -431,22 +526,7 @@ COMMANDS = {
         "type": "QUERY",
         "response": [
             ["string", "Start time for enable AC charger working", "HH:MM"],
-            ["string", "Ending time for enable AC charger working", "HH:MM"],                                                        
-        ],
-        "test_responses": [
-            b"^D0201,0,1,0,0,1,1,0,0\xc3\x85\xa0\r",
-        ],
-    },
-    "ACCT": {
-        "name": "ACCT",
-        "prefix": "^P005",
-        "crc": True,
-        "description": "Query AC charge time bucket",
-        "help": " -- queries AC charge time bucket",
-        "type": "QUERY",
-        "response": [
-            ["string", "Start time for enable AC charger working", "HH:MM"],
-            ["string", "Ending time for enable AC charger working", "HH:MM"],                                                        
+            ["string", "Ending time for enable AC charger working", "HH:MM"],
         ],
         "test_responses": [
             b"^D0120000,0000\xc3\x82\x1c\r",
@@ -461,13 +541,12 @@ COMMANDS = {
         "type": "QUERY",
         "response": [
             ["string", "Start time for enable AC supply the load", "HH:MM"],
-            ["string", "Ending time for enable AC supply the load", "HH:MM"],                                                        
+            ["string", "Ending time for enable AC supply the load", "HH:MM"],
         ],
         "test_responses": [
             b"^D0120000,0000\xc3\x82\x1c\r",
         ],
     },
-    
     # Now the setters
     "LON": {
         "name": "LON",
@@ -475,7 +554,7 @@ COMMANDS = {
         "crc": True,
         "description": "Set enable/disable machine supply power to the loads",
         "help": " -- examples: LON1 (0: disable, 1: enable)",
-        "type": "SETTER",        
+        "type": "SETTER",
         "response": [
             ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
         ],
@@ -514,7 +593,7 @@ COMMANDS = {
             b"^1\x0b\xc2\r",
             b"^0\x1b\xe3\r",
         ],
-    },    
+    },
     "PEB": {
         "name": "PEB",
         "prefix": "S006",
@@ -786,7 +865,7 @@ COMMANDS = {
         ],
         "regex": "MCHGC(\\d,\\d\\d\\d)$",
     },
-    "MUCHGC": { # Not working
+    "MUCHGC": {  # Not working
         "name": "MUCHGC",
         "prefix": "S014",
         "crc": False,
@@ -817,7 +896,7 @@ COMMANDS = {
             b"^0\x1b\xe3\r",
         ],
         "regex": "MCHGV(\\d\\d\\d,\\d\\d\\d)$",
-    },                
+    },
     "DAT": {
         "name": "DAT",
         "prefix": "S018",
@@ -866,28 +945,63 @@ COMMANDS = {
         ],
         "regex": "BUCD(\\d\\d\\d,\\d\\d\\d)$",
     },
-    
 }
 
 
-class pi18sv(AbstractProtocol):
+class pi18sv(pi18):
     def __str__(self):
-        return "PI18-SV protocol handler"
+        return "PI18 protocol handler for Easun SV inverters"
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"PI18SV"
         self.COMMANDS = COMMANDS
-        self.STATUS_COMMANDS = ["PI","T","ET","EY","EM","ED","ID","VFW","PIRI","GS","MOD","FWS","FLAG","DI","CHGCR","MUCHGCR","PRI","PGS","ACCT","ACLT"]
+        self.STATUS_COMMANDS = [
+            "PI",
+            "T",
+            "ET",
+            "EY",
+            "EM",
+            "ED",
+            "ID",
+            "VFW",
+            "PIRI",
+            "GS",
+            "MOD",
+            "FWS",
+            "FLAG",
+            "DI",
+            "CHGCR",
+            "MUCHGCR",
+            "PRI",
+            "PGS",
+            "ACCT",
+            "ACLT",
+        ]
         self.SETTINGS_COMMANDS = [
             "LON",
-            "PEA","PDA","PEB","PDB","PEC","PDC","PED","PDD","PEE","PDE","PEF","PDF","PEG","PDG","PEH","PDH",
+            "PEA",
+            "PDA",
+            "PEB",
+            "PDB",
+            "PEC",
+            "PDC",
+            "PED",
+            "PDD",
+            "PEE",
+            "PDE",
+            "PEF",
+            "PDF",
+            "PEG",
+            "PDG",
+            "PEH",
+            "PDH",
             "PF",
             "MUCHGC",
             "MUCHGV",
             "MCHGV",
             "BUCD",
-            "DAT"
+            "DAT",
         ]
         self.DEFAULT_COMMAND = "GS"
 
@@ -895,7 +1009,9 @@ class pi18sv(AbstractProtocol):
         """
         Override the default get_full_command as its different
         """
-        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
+        log.info(
+            f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
+        )
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
@@ -908,7 +1024,7 @@ class pi18sv(AbstractProtocol):
         # No CRC in PI17 commands?
         data_length = len(_cmd) + 1
         if _type == "QUERY":
-#            _prefix = f"^P{data_length:03}"
+            #            _prefix = f"^P{data_length:03}"
             _prefix = self._command_defn["prefix"]
             _pre_cmd = bytes(_prefix, "utf-8") + _cmd
             log.debug(f"_pre_cmd: {_pre_cmd}")
@@ -918,10 +1034,10 @@ class pi18sv(AbstractProtocol):
             # combine byte_cmd, CRC , return
             # PI18 full command "^P005GS\x..\x..\r"
             _crc = bytes([crc_high, crc_low, 13])
-            if self._command_defn["crc"] == False :            
-                full_command = _pre_cmd + bytes([13]) 
-            else :
-                full_command = _pre_cmd  + _crc
+            if self._command_defn["crc"] is False:
+                full_command = _pre_cmd + bytes([13])
+            else:
+                full_command = _pre_cmd + _crc
             log.debug(f"full command: {full_command}")
             return full_command
         elif _type == "QUERYD":
@@ -938,38 +1054,38 @@ class pi18sv(AbstractProtocol):
             log.debug(f"full command: {full_command}")
             return full_command
         elif _type == "QUERYEN":
-            data_length1 = len(_cmd) + 4
+            # data_length1 = len(_cmd) + 4
             # _prefix = f"^P{data_length1:03}" # Woot ?
             _prefix = self._command_defn["prefix"]
             log.debug(f"_prefix: {_prefix}")
             intermedstr = _prefix + self._command
-            #_numb0 = sum(bytearray(intermedstr, "utf-8")) & 255
-            #_numb = f"{_numb0:03d}"
-            #log.debug(f"_numb: {_numb}")
+            # _numb0 = sum(bytearray(intermedstr, "utf-8")) & 255
+            # _numb = f"{_numb0:03d}"
+            # log.debug(f"_numb: {_numb}")
             _pre_cmd = bytes(intermedstr, "utf-8")
             log.debug(f"_pre_cmd: {_pre_cmd}")
             crc_high, crc_low = crc(_pre_cmd)
-            _crc = bytes([crc_high, crc_low, 13])            
-#            full_command = bytes(_pre_cmd, "utf-8") + bytes([13])
-            if self._command_defn["crc"] == False :            
+            _crc = bytes([crc_high, crc_low, 13])
+            #            full_command = bytes(_pre_cmd, "utf-8") + bytes([13])
+            if self._command_defn["crc"] is False:
                 full_command = _pre_cmd + bytes([13])
-            else :
-                full_command = _pre_cmd + bytes([13])  + _crc            
+            else:
+                full_command = _pre_cmd + bytes([13]) + _crc
             log.debug(f"full command: {full_command}")
             return full_command
         elif _type == "SETTER":
-            data_length1 = len(_cmd) + 4
-            _prefix = '^'+self._command_defn["prefix"]
+            # data_length1 = len(_cmd) + 4
+            _prefix = "^" + self._command_defn["prefix"]
             log.debug(f"_prefix: {_prefix}")
-            #intermedstr = _prefix + "T" #+ self._command
+            # intermedstr = _prefix + "T" #+ self._command
             intermedstr = _prefix + self._command
             _pre_cmd = bytes(intermedstr, "utf-8")
             log.debug(f"_pre_cmd: {_pre_cmd}")
             crc_high, crc_low = crc(_pre_cmd)
             _crc = bytes([crc_high, crc_low, 13])
-            if self._command_defn["crc"] == False:
+            if self._command_defn["crc"] is False:
                 full_command = _pre_cmd + bytes([13])
-            else :
+            else:
                 full_command = _pre_cmd + _crc
             return full_command
         else:
@@ -984,25 +1100,6 @@ class pi18sv(AbstractProtocol):
             full_command = _pre_cmd + bytes([13])  # + _crc
             log.debug(f"full command: {full_command}")
             return full_command
-
-    def get_responses(self, response):
-        """
-        Override the default get_responses as its different
-        """
-        responses = response.split(b",")
-        if responses[0] == b"^0\x1b\xe3\r":
-            # is a reject response
-            return ["NAK"]
-        elif responses[0] == b"^1\x0b\xc2\r":
-            # is a successful acknowledgement response
-            return ["ACK"]
-
-        # Drop ^Dxxx from first response
-        responses[0] = responses[0][5:]
-        # Remove CRC of last response
-        responses[-1] = responses[-1][:-3]
-        return responses
-
 
 # Bugs / Not working
 # EMYYYYDD returns an error

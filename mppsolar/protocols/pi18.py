@@ -291,7 +291,7 @@ COMMANDS = {
         "type": "QUERY",
         "response": [["string", "Protocol Version", ""]],
         "test_responses": [
-            b"",
+            b"^D00518;\x03\r",
         ],
     },
     # SETTER ###
@@ -558,6 +558,9 @@ class pi18(AbstractProtocol):
         if responses[0] == b"^0\x1b\xe3\r":
             # is a reject response
             return ["NAK"]
+        elif responses[0] == b"^1\x0b\xc2\r":
+            # is a successful acknowledgement response
+            return ["ACK"]
 
         # Drop ^Dxxx from first response
         responses[0] = responses[0][5:]
