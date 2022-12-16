@@ -21,6 +21,25 @@
 * Display info from a Victron Smart Shunt connected to the serial port on ttyUSB0
   * `mpp-solar -p /dev/ttyUSB0 -P VED -c vedtext --porttype vserial -b 19200`
 
+* Filter output to only parameters with 'pv' or 'battery' 
+  * `mpp-solar -p /dev/ttyUSB0 -P PI30MAX --getstatus --filter "pv|battery"`
+
+```
+Command: QPIGS - General Status Parameters inquiry
+------------------------------------------------------------
+Parameter                     	Value           Unit
+battery_voltage               	52.3           	V   
+battery_charging_current      	0              	A   
+battery_capacity              	81             	%   
+pv1_input_current             	0.0            	A   
+pv1_input_voltage             	0.0            	V   
+battery_voltage_from_scc      	0.0            	V   
+battery_discharge_current     	5              	A   
+is_battery_voltage_to_steady_while_charging	0              	bool
+battery_voltage_offset_for_fans_on	0              	10mV
+pv1_charging_power
+```
+
 ## Troubleshooting / Notes ##
 - The commands default to using `/dev/ttyUSB0` if you are using direct USB connection try adding `-p /dev/hidraw0` to the commands
 - if you have other USB devices connected the inverter might show up as `/dev/hidraw1` or `/dev/hidraw2`
