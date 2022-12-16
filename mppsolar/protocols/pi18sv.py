@@ -9,7 +9,7 @@ COMMANDS = {
     "PI": {
         "name": "PI",
         "prefix": "^P005",
-        "crc": False,
+        "nocrc": True,
         "description": "Device Protocol Version inquiry",
         "help": " -- queries the device protocol version",
         "type": "QUERY",
@@ -21,7 +21,7 @@ COMMANDS = {
     "T": {
         "name": "T",
         "prefix": "^P004",
-        "crc": False,
+        "nocrc": True,
         "description": "Query current time",
         "help": " -- queries current time from the Inverter",
         "type": "QUERY",
@@ -35,7 +35,7 @@ COMMANDS = {
     "ET": {
         "name": "ET",
         "prefix": "^P005",
-        "crc": False,
+        "nocrc": True,
         "description": "Query total generated energy",
         "help": " -- queries total generated energy from the Inverter",
         "type": "QUERY",
@@ -49,7 +49,7 @@ COMMANDS = {
     "EY": {
         "name": "EY",
         "prefix": "^P009",
-        "crc": False,
+        "nocrc": True,
         "description": "Query generated energy of year",
         "help": " -- queries generated energy for the year YYYY from the Inverter",
         "type": "QUERYEN",
@@ -64,7 +64,7 @@ COMMANDS = {
     "EM": {
         "name": "EM",
         "prefix": "^P011",
-        "crc": False,
+        "nocrc": True,
         "description": "Query generated energy of month",
         "help": " -- queries generated energy for the month YYYYMM from the Inverter",
         "type": "QUERYEN",
@@ -79,7 +79,6 @@ COMMANDS = {
     "ED": {
         "name": "ED",
         "prefix": "^P013",
-        "crc": True,
         "description": "Query generated energy of day",
         "help": " -- queries generated energy for the day YYYYMMDD from the Inverter",
         "type": "QUERYEN",
@@ -94,7 +93,7 @@ COMMANDS = {
     "ID": {
         "name": "ID",
         "prefix": "^P005",
-        "crc": False,
+        "nocrc": True,
         "description": "Device Serial Number inquiry",
         "help": " -- queries the device serial number",
         "type": "QUERY",
@@ -106,7 +105,6 @@ COMMANDS = {
     "VFW": {
         "name": "VFW",
         "prefix": "^P006",
-        "crc": True,
         "description": "Device CPU version inquiry",
         "help": " -- queries the CPU version",
         "type": "QUERY",
@@ -122,7 +120,6 @@ COMMANDS = {
     "MCHGCR": {  # On my SV IV, this commands returns 12 values, from 10 to 120 amps
         "name": "MCHGCR",
         "prefix": "^P009",
-        "crc": True,
         "description": "Query Max. charging current selectable values",
         "help": " -- queries the Max. charging current selectable values",
         "type": "QUERY",
@@ -147,7 +144,6 @@ COMMANDS = {
     "MUCHGCR": {  # On my SV IV, this commands returns 13 values, from 2 to 120 amps
         "name": "MUCHGCR",
         "prefix": "^P010",
-        "crc": True,
         "description": "Query Max. AC charging current selectable values",
         "help": " -- queries the Max. AC charging current selectable values",
         "type": "QUERY",
@@ -173,7 +169,6 @@ COMMANDS = {
     "PRI": {
         "name": "PRI",
         "prefix": "^P007",
-        "crc": True,
         "description": "Query different rated information of parallel system",
         "help": " -- queries different rated information of parallel system",
         "type": "QUERYEN",
@@ -208,10 +203,9 @@ COMMANDS = {
     "PGS": {
         "name": "PGS",
         "prefix": "^P007",
-        "crc": True,
         "description": "Query general status of parallel system",
         "help": " -- queries  general status of parallel system",
-        "type": "QUERYEN",
+        "type": "QUERY",
         "response": [
             ["option", "Parallel ID connection status", ["Not existent", "Existent"]],
             ["int", "Work mode", ""],
@@ -259,7 +253,6 @@ COMMANDS = {
     "FWS": {
         "name": "FWS",
         "prefix": "^P005",
-        "crc": True,
         "description": "Query fault and warning status",
         "help": " -- queries the fault and warning status",
         "type": "QUERY",
@@ -289,7 +282,7 @@ COMMANDS = {
     "DI": {
         "name": "DI",
         "prefix": "^P005",
-        "crc": False,
+        "nocrc": True,
         "description": "Query default value of changeable parameters",
         "help": "",
         "type": "QUERY",
@@ -352,7 +345,6 @@ COMMANDS = {
     "PIRI": {
         "name": "PIRI",
         "prefix": "^P007",
-        "crc": True,
         "description": "Device rated information",
         "help": " -- queries rated information",
         "type": "QUERY",
@@ -412,7 +404,7 @@ COMMANDS = {
     "GS": {
         "name": "GS",
         "prefix": "^P005",
-        "crc": False,  # For some strange reason, crc makes this query return only partial infos ?!
+        "nocrc": True,  # For some strange reason, crc makes this query return only partial infos ?!
         "description": "Query general status",
         "help": " -- queries general status",
         "type": "QUERY",
@@ -465,7 +457,6 @@ COMMANDS = {
     "MOD": {
         "name": "MOD",
         "prefix": "^P006",
-        "crc": True,
         "description": "Device working mode inquiry",
         "help": " -- queries the device working mode",
         "type": "QUERY",
@@ -490,7 +481,6 @@ COMMANDS = {
     "FLAG": {
         "name": "FLAG",
         "prefix": "^P007",
-        "crc": True,
         "description": "Query enable/disable flag status",
         "help": " -- queries enable/disable flag status from the Inverter",
         "type": "QUERY",
@@ -520,7 +510,6 @@ COMMANDS = {
     "ACCT": {
         "name": "ACCT",
         "prefix": "^P005",
-        "crc": True,
         "description": "Query AC charge time bucket",
         "help": " -- queries AC charge time bucket",
         "type": "QUERY",
@@ -535,7 +524,6 @@ COMMANDS = {
     "ACLT": {
         "name": "ACLT",
         "prefix": "^P005",
-        "crc": True,
         "description": "Query AC supply load time bucket",
         "help": " -- queries AC supply load time bucket",
         "type": "QUERY",
@@ -547,11 +535,12 @@ COMMANDS = {
             b"^D0120000,0000\xc3\x82\x1c\r",
         ],
     },
+}
+SETTER_COMMANDS = {
     # Now the setters
     "LON": {
         "name": "LON",
         "prefix": "S007",
-        "crc": True,
         "description": "Set enable/disable machine supply power to the loads",
         "help": " -- examples: LON1 (0: disable, 1: enable)",
         "type": "SETTER",
@@ -567,7 +556,6 @@ COMMANDS = {
     "PEA": {
         "name": "PEA",
         "prefix": "S006",
-        "crc": True,
         "description": "Enable Silence buzzer or open buzzer",
         "help": " -- Enable Silence buzzer or open buzzer",
         "type": "SETTER",
@@ -582,7 +570,6 @@ COMMANDS = {
     "PDA": {
         "name": "PDA",
         "prefix": "S006",
-        "crc": True,
         "description": "Disable Silence buzzer or open buzzer",
         "help": " -- Disable Silence buzzer or open buzzer",
         "type": "SETTER",
@@ -597,7 +584,6 @@ COMMANDS = {
     "PEB": {
         "name": "PEB",
         "prefix": "S006",
-        "crc": True,
         "description": "Enable Overload bypass function",
         "help": " -- Enable Overload bypass function",
         "type": "SETTER",
@@ -612,7 +598,6 @@ COMMANDS = {
     "PDB": {
         "name": "PDB",
         "prefix": "S006",
-        "crc": True,
         "description": "Disable Overload bypass function",
         "help": " -- Disable Overload bypass function",
         "type": "SETTER",
@@ -627,7 +612,6 @@ COMMANDS = {
     "PEC": {
         "name": "PEC",
         "prefix": "S006",
-        "crc": True,
         "description": "Enable LCD display escape to default page after 1min timeout",
         "help": " -- Enable LCD display escape to default page after 1min timeout",
         "type": "SETTER",
@@ -642,7 +626,6 @@ COMMANDS = {
     "PDC": {
         "name": "PDC",
         "prefix": "S006",
-        "crc": True,
         "description": "Disable LCD display escape to default page after 1min timeout",
         "help": " -- Disable LCD display escape to default page after 1min timeout",
         "type": "SETTER",
@@ -657,7 +640,6 @@ COMMANDS = {
     "PED": {
         "name": "PED",
         "prefix": "S006",
-        "crc": True,
         "description": "Enable Overload restart",
         "help": " -- Enable Overload restart",
         "type": "SETTER",
@@ -672,7 +654,6 @@ COMMANDS = {
     "PDD": {
         "name": "PDD",
         "prefix": "S006",
-        "crc": True,
         "description": "Disable Overload restart",
         "help": " -- Disable Overload restart",
         "type": "SETTER",
@@ -687,7 +668,6 @@ COMMANDS = {
     "PEE": {
         "name": "PEE",
         "prefix": "S006",
-        "crc": True,
         "description": "Enable Over temperature restart",
         "help": " -- Enable Over temperature restart",
         "type": "SETTER",
@@ -702,7 +682,6 @@ COMMANDS = {
     "PDE": {
         "name": "PDE",
         "prefix": "S006",
-        "crc": True,
         "description": "Disable Over temperature restart",
         "help": " -- Disable Over temperature restart",
         "type": "SETTER",
@@ -717,7 +696,6 @@ COMMANDS = {
     "PEF": {
         "name": "PEF",
         "prefix": "S006",
-        "crc": True,
         "description": "Enable Backlight on",
         "help": " -- Enable Backlight on",
         "type": "SETTER",
@@ -732,7 +710,6 @@ COMMANDS = {
     "PDF": {
         "name": "PDF",
         "prefix": "S006",
-        "crc": True,
         "description": "Disable Backlight on",
         "help": " -- Disable Backlight on",
         "type": "SETTER",
@@ -747,7 +724,6 @@ COMMANDS = {
     "PEG": {
         "name": "PEG",
         "prefix": "S006",
-        "crc": True,
         "description": "Enable Alarm on when primary source interrupt",
         "help": " -- Enable Alarm on when primary source interrupt",
         "type": "SETTER",
@@ -762,7 +738,6 @@ COMMANDS = {
     "PDG": {
         "name": "PDG",
         "prefix": "S006",
-        "crc": True,
         "description": "Disable Alarm on when primary source interrupt",
         "help": " -- Disable Alarm on when primary source interrupt",
         "type": "SETTER",
@@ -777,7 +752,6 @@ COMMANDS = {
     "PEH": {
         "name": "PEH",
         "prefix": "S006",
-        "crc": True,
         "description": "Enable Fault code record",
         "help": " -- Enable Fault code record",
         "type": "SETTER",
@@ -792,7 +766,6 @@ COMMANDS = {
     "PDH": {
         "name": "PDH",
         "prefix": "S006",
-        "crc": True,
         "description": "Disable Fault code record",
         "help": " -- Disable Fault code record",
         "type": "SETTER",
@@ -807,7 +780,6 @@ COMMANDS = {
     "PEI": {
         "name": "PEI",
         "prefix": "S006",
-        "crc": True,
         "description": "Set Machine type Grid-Tie",
         "help": " --Set Machine type Grid-Tie",
         "type": "SETTER",
@@ -822,7 +794,6 @@ COMMANDS = {
     "PDI": {
         "name": "PDI",
         "prefix": "S006",
-        "crc": True,
         "description": "Set Machine type Off-Grid",
         "help": " -- Set Machine type Off-Grid",
         "type": "SETTER",
@@ -837,7 +808,6 @@ COMMANDS = {
     "PF": {
         "name": "PF",
         "prefix": "S005",
-        "crc": True,
         "description": "Set changeable parameter restore to default value",
         "help": " -- Set changeable parameter restore to default value",
         "type": "SETTER",
@@ -852,7 +822,7 @@ COMMANDS = {
     "MCHGC": {
         "name": "MCHGC",
         "prefix": "S013",
-        "crc": False,
+        "nocrc": True,
         "description": "Set battery maximum charge current",
         "help": " -- MCHGCRm,nnn with m : 0~Parallel number, if single model, it should be 0 ; n : current. Must choose a seable value returned by MCHGCR ; Ex: MCHGC0,050",
         "type": "SETTER",
@@ -868,7 +838,7 @@ COMMANDS = {
     "MUCHGC": {  # Not working
         "name": "MUCHGC",
         "prefix": "S014",
-        "crc": False,
+        "nocrc": True,
         "description": "Set battery maximum AC charge current",
         "help": " -- MUCHGCm,nnn with m : 0~Parallel number, if single model, it should be 0 ; n : current. Must choose a seable value returned by MUCHGCR ; Ex: MUCHGC0,050",
         "type": "SETTER",
@@ -884,7 +854,6 @@ COMMANDS = {
     "MCHGV": {
         "name": "MCHGV",
         "prefix": "S015",
-        "crc": True,
         "description": "Set battery maximum charge voltage",
         "help": " -- MCHGVmmm,nnn with mmm battery constant charge voltage and nnn battery float voltage. Unit 0.1V",
         "type": "SETTER",
@@ -900,7 +869,6 @@ COMMANDS = {
     "DAT": {
         "name": "DAT",
         "prefix": "S018",
-        "crc": True,
         "description": "Set date time",
         "help": " -- examples: DAT190518224530(YYMMDDHHMMSS-12digits)",
         "type": "SETTER",
@@ -916,7 +884,6 @@ COMMANDS = {
     "POP": {
         "name": "POP",
         "prefix": "S007",
-        "crc": True,
         "description": "Set output source priority",
         "help": " -- POP0 : Solar-Utility-Battery ; POP1 : Solar-Battery-Utility",
         "type": "SETTER",
@@ -932,7 +899,6 @@ COMMANDS = {
     "BUCD": {
         "name": "BUCD",
         "prefix": "S014",
-        "crc": True,
         "description": "Battery re-charged and re-discharged voltage when utility is available",
         "help": " -- BUCDmmm,nnn with mmm battery recharge voltage when utility available (44 to 51V) and nnn Battery re-discharged voltage when utility is available (0,48-58)",
         "type": "SETTER",
@@ -956,6 +922,7 @@ class pi18sv(pi18):
         super().__init__()
         self._protocol_id = b"PI18SV"
         self.COMMANDS = COMMANDS
+        self.COMMANDS.update(SETTER_COMMANDS)
         self.STATUS_COMMANDS = [
             "PI",
             "T",
@@ -1019,87 +986,42 @@ class pi18sv(pi18):
         if self._command_defn is None:
             return None
 
+        # Full command components
         _cmd = bytes(self._command, "utf-8")
+        log.debug(f"_cmd is: {_cmd}")
+
         _type = self._command_defn["type"]
-        # No CRC in PI17 commands?
-        data_length = len(_cmd) + 1
+        log.debug(f"_type is: {_type}")
+
+        # Hand coded prefix
+        _prefix = self._command_defn["prefix"]
+        log.debug(f"_prefix: {_prefix}")
+        # Auto determined prefix - TODO
+        data_length = len(_cmd) + 3
         if _type == "QUERY":
-            #            _prefix = f"^P{data_length:03}"
-            _prefix = self._command_defn["prefix"]
-            _pre_cmd = bytes(_prefix, "utf-8") + _cmd
-            log.debug(f"_pre_cmd: {_pre_cmd}")
-            log.debug(f"_prefix: {_prefix}")
-            # calculate the CRC
-            crc_high, crc_low = crc(_pre_cmd)
-            # combine byte_cmd, CRC , return
-            # PI18 full command "^P005GS\x..\x..\r"
-            _crc = bytes([crc_high, crc_low, 13])
-            if self._command_defn["crc"] is False:
-                full_command = _pre_cmd + bytes([13])
-            else:
-                full_command = _pre_cmd + _crc
-            log.debug(f"full command: {full_command}")
-            return full_command
-        elif _type == "QUERYD":
-            _prefix = self._command_defn["prefix"]
-            _pre_cmd = bytes(_prefix, "utf-8") + _cmd
-            log.debug(f"_pre_cmd: {_pre_cmd}")
-            log.debug(f"_prefix: {_prefix}")
-            # calculate the CRC
-            # crc_high; crc_low = crc(_pre_cmd)
-            # combine byte_cmd, CRC , return
-            # PI18 full command "^P005GS\x..\x..\r"
-            # _crc = bytes([crc_high, crc_low, 13])
-            full_command = _pre_cmd + bytes([13])  # + _crc
-            log.debug(f"full command: {full_command}")
-            return full_command
-        elif _type == "QUERYEN":
-            # data_length1 = len(_cmd) + 4
-            # _prefix = f"^P{data_length1:03}" # Woot ?
-            _prefix = self._command_defn["prefix"]
-            log.debug(f"_prefix: {_prefix}")
-            intermedstr = _prefix + self._command
-            # _numb0 = sum(bytearray(intermedstr, "utf-8")) & 255
-            # _numb = f"{_numb0:03d}"
-            # log.debug(f"_numb: {_numb}")
-            _pre_cmd = bytes(intermedstr, "utf-8")
-            log.debug(f"_pre_cmd: {_pre_cmd}")
-            crc_high, crc_low = crc(_pre_cmd)
-            _crc = bytes([crc_high, crc_low, 13])
-            #            full_command = bytes(_pre_cmd, "utf-8") + bytes([13])
-            if self._command_defn["crc"] is False:
-                full_command = _pre_cmd + bytes([13])
-            else:
-                full_command = _pre_cmd + bytes([13]) + _crc
-            log.debug(f"full command: {full_command}")
-            return full_command
+            auto_prefix = f"^P{data_length:03}"
         elif _type == "SETTER":
-            # data_length1 = len(_cmd) + 4
-            _prefix = "^" + self._command_defn["prefix"]
-            log.debug(f"_prefix: {_prefix}")
-            # intermedstr = _prefix + "T" #+ self._command
-            intermedstr = _prefix + self._command
-            _pre_cmd = bytes(intermedstr, "utf-8")
-            log.debug(f"_pre_cmd: {_pre_cmd}")
-            crc_high, crc_low = crc(_pre_cmd)
-            _crc = bytes([crc_high, crc_low, 13])
-            if self._command_defn["crc"] is False:
-                full_command = _pre_cmd + bytes([13])
-            else:
-                full_command = _pre_cmd + _crc
-            return full_command
+            auto_prefix = f"^S{data_length:03}"
         else:
-            _prefix = f"^S{data_length:03}"
-            _pre_cmd = bytes(_prefix, "utf-8") + _cmd
-            log.debug(f"_pre_cmd: {_pre_cmd}")
+            log.info(f"No type defined for command {_cmd}")
+            auto_prefix = f"^P{data_length:03}"
+        log.debug(f"auto_prefix: {auto_prefix}")
+
+        _pre_cmd = bytes(_prefix, "utf-8") + _cmd
+        log.debug(f"_pre_cmd: {_pre_cmd}")
+
+        # For commands that dont need CRC
+        if "nocrc" in self._command_defn and self._command_defn["nocrc"] is True:
+            full_command = _pre_cmd + bytes([13])
+        # crc commands
+        else:
             # calculate the CRC
-            # crc_high; crc_low = crc(_pre_cmd)
+            crc_high, crc_low = crc(_pre_cmd)
             # combine byte_cmd, CRC , return
-            # PI18 full command "^P005GS\x..\x..\r"
-            # _crc = bytes([crc_high, crc_low, 13])
-            full_command = _pre_cmd + bytes([13])  # + _crc
-            log.debug(f"full command: {full_command}")
-            return full_command
+            full_command = _pre_cmd + bytes([crc_high, crc_low, 13])
+        log.debug(f"full command: {full_command}")
+        return full_command
+
 
 # Bugs / Not working
 # EMYYYYDD returns an error
