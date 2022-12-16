@@ -29,7 +29,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         # print(f"{'Parameter':<30}\t{'Value':<15} Unit")
         if self._protocol_id is None:
             log.error("Attempted to list commands with no protocol defined")
-            return {"ERROR": ["Attempted to list commands with no protocol defined", ""]}
+            return {
+                "ERROR": ["Attempted to list commands with no protocol defined", ""]
+            }
         result = {}
         result["_command"] = "command help"
         result[
@@ -37,7 +39,10 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         ] = f"List available commands for protocol {str(self._protocol_id, 'utf-8')}"
         for command in self.COMMANDS:
             if "help" in self.COMMANDS[command]:
-                info = self.COMMANDS[command]["description"] + self.COMMANDS[command]["help"]
+                info = (
+                    self.COMMANDS[command]["description"]
+                    + self.COMMANDS[command]["help"]
+                )
             else:
                 info = self.COMMANDS[command]["description"]
             result[command] = [info, ""]
@@ -47,7 +52,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         return self._protocol_id
 
     def get_full_command(self, command) -> bytes:
-        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
+        log.info(
+            f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
+        )
         byte_cmd = bytes(command, "utf-8")
         # calculate the CRC
         crc_high, crc_low = crc(byte_cmd)
@@ -93,7 +100,12 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         return True, {}
 
     def process_response(
-        self, data_name=None, data_type=None, data_units=None, raw_value=None, frame_number=0
+        self,
+        data_name=None,
+        data_type=None,
+        data_units=None,
+        raw_value=None,
+        frame_number=0,
     ):
         template = None
         # Check for a format modifying template
@@ -220,7 +232,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         else:
             # No definition, so just return the data
             len_command_defn = 0
-            log.debug(f"No definition for command {command}, (splitted) raw response returned")
+            log.debug(
+                f"No definition for command {command}, (splitted) raw response returned"
+            )
             msgs["WARNING"] = [
                 f"No definition for command {command} in protocol {self._protocol_id}",
                 "",
@@ -245,7 +259,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         # DEFAULT - responses are determined by the order they are returned
         if response_type == "DEFAULT":
             log.info("Processing DEFAULT type responses")
-            print("Processing DEFAULT type responses")
+            # print("Processing DEFAULT type responses")
             for i, result in enumerate(responses):
                 # decode result
                 if type(result) is bytes:
@@ -428,7 +442,12 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     if response_defn is None:
                         # No definition for this key, so ignore???
                         log.warn(f"No definition for {response}")
-                        response_defn = ["str", 1, f"Undefined value in response {i}", ""]
+                        response_defn = [
+                            "str",
+                            1,
+                            f"Undefined value in response {i}",
+                            "",
+                        ]
                     log.debug(f"Got defn {response_defn}")
                     # length = response_defn[1] #0
                     data_type = response_defn[0]  # 1

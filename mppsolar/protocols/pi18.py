@@ -313,7 +313,7 @@ COMMANDS = {
     "POP": {
         "name": "POP",
         "prefix": "^S007",
-        "description": "Set output souce priority 				(Maunal Option 01)",
+        "description": "Set output souce priority 				(Manual Option 01)",
         "help": " -- example: POP0 		(set Output POP0 [0: Solar-Utility-Batter],  POP1 [1: Solar-Battery-Utility]",
         "type": "SETTER",
         "response": [
@@ -328,7 +328,7 @@ COMMANDS = {
     "PSP": {
         "name": "PSP",
         "prefix": "^S007",
-        "description": "Set solar power priority 				(Maunal Option 05)",
+        "description": "Set solar power priority 				(Manual Option 05)",
         "help": " -- example: PSP0 		(set Priority PSP0 [0: Battery-Load-Utiliy (+AC Charge)],  PSP1 [1: Load-Battery-Utiliy]",
         "type": "SETTER",
         "response": [
@@ -343,7 +343,7 @@ COMMANDS = {
     "PEI": {
         "name": "PEI",
         "prefix": "^S006",
-        "description": "Set Machine type,  enable: Grid-Tie 			(Maunal Option 09)",
+        "description": "Set Machine type,  enable: Grid-Tie 			(Manual Option 09)",
         "help": " -- example: PEI 		(set enable Grid-Tie)",
         "type": "SETTER",
         "response": [
@@ -357,7 +357,7 @@ COMMANDS = {
     "PDI": {
         "name": "PDI",
         "prefix": "^S006",
-        "description": "Set Machine type, disable: Grid-Tie 			(Maunal Option 09)",
+        "description": "Set Machine type, disable: Grid-Tie 			(Manual Option 09)",
         "help": " -- example: PDI 		(set disable Grid-Tie)",
         "type": "SETTER",
         "response": [
@@ -371,7 +371,7 @@ COMMANDS = {
     "PCP": {
         "name": "PCP",
         "prefix": "^S009",
-        "description": "Set charging source priority 				(Maunal Option 10)",
+        "description": "Set charging source priority 				(Manual Option 10)",
         "help": " -- example: PCP0,1 		(set unit 0 [0-9] to 0: Solar first, 1: Solar and Utility, 2: Only solar)",
         "type": "SETTER",
         "response": [
@@ -386,7 +386,7 @@ COMMANDS = {
     "MCHGC": {
         "name": "MCHGC",
         "prefix": "^S013",
-        "description": "Set Battery Max Charging Current Solar + AC 		(Maunal Option 11)",
+        "description": "Set Battery Max Charging Current Solar + AC 		(Manual Option 11)",
         "help": " -- example: MCHGC0,030 	(set unit 0 [0-9] to max charging current of  30A [    010 020 030 040 050 060 070 080])",
         "type": "SETTER",
         "response": [
@@ -401,7 +401,7 @@ COMMANDS = {
     "MUCHGC": {
         "name": "MUCHGC",
         "prefix": "^S014",
-        "description": "Set Battery Max AC Charging Current 			(Maunal Option 13)",
+        "description": "Set Battery Max AC Charging Current 			(Manual Option 13)",
         "help": " -- example: MUCHGC0,030 	(set unit 0 [0-9] utility charging current to 30A [002 010 020 030 040 050 060 070 080])",
         "type": "SETTER",
         "response": [
@@ -415,7 +415,7 @@ COMMANDS = {
     "PBT": {
         "name": "PBT",
         "prefix": "^S007",
-        "description": "Set Battery Type 					(Maunal Option 14)",
+        "description": "Set Battery Type 					(Manual Option 14)",
         "help": " -- example: PBT0 		(set battery as PBT0 [0: AGM], PBT1 [1: FLOODED], PBT2 [2: USER])",
         "type": "SETTER",
         "response": [
@@ -430,7 +430,7 @@ COMMANDS = {
     "MCHGV": {
         "name": "MCHGV",
         "prefix": "^S015",
-        "description": "Set Battery Bulk,Float charge voltages 		     (Maunal Option 17,18)",
+        "description": "Set Battery Bulk,Float charge voltages 		     (Manual Option 17,18)",
         "help": " -- example: MCHGV552,540 	(set Bulk - CV voltage [480~584] in 0.1V xxx, Float voltage [480~584] in 0.1V yyy)",
         "type": "SETTER",
         "response": [
@@ -446,7 +446,7 @@ COMMANDS = {
     "PSDV": {
         "name": "PSDV",
         "prefix": "^S010",
-        "description": "Set Battery Cut-off Voltage	 			(Maunal Option 19)",
+        "description": "Set Battery Cut-off Voltage	 			(Manual Option 19)",
         "help": " -- example: PSDV450 		(set battery cut-off voltage to 45V [400~480V] for 48V unit)",
         "type": "SETTER",
         "response": [
@@ -461,8 +461,8 @@ COMMANDS = {
     "BUCD": {
         "name": "BUCD",
         "prefix": "^S014",
-        "description": "Set Battery Stop dis,charging when Grid is available (Maunal Option 20,21)",
-        "help": " -- example: BUCD44,48	(set Stop discharge Voltate [440~510] in 0.1V xxx, Stop Charge Voltage [000(Full) or 480~580] in 0.1V yyy)",
+        "description": "Set Battery Stop dis,charging when Grid is available (Manual Option 20,21)",
+        "help": " -- example: BUCD440,480	(set Stop discharge Voltage [440~510] in 0.1V xxx, Stop Charge Voltage [000(Full) or 480~580] in 0.1V yyy)",
         "type": "SETTER",
         "response": [
             ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
@@ -471,7 +471,7 @@ COMMANDS = {
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
         ],
-        "regex": "BUCD(4[4-9]0|5[0-1]0,000|4[8-9]0|5[0-8]0)$",
+        "regex": "BUCD((4[4-9]0|5[0-1]0),(000|4[8-9]0|5[0-8]0))$",
     },
 }
 
