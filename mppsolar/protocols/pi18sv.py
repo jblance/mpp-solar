@@ -1,7 +1,6 @@
 import logging
 
 from .pi18 import pi18
-from .protocol_helpers import crcPI as crc
 
 log = logging.getLogger("pi18sv")
 
@@ -540,7 +539,7 @@ SETTER_COMMANDS = {
     # Now the setters
     "LON": {
         "name": "LON",
-        "prefix": "S007",
+        "prefix": "^S007",
         "description": "Set enable/disable machine supply power to the loads",
         "help": " -- examples: LON1 (0: disable, 1: enable)",
         "type": "SETTER",
@@ -555,7 +554,7 @@ SETTER_COMMANDS = {
     },
     "PEA": {
         "name": "PEA",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Enable Silence buzzer or open buzzer",
         "help": " -- Enable Silence buzzer or open buzzer",
         "type": "SETTER",
@@ -569,7 +568,7 @@ SETTER_COMMANDS = {
     },
     "PDA": {
         "name": "PDA",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Disable Silence buzzer or open buzzer",
         "help": " -- Disable Silence buzzer or open buzzer",
         "type": "SETTER",
@@ -583,7 +582,7 @@ SETTER_COMMANDS = {
     },
     "PEB": {
         "name": "PEB",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Enable Overload bypass function",
         "help": " -- Enable Overload bypass function",
         "type": "SETTER",
@@ -597,7 +596,7 @@ SETTER_COMMANDS = {
     },
     "PDB": {
         "name": "PDB",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Disable Overload bypass function",
         "help": " -- Disable Overload bypass function",
         "type": "SETTER",
@@ -611,7 +610,7 @@ SETTER_COMMANDS = {
     },
     "PEC": {
         "name": "PEC",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Enable LCD display escape to default page after 1min timeout",
         "help": " -- Enable LCD display escape to default page after 1min timeout",
         "type": "SETTER",
@@ -625,7 +624,7 @@ SETTER_COMMANDS = {
     },
     "PDC": {
         "name": "PDC",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Disable LCD display escape to default page after 1min timeout",
         "help": " -- Disable LCD display escape to default page after 1min timeout",
         "type": "SETTER",
@@ -639,7 +638,7 @@ SETTER_COMMANDS = {
     },
     "PED": {
         "name": "PED",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Enable Overload restart",
         "help": " -- Enable Overload restart",
         "type": "SETTER",
@@ -653,7 +652,7 @@ SETTER_COMMANDS = {
     },
     "PDD": {
         "name": "PDD",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Disable Overload restart",
         "help": " -- Disable Overload restart",
         "type": "SETTER",
@@ -667,7 +666,7 @@ SETTER_COMMANDS = {
     },
     "PEE": {
         "name": "PEE",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Enable Over temperature restart",
         "help": " -- Enable Over temperature restart",
         "type": "SETTER",
@@ -681,7 +680,7 @@ SETTER_COMMANDS = {
     },
     "PDE": {
         "name": "PDE",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Disable Over temperature restart",
         "help": " -- Disable Over temperature restart",
         "type": "SETTER",
@@ -695,7 +694,7 @@ SETTER_COMMANDS = {
     },
     "PEF": {
         "name": "PEF",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Enable Backlight on",
         "help": " -- Enable Backlight on",
         "type": "SETTER",
@@ -709,7 +708,7 @@ SETTER_COMMANDS = {
     },
     "PDF": {
         "name": "PDF",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Disable Backlight on",
         "help": " -- Disable Backlight on",
         "type": "SETTER",
@@ -723,7 +722,7 @@ SETTER_COMMANDS = {
     },
     "PEG": {
         "name": "PEG",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Enable Alarm on when primary source interrupt",
         "help": " -- Enable Alarm on when primary source interrupt",
         "type": "SETTER",
@@ -737,7 +736,7 @@ SETTER_COMMANDS = {
     },
     "PDG": {
         "name": "PDG",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Disable Alarm on when primary source interrupt",
         "help": " -- Disable Alarm on when primary source interrupt",
         "type": "SETTER",
@@ -751,7 +750,7 @@ SETTER_COMMANDS = {
     },
     "PEH": {
         "name": "PEH",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Enable Fault code record",
         "help": " -- Enable Fault code record",
         "type": "SETTER",
@@ -765,7 +764,7 @@ SETTER_COMMANDS = {
     },
     "PDH": {
         "name": "PDH",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Disable Fault code record",
         "help": " -- Disable Fault code record",
         "type": "SETTER",
@@ -779,7 +778,7 @@ SETTER_COMMANDS = {
     },
     "PEI": {
         "name": "PEI",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Set Machine type Grid-Tie",
         "help": " --Set Machine type Grid-Tie",
         "type": "SETTER",
@@ -793,7 +792,7 @@ SETTER_COMMANDS = {
     },
     "PDI": {
         "name": "PDI",
-        "prefix": "S006",
+        "prefix": "^S006",
         "description": "Set Machine type Off-Grid",
         "help": " -- Set Machine type Off-Grid",
         "type": "SETTER",
@@ -807,7 +806,7 @@ SETTER_COMMANDS = {
     },
     "PF": {
         "name": "PF",
-        "prefix": "S005",
+        "prefix": "^S005",
         "description": "Set changeable parameter restore to default value",
         "help": " -- Set changeable parameter restore to default value",
         "type": "SETTER",
@@ -821,7 +820,7 @@ SETTER_COMMANDS = {
     },
     "MCHGC": {
         "name": "MCHGC",
-        "prefix": "S013",
+        "prefix": "^S013",
         "nocrc": True,
         "description": "Set battery maximum charge current",
         "help": " -- MCHGCRm,nnn with m : 0~Parallel number, if single model, it should be 0 ; n : current. Must choose a seable value returned by MCHGCR ; Ex: MCHGC0,050",
@@ -837,7 +836,7 @@ SETTER_COMMANDS = {
     },
     "MUCHGC": {  # Not working
         "name": "MUCHGC",
-        "prefix": "S014",
+        "prefix": "^S014",
         "nocrc": True,
         "description": "Set battery maximum AC charge current",
         "help": " -- MUCHGCm,nnn with m : 0~Parallel number, if single model, it should be 0 ; n : current. Must choose a seable value returned by MUCHGCR ; Ex: MUCHGC0,050",
@@ -853,7 +852,7 @@ SETTER_COMMANDS = {
     },
     "MCHGV": {
         "name": "MCHGV",
-        "prefix": "S015",
+        "prefix": "^S015",
         "description": "Set battery maximum charge voltage",
         "help": " -- MCHGVmmm,nnn with mmm battery constant charge voltage and nnn battery float voltage. Unit 0.1V",
         "type": "SETTER",
@@ -868,7 +867,7 @@ SETTER_COMMANDS = {
     },
     "DAT": {
         "name": "DAT",
-        "prefix": "S018",
+        "prefix": "^S018",
         "description": "Set date time",
         "help": " -- examples: DAT190518224530(YYMMDDHHMMSS-12digits)",
         "type": "SETTER",
@@ -883,7 +882,7 @@ SETTER_COMMANDS = {
     },
     "POP": {
         "name": "POP",
-        "prefix": "S007",
+        "prefix": "^S007",
         "description": "Set output source priority",
         "help": " -- POP0 : Solar-Utility-Battery ; POP1 : Solar-Battery-Utility",
         "type": "SETTER",
@@ -898,7 +897,7 @@ SETTER_COMMANDS = {
     },
     "BUCD": {
         "name": "BUCD",
-        "prefix": "S014",
+        "prefix": "^S014",
         "description": "Battery re-charged and re-discharged voltage when utility is available",
         "help": " -- BUCDmmm,nnn with mmm battery recharge voltage when utility available (44 to 51V) and nnn Battery re-discharged voltage when utility is available (0,48-58)",
         "type": "SETTER",
@@ -971,56 +970,6 @@ class pi18sv(pi18):
             "DAT",
         ]
         self.DEFAULT_COMMAND = "GS"
-
-    def get_full_command(self, command) -> bytes:
-        """
-        Override the default get_full_command as its different
-        """
-        log.info(
-            f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
-        )
-        # These need to be set to allow other functions to work`
-        self._command = command
-        self._command_defn = self.get_command_defn(command)
-        # End of required variables setting
-        if self._command_defn is None:
-            return None
-
-        # Full command components
-        _cmd = bytes(self._command, "utf-8")
-        log.debug(f"_cmd is: {_cmd}")
-
-        _type = self._command_defn["type"]
-        log.debug(f"_type is: {_type}")
-
-        # Hand coded prefix
-        _prefix = self._command_defn["prefix"]
-        log.debug(f"_prefix: {_prefix}")
-        # Auto determined prefix - TODO
-        data_length = len(_cmd) + 3
-        if _type == "QUERY":
-            auto_prefix = f"^P{data_length:03}"
-        elif _type == "SETTER":
-            auto_prefix = f"^S{data_length:03}"
-        else:
-            log.info(f"No type defined for command {_cmd}")
-            auto_prefix = f"^P{data_length:03}"
-        log.debug(f"auto_prefix: {auto_prefix}")
-
-        _pre_cmd = bytes(_prefix, "utf-8") + _cmd
-        log.debug(f"_pre_cmd: {_pre_cmd}")
-
-        # For commands that dont need CRC
-        if "nocrc" in self._command_defn and self._command_defn["nocrc"] is True:
-            full_command = _pre_cmd + bytes([13])
-        # crc commands
-        else:
-            # calculate the CRC
-            crc_high, crc_low = crc(_pre_cmd)
-            # combine byte_cmd, CRC , return
-            full_command = _pre_cmd + bytes([crc_high, crc_low, 13])
-        log.debug(f"full command: {full_command}")
-        return full_command
 
 
 # Bugs / Not working

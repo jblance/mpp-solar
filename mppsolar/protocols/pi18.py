@@ -510,7 +510,7 @@ class pi18(AbstractProtocol):
 
     def get_full_command(self, command) -> bytes:
         """
-        Override the default get_full_command as its different for PI18
+        Override the default get_full_command as its different
         """
         log.info(
             f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
@@ -522,31 +522,40 @@ class pi18(AbstractProtocol):
         if self._command_defn is None:
             return None
 
+        # Full command components
         _cmd = bytes(self._command, "utf-8")
+        log.debug(f"_cmd is: {_cmd}")
+
         _type = self._command_defn["type"]
+        log.debug(f"_type is: {_type}")
 
-        # data_length = len(_cmd) + 2 + 1
+        # Hand coded prefix
+        _prefix = self._command_defn["prefix"]
+        log.debug(f"_prefix: {_prefix}")
+        # Auto determined prefix - TODO
+        data_length = len(_cmd) + 3
         if _type == "QUERY":
-            _prefix = self._command_defn["prefix"]
+            auto_prefix = f"^P{data_length:03}"
         elif _type == "SETTER":
-            _prefix = self._command_defn["prefix"]
-            #
-            # _prefix = f"^S{data_length:03}"
-
+            auto_prefix = f"^S{data_length:03}"
         else:
-            data_length = len(_cmd) + 2 + 1
-            _prefix = f"^P{data_length:03}"
+            log.info(f"No type defined for command {_cmd}")
+            auto_prefix = f"^P{data_length:03}"
+        log.debug(f"auto_prefix: {auto_prefix}")
 
         _pre_cmd = bytes(_prefix, "utf-8") + _cmd
-
+        # _pre_cmd = bytes(auto_prefix, "utf-8") + _cmd
         log.debug(f"_pre_cmd: {_pre_cmd}")
-        # calculate the CRC
-        crc_high, crc_low = crc(_pre_cmd)
-        # combine byte_cmd, CRC , return
-        # PI18 full command "^P005GS\x..\x..\r"
-        _crc = bytes([crc_high, crc_low, 13])
-        full_command = _pre_cmd + _crc
 
+        # For commands that dont need CRC
+        if "nocrc" in self._command_defn and self._command_defn["nocrc"] is True:
+            full_command = _pre_cmd + bytes([13])
+        # crc commands
+        else:
+            # calculate the CRC
+            crc_high, crc_low = crc(_pre_cmd)
+            # combine byte_cmd, CRC , return
+            full_command = _pre_cmd + bytes([crc_high, crc_low, 13])
         log.debug(f"full command: {full_command}")
         return full_command
 
