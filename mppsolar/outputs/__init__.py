@@ -86,6 +86,7 @@ def to_json(data, keep_case, excl_filter, filter):
     # Loop through responses
     for key in data:
         value = data[key]
+        log.debug(f"value: {value}")
         if isinstance(value, list):
             value = data[key][0]
         # unit = data[key][1]
@@ -96,6 +97,30 @@ def to_json(data, keep_case, excl_filter, filter):
             key = key.lower()
         if key_wanted(key, filter, excl_filter):
             output[key] = value
+    return output
+
+
+def to_json_units(data, keep_case, excl_filter, filter):
+    output = {}
+    # Loop through responses
+    for key in data:
+        value = data[key]
+        unit = None
+        log.debug(f"value: {value}")
+        if isinstance(value, list):
+            value = data[key][0]
+            unit = data[key][1]
+        # remove spaces
+        key = key.replace(" ", "_")
+        if not keep_case:
+            # make lowercase
+            key = key.lower()
+        if key_wanted(key, filter, excl_filter):
+            if unit is None:
+                output[key] = value
+            else:
+                # { "ac_output_voltage": { "value": 220, "unit": "V" }, ... }
+                output[key] = {"value": value, "unit": unit}
     return output
 
 
