@@ -1,5 +1,9 @@
 # Hardware know to work
 
+- Raspberry Pi 4
+  - USB cable to USB port of inverter
+  - connected to 1x TT-NEW1K  (/dev/hidraw0 on Pi)
+
 - Raspberry Pi 3
   - 2x USB to serial adapters (like https://www.adafruit.com/product/18)
   - connected to 2x PIP-4048MS inverters connected in parallel
