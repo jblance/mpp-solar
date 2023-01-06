@@ -6,7 +6,6 @@ import socket
 from . import to_json
 from .baseoutput import baseoutput
 from ..helpers import get_kwargs
-from ..helpers import key_wanted
 
 log = logging.getLogger("json_udp")
 

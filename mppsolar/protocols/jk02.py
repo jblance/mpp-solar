@@ -135,7 +135,9 @@ NEW_COMMANDS = {
         "help": " -- example setCellOVP3.65",
         "type": "SETTER",
         "response_type": "POSITIONAL",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             bytes.fromhex(
                 "55aaeb9002b52e0d280dfa0c2e0d2f0d220d220d130d190d1d0d1d0d170d1f0d160dfb0c1f0d00000000000000000000000000000000ffff00001c0d350004029b00c600a000b300bc00cc00be00b100b4002d013d01b000a100ab00b200ad0000000000000000000000000000000000000000000000bcd1000000000000000000001e0116013c010000000000636b0c0300400d030000000000dc4d010064000000781e16000101480a000000000000000000000000070101000000980400000000260141400000000037feffff00000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080"
@@ -151,8 +153,9 @@ class jk02(jkAbstractProtocol):
     JK02 - Handler for JKBMS 2 byte data communication
          - e.g. ASAS = ??V
     """
+
     def __str__(self):
-        return "JKBMS BLE 2 byte data communication protocol handler"
+        return "JK02 - JKBMS BLE 2 byte data communication protocol handler"
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()

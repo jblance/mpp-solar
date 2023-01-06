@@ -9,7 +9,7 @@ log = logging.getLogger("helpers")
 
 
 def list_outputs():
-    print("outputs list outputs")
+    # print("outputs list outputs")
     pkgpath = __file__
     pkgpath = pkgpath[: pkgpath.rfind("/")]
     pkgpath += "/../outputs"
@@ -22,10 +22,12 @@ def list_outputs():
         try:
             _module_class = importlib.import_module("mppsolar.outputs." + name, ".")
             _module = getattr(_module_class, name)
+            result[name] = (str(_module()), "", "")
         except ModuleNotFoundError as e:
-            log.error(f"Error in module {name}: {e}")
+            # log.error(f"Error in module {name}: {e}")
+            result[f"{name}*"] = (f"ERROR: {e}", "", "")
         # print(_module())
-        result[name] = (str(_module()), "", "")
+
     # print(result)
     return result
 
