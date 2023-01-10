@@ -12,7 +12,8 @@ t: tests/*.py
 
 pypi:
 	rm -rf dist/*
-	python3 -m build 
+	#python3 -m build 
+	poetry build
 	ls -l dist/
 
 pypi-upload:

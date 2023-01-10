@@ -5,7 +5,7 @@ from .protocol_helpers import crcPI as crc
 
 log = logging.getLogger("pi30")
 
-COMMANDS = {
+SETTER_COMMANDS = {
     "F": {
         "name": "F",
         "description": "Set Device Output Frequency",
@@ -53,7 +53,9 @@ COMMANDS = {
         "description": "Set Utility Max Charging Current",
         "help": " -- example: MUCHGC130 (set unit 1 utility max charging current to 30A)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -65,7 +67,9 @@ COMMANDS = {
         "description": "Set Battery re-charge voltage",
         "help": " -- example PBCV44.0 - set re-charge voltage to 44V (12V unit: 11V/11.3V/11.5V/11.8V/12V/12.3V/12.5V/12.8V, 24V unit: 22V/22.5V/23V/23.5V/24V/24.5V/25V/25.5V, 48V unit: 44V/45V/46V/47V/48V/49V/50V/51V)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -77,7 +81,9 @@ COMMANDS = {
         "description": "Set Battery re-discharge voltage",
         "help": " -- example PBDV48.0 - set re-discharge voltage to 48V (12V unit: 00.0V/12V/12.3V/12.5V/12.8V/13V/13.3V/13.5V/13.8V/14V/14.3V/14.5, 24V unit: 00.0V/24V/24.5V/25V/25.5V/26V/26.5V/27V/27.5V/28V/28.5V/29V, 48V unit: 00.0V/48V/49V/50V/51V/52V/53V/54V/55V/56V/57V/58V, 00.0V means battery is full(charging in float mode).)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -89,7 +95,9 @@ COMMANDS = {
         "description": "Set Battery Float Charging Voltage",
         "help": " -- example PBFT58.0 - set battery float charging voltage to 58V (48.0 - 58.4V for 48V unit)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -101,7 +109,9 @@ COMMANDS = {
         "description": "Set Battery Type",
         "help": " -- examples: PBT00 (set battery as AGM), PBT01 (set battery as FLOODED), PBT02 (set battery as USER)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -113,7 +123,9 @@ COMMANDS = {
         "description": "Set Device Charger Priority",
         "help": " -- examples: PCP00 (set utility first), PCP01 (set solar first), PCP02 (HS only: set solar and utility), PCP03 (set solar only charging)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -125,7 +137,9 @@ COMMANDS = {
         "description": "Set Battery C.V. (constant voltage) charging voltage",
         "help": " -- example PCVV48.0 - set charging voltage to 48V (48.0 - 58.4V for 48V unit)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -137,7 +151,9 @@ COMMANDS = {
         "description": "Set the enabled state of an Inverter setting",
         "help": " -- examples: PEa - enable a (buzzer) [a=buzzer, b=overload bypass, j=power saving, K=LCD go to default after 1min, u=overload restart, v=overtemp restart, x=backlight, y=alarm on primary source interrupt, z=fault code record]",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -149,7 +165,9 @@ COMMANDS = {
         "description": "Set the disabled state of an Inverter setting",
         "help": " -- examples: PDa - disable a (buzzer) [a=buzzer, b=overload bypass, j=power saving, K=LCD go to default after 1min, u=overload restart, v=overtemp restart, x=backlight, y=alarm on primary source interrupt, z=fault code record]",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -161,7 +179,9 @@ COMMANDS = {
         "description": "Set Control Parameters to Default Values",
         "help": " -- example PF (reset control parameters to defaults)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -172,7 +192,9 @@ COMMANDS = {
         "description": "Set Grid Working Range",
         "help": " -- examples: PCR00 (set device working range to appliance), PCR01 (set device working range to UPS)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -184,7 +206,9 @@ COMMANDS = {
         "description": "Set Device Output Source Priority",
         "help": " -- examples: POP00 (set utility first), POP01 (set solar first), POP02 (set SBU priority)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -196,7 +220,9 @@ COMMANDS = {
         "description": "Set Device Operation Logic",
         "help": " -- examples: POPLG00 (set Auto mode), POPLG01 (set Online mode), POPLG02 (set ECO mode)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -208,7 +234,9 @@ COMMANDS = {
         "description": "Set Device Output Mode (for 4000/5000)",
         "help": " -- examples: POPM01 (set unit 0 to 1 - parallel output), POPM10 (set unit 1 to 0 - single machine output), POPM02 (set unit 0 to 2 - phase 1 of 3), POPM13 (set unit 1 to 3 - phase 2 of 3), POPM24 (set unit 2 to 4 - phase 3 of 3)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -220,7 +248,9 @@ COMMANDS = {
         "description": "Set Parallel Device Charger Priority (for 4000/5000)",
         "help": " -- examples: PPCP000 (set unit 1 to 00 - utility first), PPCP101 (set unit 1 to 01 - solar first), PPCP202 (set unit 2 to 02 - solar and utility), PPCP003 (set unit 0 to 03 - solar only charging)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -232,7 +262,9 @@ COMMANDS = {
         "description": "Set PV OK Condition",
         "help": " -- examples: PPVOKC0 (as long as one unit has connected PV, parallel system will consider PV OK), PPVOKC1 (only if all inverters have connected PV, parallel system will consider PV OK)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -244,7 +276,9 @@ COMMANDS = {
         "description": "Set Battery Cut-off Voltage",
         "help": " -- example PSDV40.0 - set battery cut-off voltage to 40V (40.0 - 48.0V for 48V unit)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -256,7 +290,9 @@ COMMANDS = {
         "description": "Set Solar Power Balance",
         "help": " -- examples: PSPB0 (PV input max current will be the max charged current), PSPB1 (PV input max power will be the sum of the max charge power and loads power)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -268,7 +304,9 @@ COMMANDS = {
         "description": "Battery charge/discharge controlling command",
         "help": " -- examples: PBATCDxxx (please read description, use carefully)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -280,7 +318,9 @@ COMMANDS = {
         "description": "Set Date Time",
         "help": " -- examples: DATYYYYMMDDHHMMSS (14 digits after DAT)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -292,13 +332,17 @@ COMMANDS = {
         "description": "Battery max discharge current",
         "help": " -- examples: PBATMAXDISCxxx (000- disable or 030-150A)",
         "type": "SETTER",
-        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
         ],
         "regex": "PBATMAXDISC([01]\\d\\d)$",
     },
+}
+QUERY_COMMANDS = {
     "Q1": {
         "name": "Q1",
         "description": "Q1 query",
@@ -491,6 +535,16 @@ COMMANDS = {
             b"(S\x64\x39\r",
         ],
     },
+    "QMN": {
+        "name": "QMN",
+        "description": "Model Name Inquiry",
+        "type": "QUERY",
+        "response_type": "SEQUENTIAL",
+        "response": [["bytes.decode", "Model Name", ""]],
+        "test_responses": [
+            b"(MKS2-8000\xb2\x8d\r",
+        ],
+    },
     "QMUCHGCR": {
         "name": "QMUCHGCR",
         "description": "Max Utility Charging Current Options inquiry",
@@ -661,26 +715,28 @@ COMMANDS = {
         "description": "General Status Parameters inquiry",
         "help": " -- queries the value of various metrics from the Inverter",
         "type": "QUERY",
+        "response_type": "INDEXED",
         "response": [
-            ["float", "AC Input Voltage", "V"],
-            ["float", "AC Input Frequency", "Hz"],
-            ["float", "AC Output Voltage", "V"],
-            ["float", "AC Output Frequency", "Hz"],
-            ["int", "AC Output Apparent Power", "VA"],
-            ["int", "AC Output Active Power", "W"],
-            ["int", "AC Output Load", "%"],
-            ["int", "BUS Voltage", "V"],
-            ["float", "Battery Voltage", "V"],
-            ["int", "Battery Charging Current", "A"],
-            ["int", "Battery Capacity", "%"],
-            ["int", "Inverter Heat Sink Temperature", "°C"],
-            ["float", "PV Input Current for Battery", "A"],
-            ["float", "PV Input Voltage", "V"],
-            ["float", "Battery Voltage from SCC", "V"],
-            ["int", "Battery Discharge Current", "A"],
+            [0, "AC Input Voltage", "float", "V", {"icon": "lightning"}],
+            [1, "AC Input Frequency", "float", "Hz"],
+            [2, "AC Output Voltage", "float", "V"],
+            [3, "AC Output Frequency", "float", "Hz"],
+            [4, "AC Output Apparent Power", "int", "VA"],
+            [5, "AC Output Active Power", "int", "W"],
+            [6, "AC Output Load", "int", "%"],
+            [7, "BUS Voltage", "int", "V"],
+            [8, "Battery Voltage", "float", "V"],
+            [9, "Battery Charging Current", "int", "A"],
+            [10, "Battery Capacity", "int", "%"],
+            [11, "Inverter Heat Sink Temperature", "int", "°C"],
+            [12, "PV Input Current for Battery", "float", "A"],
+            [13, "PV Input Voltage", "float", "V"],
+            [14, "Battery Voltage from SCC", "float", "V"],
+            [15, "Battery Discharge Current", "int", "A"],
             [
-                "flags",
+                16,
                 "Device Status",
+                "flags",
                 [
                     "Is SBU Priority Version Added",
                     "Is Configuration Changed",
@@ -692,12 +748,13 @@ COMMANDS = {
                     "Is AC Charging On",
                 ],
             ],
-            ["int", "RSV1", "A"],
-            ["int", "RSV2", "A"],
-            ["int", "PV Input Power", "W"],
+            [17, "RSV1", "int", "A"],
+            [18, "RSV2", "int", "A"],
+            [19, "PV Input Power", "int", "W"],
             [
-                "flags",
+                20,
                 "Device Status2",
+                "flags",
                 ["Is Charging to Float", "Is Switched On", "Is Reserved"],
             ],
         ],
@@ -796,7 +853,11 @@ COMMANDS = {
                 ],
             ],
             ["int", "Max charging time for CV stage", "min"],
-            ["option", "Operation Logic", ["Automatic mode", "On-line mode", "ECO mode"]],
+            [
+                "option",
+                "Operation Logic",
+                ["Automatic mode", "On-line mode", "ECO mode"],
+            ],
         ],
         "test_responses": [
             b"(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1\x6F\x7E\r",
@@ -886,7 +947,8 @@ class pi30(AbstractProtocol):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"PI30"
-        self.COMMANDS = COMMANDS
+        self.COMMANDS = QUERY_COMMANDS
+        self.COMMANDS.update(SETTER_COMMANDS)
         self.STATUS_COMMANDS = ["QPIGS", "Q1"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
@@ -894,22 +956,25 @@ class pi30(AbstractProtocol):
 
     def check_response_valid(self, response):
         if response is None:
-            return False, {"ERROR": ["No response", ""]}
+            return False, {"validity check": ["Error: Response was empty", ""]}
+        if type(response) is dict:
+            response["validity check"] = ["Error: incorrect response format", ""]
+            return False, response
         if len(response) <= 3:
-            return False, {"ERROR": ["Response to short", ""]}
+            return False, {"validity check": ["Error: Response to short", ""]}
 
         if type(response) is str:
             if "(NAK" in response:
-                return False, {"ERROR": ["NAK", ""]}
+                return False, {"validity check": ["Error: NAK", ""]}
             crc_high, crc_low = crc(response[:-3])
             if [ord(response[-3]), ord(response[-2])] != [crc_high, crc_low]:
-                return False, {"ERROR": ["Invalid response CRCs", ""]}
+                return False, {"validity check": ["Error: Invalid response CRCs", ""]}
         elif type(response) is bytes:
             if b"(NAK" in response:
-                return False, {"ERROR": ["NAK", ""]}
+                return False, {"validity check": ["Error: NAK", ""]}
 
             crc_high, crc_low = crc(response[:-3])
             if response[-3:-1] != bytes([crc_high, crc_low]):
-                return False, {"ERROR": ["Invalid response CRC", ""]}
+                return False, {"validity check": ["Error: Invalid response CRCs", ""]}
         log.debug("CRCs match")
         return True, {}

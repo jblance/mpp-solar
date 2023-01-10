@@ -13,6 +13,7 @@ class PortType(Enum):
     MQTT = auto()
     VSERIAL = auto()
     DALYSERIAL = auto()
+    BLE = auto()
 
 
 log = logging.getLogger("ports")
@@ -20,19 +21,19 @@ log = logging.getLogger("ports")
 
 def get_port(config):
     log.info(f"Geting port for config '{config}'")
-    porttype = config.pop("type", None)
+    porttype = config.get("type", None)
 
     # return None if port type is not defined
     if porttype is None:
         return None
 
-    # check for
-    porttype_id = porttype.lower()
+    # transform porttype for module lookup
+    porttype_id = f"{porttype.lower()}port"
     # Try to import the porttype module with the supplied name (may not exist)
     try:
         port_module = importlib.import_module("mppsolar.ports." + porttype_id, ".")
     except ModuleNotFoundError:
-        log.error(f"No module found for porttype {porttype_id}")
+        log.error(f"No module found for porttype '{porttype_id}'")
         return None
     # Find the protocol class - classname must be the same as the protocol_id
     try:
@@ -41,4 +42,4 @@ def get_port(config):
         log.error(f"Module {port_module} has no attribute {porttype_id}")
         return None
     # Return the instantiated class
-    return port_class(config)
+    return port_class(config=config)

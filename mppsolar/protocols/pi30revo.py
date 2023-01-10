@@ -377,24 +377,26 @@ class pi30revo(AbstractProtocol):
 
     def check_response_valid(self, response):
         if response is None:
-            return False, {"ERROR": ["No response", ""]}
+            return False, {"validity check": ["Error: Response was empty", ""]}
         if len(response) <= 3:
-            return False, {"ERROR": ["Response to short", ""]}
+            return False, {"validity check": ["Error: Response to short", ""]}
 
         # This protocol responses can either have a CRC or a Checksum...
         if b"(NAK" in response:
-            return False, {"ERROR": ["NAK", ""]}
+            return False, {"validity check": ["Error: NAK", ""]}
 
         if self.is_CHK_valid(response) or self.is_CRC_valid(response):
             return True, {}
         else:
-            return False, {"ERROR": ["Invalid response CRC", ""]}
+            return False, {"validity check": ["Error: Invalid response CRCs", ""]}
 
     def get_full_command(self, command) -> bytes:
         """
         Override the default get_full_command as its different for PI30REVO
         """
-        log.info(f"sing protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
+        log.info(
+            f"sing protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
+        )
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)

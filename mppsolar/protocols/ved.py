@@ -122,6 +122,7 @@ class ved(AbstractProtocol):
     """
     VED - VEDirect protocol handler
     """
+
     def __str__(self):
         return "VED protocol handler for Victron direct SmartShunts"
 
@@ -141,7 +142,9 @@ class ved(AbstractProtocol):
         """
         Override the default get_full_command as its different for VEDirect
         """
-        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
+        log.info(
+            f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
+        )
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
@@ -181,7 +184,7 @@ class ved(AbstractProtocol):
         VED Text protocol - no validity check
         """
         if not response:
-            return False, {"ERROR": ["No response", ""]}
+            return False, {"validity check": ["Error: Response was empty", ""]}
         if b":" in response:
             # HEX protocol response
             log.debug(f"checking validity of {response}")
@@ -194,13 +197,15 @@ class ved(AbstractProtocol):
             data = _r[:-1]
             checksum = _r[-1:][0]
             if vedHexChecksum(data) == checksum:
-                log.debug(f"VED Hex Checksum matches in response '{response}' checksum:{checksum}")
+                log.debug(
+                    f"VED Hex Checksum matches in response '{response}' checksum:{checksum}"
+                )
                 return True, {}
             else:
                 # print("VED Hex Checksum does not match")
                 return False, {
-                    "ERROR": [
-                        f"VED HEX checksum did not match for response {response}",
+                    "validity check": [
+                        f"Error: VED HEX checksum did not match for response {response}",
                         "",
                     ]
                 }

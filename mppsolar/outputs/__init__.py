@@ -64,22 +64,36 @@ def get_outputs(output_list):
     return ops
 
 
-def output_results(results, outputs, mqtt_broker):
-    print(outputs)
+def output_results(results, command, mqtt_broker):
+    # "normal command definition"
+    # - command: QPIGS
+    #   outputs:
+    #   - name: screen
+    #   - name: mqtt
+    #     results_topic: results/qpigs
+    #
+    # or "adhoc_commands"
+    #  topic: test/command_topic
+    #  outputs:
+    #  - name: screen
 
+    # Check if an outputs section was supplied
+    if "outputs" in command:
+        outputs = command["outputs"]
+    # if not default to screen
+    else:
+        outputs["name"] = "screen"
     for op in outputs:
-        # maybe include the command and what the command is im the output
-        # eg QDI run, Display Inverter Default Settings
         # filter = config.get("CONFIG", "filter")
         # log.debug(f"Using output filter: {filter}")
-        output = get_output(op["name"])
+        if "name" in op:
+            output = get_output(op["name"])
+        else:
+            output = get_output("screen")
         output.output(
             data=dict(results),
-            # tag=config.get("CONFIG", "tag"),
+            config=op,
             mqtt_broker=mqtt_broker,
-            # filter=filter,
-            # excl_filter=excl_filter,
-            # keep_case=keep_case,
         )
 
 

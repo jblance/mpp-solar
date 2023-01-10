@@ -4,7 +4,7 @@ import logging
 import re
 from typing import Tuple
 
-from ..helpers import get_resp_defn
+from ..helpers import get_resp_defn, get_value
 from .protocol_helpers import BigHex2Short, BigHex2Float  # noqa: F401
 from .protocol_helpers import LittleHex2Float, LittleHex2Short  # noqa: F401
 from .protocol_helpers import LittleHex2UInt, LittleHex2Int  # noqa: F401
@@ -37,7 +37,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         result[
             "_command_description"
         ] = f"List available commands for protocol {str(self._protocol_id, 'utf-8')}"
-        for command in self.COMMANDS:
+        for command in sorted(self.COMMANDS):
             if "help" in self.COMMANDS[command]:
                 info = (
                     self.COMMANDS[command]["description"]
@@ -96,7 +96,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         Simplest validity check, CRC checks should be added to individual protocols
         """
         if response is None:
-            return False, {"ERROR": ["No response", ""]}
+            return False, {"validity check": ["Error: Response was empty", ""]}
         return True, {}
 
     def process_response(
@@ -117,28 +117,47 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         )
         if data_type == "loop":
             log.warning("loop not implemented...")
-            return data_name, None, data_units
+            return [(data_name, None, data_units)]
         if data_type == "exclude" or data_type == "discard" or raw_value == "extra":
             # Just ignore these ones
             log.debug(f"Discarding {data_name}:{raw_value}")
-            return None, raw_value, data_units
+            return [(None, raw_value, data_units)]
         if data_type == "option":
             try:
                 key = int(raw_value)
                 r = data_units[key]
             except ValueError:
                 r = f"Unable to process to int: {raw_value}"
-                return None, r, ""
+                return [(None, r, "")]
             except IndexError:
                 r = f"Invalid option: {key}"
-            return data_name, r, ""
+            return [(data_name, r, "")]
         if data_type == "hex_option":
             key = int(raw_value[0])
             if key < len(data_units):
                 r = data_units[key]
             else:
                 r = f"Invalid hex_option: {key}"
-            return data_name, r, ""
+            return [(data_name, r, "")]
+        if data_type == "flags":
+            log.debug("flags defn")
+            # [
+            #     "flags",
+            #     "Device Status",
+            #     [
+            #         "Is SBU Priority Version Added",
+            #         "Is SCC Firmware Updated",
+            #         "Is Load On",
+            #     ],
+            # ],
+            return_value = []
+            for i, flag in enumerate(raw_value):
+                return_value.append((data_units[i], int(chr(flag)), "bool"))
+
+            # if flag != "" and flag != b'':
+            # msgs[resp_format[2][j]] = [int(flag), "bool"]
+            # print(j, int(flag))
+            return return_value
         if data_type == "keyed":
             log.debug("keyed defn")
             # [
@@ -159,7 +178,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 r = data_units[key]
             else:
                 r = f"Invalid key: {key}"
-            return data_name, r, ""
+            return [(data_name, r, "")]
         if data_type == "str_keyed":
             log.debug("str_keyed defn")
             # [
@@ -182,23 +201,25 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 r = data_units[key]
             else:
                 r = f"Invalid key: {key}"
-            return data_name, r, ""
+            return [(data_name, r, "")]
         format_string = f"{data_type}(raw_value)"
         log.debug(f"Processing format string {format_string}")
         try:
             r = eval(format_string)
         except ValueError as e:
             log.info(f"Failed to eval format {format_string} (returning 0), error: {e}")
-            return data_name, 0, data_units
+            return [(data_name, 0, data_units)]
         except TypeError as e:
             log.warning(f"Failed to eval format {format_string}, error: {e}")
-            return data_name, format_string, data_units
+            return [(data_name, format_string, data_units)]
         if template is not None:
+            # eg template=r/1000
             r = eval(template)
         if "{" in data_name:
+            # eg "f'Frame Number {f:02d}'"
             f = frame_number  # noqa: F841
             data_name = eval(data_name)
-        return data_name, r, data_units
+        return [(data_name, r, data_units)]
 
     def decode(self, response, command) -> dict:
         """
@@ -206,10 +227,21 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         """
 
         log.info(f"response passed to decode: {response}")
+        msgs = {}
 
-        valid, msgs = self.check_response_valid(response)
+        # Add metadata
+        msgs["_command"] = command
+        # Check for a stored command definition
+        command_defn = self.get_command_defn(command)
+        if command_defn is not None:
+            msgs["_command_description"] = command_defn["description"]
+            len_command_defn = len(command_defn["response"])
+
+        # Check response is valid
+        valid, _msg = self.check_response_valid(response)
         if not valid:
-            log.info(msgs["ERROR"][0])
+            msgs.update(_msg)
+            log.info(f"validity check fail: {_msg}")
             return msgs
 
         # Add Raw response
@@ -222,14 +254,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         raw_response = _response.decode("utf-8")
         msgs["raw_response"] = [raw_response, ""]
 
-        # Add metadata
-        msgs["_command"] = command
-        # Check for a stored command definition
-        command_defn = self.get_command_defn(command)
-        if command_defn is not None:
-            msgs["_command_description"] = command_defn["description"]
-            len_command_defn = len(command_defn["response"])
-        else:
+        if command_defn is None:
             # No definition, so just return the data
             len_command_defn = 0
             log.debug(
@@ -419,6 +444,28 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     data_name = response_defn[1]  # 2
                     data_units = response_defn[2]  # 3
 
+                elif response_type == "INDEXED":
+                    log.debug("Processing INDEXED type responses")
+                    # [1, "AC Input Voltage", "float", "V", {icon: blah}]
+                    # check for extra definitions...
+                    extra_responses_needed = len(command_defn["response"]) - len(frame)
+                    if extra_responses_needed > 0:
+                        for _ in range(extra_responses_needed):
+                            frame.append("extra")
+
+                    # Check if we are past the 'known' responses
+                    if i >= len_command_defn:
+                        response_defn = [i, "str", f"Unknown value in response {i}", ""]
+                    else:
+                        response_defn = command_defn["response"][i]
+                    log.debug(f"Got defn {response_defn}")
+                    raw_value = response
+                    # data_posi = get_value(response_defn, 0)
+                    data_name = get_value(response_defn, 1)
+                    data_type = get_value(response_defn, 2)
+                    data_units = get_value(response_defn, 3)
+                    # extra_info = get_value(response_defn, 4)
+
                     # print(f"{data_type=}, {data_name=}, {raw_value=}")
                 elif response_type in ["POSITIONAL", "MULTIFRAME-POSITIONAL"]:
                     log.debug("Processing POSITIONAL type responses")
@@ -466,6 +513,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     lookup = eval(template)
                     log.debug(f"looking up values for: {lookup}")
                     value, data_units = m[lookup]
+                    if data_name is not None:
+                        msgs[data_name] = [value, data_units]
                 elif data_type.startswith("info"):
                     log.debug("processing info...")
                     # print(
@@ -475,18 +524,29 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     # Provide cv as shortcut to self._command_value for info fields
                     cv = self._command_value  # noqa: F841
                     value = eval(template)
+                    if data_name is not None:
+                        msgs[data_name] = [value, data_units]
                 else:
                     # Process response
-                    data_name, value, data_units = self.process_response(
+                    processed_responses = self.process_response(
                         data_name=data_name,
                         raw_value=raw_value,
                         data_units=data_units,
                         data_type=data_type,
                         frame_number=frame_number,
                     )
-                # print(data_type, data_name, raw_value, value)
-                if data_name is not None:
-                    msgs[data_name] = [value, data_units]
+                    # data_name, value, data_units = self.process_response(
+                    #     data_name=data_name,
+                    #     raw_value=raw_value,
+                    #     data_units=data_units,
+                    #     data_type=data_type,
+                    #     frame_number=frame_number,
+                    # )
+                    # print(data_type, data_name, raw_value, value)
+                    for item in processed_responses:
+                        data_name, value, data_units = item
+                        if data_name is not None:
+                            msgs[data_name] = [value, data_units]
             # print(f"{i=} {response=} {len(command_defn['response'])}")
 
         return msgs

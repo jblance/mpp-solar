@@ -11,11 +11,11 @@ class Port(ABC):
         raise NotImplementedError
 
     def connect(self) -> None:
-        log.debug("connect not implemented")
+        log.debug("Port connect not implemented")
         return
 
     def disconnect(self) -> None:
-        log.debug("disconnect not implemented")
+        log.debug("Port disconnect not implemented")
         return
 
     def process_command(self, command, protocol):

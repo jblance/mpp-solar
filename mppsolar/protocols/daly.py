@@ -190,6 +190,7 @@ class daly(AbstractProtocol):
     """
     DALY - Daly BMS protocol handler
     """
+
     def __str__(self):
         return "Daly BMS protocol handler"
 
@@ -210,7 +211,9 @@ class daly(AbstractProtocol):
         """
         Override the default get_full_command as its different
         """
-        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
+        log.info(
+            f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
+        )
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
@@ -243,10 +246,9 @@ class daly(AbstractProtocol):
         """
         DALY protocol - checksum is sum of bytes
         """
-        if not response:
-            return False, {"ERROR": ["No response", ""]}
-
         log.debug(f"checking validity of {response}")
+        if not response:
+            return False, {"validity check": ["Error: Response was empty", ""]}
 
         # Check to see if the response is a multi frame response
         if self.is_multiframe(response):
@@ -259,11 +261,18 @@ class daly(AbstractProtocol):
         data = _r[:-1]
         checksum = _r[-1:][0]
         if dalyChecksum(data) == checksum:
-            log.debug(f"DALY Checksum matches response '{response}' checksum:{checksum}")
+            log.debug(
+                f"DALY Checksum matches response '{response}' checksum:{checksum}"
+            )
             return True, {}
         else:
             # print("VED Hex Checksum does not match")
-            return False, {"ERROR": [f"DALY checksum did not match for response {response}", ""]}
+            return False, {
+                "validity check": [
+                    f"Error: DALY checksum did not match for response {response}",
+                    "",
+                ]
+            }
 
     def get_responses(self, response):
         """
@@ -280,7 +289,10 @@ class daly(AbstractProtocol):
             # Have multiple frames of positional data
             # Split into frames
             frame_size = self._command_defn["response_length"]
-            frames = [response[i : i + frame_size] for i in range(0, len(response), frame_size)]
+            frames = [
+                response[i : i + frame_size]
+                for i in range(0, len(response), frame_size)
+            ]
             log.info(f"Multi frame response with {len(frames)} frames")
             # Loop through each frame and process as per definition
             for frame in frames:
@@ -296,7 +308,10 @@ class daly(AbstractProtocol):
             # print(responses)
             return responses
 
-        if self._command_defn is not None and self._command_defn["response_type"] == "POSITIONAL":
+        if (
+            self._command_defn is not None
+            and self._command_defn["response_type"] == "POSITIONAL"
+        ):
             # Have a POSITIONAL type response, so need to break it up...
             # example defn :
             # "response": [

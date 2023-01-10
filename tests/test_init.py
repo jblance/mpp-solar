@@ -1,19 +1,19 @@
 import unittest
 
 import mppsolar
-from mppsolar.outputs.baseoutput import baseoutput
-from mppsolar.devices.mppsolar import mppsolar as _mppsolar
 from mppsolar.devices.jkbms import jkbms as _jkbms
+from mppsolar.devices.mppsolar import mppsolar as _mppsolar
+from mppsolar.outputs.baseoutput import baseoutput
 
 # from mppsolar.devices.device import AbstractDevice as _abstractdevice
 
 
 class test_init(unittest.TestCase):
+    maxDiff = 9999
+
     def test_get_outputs(self):
         """test the get_outputs command"""
-        list_of_outputs = (
-            "hass_mqtt,influx_mqtt,influx2_mqtt,json_mqtt,json,mqtt,raw,screen,tag_mqtt,json_udp"
-        )
+        list_of_outputs = "hass_mqtt,influx_mqtt,influx2_mqtt,json_mqtt,json_units,json,mqtt,raw,screen,tag_mqtt,json_udp"
         outputs = mppsolar.get_outputs(list_of_outputs)
 
         # Check all outputs are valid
@@ -33,8 +33,3 @@ class test_init(unittest.TestCase):
         device_class = mppsolar.get_device_class("jkbms")
         self.assertEqual(device_class, _jkbms)
         self.assertEqual(device_class, type(_jkbms()))
-
-        # print(mppsolar.main())
-
-    # def test_get_main(self):
-    #     print(mppsolar.main())

@@ -1,7 +1,6 @@
 import logging
 
 from .pi30max import pi30max
-from .protocol_helpers import crcPI as crc
 
 log = logging.getLogger("pi30mst")
 
@@ -47,25 +46,3 @@ class pi30mst(pi30max):
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
         # log.info(f'Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands')
-
-    def check_response_valid(self, response):
-        if response is None:
-            return False, {"ERROR": ["No response", ""]}
-        if len(response) <= 3:
-            return False, {"ERROR": ["Response to short", ""]}
-
-        if type(response) is str:
-            if "(NAK" in response:
-                return False, {"ERROR": ["NAK", ""]}
-            crc_high, crc_low = crc(response[:-3])
-            if [ord(response[-3]), ord(response[-2])] != [crc_high, crc_low]:
-                return False, {"ERROR": ["Invalid response CRCs", ""]}
-        elif type(response) is bytes:
-            if b"(NAK" in response:
-                return False, {"ERROR": ["NAK", ""]}
-
-            crc_high, crc_low = crc(response[:-3])
-            if response[-3:-1] != bytes([crc_high, crc_low]):
-                return False, {"ERROR": ["Invalid response CRC", ""]}
-        log.debug("CRCs match")
-        return True, {}

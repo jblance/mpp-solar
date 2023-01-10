@@ -1,7 +1,6 @@
 import logging
 
 from .pi30 import pi30
-from .protocol_helpers import crcPI as crc
 
 log = logging.getLogger("pi30max")
 
@@ -713,16 +712,6 @@ QUERY_COMMANDS = {
             b"(1 030 030 080 021 55.40 224 030 0 0234y?\r",
         ],
     },
-    "QMN": {
-        "name": "QMN",
-        "description": "Model Name Inquiry",
-        "type": "QUERY",
-        "response_type": "SEQUENTIAL",
-        "response": [["bytes.decode", "Model Name", ""]],
-        "test_responses": [
-            b"(MKS2-8000\xb2\x8d\r",
-        ],
-    },
     "QET": {
         "name": "QET",
         "description": "Total PV Generated Energy Inquiry",
@@ -968,25 +957,3 @@ class pi30max(pi30):
         log.info(
             f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
         )
-
-    def check_response_valid(self, response):
-        if response is None:
-            return False, {"ERROR": ["No response", ""]}
-        if len(response) <= 3:
-            return False, {"ERROR": ["Response to short", ""]}
-
-        if type(response) is str:
-            if "(NAK" in response:
-                return False, {"ERROR": ["NAK", ""]}
-            crc_high, crc_low = crc(response[:-3])
-            if [ord(response[-3]), ord(response[-2])] != [crc_high, crc_low]:
-                return False, {"ERROR": ["Invalid response CRCs", ""]}
-        elif type(response) is bytes:
-            if b"(NAK" in response:
-                return False, {"ERROR": ["NAK", ""]}
-
-            crc_high, crc_low = crc(response[:-3])
-            if response[-3:-1] != bytes([crc_high, crc_low]):
-                return False, {"ERROR": ["Invalid response CRC", ""]}
-        log.debug("CRCs match")
-        return True, {}

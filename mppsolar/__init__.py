@@ -3,7 +3,7 @@ import logging
 from argparse import ArgumentParser
 
 from .helpers import get_device_class
-from .libs.mqttbroker import MqttBroker
+from .libs.mqttbrokerc import MqttBroker
 from .outputs import get_outputs, list_outputs
 from .protocols import list_protocols
 from .version import __version__  # noqa: F401
@@ -45,7 +45,7 @@ def main():
             type=str,
             const="help",
             help="Specifies the device command and response protocol, (default: JK04)",
-            default="JK04"
+            default="JK04",
         )
     else:
         parser.add_argument(
@@ -55,7 +55,7 @@ def main():
             type=str,
             const="help",
             help="Specifies the device command and response protocol, (default: PI30)",
-            default="PI30"
+            default="PI30",
         )
     parser.add_argument(
         "-T",
@@ -226,11 +226,19 @@ def main():
         op.output(data=list_protocols())
         exit()
 
+    # mqttbroker:
+    #     name: null
+    #     port: 1883
+    #     user: null
+    #     pass: null
+
     mqtt_broker = MqttBroker(
-        name=args.mqttbroker,
-        port=args.mqttport,
-        username=args.mqttuser,
-        password=args.mqttpass,
+        config={
+            "name": args.mqttbroker,
+            "port": args.mqttport,
+            "user": args.mqttuser,
+            "pass": args.mqttpass,
+        }
     )
     mqtt_broker.set(
         "results_topic", (args.mqtttopic if args.mqtttopic is not None else prog_name)

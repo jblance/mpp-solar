@@ -10,12 +10,16 @@ from .port import Port
 log = logging.getLogger("Test")
 
 
-class test(Port):
+class testport(Port):
     def __init__(self, *args, **kwargs) -> None:
         # self._test_data = None
         # self._counter = 0
         # self._device = get_kwargs(kwargs, "device_path")
-        log.debug("test port", *args, **kwargs)
+        log.debug(f"Initializing test port args:{args}, kwargs: {kwargs}")
+
+    def connect(self) -> None:
+        log.debug("Test port connected")
+        return
 
     def send_and_receive(self, *args, **kwargs) -> dict:
         # full_command = get_kwargs(kwargs, "full_command")

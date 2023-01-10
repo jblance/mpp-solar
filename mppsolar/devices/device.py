@@ -108,9 +108,8 @@ class AbstractDevice(ABC):
                 ]
             }
         # dict is returned on exception
-
-        if isinstance(raw_response, dict):
-            return raw_response
+        # if isinstance(raw_response, dict):
+        #     return raw_response
 
         # Decode response
         decoded_response = self._protocol.decode(raw_response, command)

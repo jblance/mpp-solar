@@ -31,6 +31,16 @@ def key_wanted(key, filter=None, excl_filter=None):
         return False
 
 
+def get_value(_list, _index):
+    """
+    get the value from _list or return None if _index is out of bounds
+    """
+    # print(_list, len(_list))
+    if _index >= len(_list):
+        return None
+    return _list[_index]
+
+
 def get_resp_defn(key, defns):
     """
     look for a definition for the supplied key
@@ -52,27 +62,6 @@ def get_resp_defn(key, defns):
     return [key, key, "", ""]
 
 
-# def get_outputs(output_list):
-#     """
-#     Take a comma separated list of output names
-#     attempt to find and instantiate the corresponding module
-#     return array of modules
-#     """
-#     ops = []
-#     outputs = output_list.split(",")
-#     for output in outputs:
-#         log.info(f"attempting to create output processor: {output}")
-#         try:
-#             output_module = importlib.import_module("mppsolar.outputs." + output, ".")
-#             output_class = getattr(output_module, output)
-#             ops.append(output_class())
-#         except ModuleNotFoundError:
-#             # perhaps raise a Powermon exception here??
-#             # maybe warn and keep going, only error if no outputs found?
-#             log.critical(f"No module found for output processor {output}")
-#     return ops
-
-
 def get_device_class(device_type=None):
     """
     Take a device type string
@@ -90,3 +79,19 @@ def get_device_class(device_type=None):
         return None
     device_class = getattr(device_module, device_type)
     return device_class
+
+
+def getMaxLen(d):
+    _maxLen = 0
+    for i in d:
+        if type(i) == list:
+            i = i[0]
+        if len(i) > _maxLen:
+            _maxLen = len(i)
+    return _maxLen
+
+
+def pad(text, length):
+    if len(text) > length:
+        return text
+    return text.ljust(length, " ")
