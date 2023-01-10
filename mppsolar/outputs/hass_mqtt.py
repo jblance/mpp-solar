@@ -52,23 +52,36 @@ class hass_mqtt(mqtt):
                 # <discovery_prefix>/<component>/[<node_id>/]<object_id>/config
                 # topic "homeassistant/binary_sensor/garden/config"
                 # msg '{"name": "garden", "device_class": "motion", "state_topic": "homeassistant/binary_sensor/garden/state", "unit_of_measurement": "°C"}'
-                topic = f"homeassistant/sensor/mpp_{tag}_{key}/config"
-                topic = topic.replace(" ", "_")
-                name = f"{tag} {_key}"
-                if unit == "W":
-                    payload = f'{{"name": "{name}", "state_topic": "homeassistant/sensor/mpp_{tag}_{key}/state", "unit_of_measurement": "{unit}", "unique_id": "mpp_{tag}_{key}", "state_class": "measurement", "device_class": "power", "force_update": "true" }}'
+                if unit == "bool":
+                    topic = f"homeassistant/binary_sensor/mpp_{tag}_{key}/config"
+                    topic = topic.replace(" ", "_")
+                    name = f"{tag} {_key}"
+                    payload = f'{{"name": "{name}", "state_topic": "homeassistant/binary_sensor/mpp_{tag}_{key}/state", "unique_id": "mpp_{tag}_{key}", "force_update": "true" }}'
+                    msg = {"topic": topic, "payload": payload}
+                    msgs.append(msg)
+                    topic = f"homeassistant/binary_sensor/mpp_{tag}_{key}/state"
+                    msg = {"topic": topic, "payload": value}
+                    msgs.append(msg)
                 else:
-                    payload = f'{{"name": "{name}", "state_topic": "homeassistant/sensor/mpp_{tag}_{key}/state", "unit_of_measurement": "{unit}", "unique_id": "mpp_{tag}_{key}", "force_update": "true" }}'
-                # msg = {"topic": topic, "payload": payload, "retain": True}
-                msg = {"topic": topic, "payload": payload}
-                msgs.append(msg)
-                #
-                # VALUE SETTING
-                #
-                # unit = data[key][1]
-                # 'tag'/status/total_output_active_power/value 1250
-                # 'tag'/status/total_output_active_power/unit W
-                topic = f"homeassistant/sensor/mpp_{tag}_{key}/state"
-                msg = {"topic": topic, "payload": value}
-                msgs.append(msg)
+                    topic = f"homeassistant/sensor/mpp_{tag}_{key}/config"
+                    topic = topic.replace(" ", "_")
+                    name = f"{tag} {_key}"
+                    if unit == "W":
+                        payload = f'{{"name": "{name}", "state_topic": "homeassistant/sensor/mpp_{tag}_{key}/state", "unit_of_measurement": "{unit}", "unique_id": "mpp_{tag}_{key}", "state_class": "measurement", "device_class": "power", "force_update": "true" }}'
+                    elif unit == "":
+                        payload = f'{{"name": "{name}", "state_topic": "homeassistant/sensor/mpp_{tag}_{key}/state", "unique_id": "mpp_{tag}_{key}", "force_update": "true" }}'
+                    else:
+                        payload = f'{{"name": "{name}", "state_topic": "homeassistant/sensor/mpp_{tag}_{key}/state", "unit_of_measurement": "{unit}", "unique_id": "mpp_{tag}_{key}", "force_update": "true" }}'
+                    # msg = {"topic": topic, "payload": payload, "retain": True}
+                    msg = {"topic": topic, "payload": payload}
+                    msgs.append(msg)
+                    #
+                    # VALUE SETTING
+                    #
+                    # unit = data[key][1]
+                    # 'tag'/status/total_output_active_power/value 1250
+                    # 'tag'/status/total_output_active_power/unit W
+                    topic = f"homeassistant/sensor/mpp_{tag}_{key}/state"
+                    msg = {"topic": topic, "payload": value}
+                    msgs.append(msg)
         return msgs
