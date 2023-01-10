@@ -199,7 +199,7 @@ QUERY_COMMANDS = {
             ],
             [18, "Battery Voltage Offset for Fans On", "int", "10mV"],
             [19, "EEPROM Version", "int", ""],
-            [20, "PV1 Charging Power", "int", "W"],
+            [20, "PV1 Charging Power", "int", "W", {"icon": "solar-power"}],
             [
                 21,
                 "Device Status2",
