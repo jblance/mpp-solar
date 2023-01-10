@@ -64,7 +64,7 @@ def get_outputs(output_list):
     return ops
 
 
-def output_results(results, command, mqtt_broker):
+def output_results(results, command, mqtt_broker, fullconfig={}):
     # "normal command definition"
     # - command: QPIGS
     #   outputs:
@@ -94,6 +94,7 @@ def output_results(results, command, mqtt_broker):
             data=dict(results),
             config=op,
             mqtt_broker=mqtt_broker,
+            fullconfig=fullconfig,
         )
 
 

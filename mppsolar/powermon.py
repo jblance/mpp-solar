@@ -201,6 +201,7 @@ def main():
                         results=results,
                         command=config["mqttbroker"]["adhoc_commands"],
                         mqtt_broker=mqtt_broker,
+                        fullconfig=config,
                     )
                 # process 'normal' commands
                 if not inDelay:
@@ -217,6 +218,7 @@ def main():
                         results=results,
                         command=command,
                         mqtt_broker=mqtt_broker,
+                        fullconfig=config,
                     )
                     # pause
                     # pause_time = config["command_pause"]
