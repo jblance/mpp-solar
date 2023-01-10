@@ -95,13 +95,16 @@ class hassd_mqtt(mqtt):
         for _key in _data:
             value = _data[_key][0]
             unit = _data[_key][1]
+            icon = None
+            if len(_data[_key]) > 2 and _data[_key][2] and "icon" in _data[_key][2]:
+                icon = _data[_key][2]["icon"]
 
             #
             # CONFIG / AUTODISCOVER
             #
             # <discovery_prefix>/<component>/[<node_id>/]<object_id>/config
             # topic "homeassistant/binary_sensor/garden/config"
-            # msg '{"name": "garden", "device_class": "motion", "state_topic": "homeassistant/binary_sensor/garden/state", "unit_of_measurement": "°C"}'
+            # msg '{"name": "garden", "device_class": "motion", "state_topic": "homeassistant/binary_sensor/garden/state", "unit_of_measurement": "°C", "icon": "power-plug"}'
 
             # For binary sensors
             if unit == "bool":
@@ -129,6 +132,8 @@ class hassd_mqtt(mqtt):
             }
             if unit == "W":
                 payload.update({"state_class": "measurement", "device_class": "power"})
+            if icon:
+                payload.update({"icon": icon})
             # msg = {"topic": topic, "payload": payload, "retain": True}
             payloads = js.dumps(payload)
             # print(payloads)

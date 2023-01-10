@@ -86,4 +86,8 @@ class screen(baseoutput):
         for key in displayData:
             value = displayData[key][0]
             unit = displayData[key][1]
-            print(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}")
+            if len(displayData[key]) > 2 and displayData[key][2]:
+                extra = displayData[key][2]
+                print(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}\t{extra}")
+            else:
+                print(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}")

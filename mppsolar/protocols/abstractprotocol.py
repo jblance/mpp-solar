@@ -106,6 +106,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         data_units=None,
         raw_value=None,
         frame_number=0,
+        extra_info=None,
     ):
         template = None
         # Check for a format modifying template
@@ -117,28 +118,28 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         )
         if data_type == "loop":
             log.warning("loop not implemented...")
-            return [(data_name, None, data_units)]
+            return [(data_name, None, data_units, extra_info)]
         if data_type == "exclude" or data_type == "discard" or raw_value == "extra":
             # Just ignore these ones
             log.debug(f"Discarding {data_name}:{raw_value}")
-            return [(None, raw_value, data_units)]
+            return [(None, raw_value, data_units, extra_info)]
         if data_type == "option":
             try:
                 key = int(raw_value)
                 r = data_units[key]
             except ValueError:
                 r = f"Unable to process to int: {raw_value}"
-                return [(None, r, "")]
+                return [(None, r, "", None)]
             except IndexError:
                 r = f"Invalid option: {key}"
-            return [(data_name, r, "")]
+            return [(data_name, r, "", extra_info)]
         if data_type == "hex_option":
             key = int(raw_value[0])
             if key < len(data_units):
                 r = data_units[key]
             else:
                 r = f"Invalid hex_option: {key}"
-            return [(data_name, r, "")]
+            return [(data_name, r, "", extra_info)]
         if data_type == "flags":
             log.debug("flags defn")
             # [
@@ -152,7 +153,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             # ],
             return_value = []
             for i, flag in enumerate(raw_value):
-                return_value.append((data_units[i], int(chr(flag)), "bool"))
+                return_value.append((data_units[i], int(chr(flag)), "bool", None))
 
             # if flag != "" and flag != b'':
             # msgs[resp_format[2][j]] = [int(flag), "bool"]
@@ -178,7 +179,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 r = data_units[key]
             else:
                 r = f"Invalid key: {key}"
-            return [(data_name, r, "")]
+            return [(data_name, r, "", None)]
         if data_type == "str_keyed":
             log.debug("str_keyed defn")
             # [
@@ -201,17 +202,17 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 r = data_units[key]
             else:
                 r = f"Invalid key: {key}"
-            return [(data_name, r, "")]
+            return [(data_name, r, "", extra_info)]
         format_string = f"{data_type}(raw_value)"
         log.debug(f"Processing format string {format_string}")
         try:
             r = eval(format_string)
         except ValueError as e:
             log.info(f"Failed to eval format {format_string} (returning 0), error: {e}")
-            return [(data_name, 0, data_units)]
+            return [(data_name, 0, data_units, extra_info)]
         except TypeError as e:
             log.warning(f"Failed to eval format {format_string}, error: {e}")
-            return [(data_name, format_string, data_units)]
+            return [(data_name, format_string, data_units, extra_info)]
         if template is not None:
             # eg template=r/1000
             r = eval(template)
@@ -219,7 +220,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             # eg "f'Frame Number {f:02d}'"
             f = frame_number  # noqa: F841
             data_name = eval(data_name)
-        return [(data_name, r, data_units)]
+        return [(data_name, r, data_units, extra_info)]
 
     def decode(self, response, command) -> dict:
         """
@@ -404,6 +405,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         for frame_number, frame in enumerate(frames):
 
             for i, response in enumerate(frame):
+                extra_info = None
                 if response_type == "KEYED":
                     log.debug("Processing KEYED type responses")
                     # example defn ["V", "Main or channel 1 (battery) voltage", "V", "float:r/1000"]
@@ -464,7 +466,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     data_name = get_value(response_defn, 1)
                     data_type = get_value(response_defn, 2)
                     data_units = get_value(response_defn, 3)
-                    # extra_info = get_value(response_defn, 4)
+                    extra_info = get_value(response_defn, 4)
 
                     # print(f"{data_type=}, {data_name=}, {raw_value=}")
                 elif response_type in ["POSITIONAL", "MULTIFRAME-POSITIONAL"]:
@@ -514,7 +516,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     log.debug(f"looking up values for: {lookup}")
                     value, data_units = m[lookup]
                     if data_name is not None:
-                        msgs[data_name] = [value, data_units]
+                        msgs[data_name] = [value, data_units, extra_info]
                 elif data_type.startswith("info"):
                     log.debug("processing info...")
                     # print(
@@ -525,7 +527,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     cv = self._command_value  # noqa: F841
                     value = eval(template)
                     if data_name is not None:
-                        msgs[data_name] = [value, data_units]
+                        msgs[data_name] = [value, data_units, extra_info]
                 else:
                     # Process response
                     processed_responses = self.process_response(
@@ -534,6 +536,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         data_units=data_units,
                         data_type=data_type,
                         frame_number=frame_number,
+                        extra_info=extra_info,
                     )
                     # data_name, value, data_units = self.process_response(
                     #     data_name=data_name,
@@ -544,9 +547,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     # )
                     # print(data_type, data_name, raw_value, value)
                     for item in processed_responses:
-                        data_name, value, data_units = item
+                        data_name, value, data_units, extra_info = item
                         if data_name is not None:
-                            msgs[data_name] = [value, data_units]
+                            msgs[data_name] = [value, data_units, extra_info]
             # print(f"{i=} {response=} {len(command_defn['response'])}")
 
         return msgs
