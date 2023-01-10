@@ -31,6 +31,8 @@ class hassd_mqtt(mqtt):
         config = get_kwargs(kwargs, "config")
         if config is not None:
             log.debug(f"config: {config}")
+            # try for fullconfig
+            fullconfig = get_kwargs(kwargs, "fullconfig")
             # get results topic
             # results_topic = config.get("results_topic", None)
             # get formatting info
@@ -39,7 +41,11 @@ class hassd_mqtt(mqtt):
             filter = config.get("filter", None)
             excl_filter = config.get("excl_filter", None)
             tag = config.get("tag", None)
-            # device_name =
+            device = fullconfig.get("device", {})
+            device_name = device.get("name", "mppsolar")
+            device_id = device.get("id", "mppsolar")
+            device_model = device.get("model", "mppsolar")
+            device_manufacturer = device.get("manufacturer", "mppsolar")
         else:
             # results_topic = None
             # get formatting info
@@ -48,7 +54,10 @@ class hassd_mqtt(mqtt):
             filter = get_kwargs(kwargs, "filter")
             excl_filter = get_kwargs(kwargs, "excl_filter")
             tag = get_kwargs(kwargs, "tag")
-        device_name = get_kwargs(kwargs, "name", "mppsolar")
+            device_name = get_kwargs(kwargs, "name", "mppsolar")
+            device_id = device_name
+            device_model = device_name
+            device_manufacturer = "MPP-Solar"
 
         if filter is not None:
             filter = re.compile(filter)
@@ -113,10 +122,10 @@ class hassd_mqtt(mqtt):
 
             # payload["device"] = {"name": f"{device_name}", "identifiers": ["mppsolar"], "model": "PIP6048MAX", "manufacturer": "MPP-Solar"}
             payload["device"] = {
-                "name": f"{device_name}",
-                "identifiers": [f"{device_name}"],
-                "model": f"{device_name}",
-                "manufacturer": "MPP-Solar",
+                "name": device_name,
+                "identifiers": [device_id],
+                "model": device_model,
+                "manufacturer": device_manufacturer,
             }
             if unit == "W":
                 payload.update({"state_class": "measurement", "device_class": "power"})

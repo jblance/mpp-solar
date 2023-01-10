@@ -1,5 +1,5 @@
 device:
-  name: Inverter_2
+  name: Test_Inverter
   id: 123456789
   model: 8048MAX
   manufacturer: MPP-Solar
@@ -25,7 +25,10 @@ commands:
     f_command: f'QED{(date.today()-timedelta(days=1)).strftime("%Y%m%d")}'
     outputs:
     - name: screen
+      filter: pv
     - name: hassd_mqtt
+      filter: pv
+      tag: QED
   # - command: QPIRI
   #   outputs:
   #   - name: screen

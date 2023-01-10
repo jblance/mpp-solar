@@ -82,7 +82,7 @@ def main():
         nargs="?",
         type=str,
         help="Full location of config file",
-        const="/etc/mpp-solar/powermon.yml",
+        const="./powermon.yaml",
         default=None,
     )
     parser.add_argument(
@@ -108,6 +108,12 @@ def main():
     )
     parser.add_argument(
         "-I", "--info", action="store_true", help="Enable Info and above level messages"
+    )
+    parser.add_argument(
+        "--adhoc",
+        type=str,
+        default=None,
+        help="Send adhoc command to mqtt adhoc command queue - needs config file specified and populated",
     )
 
     args = parser.parse_args()
@@ -151,11 +157,14 @@ def main():
     # Build mqtt broker
     mqttconfig = config.get("mqttbroker", {})
     mqtt_broker = MqttBroker(config=mqttconfig)
+    # is this just a call to send and adhoc command to the queue?
+    if args.adhoc:
+        print("ADHOC is todo")
+        return
     # sub to command topic if defined
-    if mqtt_broker.enabled:
-        mqtt_broker.setAdhocCommands(
-            adhoc_commands=mqttconfig.get("adhoc_commands"), callback=mqtt_callback
-        )
+    mqtt_broker.setAdhocCommands(
+        adhoc_commands=mqttconfig.get("adhoc_commands"), callback=mqtt_callback
+    )
     log.debug(mqtt_broker)
 
     # get port
