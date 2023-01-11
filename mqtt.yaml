@@ -1,12 +1,26 @@
+# sample yaml file for listening to mqtt commands
 port:
   path: /dev/ttyUSB0
   type: test
   baud: 2400
 protocol: PI30
 mqttbroker:
-  name: localhost
+  name: homeassistant.lan
+  #name: screen
   port: 1883
-  user: null
-  pass: null
+  user: johnb
+  pass: password
   adhoc_commands:
     topic: test/command_topic
+    outputs:
+    - name: screen
+commands:
+  - command: QPIGS
+    outputs:
+    - name: screen  
+      #filter: input
+    - name: mqtt
+      filter: ^pv|^ac
+      excl_filter: battery
+      results_topic: test/inverter-data
+loop: 10
