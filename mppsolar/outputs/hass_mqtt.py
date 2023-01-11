@@ -52,7 +52,7 @@ class hass_mqtt(mqtt):
                 # <discovery_prefix>/<component>/[<node_id>/]<object_id>/config
                 # topic "homeassistant/binary_sensor/garden/config"
                 # msg '{"name": "garden", "device_class": "motion", "state_topic": "homeassistant/binary_sensor/garden/state", "unit_of_measurement": "°C"}'
-                if unit == "bool":
+                if unit == "bool" or value == "enabled" or value == "disabled":
                     topic = f"homeassistant/binary_sensor/mpp_{tag}_{key}/config"
                     topic = topic.replace(" ", "_")
                     name = f"{tag} {_key}"
@@ -60,6 +60,11 @@ class hass_mqtt(mqtt):
                     msg = {"topic": topic, "payload": payload}
                     msgs.append(msg)
                     topic = f"homeassistant/binary_sensor/mpp_{tag}_{key}/state"
+                    if value == 0 or value == "0" or value == "disabled":
+                        # for QPIWS one can add [or tag == "myQPIWStag"], if there's a QPIWS section in mpp-solar.conf
+                        value = "OFF"
+                    elif value == 1 or value == "1" or value == "enabled":
+                        value = "ON"
                     msg = {"topic": topic, "payload": value}
                     msgs.append(msg)
                 else:
