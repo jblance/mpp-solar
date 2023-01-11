@@ -93,8 +93,13 @@ class hassd_mqtt(mqtt):
                 # msg '{"name": "garden", "device_class": "motion", "state_topic": "homeassistant/binary_sensor/garden/state", "unit_of_measurement": "°C", "icon": "power-plug"}'
 
                 # For binary sensors
-                if unit == "bool":
+                if unit == "bool" or value == "enabled" or value == "disabled":
                     sensor = "binary_sensor"
+                    if value == 0 or value == "0" or value == "disabled":
+                        # for QPIWS one can add [or tag == "myQPIWStag"], if there's a QPIWS section in mpp-solar.conf
+                        value = "OFF"
+                    elif value == 1 or value == "1" or value == "enabled":
+                        value = "ON"
                 else:
                     sensor = "sensor"
                 topic = f"homeassistant/{sensor}/mpp_{tag}_{key}/config"
