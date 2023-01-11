@@ -64,7 +64,10 @@ class hassd_mqtt(mqtt):
         if excl_filter is not None:
             excl_filter = re.compile(excl_filter)
         if tag is None:
-            tag = command
+            if command:
+                tag = command
+            else:
+                tag = "mppsolar"
 
         # Build array of mqtt messages with hass update format
         msgs = []
@@ -77,6 +80,9 @@ class hassd_mqtt(mqtt):
             icon = None
             if len(data[key]) > 2 and data[key][2] and "icon" in data[key][2]:
                 icon = data[key][2]["icon"]
+            device_class = None
+            if len(data[key]) > 2 and data[key][2] and "device-class" in data[key][2]:
+                device_class = data[key][2]["device-class"]
 
             # remove spaces
             if remove_spaces:
@@ -121,10 +127,10 @@ class hassd_mqtt(mqtt):
                     "model": device_model,
                     "manufacturer": device_manufacturer,
                 }
+                if device_class:
+                    payload["device_class"] = device_class
                 if unit == "W":
-                    payload.update(
-                        {"state_class": "measurement", "device_class": "power"}
-                    )
+                    payload.update({"state_class": "measurement", "device_class": "power"})
                 if icon:
                     payload.update({"icon": icon})
                 # msg = {"topic": topic, "payload": payload, "retain": True}

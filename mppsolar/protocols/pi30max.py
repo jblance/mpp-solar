@@ -166,17 +166,23 @@ QUERY_COMMANDS = {
         "type": "QUERY",
         "response_type": "INDEXED",
         "response": [
-            [1, "AC Input Voltage", "float", "V", {"icon": "mdi:power-plug"}],
+            [
+                1,
+                "AC Input Voltage",
+                "float",
+                "V",
+                {"icon": "mdi:transmission-tower-export"},
+            ],
             [2, "AC Input Frequency", "float", "Hz", {"icon": "mdi:current-ac"}],
             [3, "AC Output Voltage", "float", "V", {"icon": "mdi:power-plug"}],
             [4, "AC Output Frequency", "float", "Hz", {"icon": "mdi:current-ac"}],
-            [5, "AC Output Apparent Power", "int", "VA", {"icon": "mdi:power-plug"}],
+            [5, "AC Output Apparent Power", "int", "VA", {"icon": "mdi:power-plug", "device-class": "apparent_power"}],
             [6, "AC Output Active Power", "int", "W", {"icon": "mdi:power-plug"}],
             [7, "AC Output Load", "int", "%", {"icon": "mdi:brightness-percent"}],
             [8, "BUS Voltage", "int", "V", {"icon": "mdi:details"}],
             [9, "Battery Voltage", "float", "V", {"icon": "mdi:battery-outline"}],
             [10, "Battery Charging Current", "int", "A", {"icon": "mdi:current-dc"}],
-            [11, "Battery Capacity", "int", "%", {"icon": "mdi:battery-outline"}],
+            [11, "Battery Capacity", "int", "%", {"device-class": "battery"}],
             [
                 12,
                 "Inverter Heat Sink Temperature",
@@ -263,7 +269,7 @@ QUERY_COMMANDS = {
         "response_type": "INDEXED",
         "response": [
             [1, "Parallel instance number", "option", ["Not valid", "valid"]],
-            [2, "Serial number", "bytes:r.decode()", ""],
+            [2, "Serial number", "bytes:r.decode()", "", {"icon": "mdi:identifier"}],
             [
                 3,
                 "Work mode",
@@ -321,12 +327,12 @@ QUERY_COMMANDS = {
             [6, "Grid Frequency", "float", "Hz", {"icon": "mdi:current-ac"}],
             [7, "AC Output Voltage", "float", "V", {"icon": "mdi:power-plug"}],
             [8, "AC Output Frequency", "float", "Hz", {"icon": "mdi:current-ac"}],
-            [9, "AC Output Apparent Power", "int", "VA", {"icon": "mdi:power-plug"}],
+            [9, "AC Output Apparent Power", "int", "VA", {"icon": "mdi:power-plug", "device-class": "apparent_power"}],
             [10, "AC Output Active Power", "int", "W", {"icon": "mdi:power-plug"}],
             [11, "Load Percentage", "int", "%", {"icon": "mdi:brightness-percent"}],
             [12, "Battery Voltage", "float", "V", {"icon": "mdi:battery-outline"}],
             [13, "Battery Charging Current", "int", "A", {"icon": "mdi:current-dc"}],
-            [14, "Battery Capacity", "int", "%", {"icon": "mdi:battery-outline"}],
+            [14, "Battery Capacity", "int", "%", {"device-class": "battery"}],
             [15, "PV1 Input Voltage", "float", "V", {"icon": "mdi:solar-power"}],
             [
                 16,
@@ -906,9 +912,7 @@ SETTER_COMMANDS = {
         "description": "Enable/disable LED function",
         "help": " -- examples: PLEDE0 (disable LED), PLEDE1 (enable LED)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -920,9 +924,7 @@ SETTER_COMMANDS = {
         "description": "Set LED speed",
         "help": " -- examples: PLEDS0 (set LED speed low), PLEDS1 (set LED speed medium), PLEDS2 (set LED speed high)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -934,9 +936,7 @@ SETTER_COMMANDS = {
         "description": "Set LED effect",
         "help": " -- examples: PLEDM0 (set LED effect breathing), PLEDM2 (set LED effect solid), PLEDM3 (set LED right scrolling)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -948,9 +948,7 @@ SETTER_COMMANDS = {
         "description": "Set LED brightness",
         "help": " -- examples: PLEDB1 (set LED brightness low), PLEDB5 (set LED brightness normal), PLEDB9 (set LED brightness high)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -962,9 +960,7 @@ SETTER_COMMANDS = {
         "description": "Set LED total number of colors",
         "help": " -- examples: PLEDT2 (set 2 LED colors), PLEDT3 (set 3 LED colors)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -976,9 +972,7 @@ SETTER_COMMANDS = {
         "description": "Set LED color",
         "help": " -- examples: PLEDCnRRRGGGBBB (n: 1 line mode, 2 AVR mode, 3 battery mode)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -987,7 +981,7 @@ SETTER_COMMANDS = {
     },
 }
 
-COMMANDS_TO_REMOVE = ["Q1", "QID", "QVFW3"]
+COMMANDS_TO_REMOVE = ["QID", "QVFW2"]
 
 
 class pi30max(pi30):
@@ -1008,6 +1002,4 @@ class pi30max(pi30):
         self.STATUS_COMMANDS = ["QPIGS", "QPIGS2"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
-        log.info(
-            f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
-        )
+        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
