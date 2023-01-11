@@ -263,11 +263,11 @@ QUERY_COMMANDS = {
         "response_type": "INDEXED",
         "response": [
             [1, "Parallel instance number", "option", ["Not valid", "valid"]],
-            [2, "Serial number", "str", ""],
+            [2, "Serial number", "bytes:r.decode()", ""],
             [
                 3,
                 "Work mode",
-                "keyed",
+                "str_keyed",
                 {
                     "P": "Power On Mode",
                     "S": "Standby Mode",
@@ -281,7 +281,7 @@ QUERY_COMMANDS = {
             [
                 4,
                 "Fault code",
-                "keyed",
+                "str_keyed",
                 {
                     "00": "No fault",
                     "01": "Fan is locked",
