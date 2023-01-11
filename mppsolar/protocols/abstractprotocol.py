@@ -457,7 +457,14 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
                     # Check if we are past the 'known' responses
                     if i >= len_command_defn:
-                        response_defn = [i, "str", f"Unknown value in response {i}", ""]
+                        if not response:
+                            continue
+                        response_defn = [
+                            i + 1,
+                            f"Unknown value in response {i+1}",
+                            "str",
+                            "",
+                        ]
                     else:
                         response_defn = command_defn["response"][i]
                     log.debug(f"Got defn {response_defn}")
