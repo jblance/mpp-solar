@@ -15,7 +15,7 @@ class test_pi30_decode(unittest.TestCase):
     maxDiff = None
 
     def test_pi30_QPI(self):
-        """ test the decode of a QPI response"""
+        """test the decode of a QPI response"""
         protocol = pi()
         response = b"(PI30\x9a\x0b\r"
         command = "QPI"
@@ -29,7 +29,7 @@ class test_pi30_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_pi30_QPIGS(self):
-        """ test the decode of a QPIGS response"""
+        """test the decode of a QPIGS response"""
         protocol = pi()
         response = b"(000.0 00.0 230.0 49.9 0161 0119 003 460 57.50 012 100 0069 0014 103.8 57.45 00000 00110110 00 00 00856 010\x24\x8c\r"
 
@@ -41,7 +41,7 @@ class test_pi30_decode(unittest.TestCase):
             ],
             "_command": "QPIGS",
             "_command_description": "General Status Parameters inquiry",
-            "AC Input Voltage": [0.0, "V"],
+            "AC Input Voltage": [0.0, "V", {"icon": "lightning"}],
             "AC Input Frequency": [0.0, "Hz"],
             "AC Output Voltage": [230.0, "V"],
             "AC Output Frequency": [49.9, "Hz"],
@@ -76,7 +76,7 @@ class test_pi30_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_pi30_QPIRI(self):
-        """ test the decode of a QPIRI response"""
+        """test the decode of a QPIRI response"""
         protocol = pi()
         response = b"(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1\x6F\x7E\r"
         command = "QPIRI"
@@ -124,7 +124,7 @@ class test_pi30_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_pi30_QPIRI_badoption(self):
-        """ test the decode of a QPIRI response with bad option"""
+        """test the decode of a QPIRI response with bad option"""
         protocol = pi()
         response = b"(230.0 21.7 230.0 50.0 21.7 5000 5000 48.0 47.0 46.5 57.6 57.6 9 30 080 0 1 2 1 01 0 0 52.0 0 1\x9c\x6f\r"
         command = "QPIRI"
@@ -172,7 +172,7 @@ class test_pi30_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_pi30_QFLAG(self):
-        """ test the decode of a QFLAG response"""
+        """test the decode of a QFLAG response"""
         protocol = pi()
         response = b"(EakxyDbjuvz\x2F\x29\r"
         command = "QFLAG"
@@ -195,7 +195,7 @@ class test_pi30_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_pi30_QPIWS(self):
-        """ test the decode of a QPIWS response"""
+        """test the decode of a QPIWS response"""
         protocol = pi()
         response = b"(00000100000000001000000000000000\x56\xA6\r"
         command = "QPIWS"
@@ -237,7 +237,7 @@ class test_pi30_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_pi30_QPGS(self):
-        """ test the decode of a QPGS response"""
+        """test the decode of a QPGS response"""
         protocol = pi()
         response = b"(1 92931701100510 B 00 000.0 00.00 230.6 50.00 0275 0141 005 51.4 001 100 083.3 002 00574 00312 003 10100110 1 2 060 120 10 04 000\xcc#\r"
         command = "QPGS0"

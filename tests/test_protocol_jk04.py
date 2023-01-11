@@ -111,8 +111,8 @@ class test_jk04_decode(unittest.TestCase):
             "Flags": ["0101", ""],
             "uptime": ["0D3H23M12S", ""],
             "Checksum": ["0b", ""],
-            "Highest Cell Voltage": [2.367180585861206, "V"],
-            "Lowest Cell Voltage": [2.186809778213501, "V"],
+            "Highest Cell Voltage": [2.367180585861206, "V", None],
+            "Lowest Cell Voltage": [2.186809778213501, "V", None],
         }
 
         protocol.get_full_command(command)

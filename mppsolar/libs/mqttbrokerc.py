@@ -173,7 +173,11 @@ class MqttBroker:
         except Exception as e:
             log.warning(str(e))
 
-    def setAdhocCommands(self, adhoc_commands={}, callback=None):
+    def setAdhocCommands(self, config={}, callback=None):
+        if not config:
+            return
+
+        adhoc_commands = config.get("adhoc_commands")
         # sub to command topic if defined
         adhoc_commands_topic = adhoc_commands.get("topic")
         if adhoc_commands_topic is not None:

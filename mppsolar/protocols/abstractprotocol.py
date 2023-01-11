@@ -549,7 +549,10 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     for item in processed_responses:
                         data_name, value, data_units, extra_info = item
                         if data_name is not None:
-                            msgs[data_name] = [value, data_units, extra_info]
+                            if extra_info:
+                                msgs[data_name] = [value, data_units, extra_info]
+                            else:
+                                msgs[data_name] = [value, data_units]
             # print(f"{i=} {response=} {len(command_defn['response'])}")
 
         return msgs

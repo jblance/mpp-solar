@@ -162,9 +162,7 @@ def main():
         print("ADHOC is todo")
         return
     # sub to command topic if defined
-    mqtt_broker.setAdhocCommands(
-        adhoc_commands=mqttconfig.get("adhoc_commands"), callback=mqtt_callback
-    )
+    mqtt_broker.setAdhocCommands(config=mqttconfig, callback=mqtt_callback)
     log.debug(mqtt_broker)
 
     # get port

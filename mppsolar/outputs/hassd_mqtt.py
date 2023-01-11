@@ -66,16 +66,18 @@ class hassd_mqtt(mqtt):
         if tag is None:
             tag = command
 
-        # build topic prefix
-        # if results_topic is not None:
-        #     topic_prefix = results_topic
-        # else:
-        #     topic_prefix = f"{tag}/status"
+        # Build array of mqtt messages with hass update format
+        msgs = []
 
-        # build data to output
-        _data = {}
+        # Loop through responses
         for key in data:
-            _values = data[key]
+            orig_key = key
+            value = data[key][0]
+            unit = data[key][1]
+            icon = None
+            if len(data[key]) > 2 and data[key][2] and "icon" in data[key][2]:
+                icon = data[key][2]["icon"]
+
             # remove spaces
             if remove_spaces:
                 key = key.replace(" ", "_")
@@ -83,69 +85,55 @@ class hassd_mqtt(mqtt):
                 # make lowercase
                 key = key.lower()
             if key_wanted(key, filter, excl_filter):
-                _data[key] = _values
-        log.debug(f"output data: {_data}")
+                #
+                # CONFIG / AUTODISCOVER
+                #
+                # <discovery_prefix>/<component>/[<node_id>/]<object_id>/config
+                # topic "homeassistant/binary_sensor/garden/config"
+                # msg '{"name": "garden", "device_class": "motion", "state_topic": "homeassistant/binary_sensor/garden/state", "unit_of_measurement": "°C", "icon": "power-plug"}'
 
-        # Build array of mqtt messages with hass update format
-        # assumes hass_config has been run
-        # or hass updated manually
-        msgs = []
+                # For binary sensors
+                if unit == "bool":
+                    sensor = "binary_sensor"
+                else:
+                    sensor = "sensor"
+                topic = f"homeassistant/{sensor}/mpp_{tag}_{key}/config"
+                topic = topic.replace(" ", "_")
+                name = f"{tag} {orig_key}"
+                payload = {
+                    "name": f"{name}",
+                    "state_topic": f"homeassistant/{sensor}/mpp_{tag}_{key}/state",
+                    "unique_id": f"mpp_{tag}_{key}",
+                    "force_update": "true",
+                }
+                if unit and unit != "bool":
+                    payload["unit_of_measurement"] = f"{unit}"
 
-        # Loop through responses
-        for _key in _data:
-            value = _data[_key][0]
-            unit = _data[_key][1]
-            icon = None
-            if len(_data[_key]) > 2 and _data[_key][2] and "icon" in _data[_key][2]:
-                icon = _data[_key][2]["icon"]
-
-            #
-            # CONFIG / AUTODISCOVER
-            #
-            # <discovery_prefix>/<component>/[<node_id>/]<object_id>/config
-            # topic "homeassistant/binary_sensor/garden/config"
-            # msg '{"name": "garden", "device_class": "motion", "state_topic": "homeassistant/binary_sensor/garden/state", "unit_of_measurement": "°C", "icon": "power-plug"}'
-
-            # For binary sensors
-            if unit == "bool":
-                sensor = "binary_sensor"
-            else:
-                sensor = "sensor"
-            topic = f"homeassistant/{sensor}/mpp_{tag}_{_key}/config"
-            topic = topic.replace(" ", "_")
-            name = f"{tag} {_key}"
-            payload = {
-                "name": f"{name}",
-                "state_topic": f"homeassistant/{sensor}/mpp_{tag}_{_key}/state",
-                "unique_id": f"mpp_{tag}_{_key}",
-                "force_update": "true",
-            }
-            if unit and unit != "bool":
-                payload["unit_of_measurement"] = f"{unit}"
-
-            # payload["device"] = {"name": f"{device_name}", "identifiers": ["mppsolar"], "model": "PIP6048MAX", "manufacturer": "MPP-Solar"}
-            payload["device"] = {
-                "name": device_name,
-                "identifiers": [device_id],
-                "model": device_model,
-                "manufacturer": device_manufacturer,
-            }
-            if unit == "W":
-                payload.update({"state_class": "measurement", "device_class": "power"})
-            if icon:
-                payload.update({"icon": icon})
-            # msg = {"topic": topic, "payload": payload, "retain": True}
-            payloads = js.dumps(payload)
-            # print(payloads)
-            msg = {"topic": topic, "payload": payloads}
-            msgs.append(msg)
-            #
-            # VALUE SETTING
-            #
-            # unit = data[key][1]
-            # 'tag'/status/total_output_active_power/value 1250
-            # 'tag'/status/total_output_active_power/unit W
-            topic = f"homeassistant/{sensor}/mpp_{tag}_{_key}/state"
-            msg = {"topic": topic, "payload": value}
-            msgs.append(msg)
+                # payload["device"] = {"name": f"{device_name}", "identifiers": ["mppsolar"], "model": "PIP6048MAX", "manufacturer": "MPP-Solar"}
+                payload["device"] = {
+                    "name": device_name,
+                    "identifiers": [device_id],
+                    "model": device_model,
+                    "manufacturer": device_manufacturer,
+                }
+                if unit == "W":
+                    payload.update(
+                        {"state_class": "measurement", "device_class": "power"}
+                    )
+                if icon:
+                    payload.update({"icon": icon})
+                # msg = {"topic": topic, "payload": payload, "retain": True}
+                payloads = js.dumps(payload)
+                # print(payloads)
+                msg = {"topic": topic, "payload": payloads}
+                msgs.append(msg)
+                #
+                # VALUE SETTING
+                #
+                # unit = data[key][1]
+                # 'tag'/status/total_output_active_power/value 1250
+                # 'tag'/status/total_output_active_power/unit W
+                topic = f"homeassistant/{sensor}/mpp_{tag}_{key}/state"
+                msg = {"topic": topic, "payload": value}
+                msgs.append(msg)
         return msgs
