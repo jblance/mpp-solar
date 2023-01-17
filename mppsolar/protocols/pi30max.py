@@ -818,7 +818,7 @@ QUERY_COMMANDS = {
         "type": "QUERY",
         "response_type": "INDEXED",
         "response": [
-            [1, "PV Generated Energy for Day", "int", "Wh", {"icon": "mdi:solar-power", "device-class": "power"}],
+            [1, "PV Generated Energy for Day", "int", "Wh", {"icon": "mdi:solar-power", "device-class": "energy"}],
             [2, "Year", "info:cv[:4]", ""],
             [3, "Month", "info:calendar.month_name[int(cv[4:6])]", ""],
             [4, "Day", "info:cv[6:]", ""],

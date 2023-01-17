@@ -1,6 +1,7 @@
 import json as js
 import logging
 import re
+from time import sleep
 
 from ..helpers import get_kwargs, key_wanted
 from .mqtt import mqtt
@@ -172,4 +173,5 @@ class hassd_mqtt(mqtt):
 
         # publish
         mqtt_broker.publishMultiple(config_msgs)
+        sleep(0.5)
         mqtt_broker.publishMultiple(value_msgs)
