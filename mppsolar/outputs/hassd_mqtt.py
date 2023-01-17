@@ -70,7 +70,8 @@ class hassd_mqtt(mqtt):
                 tag = "mppsolar"
 
         # Build array of mqtt messages with hass update format
-        msgs = []
+        config_msgs = []
+        value_msgs = []
 
         # Loop through responses
         for key in data:
@@ -137,7 +138,7 @@ class hassd_mqtt(mqtt):
                 payloads = js.dumps(payload)
                 # print(payloads)
                 msg = {"topic": topic, "payload": payloads}
-                msgs.append(msg)
+                config_msgs.append(msg)
                 #
                 # VALUE SETTING
                 #
@@ -146,5 +147,29 @@ class hassd_mqtt(mqtt):
                 # 'tag'/status/total_output_active_power/unit W
                 topic = f"homeassistant/{sensor}/mpp_{tag}_{key}/state"
                 msg = {"topic": topic, "payload": value}
-                msgs.append(msg)
-        return msgs
+                value_msgs.append(msg)
+        return config_msgs, value_msgs
+
+    def output(self, *args, **kwargs):
+        """Over write mqtt output as we want to send config msgs first...."""
+        log.info("Using output processor: hassd_mqtt")
+        log.debug(f"kwargs {kwargs}")
+        data = get_kwargs(kwargs, "data")
+        # exit if no data
+        if data is None:
+            return
+
+        # get the broker instance
+        mqtt_broker = get_kwargs(kwargs, "mqtt_broker")
+        # exit if no broker
+        if mqtt_broker is None:
+            return
+
+        # build the messages...
+        config_msgs, value_msgs = self.build_msgs(**kwargs)
+        log.debug(f"hassd_mqtt.output config_msgs {config_msgs}")
+        log.debug(f"hassd_mqtt.output value_msgs {value_msgs}")
+
+        # publish
+        mqtt_broker.publishMultiple(config_msgs)
+        mqtt_broker.publishMultiple(value_msgs)

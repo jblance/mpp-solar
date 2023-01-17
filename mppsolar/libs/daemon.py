@@ -66,5 +66,10 @@ class Daemon:
         # Send stopping
         self._notify(self._Notification.STOPPING)
 
+    def log(self, *args, **kwargs):
+        # Print log message
+        if args:
+            print(args[0])
+
     def _dummyNotify(self, *args, **kwargs):
         pass

@@ -211,6 +211,7 @@ def main():
                     log.info(f"Processing command: {adhoc_command}")
                     results = port.process_command(command=adhoc_command, protocol=protocol)
                     log.debug(f"results {results}")
+                    daemon.log(f"Processing adhoc command: {adhoc_command}")
                     # send to output processor(s)
                     # TODO sort outputs
                     output_results(
