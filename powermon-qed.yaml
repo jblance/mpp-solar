@@ -10,24 +10,6 @@ device:
     type: test
     protocol: PI30MAX
   commands:
-  - command: QPIGS
-    outputs:
-    - name: screen
-      tag: Test_Inverter
-  - command: QPIGS2
-    outputs:
-    - name: screen
-      tag: Test_Inverter
-  - command: QPGS0
-    outputs:
-    - name: screen
-      tag: Test_Inverter
-      filter: ^serial|^work|^charger|^fault
-  - command: Q1
-    outputs:
-    - name: screen
-      tag: Test_Inverter
-      filter: ^inverter_charge
   - command: QED
     # f_command: f'QED{(date.today()-timedelta(days=1)).strftime("%Y%m%d")}'
     f_command: f'QED{(date.today()).strftime("%Y%m%d")}'
@@ -35,8 +17,9 @@ device:
     - name: screen
       tag: Test_Inverter
       filter: ^pv
+loop: 60
 mqttbroker:
-  name: localhost
+  name: homeassistant.lan
   port: 1883
   user: null
   pass: null
@@ -45,8 +28,3 @@ mqttbroker:
     outputs:
     - name: screen
       tag: Test_Inverter
-daemon:
-  type: systemd
-  keepalive: 10
-#daemon: initd
-loop: 60

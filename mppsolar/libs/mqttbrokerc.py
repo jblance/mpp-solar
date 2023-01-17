@@ -10,13 +10,6 @@ log = logging.getLogger("mqttbroker")
 
 
 class MqttBroker:
-    # name: str
-    # port: int = 1883
-    # username: Optional[str] = None
-    # password: Optional[str] = None
-    # results_topic: Optional[str] = None
-    # mqttc: mqtt_client.Client = mqtt_client.Client()
-    # _isConnected: bool = False
     def __str__(self):
         if self.enabled:
             return f"MqttBroker name: {self.name}, port: {self.port}, user: {self.username}"
@@ -65,9 +58,7 @@ class MqttBroker:
             "Connection refused - bad username or password",
             "Connection refused - not authorised",
         ]
-        log.debug(
-            f"MqttBroker connection returned result: {rc} {connection_result[rc]}"
-        )
+        log.debug(f"MqttBroker connection returned result: {rc} {connection_result[rc]}")
         if rc == 0:
             self._isConnected = True
             return
@@ -79,9 +70,7 @@ class MqttBroker:
 
     def connect(self):
         if not self.enabled:
-            log.info(
-                f"MQTT broker not enabled, was a broker name defined? '{self.name}'"
-            )
+            log.info(f"MQTT broker not enabled, was a broker name defined? '{self.name}'")
             return
         if not self.name:
             log.info(f"MQTT did not connect as no broker name '{self.name}'")
@@ -97,9 +86,7 @@ class MqttBroker:
             if self.username:
                 # auth = {"username": mqtt_user, "password": mqtt_pass}
                 _password = "********" if self.password is not None else "None"
-                log.info(
-                    f"Using mqtt authentication, username: {self.username}, password: {_password}"
-                )
+                log.info(f"Using mqtt authentication, username: {self.username}, password: {_password}")
                 self.mqttc.username_pw_set(self.username, password=self.password)
             else:
                 log.debug("No mqtt authentication used")
@@ -155,9 +142,7 @@ class MqttBroker:
     def publish(self, topic, payload):
         log.debug(f"Publishing '{payload}' to '{topic}'")
         if self.name == "screen":
-            print(
-                f"mqtt debug output only as broker name is 'screen' - topic: '{topic}', payload: '{payload}'"
-            )
+            print(f"mqtt debug output only as broker name is 'screen' - topic: '{topic}', payload: '{payload}'")
             return
         # check if connected, connect if not
         if not self._isConnected:

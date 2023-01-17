@@ -2,12 +2,13 @@
 import logging
 from argparse import ArgumentParser
 from collections import deque
-from time import sleep, time
 from datetime import date, timedelta  # noqa: F401
+from time import sleep, time
 
 import yaml
 
 from mppsolar.libs.mqttbrokerc import MqttBroker
+from mppsolar.libs.daemon import Daemon
 from mppsolar.outputs import output_results
 from mppsolar.ports import get_port
 from mppsolar.protocols import get_protocol
@@ -25,11 +26,14 @@ class ConfigError(Exception):
 
 
 sample_config = """
+device:
+  name: Test_Inverter
+  id: 123456789
   port:
     path: /dev/ttyUSB0
     type: test
     baud: 2400
-  protocol: PI30
+    protocol: PI30
   commands:
     - command: QPI
       outputs:
@@ -85,9 +89,7 @@ def main():
         const="./powermon.yaml",
         default=None,
     )
-    parser.add_argument(
-        "-v", "--version", action="store_true", help="Display the version"
-    )
+    parser.add_argument("-v", "--version", action="store_true", help="Display the version")
     parser.add_argument(
         "-d",
         "--dumpConfig",
@@ -106,9 +108,7 @@ def main():
         action="store_true",
         help="Enable Debug and above (i.e. all) messages",
     )
-    parser.add_argument(
-        "-I", "--info", action="store_true", help="Enable Info and above level messages"
-    )
+    parser.add_argument("-I", "--info", action="store_true", help="Enable Info and above level messages")
     parser.add_argument(
         "--adhoc",
         type=str,
@@ -147,7 +147,7 @@ def main():
     # if generateConfigFile is true then print config out
     if args.dumpConfig:
         print("# yaml config for powermon")
-        print("# default location /etc/mpp-solar/powermon.yml")
+        print("# default location ./powermon.yaml")
         print(yaml.dump(config))
         return
 
@@ -165,17 +165,25 @@ def main():
     mqtt_broker.setAdhocCommands(config=mqttconfig, callback=mqtt_callback)
     log.debug(mqtt_broker)
 
+    device_config = config.get("device", None)
+    if not device_config:
+        log.error(f"No device definition in config. Check {args.configFile}?")
+        exit(1)
+
+    daemon = Daemon(config=config)
+    log.debug(f"Got daemon config: {daemon}")
+
     # get port
-    portconfig = config["port"].copy()
-    log.debug(f"portconfig: {portconfig}")
-    port = get_port(portconfig)
+    port_config = device_config["port"].copy()
+    log.debug(f"portconfig: {port_config}")
+    port = get_port(port_config)
     # port = get_port(porttype=porttype)
     if not port:
-        log.error(f"No port for config '{portconfig}' found")
-        raise ConfigError(f"No port for config '{portconfig}' found")
+        log.error(f"No port for config '{port_config}' found")
+        raise ConfigError(f"No port for config '{port_config}' found")
 
     # get protocol handler
-    protocol = get_protocol(protocol=config["protocol"])
+    protocol = get_protocol(protocol=port_config["protocol"])
 
     # Get loop details
     loop = config.get("loop", "once")
@@ -183,24 +191,25 @@ def main():
     delayRemaining = loop
     doLoop = True
 
+    # initialize daemon if needed
+    daemon.initialize()
+
+    # Catch keyboard interupt
     try:
         # connect to port
         port.connect()
         while doLoop:
             # Start timer
             start_time = time()
+            daemon.notify("OK")
             # loop through command list
-            for command in config["commands"]:
+            for command in device_config["commands"]:
                 # process any adhoc commands first
                 while len(ADHOC_COMMANDS) > 0:
                     log.debug(f"adhoc command list: {ADHOC_COMMANDS}")
-                    adhoc_command = (
-                        ADHOC_COMMANDS.popleft().decode()
-                    )  # FIXME: decode to str #
+                    adhoc_command = ADHOC_COMMANDS.popleft().decode()  # FIXME: decode to str #
                     log.info(f"Processing command: {adhoc_command}")
-                    results = port.process_command(
-                        command=adhoc_command, protocol=protocol
-                    )
+                    results = port.process_command(command=adhoc_command, protocol=protocol)
                     log.debug(f"results {results}")
                     # send to output processor(s)
                     # TODO sort outputs
@@ -238,9 +247,7 @@ def main():
                 end_time = time()
                 delayRemaining = delayRemaining - (end_time - start_time)
                 if delayRemaining > 0 and not inDelay:
-                    log.debug(
-                        f"delaying for {loop}sec, delayRemaining: {delayRemaining}"
-                    )
+                    log.debug(f"delaying for {loop}sec, delayRemaining: {delayRemaining}")
                     inDelay = True
                 if delayRemaining < 0:
                     log.debug("setting inDelay to false")
@@ -253,3 +260,5 @@ def main():
         port.disconnect()
         # Disconnect mqtt
         mqtt_broker.stop()
+        # Notify the daemon
+        daemon.stop()
