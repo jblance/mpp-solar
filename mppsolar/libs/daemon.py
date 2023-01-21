@@ -34,9 +34,10 @@ class Daemon:
 
         if self.type == "systemd":
             try:
-                from cysystemd.daemon import Notification, notify
+                from cysystemd.daemon import Notification, notify, journal
 
                 self._notify = notify
+                self._journal = journal
                 self._Notification = Notification
             except ModuleNotFoundError as e:
                 print(
@@ -45,6 +46,7 @@ class Daemon:
                 exit(1)
         else:
             self._notify = self._dummyNotify
+            self._journal = self._dummyNotify
             self._Notification = dummyNotification
 
     def initialize(self, *args, **kwargs):
@@ -61,6 +63,7 @@ class Daemon:
                 status = "OK"
             self._notify(self._Notification.STATUS, status)
             self._lastNotify = time()
+            self._journal(f"Daemon notify at {self._lastNotify}")
 
     def stop(self, *args, **kwargs):
         # Send stopping
