@@ -34,7 +34,8 @@ class Daemon:
 
         if self.type == "systemd":
             try:
-                from cysystemd.daemon import Notification, notify, journal
+                from cysystemd.daemon import Notification, notify
+                from cysystemd import journal
 
                 self._notify = notify
                 self._journal = journal
