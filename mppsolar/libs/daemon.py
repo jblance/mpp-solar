@@ -32,7 +32,6 @@ class Daemon:
             self.keepalive = daemon_config.get("keepalive", 60)
 
         log.info(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
-        print(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
 
         if self.type == "systemd":
             try:
@@ -51,6 +50,7 @@ class Daemon:
             self._notify = self._dummyNotify
             self._journal = self._dummyNotify
             self._Notification = dummyNotification
+        self._notify(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
 
     def initialize(self, *args, **kwargs):
         # Send READY=1
@@ -83,5 +83,6 @@ class Daemon:
 
     def _dummyNotify(self, *args, **kwargs):
         # Print log message
-        if args:
-            print(args[0])
+        # if args:
+        #     print(args[0])
+        pass
