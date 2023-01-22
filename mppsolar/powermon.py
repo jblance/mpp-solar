@@ -201,7 +201,7 @@ def main():
         while doLoop:
             # Start timer
             start_time = time()
-            daemon.notify("OK")
+            daemon.watchdog()
             # loop through command list
             for command in device_config["commands"]:
                 # process any adhoc commands first

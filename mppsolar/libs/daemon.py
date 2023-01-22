@@ -12,6 +12,7 @@ class dummyNotification(Enum):
     READY = auto()
     STATUS = auto()
     STOPPING = auto()
+    WATCHDOG = auto()
 
 
 class Daemon:
@@ -31,6 +32,7 @@ class Daemon:
             self.keepalive = daemon_config.get("keepalive", 60)
 
         log.info(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
+        print(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
 
         if self.type == "systemd":
             try:
@@ -38,7 +40,7 @@ class Daemon:
                 from cysystemd import journal
 
                 self._notify = notify
-                self._journal = journal
+                self._journal = journal.write
                 self._Notification = Notification
             except ModuleNotFoundError as e:
                 print(
@@ -55,16 +57,20 @@ class Daemon:
         self._notify(self._Notification.READY)
         self._lastNotify = time()
 
-    def notify(self, *args, **kwargs):
-        if (time() - self._lastNotify) > self.keepalive:
-            # Send status
-            if args:
-                status = args[0]
-            else:
-                status = "OK"
-            self._notify(self._Notification.STATUS, status)
+    def watchog(self, *args, **kwargs):
+        elapsed = time() - self._lastNotify
+        if (elapsed) > self.keepalive:
+            self._notify(self._Notification.WATCHDOG)
             self._lastNotify = time()
             self._journal(f"Daemon notify at {self._lastNotify}")
+
+    def notify(self, *args, **kwargs):
+        # Send status
+        if args:
+            status = args[0]
+        else:
+            status = "OK"
+        self._notify(self._Notification.STATUS, status)
 
     def stop(self, *args, **kwargs):
         # Send stopping
@@ -73,7 +79,9 @@ class Daemon:
     def log(self, *args, **kwargs):
         # Print log message
         if args:
-            print(args[0])
+            self._journal(args[0])
 
     def _dummyNotify(self, *args, **kwargs):
-        pass
+        # Print log message
+        if args:
+            print(args[0])
