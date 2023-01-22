@@ -57,7 +57,7 @@ class Daemon:
         self._notify(self._Notification.READY)
         self._lastNotify = time()
 
-    def watchog(self, *args, **kwargs):
+    def watchdog(self, *args, **kwargs):
         elapsed = time() - self._lastNotify
         if (elapsed) > self.keepalive:
             self._notify(self._Notification.WATCHDOG)
