@@ -50,7 +50,7 @@ class Daemon:
             self._notify = self._dummyNotify
             self._journal = self._dummyNotify
             self._Notification = dummyNotification
-        self._notify(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
+        self.notify(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
 
     def initialize(self, *args, **kwargs):
         # Send READY=1
