@@ -981,7 +981,7 @@ SETTER_COMMANDS = {
     },
 }
 
-COMMANDS_TO_REMOVE = ["QID", "QVFW2"]
+COMMANDS_TO_REMOVE = ["QVFW2"]
 
 
 class pi30max(pi30):
