@@ -180,6 +180,7 @@ def main():
     parser.add_argument("--daemon", action="store_true", help="Run as daemon")
     parser.add_argument("--getstatus", action="store_true", help="Get Inverter Status")
     parser.add_argument("--getsettings", action="store_true", help="Get Inverter Settings")
+    parser.add_argument("--getDeviceId", action="store_true", help="Generate Device ID")
 
     parser.add_argument("-v", "--version", action="store_true", help="Display the version")
     parser.add_argument(
@@ -225,7 +226,6 @@ def main():
     #     port: 1883
     #     user: null
     #     pass: null
-
     mqtt_broker = MqttBroker(
         config={
             "name": args.mqttbroker,
@@ -368,7 +368,7 @@ def main():
             keep_case = True
             commands.append("list_commands")
         elif args.output == "help":
-            commands.append("list_outputs")
+            # commands.append("list_outputs")
             keep_case = True
             op = get_outputs("screen")[0]
             op.output(data=list_outputs())
@@ -382,6 +382,9 @@ def main():
         elif args.getsettings:
             # use get_settings helper
             commands.append("get_settings")
+        elif args.getDeviceId:
+            # use get_settings helper
+            commands.append("get_device_id")
         elif args.command is None:
             # run the command
             commands.append("")

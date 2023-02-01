@@ -35,9 +35,7 @@ class AbstractDevice(ABC):
         self._name = get_kwargs(kwargs, "name")
         self._port = get_port(**kwargs)
         self._protocol = get_protocol(get_kwargs(kwargs, "protocol"))
-        log.debug(
-            f"__init__ name {self._name}, port {self._port}, protocol {self._protocol}"
-        )
+        log.debug(f"__init__ name {self._name}, port {self._port}, protocol {self._protocol}")
 
     def __str__(self):
         """
@@ -55,9 +53,7 @@ class AbstractDevice(ABC):
             log.error("Attempted to run command with no protocol defined")
             return {"ERROR": ["Attempted to run command with no protocol defined", ""]}
         if self._port is None:
-            log.error(
-                f"No communications port defined - unable to run command {command}"
-            )
+            log.error(f"No communications port defined - unable to run command {command}")
             return {
                 "ERROR": [
                     f"No communications port defined - unable to run command {command}",
@@ -71,6 +67,9 @@ class AbstractDevice(ABC):
             return self.get_status()
         if command == "get_settings":
             return self.get_settings()
+        if command == "get_device_id":
+            return self.get_device_id()
+
         if not command:
             command = self._protocol.DEFAULT_COMMAND
 
@@ -78,9 +77,7 @@ class AbstractDevice(ABC):
         full_command = self._protocol.get_full_command(command)
         log.info(f"full command {full_command} for command {command}")
         if full_command is None:
-            log.error(
-                f"full_command not found for {command} in protocol {self._protocol._protocol_id}"
-            )
+            log.error(f"full_command not found for {command} in protocol {self._protocol._protocol_id}")
             return {
                 "ERROR": [
                     f"full_command not found for {command} in protocol {self._protocol._protocol_id}",
@@ -130,3 +127,17 @@ class AbstractDevice(ABC):
         for command in self._protocol.SETTINGS_COMMANDS:
             data.update(self.run_command(command))
         return data
+
+    def get_device_id(self) -> dict:
+        _id = ""
+        for command in self._protocol.ID_COMMANDS:
+            result = self.run_command(command)
+            last_key = list(result).pop()
+            value = result[last_key][0]
+
+            if not _id:
+                _id = f"{value}"
+            else:
+                _id = f"{_id}:{value}"
+        log.info(f"DeviceId: {_id}")
+        return {"_command": "Get Device ID", "_command_description": "Generate a device id", "DeviceID": [_id, ""]}

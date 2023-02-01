@@ -29,6 +29,9 @@ class screen:
         formatter = config.get("format", "table")
 
         formatted_data = format_data(formatter=formatter, config=config, data=data)
+        if formatted_data is None:
+            print("Nothing returned from data formatting")
+            return
 
         # dd = json.dumps(config, indent=2)
 

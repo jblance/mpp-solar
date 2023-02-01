@@ -924,6 +924,7 @@ class pi30(AbstractProtocol):
         self.STATUS_COMMANDS = ["QPIGS", "Q1"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
+        self.ID_COMMANDS = ["QPI", "QGMN", "QMN"]
         # log.info(f'Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands')
 
     def check_response_valid(self, response):
