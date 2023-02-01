@@ -5,7 +5,7 @@ import time
 from .port import Port
 from ..helpers import get_kwargs
 
-log = logging.getLogger("usbserial")
+log = logging.getLogger("serial")
 
 
 class serialport(Port):

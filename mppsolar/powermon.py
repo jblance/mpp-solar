@@ -9,7 +9,7 @@ import yaml
 
 from mppsolar.libs.mqttbrokerc import MqttBroker
 from mppsolar.libs.daemon import Daemon
-from mppsolar.outputs import output_results
+from mppsolar.sender import output_results
 from mppsolar.ports import get_port
 from mppsolar.protocols import get_protocol
 from mppsolar.version import __version__  # noqa: F401
@@ -157,41 +157,63 @@ def main():
     # Build mqtt broker
     mqttconfig = config.get("mqttbroker", {})
     mqtt_broker = MqttBroker(config=mqttconfig)
-    # is this just a call to send and adhoc command to the queue?
+    # is this just a call to send an adhoc command to the queue?
     if args.adhoc:
         print("ADHOC is todo")
         return
-    # sub to command topic if defined
+    # sub to the adhoc command topic ie listen for 'extra' commands
     mqtt_broker.setAdhocCommands(config=mqttconfig, callback=mqtt_callback)
-    log.debug(mqtt_broker)
+    # debug dump mqttbroker details
+    log.debug(f"mqtt_broker: {mqtt_broker}")
 
+    # get the device config
+    # this is required, and contains:
+    #     device:
+    #       name:
+    #       id:
+    #       model:
+    #       manufacturer:
+    #       port:
+    #       commands:
     device_config = config.get("device", None)
     if not device_config:
         log.error(f"No device definition in config. Check {args.configFile}?")
         exit(1)
 
+    # configure the daemon (optional)
+    #     daemon:
+    #       type: systemd  # noqa:
+    #       keepalive: 10
     daemon = Daemon(config=config)
-    log.debug(f"Got daemon config: {daemon}")
+    log.debug(f"daemon: {daemon}")
 
-    # get port
+    # config the port (required)
+    # config depends on port type
+    #   port:
+    #     baud: 2400
+    #     path: /dev/ttyUSB0
+    #     type: serial  # noqa:
+    #     protocol: PI30MAX
     port_config = device_config["port"].copy()
     log.debug(f"portconfig: {port_config}")
     port = get_port(port_config)
-    # port = get_port(porttype=porttype)
+    log.debug(f"port: {port}")
+    # error out if unable to configure port
     if not port:
         log.error(f"No port for config '{port_config}' found")
         raise ConfigError(f"No port for config '{port_config}' found")
 
     # get protocol handler
     protocol = get_protocol(protocol=port_config["protocol"])
+    log.debug(f"protocol: {protocol}")
 
-    # Get loop details
+    # Get loop timing details
     loop = config.get("loop", "once")
     inDelay = False
     delayRemaining = loop
     doLoop = True
 
-    # initialize daemon if needed
+    # initialize daemon
     daemon.initialize()
 
     # Catch keyboard interupt
@@ -201,6 +223,7 @@ def main():
         while doLoop:
             # Start timer
             start_time = time()
+            # tell the daemon we're still working
             daemon.watchdog()
             # loop through command list
             for command in device_config["commands"]:
@@ -209,11 +232,11 @@ def main():
                     log.debug(f"adhoc command list: {ADHOC_COMMANDS}")
                     adhoc_command = ADHOC_COMMANDS.popleft().decode()  # FIXME: decode to str #
                     log.info(f"Processing command: {adhoc_command}")
+                    daemon.log(f"Processing adhoc command: {adhoc_command}")
                     results = port.process_command(command=adhoc_command, protocol=protocol)
                     log.debug(f"results {results}")
-                    daemon.log(f"Processing adhoc command: {adhoc_command}")
+
                     # send to output processor(s)
-                    # TODO sort outputs
                     output_results(
                         results=results,
                         command=config["mqttbroker"]["adhoc_commands"],
@@ -228,6 +251,7 @@ def main():
                         _command = eval(_command)
                     else:
                         _command = command["command"]
+                    # TODO: allow protocol override
                     results = port.process_command(command=_command, protocol=protocol)
                     log.debug(f"results {results}")
                     # send to output processor(s)
@@ -245,8 +269,8 @@ def main():
             else:
                 # Small pause to ....
                 sleep(0.1)
-                end_time = time()
-                delayRemaining = delayRemaining - (end_time - start_time)
+                elapsed_time = time() - start_time
+                delayRemaining = delayRemaining - elapsed_time
                 if delayRemaining > 0 and not inDelay:
                     log.debug(f"delaying for {loop}sec, delayRemaining: {delayRemaining}")
                     inDelay = True
@@ -256,6 +280,8 @@ def main():
                     delayRemaining = loop
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
+    except Exception as e:
+        print(e)
     finally:
         # Disconnect port
         port.disconnect()

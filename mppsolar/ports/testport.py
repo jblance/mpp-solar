@@ -7,7 +7,7 @@ from .port import Port
 # import re
 
 
-log = logging.getLogger("Test")
+log = logging.getLogger("test")
 
 
 class testport(Port):
@@ -28,9 +28,7 @@ class testport(Port):
         if command_defn is not None:
             # Have test data defined, so use that
             number_of_test_responses = len(command_defn["test_responses"])
-            self._test_data = command_defn["test_responses"][
-                random.randrange(number_of_test_responses)
-            ]
+            self._test_data = command_defn["test_responses"][random.randrange(number_of_test_responses)]
         else:
             # No test responses defined
             log.warn("Testing a command with no test responses defined")

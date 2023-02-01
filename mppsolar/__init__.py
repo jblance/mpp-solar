@@ -179,22 +179,16 @@ def main():
         )
     parser.add_argument("--daemon", action="store_true", help="Run as daemon")
     parser.add_argument("--getstatus", action="store_true", help="Get Inverter Status")
-    parser.add_argument(
-        "--getsettings", action="store_true", help="Get Inverter Settings"
-    )
+    parser.add_argument("--getsettings", action="store_true", help="Get Inverter Settings")
 
-    parser.add_argument(
-        "-v", "--version", action="store_true", help="Display the version"
-    )
+    parser.add_argument("-v", "--version", action="store_true", help="Display the version")
     parser.add_argument(
         "-D",
         "--debug",
         action="store_true",
         help="Enable Debug and above (i.e. all) messages",
     )
-    parser.add_argument(
-        "-I", "--info", action="store_true", help="Enable Info and above level messages"
-    )
+    parser.add_argument("-I", "--info", action="store_true", help="Enable Info and above level messages")
 
     args = parser.parse_args()
     prog_name = parser.prog
@@ -240,9 +234,7 @@ def main():
             "pass": args.mqttpass,
         }
     )
-    mqtt_broker.set(
-        "results_topic", (args.mqtttopic if args.mqtttopic is not None else prog_name)
-    )
+    mqtt_broker.set("results_topic", (args.mqtttopic if args.mqtttopic is not None else prog_name))
     log.debug(mqtt_broker)
     udp_port = args.udpport
     log.debug(f"udp port {udp_port}")
@@ -255,6 +247,7 @@ def main():
     filter = args.filter
     excl_filter = args.exclfilter
     keep_case = args.keepcase
+    mqtt_topic = args.mqtttopic
 
     _commands = []
     # Initialize Daemon
@@ -284,9 +277,7 @@ def main():
         sections = config.sections()
         # Check setup section exists
         if "SETUP" not in config:
-            log.error(
-                f"Config File '{args.configfile}' is missing the required 'SETUP' section"
-            )
+            log.error(f"Config File '{args.configfile}' is missing the required 'SETUP' section")
             exit(1)
         # Process setup section
         pause = config["SETUP"].getint("pause", fallback=60)
@@ -442,7 +433,7 @@ def main():
                     # mqtt_port=mqtt_port,
                     # mqtt_user=mqtt_user,
                     # mqtt_pass=mqtt_pass,
-                    # mqtt_topic=mqtt_topic,
+                    mqtt_topic=mqtt_topic,
                     filter=filter,
                     excl_filter=excl_filter,
                     keep_case=keep_case,

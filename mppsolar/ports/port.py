@@ -42,7 +42,6 @@ class Port(ABC):
                 ]
             }
         # dict is returned on exception
-
         if isinstance(raw_response, dict):
             return raw_response
 
