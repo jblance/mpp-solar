@@ -10,7 +10,8 @@ QUERY_COMMANDS = {
         "description": "Device Serial Number inquiry",
         "help": " -- queries the device serial number (length greater than 14)",
         "type": "QUERY",
-        "response": [["string", "Serial Number", ""]],
+        "response_type": "INDEXED",
+        "response": [[1, "Serial Number", "bytes.decode:r[2:int(r[0:2])+2]", ""]],
         "test_responses": [
             b"(1492932105105335005535\x94\x0e\r",
         ],
