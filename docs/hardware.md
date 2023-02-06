@@ -19,3 +19,7 @@
 - Ubuntu 2020.04
   - Direct USB connection to Inverter (LV5048)
   - see [documented approach](ubuntu_install.md)
+
+- Any x86 PC
+  - with USB/RS232 port
+  - with Bluetooth 4.0+
