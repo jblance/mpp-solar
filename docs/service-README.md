@@ -87,7 +87,7 @@ $ systemctl --user disable mpp-solar
 ```
 ## Moving the Unit File ##
 /etc/systemd/user/mpp-solar.service
-Previously, we stored our unit file in a directory appropriate for user services (`/etc/systemd/user/mpp-solar.service`). As with user unit files, systemd looks into more than one directory for system unit files. We'll be using `/etc/systemd/user/mpp-solar.service`, so move your unit file there and make sure that it has the right permissions
+Previously, we stored our unit file in a directory appropriate for user services (`/etc/systemd/user/mpp-solar.service`). As with user unit files, systemd looks into more than one directory for system unit files. We'll be using `/etc/systemd/system/mpp-solar.service`, so move your unit file there and make sure that it has the right permissions
 ```
 $ sudo mv /etc/systemd/user/mpp-solar.service /etc/systemd/system/
 $ sudo chown root:root /etc/systemd/system/mpp-solar.service
