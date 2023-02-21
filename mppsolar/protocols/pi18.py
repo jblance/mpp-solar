@@ -9,13 +9,33 @@ log = logging.getLogger("pi18")
 
 COMMANDS = {
     # QUERY #
+    "PI": {
+        "name": "PI",
+        "prefix": "^P005",
+        "description": "Device Protocol Version inquiry",
+        "help": " -- queries the device protocol version \n",
+        "type": "QUERY",
+        "response": [["string", "Protocol Version", ""]],
+        "test_responses": [
+            b"^D00518;\x03\r",
+        ],
+    },
+#    "T": {
+#        "name": "T",
+#        "prefix": "^P004",
+#        "description": "Queryy current time",
+#        "help": " -- queries the device protocol version \n",
+#    },
     "ET": {
         "name": "ET",
         "prefix": "^P005",
-        "description": "Total Generated Energy query",
-        "help": " -- Query total generated energy",
+        "description": "Total PV Generated Energy Inquiry",
+        "help": " -- display Total PV generated energy",
         "type": "QUERY",
-        "response": [["int", "Total generated energy", "Wh"]],
+        "response_type": "SEQUENTIAL",
+        "response": [
+            ["int", "Total PV Generated Energy", "Wh", {"icon": "mdi:counter", "device-class": "energy", "state_class": "total_increasing"}]
+        ],
         "test_responses": [
             b"",
         ],
@@ -23,14 +43,53 @@ COMMANDS = {
     "EY": {
         "name": "EY",
         "prefix": "^P009",
-        "description": "Query generated energy of year",
-        "help": " -- queries generated energy for the year YYYY from the Inverter",
+        "description": "Yearly PV Generated Energy Inquiry",
+        "help": " -- display Yearly PV generated energy, format is EDyyyy",
         "type": "QUERY",
-        "response": [["int", "Year generated energy", "Wh"]],
+        "response_type": "INDEXED",
+        "response": [
+            [1, "PV Generated Energy for Year", "int", "Wh", {"icon": "mdi:counter", "device-class": "energy"}],
+            [2, "Year", "info:cv[:4]", ""],
+        ],
+        "test_responses": [
+            b"^D01105580051\x0b\x9f\r",
+        ],
+        "regex": "EY(\\d\\d\\d\\d)$",
+    },
+    "EM": {
+        "name": "EM",
+        "prefix": "^P011",
+        "description": "Monthly PV Generated Energy Inquiry",
+        "help": " -- display monthly PV generated energy, format is EMyyyymm",
+        "type": "QUERY",
+        "response_type": "INDEXED",
+        "response": [
+            [1, "PV Generated Energy for Month", "int", "Wh", {"icon": "mdi:counter", "device-class": "energy"}],
+            [2, "Year", "info:cv[:4]", ""],
+            [3, "Month", "info:calendar.month_name[int(cv[4:6])]", ""],
+        ],
         "test_responses": [
             b"",
         ],
-        "regex": "EY(\\d\\d\\d\\d)$",
+        "regex": "EM(\\d\\d\\d\\d\\d\\d)$",
+    },
+    "ED": {
+        "name": "ED",
+        "prefix": "^P013",
+        "description": "Daily PV Generated Energy Inquiry",
+        "help": " -- display daily PV generated energy, format is EDyyyymmdd",
+        "type": "QUERY",
+        "response_type": "INDEXED",
+        "response": [
+            [1, "PV Generated Energy for Day", "int", "Wh", {"icon": "mdi:counter", "device-class": "energy"}],
+            [2, "Year", "info:cv[:4]", ""],
+            [3, "Month", "info:calendar.month_name[int(cv[4:6])]", ""],
+            [4, "Day", "info:cv[6:]", ""],
+        ],
+        "test_responses": [
+            b"^D009000091\xba\x10\r",
+        ],
+        "regex": "ED(\\d\\d\\d\\d\\d\\d\\d\\d)$",
     },
     "ID": {
         "name": "ID",
@@ -283,17 +342,6 @@ COMMANDS = {
             b"",
         ],
     },
-    "PI": {
-        "name": "PI",
-        "prefix": "^P005",
-        "description": "Device Protocol Version inquiry",
-        "help": " -- queries the device protocol version \n",
-        "type": "QUERY",
-        "response": [["string", "Protocol Version", ""]],
-        "test_responses": [
-            b"^D00518;\x03\r",
-        ],
-    },
     # SETTER ###
     #    "LON": {
     #        "name": "LON",
@@ -487,6 +535,8 @@ class pi18(AbstractProtocol):
         self.STATUS_COMMANDS = [
             "ET",
             "EY",
+            "EM",
+            "ED",
             "ID",
             "VFW",
             "PIRI",

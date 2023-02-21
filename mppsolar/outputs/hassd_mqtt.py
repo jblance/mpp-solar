@@ -1,13 +1,13 @@
 import json as js
 import logging
 import re
+from datetime import datetime
 from time import sleep
 
 from ..helpers import get_kwargs, key_wanted
 from .mqtt import mqtt
 
 log = logging.getLogger("hassd_mqtt")
-
 
 class hassd_mqtt(mqtt):
     def __str__(self):
@@ -18,7 +18,6 @@ class hassd_mqtt(mqtt):
 
     def build_msgs(self, *args, **kwargs):
         log.debug(f"kwargs {kwargs}")
-
         data = get_kwargs(kwargs, "data")
         # Clean data
         if "_command" in data:
@@ -133,6 +132,10 @@ class hassd_mqtt(mqtt):
                     payload["device_class"] = device_class
                 if unit == "W":
                     payload.update({"state_class": "measurement", "device_class": "power"})
+                elif unit == "Wh" or unit == "kWh":
+                    #payload.update( {"icon": "mdi:counter", "device_class": "energy", "state_class": "total_increasing", "last_reset" : str(datetime.now()) } )
+                    #payload.update( {"icon": "mdi:counter", "device-class": "energy", "state_class": "total_increasing", "last_reset" : "1970-01-01T00:00:00+00:00" } )
+                    payload.update( {"icon": "mdi:counter", "device-class": "energy", "state_class": "total_increasing" } )
                 if icon:
                     payload.update({"icon": icon})
                 # msg = {"topic": topic, "payload": payload, "retain": True}
