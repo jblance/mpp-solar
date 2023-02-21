@@ -602,7 +602,6 @@ class pi18(AbstractProtocol):
             # "DI",
             "MCHGCR",
             "MUCHGCR",
-            "PI",
         ]
         self.SETTINGS_COMMANDS = [
             "PEI" "PDI" "POP"
@@ -611,7 +610,8 @@ class pi18(AbstractProtocol):
             "MCHGV",
             "MUCHGC",
         ]
-        self.DEFAULT_COMMAND = "PI"
+        self.DEFAULT_COMMAND = ["PIRI"]
+        self.ID_COMMANDS = ["ID"]
 
     def get_full_command(self, command) -> bytes:
         """
