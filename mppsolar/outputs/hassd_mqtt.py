@@ -84,6 +84,9 @@ class hassd_mqtt(mqtt):
             device_class = None
             if len(data[key]) > 2 and data[key][2] and "device-class" in data[key][2]:
                 device_class = data[key][2]["device-class"]
+            #state_class = None
+            #if len(data[key]) > 2 and data[key][2] and "state_class" in data[key][2]:
+            #    state_class = data[key][2]["state_class"]
 
             # remove spaces
             if remove_spaces:
@@ -130,14 +133,16 @@ class hassd_mqtt(mqtt):
                 }
                 if device_class:
                     payload["device_class"] = device_class
-                if unit == "W":
-                    payload.update({"state_class": "measurement", "device_class": "power"})
-                elif unit == "Wh" or unit == "kWh":
-                    #payload.update( {"icon": "mdi:counter", "device_class": "energy", "state_class": "total_increasing", "last_reset" : str(datetime.now()) } )
-                    #payload.update( {"icon": "mdi:counter", "device-class": "energy", "state_class": "total_increasing", "last_reset" : "1970-01-01T00:00:00+00:00" } )
-                    payload.update( {"icon": "mdi:counter", "device-class": "energy", "state_class": "total_increasing" } )
+                #if state_class:
+                #    payload["state_class"] = state_class
                 if icon:
                     payload.update({"icon": icon})
+
+                if unit == "W":
+                    payload.update({"state_class": "measurement", "device_class": "power"})
+                if unit == "Wh" or unit == "kWh":
+                    payload.update( {"icon": "mdi:counter", "device_class": "energy", "state_class": "total", "last_reset" : str(datetime.now()) } )
+
                 # msg = {"topic": topic, "payload": payload, "retain": True}
                 payloads = js.dumps(payload)
                 # print(payloads)
