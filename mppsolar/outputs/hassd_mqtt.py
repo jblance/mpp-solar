@@ -84,9 +84,9 @@ class hassd_mqtt(mqtt):
             device_class = None
             if len(data[key]) > 2 and data[key][2] and "device-class" in data[key][2]:
                 device_class = data[key][2]["device-class"]
-            #state_class = None
-            #if len(data[key]) > 2 and data[key][2] and "state_class" in data[key][2]:
-            #    state_class = data[key][2]["state_class"]
+            state_class = None
+            if len(data[key]) > 2 and data[key][2] and "state_class" in data[key][2]:
+                state_class = data[key][2]["state_class"]
 
             # remove spaces
             if remove_spaces:
@@ -133,11 +133,10 @@ class hassd_mqtt(mqtt):
                 }
                 if device_class:
                     payload["device_class"] = device_class
-                #if state_class:
-                #    payload["state_class"] = state_class
+                if state_class:
+                    payload["state_class"] = state_class
                 if icon:
                     payload.update({"icon": icon})
-
                 if unit == "W":
                     payload.update({"state_class": "measurement", "device_class": "power"})
                 if unit == "Wh" or unit == "kWh":
