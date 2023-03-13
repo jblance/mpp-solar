@@ -3,28 +3,31 @@
 ```
 [SETUP]
 ### NOTE WELL: No end of line comments are supported!
-### Commented out lines must begin at the start of a line!
+### Commented out lines must be at the beginning of a line but can be indented.
 
 # Number of seconds to pause between loops of processing the sections
 # i.e. the pause at the end of an entire run through the config file
 # default is 60
 pause=5
+
 # ipaddress or hostname of the mqtt broker, default is 'localhost'
 mqtt_broker=localhost
+
 # mqtt broker port number, default is 1883
 mqtt_port=1883
+
 # username and password (if required) for mqtt broker, default to None and not used unless defined
 mqtt_user=username
 mqtt_pass=password
 
-# The section name needs to be unique
-# There can be multiple sections which are processed sequentially without pause
-# The pause occurs after all sections are processed, before the next loop
-# The name is used for:
-#   client_id in MQTTIO (using in the command and response topics)
-#
+### The section name needs to be unique
+### There can be multiple sections which are processed sequentially without pause
+### The pause occurs after all sections are processed, before the next loop
+### The name is used for:
+###   client_id in MQTTIO (using in the command and response topics)
+
 [SectionName]
-#
+
 # required - protocol to use to decode command and response (default: PI30)
 protocol=PI30
 
