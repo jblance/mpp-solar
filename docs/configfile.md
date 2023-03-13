@@ -2,6 +2,9 @@
 
 ```
 [SETUP]
+### NOTE WELL: No end of line comments are supported!
+### Commented out lines must begin at the start of a line!
+
 # Number of seconds to pause between loops of processing the sections
 # i.e. the pause at the end of an entire run through the config file
 # default is 60
@@ -22,17 +25,38 @@ mqtt_pass=password
 #
 [SectionName]
 #
-protocol=PI30     # required - protocol to use to decode command and response (default: PI30)
-type=mppsolar     # required - type of device (default: mppsolar)
-port=/dev/ttyUSB0 # required - port used to communicate with device (default: /dev/ttyUSB0)
-baud=2400         # optional - baud rate of port communications (default: 2400)
-command=QPI       # required - hash separated list of commands to execute
-tag=TagName       # optional - used in various ways in the outputs (see output list)
-outputs=screen    # required - comma separated list of outputs (default: screen)
-porttype=serial   # optional - used to override the automatic port type determination
-filter=^voltage   # optional - if defined only field names that match the filter will be output (uses python re format)
-excl_filter=test  # optional - if defined any field names that match the filter will be excluded from the output (uses python re format)
-udpport=5566      # optional - redefines UDP publish port (default: 5555)
+# required - protocol to use to decode command and response (default: PI30)
+protocol=PI30
+
+# required - type of device (default: mppsolar)
+type=mppsolar
+
+# required - port used to communicate with device (default: /dev/ttyUSB0)
+port=/dev/ttyUSB0
+
+# optional - baud rate of port communications (default: 2400)
+baud=2400
+
+# required - hash separated list of commands to execute
+command=QPI
+
+# optional - used in various ways in the outputs (see output list)
+tag=TagName
+
+# required - comma separated list of outputs (default: screen)
+outputs=screen
+
+# optional - used to override the automatic port type determination
+porttype=serial
+
+# optional - if defined only field names that match the filter will be output (uses python re format)
+filter=^voltage
+
+# optional - if defined any field names that match the filter will be
+excl_filter=test excluded from the output (uses python re format)
+
+# optional - redefines UDP publish port (default: 5555)
+udpport=5566
 ```
 
 [list of outputs](usage.md#List-available-output-processors)
