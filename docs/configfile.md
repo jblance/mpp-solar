@@ -56,7 +56,7 @@ porttype=serial
 filter=^voltage
 
 # optional - if defined any field names that match the filter will be
-excl_filter=test excluded from the output (uses python re format)
+exclfilter=test excluded from the output (uses python re format)
 
 # optional - redefines UDP publish port (default: 5555)
 udpport=5566
