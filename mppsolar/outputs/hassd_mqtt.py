@@ -1,13 +1,13 @@
 import json as js
 import logging
 import re
+from datetime import datetime
 from time import sleep
 
 from ..helpers import get_kwargs, key_wanted
 from .mqtt import mqtt
 
 log = logging.getLogger("hassd_mqtt")
-
 
 class hassd_mqtt(mqtt):
     def __str__(self):
@@ -18,7 +18,6 @@ class hassd_mqtt(mqtt):
 
     def build_msgs(self, *args, **kwargs):
         log.debug(f"kwargs {kwargs}")
-
         data = get_kwargs(kwargs, "data")
         # Clean data
         if "_command" in data:
@@ -85,6 +84,9 @@ class hassd_mqtt(mqtt):
             device_class = None
             if len(data[key]) > 2 and data[key][2] and "device-class" in data[key][2]:
                 device_class = data[key][2]["device-class"]
+            state_class = None
+            if len(data[key]) > 2 and data[key][2] and "state_class" in data[key][2]:
+                state_class = data[key][2]["state_class"]
 
             # remove spaces
             if remove_spaces:
@@ -131,10 +133,15 @@ class hassd_mqtt(mqtt):
                 }
                 if device_class:
                     payload["device_class"] = device_class
-                if unit == "W":
-                    payload.update({"state_class": "measurement", "device_class": "power"})
+                if state_class:
+                    payload["state_class"] = state_class
                 if icon:
                     payload.update({"icon": icon})
+                if unit == "W":
+                    payload.update({"state_class": "measurement", "device_class": "power"})
+                if unit == "Wh" or unit == "kWh":
+                    payload.update( {"icon": "mdi:counter", "device_class": "energy", "state_class": "total", "last_reset" : str(datetime.now()) } )
+
                 # msg = {"topic": topic, "payload": payload, "retain": True}
                 payloads = js.dumps(payload)
                 # print(payloads)
