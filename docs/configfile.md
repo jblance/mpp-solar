@@ -2,37 +2,64 @@
 
 ```
 [SETUP]
+### NOTE WELL: No end of line comments are supported!
+### Commented out lines must be at the beginning of a line but can be indented.
+
 # Number of seconds to pause between loops of processing the sections
 # i.e. the pause at the end of an entire run through the config file
 # default is 60
 pause=5
+
 # ipaddress or hostname of the mqtt broker, default is 'localhost'
 mqtt_broker=localhost
+
 # mqtt broker port number, default is 1883
 mqtt_port=1883
+
 # username and password (if required) for mqtt broker, default to None and not used unless defined
 mqtt_user=username
 mqtt_pass=password
 
-# The section name needs to be unique
-# There can be multiple sections which are processed sequentially without pause
-# The pause occurs after all sections are processed, before the next loop
-# The name is used for:
-#   client_id in MQTTIO (using in the command and response topics)
-#
+### The section name needs to be unique
+### There can be multiple sections which are processed sequentially without pause
+### The pause occurs after all sections are processed, before the next loop
+### The name is used for:
+###   client_id in MQTTIO (using in the command and response topics)
+
 [SectionName]
-#
-protocol=PI30     # required - protocol to use to decode command and response (default: PI30)
-type=mppsolar     # required - type of device (default: mppsolar)
-port=/dev/ttyUSB0 # required - port used to communicate with device (default: /dev/ttyUSB0)
-baud=2400         # optional - baud rate of port communications (default: 2400)
-command=QPI       # required - hash separated list of commands to execute
-tag=TagName       # optional - used in various ways in the outputs (see output list)
-outputs=screen    # required - comma separated list of outputs (default: screen)
-porttype=serial   # optional - used to override the automatic port type determination
-filter=^voltage   # optional - if defined only field names that match the filter will be output (uses python re format)
-excl_filter=test  # optional - if defined any field names that match the filter will be excluded from the output (uses python re format)
-udpport=5566      # optional - redefines UDP publish port (default: 5555)
+
+# required - protocol to use to decode command and response (default: PI30)
+protocol=PI30
+
+# required - type of device (default: mppsolar)
+type=mppsolar
+
+# required - port used to communicate with device (default: /dev/ttyUSB0)
+port=/dev/ttyUSB0
+
+# optional - baud rate of port communications (default: 2400)
+baud=2400
+
+# required - hash separated list of commands to execute
+command=QPI
+
+# optional - used in various ways in the outputs (see output list)
+tag=TagName
+
+# required - comma separated list of outputs (default: screen)
+outputs=screen
+
+# optional - used to override the automatic port type determination
+porttype=serial
+
+# optional - if defined only field names that match the filter will be output (uses python re format)
+filter=^voltage
+
+# optional - if defined any field names that match the filter will be
+excl_filter=test excluded from the output (uses python re format)
+
+# optional - redefines UDP publish port (default: 5555)
+udpport=5566
 ```
 
 [list of outputs](usage.md#List-available-output-processors)
