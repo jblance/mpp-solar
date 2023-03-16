@@ -38,3 +38,9 @@ The python code is designed to run on Linux type python environments using pytho
 
 ## Full Documentation ##
 [More detailed documentation](https://github.com/jblance/mpp-solar/blob/master/docs/README.md)
+
+## Support ##
+If you want to tip me for this work, you can now buy me a coffee
+
+[![buymeacoffee1](https://user-images.githubusercontent.com/1266998/225745276-54d6a4d4-a1ed-44f9-a1f2-e99eb1aa2812.png)](https://www.buymeacoffee.com/jblance)
+
