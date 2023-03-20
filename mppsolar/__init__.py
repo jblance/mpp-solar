@@ -277,7 +277,7 @@ def main():
         sections = config.sections()
         # Check setup section exists
         if "SETUP" not in config:
-            log.error(f"Config File '{args.configfile}'  is missing the required 'SETUP' section")
+            log.error(f"Config File '{args.configfile}'  is missing the required 'SETUP' section, using defaults")
         # Process setup section
         pause = config["SETUP"].getint("pause", fallback=60)
         # Overide mqtt_broker settings
