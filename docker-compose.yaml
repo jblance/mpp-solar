@@ -1,0 +1,16 @@
+services:
+  mppsolar:
+    build: .
+    entrypoint:
+    - sleep
+    - infinity
+    init: true
+
+    volumes:
+    - type: bind
+      source: ./docker/
+      target: /etc/mpp-solar
+    - type: bind
+      source: .
+      target: /code
+
