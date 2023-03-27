@@ -104,4 +104,6 @@ ENV/
 .vscode/
 .idea/
 mppsolar/.idea/
-poetry.lock
+docker/mosquitto/data/mosquitto.db
+docker/mosquitto/log/mosquitto.log
+docker/mosquitto/config/mosquitto.passwd
