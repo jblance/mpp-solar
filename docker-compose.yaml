@@ -22,8 +22,10 @@ services:
         target: /mpp-solar
     build: .
     entrypoint:
-      - sleep
-      - infinity
+      - mpp-solar
+      - -C
+      - /etc/mpp-solar/mpp-solar.conf #Available due to volume binding above
+      - --daemon
     depends_on:
       - mosquitto
 
