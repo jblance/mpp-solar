@@ -9,6 +9,7 @@ from .mqtt import mqtt
 
 log = logging.getLogger("hassd_mqtt")
 
+
 class hassd_mqtt(mqtt):
     def __str__(self):
         return """outputs the to the supplied mqtt broker in hass format: eg "homeassistant/sensor/mpp_{tag}_{key}/state" """
@@ -140,7 +141,14 @@ class hassd_mqtt(mqtt):
                 if unit == "W":
                     payload.update({"state_class": "measurement", "device_class": "power"})
                 if unit == "Wh" or unit == "kWh":
-                    payload.update( {"icon": "mdi:counter", "device_class": "energy", "state_class": "total", "last_reset" : str(datetime.now()) } )
+                    payload.update(
+                        {
+                            "icon": "mdi:counter",
+                            "device_class": "energy",
+                            "state_class": "total",
+                            "last_reset": str(datetime.now()),
+                        }
+                    )
 
                 # msg = {"topic": topic, "payload": payload, "retain": True}
                 payloads = js.dumps(payload)

@@ -56,7 +56,13 @@ QUERY_COMMANDS = {
             [4, "AC Output Frequency", "float", "Hz", {"icon": "mdi:current-ac", "device-class": "frequency"}],
             [5, "AC Output Current", "float", "A", {"icon": "mdi:current-ac", "device-class": "current"}],
             [6, "AC Output Apparent Power", "int", "VA", {"icon": "mdi:power-plug", "device-class": "apparent_power"}],
-            [7, "AC Output Active Power", "int", "W", {"icon": "mdi:power-plug", "device-class": "power"}],
+            [
+                7,
+                "AC Output Active Power",
+                "int",
+                "W",
+                {"icon": "mdi:power-plug", "device-class": "power", "state_class": "measurement"},
+            ],
             [8, "Battery Voltage", "float", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
             [9, "Battery Recharge Voltage", "float", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
             [10, "Battery Under Voltage", "float", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
@@ -214,7 +220,13 @@ QUERY_COMMANDS = {
             [3, "AC Output Voltage", "float", "V", {"icon": "mdi:power-plug", "device-class": "voltage"}],
             [4, "AC Output Frequency", "float", "Hz", {"icon": "mdi:current-ac", "device-class": "frequency"}],
             [5, "AC Output Apparent Power", "int", "VA", {"icon": "mdi:power-plug", "device-class": "apparent_power"}],
-            [6, "AC Output Active Power", "int", "W", {"icon": "mdi:power-plug", "device-class": "power"}],
+            [
+                6,
+                "AC Output Active Power",
+                "int",
+                "W",
+                {"icon": "mdi:power-plug", "device-class": "power", "state_class": "measurement"},
+            ],
             [7, "AC Output Load", "int", "%", {"icon": "mdi:brightness-percent"}],
             [8, "BUS Voltage", "int", "V", {"icon": "mdi:details", "device-class": "voltage"}],
             [9, "Battery Voltage", "float", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
@@ -260,7 +272,13 @@ QUERY_COMMANDS = {
             ],
             [18, "Battery Voltage Offset for Fans On", "int", "10mV"],
             [19, "EEPROM Version", "int", ""],
-            [20, "PV1 Charging Power", "int", "W", {"icon": "mdi:solar-power", "device-class": "power"}],
+            [
+                20,
+                "PV1 Charging Power",
+                "int",
+                "W",
+                {"icon": "mdi:solar-power", "device-class": "power", "state_class": "measurement"},
+            ],
             [
                 21,
                 "Device Status2",
@@ -278,7 +296,13 @@ QUERY_COMMANDS = {
                     "02": "South America",
                 },
             ],
-            [24, "Solar Feed to Grid Power", "int", "W"],
+            [
+                24,
+                "Solar Feed to Grid Power",
+                "int",
+                "W",
+                {"icon": "mdi:solar-power", "device-class": "power", "state_class": "measurement"},
+            ],
         ],
         "test_responses": [
             b"(227.2 50.0 230.3 50.0 0829 0751 010 447 54.50 020 083 0054 02.7 323.6 00.00 00000 00010110 00 00 00879 010\xf1\x8c\r",
@@ -292,7 +316,13 @@ QUERY_COMMANDS = {
         "response": [
             [1, "PV2 Input Current", "float", "A", {"icon": "mdi:solar-power", "device-class": "current"}],
             [2, "PV2 Input Voltage", "float", "V", {"icon": "mdi:solar-power", "device-class": "voltage"}],
-            [3, "PV2 Charging Power", "int", "W", {"icon": "mdi:solar-power", "device-class": "power"}],
+            [
+                3,
+                "PV2 Charging Power",
+                "int",
+                "W",
+                {"icon": "mdi:solar-power", "device-class": "power", "state_class": "measurement"},
+            ],
         ],
         "test_responses": [
             b"(03.1 327.3 01026 \xc9\x8b\r",
@@ -365,7 +395,13 @@ QUERY_COMMANDS = {
             [7, "AC Output Voltage", "float", "V", {"icon": "mdi:power-plug", "device-class": "voltage"}],
             [8, "AC Output Frequency", "float", "Hz", {"icon": "mdi:current-ac", "device-class": "frequency"}],
             [9, "AC Output Apparent Power", "int", "VA", {"icon": "mdi:power-plug", "device-class": "apparent_power"}],
-            [10, "AC Output Active Power", "int", "W", {"icon": "mdi:power-plug", "device-class": "power"}],
+            [
+                10,
+                "AC Output Active Power",
+                "int",
+                "W",
+                {"icon": "mdi:power-plug", "device-class": "power", "state_class": "measurement"},
+            ],
             [11, "Load Percentage", "int", "%", {"icon": "mdi:brightness-percent"}],
             [12, "Battery Voltage", "float", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
             [13, "Battery Charging Current", "int", "A", {"icon": "mdi:current-dc", "device-class": "current"}],
@@ -385,7 +421,13 @@ QUERY_COMMANDS = {
                 "VA",
                 {"icon": "mdi:power-plug", "device-class": "apparent_power"},
             ],
-            [18, "Total Output Active Power", "int", "W", {"icon": "mdi:power-plug", "device-class": "power"}],
+            [
+                18,
+                "Total Output Active Power",
+                "int",
+                "W",
+                {"icon": "mdi:power-plug", "device-class": "power", "state_class": "measurement"},
+            ],
             [
                 19,
                 "Total AC Output Percentage",
@@ -816,7 +858,14 @@ QUERY_COMMANDS = {
         "description": "Total PV Generated Energy Inquiry",
         "type": "QUERY",
         "response_type": "SEQUENTIAL",
-        "response": [["int", "Total PV Generated Energy", "Wh"]],
+        "response": [
+            [
+                "int",
+                "Total PV Generated Energy",
+                "Wh",
+                {"icon": "mdi:solar-power", "device-class": "energy", "state_class": "total"},
+            ]
+        ],
         "test_responses": [
             b"(00238800!J\r",
         ],
@@ -827,7 +876,12 @@ QUERY_COMMANDS = {
         "type": "QUERY",
         "response_type": "SEQUENTIAL",
         "response": [
-            ["int", "PV Generated Energy for Year", "Wh"],
+            [
+                "int",
+                "PV Generated Energy for Year",
+                "Wh",
+                {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},
+            ],
             ["info:cv", "Year", ""],
         ],
         "test_responses": [
@@ -841,7 +895,12 @@ QUERY_COMMANDS = {
         "type": "QUERY",
         "response_type": "SEQUENTIAL",
         "response": [
-            ["int", "PV Generated Energy for Month", "Wh"],
+            [
+                "int",
+                "PV Generated Energy for Month",
+                "Wh",
+                {"icon": "mdi:solar-power", "device-class": "energy", "state_class": "total"},
+            ],
             ["info:cv[:4]", "Year", ""],
             ["info:calendar.month_name[int(cv[4:])]", "Month", ""],
         ],
@@ -857,7 +916,13 @@ QUERY_COMMANDS = {
         "type": "QUERY",
         "response_type": "INDEXED",
         "response": [
-            [1, "PV Generated Energy for Day", "int", "Wh", {"icon": "mdi:solar-power", "device-class": "energy"}],
+            [
+                1,
+                "PV Generated Energy for Day",
+                "int",
+                "Wh",
+                {"icon": "mdi:solar-power", "device-class": "energy", "state_class": "total"},
+            ],
             [2, "Year", "info:cv[:4]", ""],
             [3, "Month", "info:calendar.month_name[int(cv[4:6])]", ""],
             [4, "Day", "info:cv[6:]", ""],
@@ -872,7 +937,14 @@ QUERY_COMMANDS = {
         "description": "Total Output Load Energy Inquiry",
         "type": "QUERY",
         "response_type": "SEQUENTIAL",
-        "response": [["int", "Total Output Load Energy", "Wh"]],
+        "response": [
+            [
+                "int",
+                "Total Output Load Energy",
+                "Wh",
+                {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},
+            ]
+        ],
         "test_responses": [
             b"(00238800!J\r",
         ],
@@ -883,7 +955,12 @@ QUERY_COMMANDS = {
         "type": "QUERY",
         "response_type": "SEQUENTIAL",
         "response": [
-            ["int", "Output Load Energy for Year", "Wh"],
+            [
+                "int",
+                "Output Load Energy for Year",
+                "Wh",
+                {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},
+            ],
             ["info:cv", "Year", ""],
         ],
         "test_responses": [
@@ -897,7 +974,12 @@ QUERY_COMMANDS = {
         "type": "QUERY",
         "response_type": "SEQUENTIAL",
         "response": [
-            ["int", "Output Load Energy for Month", "Wh"],
+            [
+                "int",
+                "Output Load Energy for Month",
+                "Wh",
+                {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},
+            ],
             ["info:cv[:4]", "Year", ""],
             ["info:calendar.month_name[int(cv[4:])]", "Month", ""],
         ],
@@ -912,7 +994,12 @@ QUERY_COMMANDS = {
         "type": "QUERY",
         "response_type": "SEQUENTIAL",
         "response": [
-            ["int", "Output Load Energy for Day", "Wh"],
+            [
+                "int",
+                "Output Load Energy for Day",
+                "Wh",
+                {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},
+            ],
             ["info:cv[:4]", "Year", ""],
             ["info:calendar.month_name[int(cv[4:6])]", "Month", ""],
             ["info:cv[6:]", "Day", ""],

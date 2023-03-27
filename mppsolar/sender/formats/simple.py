@@ -1,14 +1,14 @@
 import logging
 import re
 
-from mppsolar.helpers import get_kwargs, getMaxLen, key_wanted, pad
+from mppsolar.helpers import get_kwargs, key_wanted
 
-log = logging.getLogger("table")
+log = logging.getLogger("simple")
 
 
-class table:
+class simple:
     def output(*args, **kwargs):
-        log.info("Using output formatter: table")
+        log.info("Using output formatter: simple")
         log.debug(f"kwargs {kwargs}")
         data = get_kwargs(kwargs, "data")
 
@@ -40,15 +40,11 @@ class table:
         if "raw_response" in data:
             data.pop("raw_response")
 
-        # build header
+        # remove command details
         if "_command" in data:
-            command = data.pop("_command")
-        else:
-            command = "Unknown command"
+            data.pop("_command")
         if "_command_description" in data:
-            description = data.pop("_command_description")
-        else:
-            description = "No description found"
+            data.pop("_command_description")
 
         # build data to display
         displayData = {}
@@ -64,26 +60,13 @@ class table:
                 displayData[key] = _values
         log.debug(f"displayData: {displayData}")
 
-        # build header
-        _result.append(f"Command: {command} - {description}")
-        if filter or excl_filter:
-            _result.append(
-                f"Using filter: '{filter}' and excl_filter: '{excl_filter}'. {len(displayData)} results retained from {len(data)} in total"
-            )
-        _result.append("-" * 80)
-
         # build data
-        maxP = getMaxLen(displayData)
-        if maxP < 9:
-            maxP = 9
-        # maxV = getMaxLen(data.values())
-        _result.append(f"{pad('Parameter', maxP+1)}{'Value':<15}\tUnit")
         for key in displayData:
             value = displayData[key][0]
             unit = displayData[key][1]
             if len(displayData[key]) > 2 and displayData[key][2] and extra_info:
                 extra = displayData[key][2]
-                _result.append(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}\t{extra}")
+                _result.append(f"{key}={value}{unit} {extra}")
             else:
-                _result.append(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}")
+                _result.append(f"{key}={value}{unit}")
         return _result

@@ -11,7 +11,7 @@ device:
   - command: QPIGS
     outputs:
     - name: screen
-      format: table
+      format: raw
       #keep_case: True
       #remove_spaces: False
       #extra_info: True
