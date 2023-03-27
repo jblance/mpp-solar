@@ -11,5 +11,6 @@ device:
     outputs:
     - name: screen
       format: hass
-      tag: testinverter
+      entity_id_prefix: inverter42
+      discovery_prefix: homeassistant
       filter: ^serial|^work|^charger|^fault

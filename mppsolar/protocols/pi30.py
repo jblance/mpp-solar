@@ -689,7 +689,7 @@ QUERY_COMMANDS = {
         "type": "QUERY",
         "response_type": "INDEXED",
         "response": [
-            [0, "AC Input Voltage", "float", "V", {"icon": "lightning"}],
+            [0, "AC Input Voltage", "float", "V", {"icon": "mdi:lightning"}],
             [1, "AC Input Frequency", "float", "Hz"],
             [2, "AC Output Voltage", "float", "V"],
             [3, "AC Output Frequency", "float", "Hz"],

@@ -41,7 +41,7 @@ class test_pi30_decode(unittest.TestCase):
             ],
             "_command": "QPIGS",
             "_command_description": "General Status Parameters inquiry",
-            "AC Input Voltage": [0.0, "V", {"icon": "lightning"}],
+            "AC Input Voltage": [0.0, "V", {"icon": "mdi:lightning"}],
             "AC Input Frequency": [0.0, "Hz"],
             "AC Output Voltage": [230.0, "V"],
             "AC Output Frequency": [49.9, "Hz"],

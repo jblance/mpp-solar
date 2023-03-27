@@ -130,14 +130,21 @@ class AbstractDevice(ABC):
 
     def get_device_id(self) -> dict:
         _id = ""
-        for command in self._protocol.ID_COMMANDS:
-            result = self.run_command(command)
-            last_key = list(result).pop()
-            value = result[last_key][0]
+        if self._protocol.ID_COMMANDS:
+            for command in self._protocol.ID_COMMANDS:
+                result = self.run_command(command)
+                last_key = list(result).pop()
+                value = result[last_key][0]
 
-            if not _id:
-                _id = f"{value}"
-            else:
-                _id = f"{_id}:{value}"
-        log.info(f"DeviceId: {_id}")
-        return {"_command": "Get Device ID", "_command_description": "Generate a device id", "DeviceID": [_id, ""]}
+                if not _id:
+                    _id = f"{value}"
+                else:
+                    _id = f"{_id}:{value}"
+            log.info(f"DeviceId: {_id}")
+            return {"_command": "Get Device ID", "_command_description": "Generate a device id", "DeviceID": [_id, ""]}
+        else:
+            return {
+                "_command": "Get Device ID",
+                "_command_description": "Generate a device id",
+                "DeviceID": ["getDeviceId not supported for this protocol", ""],
+            }
