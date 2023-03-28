@@ -10,6 +10,20 @@ log = logging.getLogger("pi16")
 # (000 001 002 003 004
 
 COMMANDS = {
+    "QEH": {
+        "name": "QEH",
+        "description": "Query energy produced for a specific hour",
+        "help": " -- Query device for energy produced in the specific day at date in YYYYMMDDHH format",
+        "type": "QUERY",
+        "checksum_required": "True",
+        "response_type": "SEQUENTIAL",
+        "response": [
+            ["int", "Energy produced", "Wh"],
+        ],
+        "test_responses": [
+        ],
+        "regex": "QED(\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d)$",
+    },
     "QED": {
         "name": "QED",
         "description": "Query energy produced for a specific day",
@@ -24,6 +38,34 @@ COMMANDS = {
             b"(012345\x9c\xaf\r",
         ],
         "regex": "QED(\\d\\d\\d\\d\\d\\d\\d\\d)$",
+    },
+    "QEM": {
+        "name": "QEM",
+        "description": "Query energy produced for a specific month",
+        "help": " -- Query device for energy produced in the specific month at date in YYYYMM format",
+        "type": "QUERY",
+        "checksum_required": "True",
+        "response_type": "SEQUENTIAL",
+        "response": [
+            ["int", "Energy produced", "Wh"],
+        ],
+        "test_responses": [
+        ],
+        "regex": "QED(\\d\\d\\d\\d\\d\\d)$",
+    },
+    "QEY": {
+        "name": "QEY",
+        "description": "Query energy produced for a specific year",
+        "help": " -- Query device for energy produced in the specific month at date in YYYY format",
+        "type": "QUERY",
+        "checksum_required": "True",
+        "response_type": "SEQUENTIAL",
+        "response": [
+            ["int", "Energy produced", "Wh"],
+        ],
+        "test_responses": [
+        ],
+        "regex": "QED(\\d\\d\\d\\d)$",
     },
     "QMOD": {
         "name": "QMOD",
