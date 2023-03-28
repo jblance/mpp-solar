@@ -16,7 +16,12 @@ services:
       - type: bind
         source: ./docker/
         target: /etc/mpp-solar
-    build: .
+    #Bind the code
+      - type: bind
+        source: .
+        target: /mpp-solar
+    build: 
+      dockerfile: Dockerfile.development
     entrypoint:
       - mpp-solar
       - -C
