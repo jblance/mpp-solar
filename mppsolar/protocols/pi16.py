@@ -20,8 +20,7 @@ COMMANDS = {
         "response": [
             ["int", "Energy produced", "Wh"],
         ],
-        "test_responses": [
-        ],
+        "test_responses": [],
         "regex": "QED(\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d)$",
     },
     "QED": {
@@ -49,8 +48,7 @@ COMMANDS = {
         "response": [
             ["int", "Energy produced", "Wh"],
         ],
-        "test_responses": [
-        ],
+        "test_responses": [],
         "regex": "QED(\\d\\d\\d\\d\\d\\d)$",
     },
     "QEY": {
@@ -63,9 +61,28 @@ COMMANDS = {
         "response": [
             ["int", "Energy produced", "Wh"],
         ],
-        "test_responses": [
-        ],
+        "test_responses": [],
         "regex": "QED(\\d\\d\\d\\d)$",
+    },
+    "QID": {
+        "name": "QID",
+        "description": "Device Serial Number inquiry",
+        "help": " -- queries the device serial number",
+        "type": "QUERY",
+        "response": [["string", "Serial Number", ""]],
+        "test_responses": [
+            b"(96131801100057\x93\xa5\r",
+        ],
+    },
+    "QGMN": {
+        "name": "QGMN",
+        "description": "General Model Name Inquiry",
+        "type": "QUERY",
+        "response_type": "SEQUENTIAL",
+        "response": [["bytes.decode", "General Model Name", ""]],
+        "test_responses": [
+            b"(000D\xee\r",
+        ],
     },
     "QMOD": {
         "name": "QMOD",
@@ -184,6 +201,28 @@ COMMANDS = {
             b"(230.0 50.0 013.0 230.0 013.0 18.0 048.0 1 10 0\x86\x42\r",
         ],
     },
+    "QVFW": {
+        "name": "QVFW",
+        "description": "Main CPU firmware version inquiry",
+        "help": " -- queries the main CPU firmware version",
+        "type": "QUERY",
+        "response_type": "SEQUENTIAL",
+        "response": [["bytes.decode:r[6:]", "Main CPU firmware version", ""]],
+        "test_responses": [
+            b"(VERFW:00000.27V\t\r",
+        ],
+    },
+    "QVFW2": {
+        "name": "QVFW2",
+        "description": "Secondary CPU firmware version inquiry",
+        "help": " -- queries the secondary CPU firmware version",
+        "type": "QUERY",
+        "response_type": "SEQUENTIAL",
+        "response": [["bytes.decode:r[7:]", "Secondary CPU firmware version", ""]],
+        "test_responses": [
+            b"(VERFW2:00000.30\xe3\x88\r",
+        ],
+    },
 }
 
 
@@ -202,6 +241,7 @@ class pi16(AbstractProtocol):
             "QPI",
         ]
         self.DEFAULT_COMMAND = "QPI"
+        self.ID_COMMANDS = ["QPI", "QGMN", "QVFW"]
 
     def checksum(self, data):
         # QED20150620106
