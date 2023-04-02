@@ -18,3 +18,9 @@ pypi:
 
 pypi-upload:
 	twine upload dist/*
+
+docker-up:
+	docker-compose up --build
+
+dockerdev-up:
+	docker compose -f docker-compose.development.yaml up --build
