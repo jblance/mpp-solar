@@ -1,0 +1,51 @@
+# yaml config for powermon
+device:
+  name: Test_Inverter
+  id: 123456789
+  model: 1012LV-MK
+  manufacturer: MPP-Solar
+  port:
+    baud: 2400
+    path: /dev/hidraw0
+    type: test
+    protocol: PI30
+
+#Separate the schedule from the device definition
+scheduling:
+  loop: 10
+  schedules:
+  #Define a schedule for a device to listen to adhoc commands
+  - name: adhoc_listener
+    type: loop
+    run_every_x_loops: 1 # runs every 10 seconds 
+    commands:
+    - command: adhoc #the command name could be anything
+      type: listen
+      command_topic: /mpp-solar/commands/ #mqtt topic that will listen for commands
+      outputs:
+      - name: mqtt
+        tag: Test_Inverter
+  - name: QPIGS_5_minutes
+    type: loop
+    run_every_x_loops: 6 #will run every 1 minute
+    commands:
+    - command: QPIGS
+      type: basic #default command type is basic
+      outputs:
+      - name: mqtt
+        tag: Test_Inverter
+mqttbroker:
+  name: localhost
+  port: 1883
+  user: null
+  pass: null
+  adhoc_commands:
+    topic: Test_Inverter/commands
+    outputs:
+    - name: screen
+      tag: Test_Inverter
+daemon:
+  type: systemd
+  keepalive: 10
+#daemon: initd
+

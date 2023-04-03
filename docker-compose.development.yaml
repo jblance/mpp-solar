@@ -23,10 +23,9 @@ services:
     build: 
       dockerfile: Dockerfile.development
     entrypoint:
-      - mpp-solar
+      - powermon
       - -C
-      - /etc/mpp-solar/mpp-solar.conf #Available due to volume binding above
-      - --daemon
+      - /etc/mpp-solar/powermon.yaml #Available due to volume binding above
     depends_on:
       - mosquitto
 
