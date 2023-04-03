@@ -1,6 +1,6 @@
 # yaml config for powermon
-device:
-  name: Test_Inverter
+devices:
+- name: Test_Inverter
   id: 123456789
   model: 8048MAX
   manufacturer: MPP-Solar
@@ -9,32 +9,44 @@ device:
     path: /dev/ttyUSB0
     type: test
     protocol: PI30MAX
-  commands:
-  - command: QPIGS
-    outputs:
-    - name: screen
-      tag: Test_Inverter
-  - command: QPIGS2
-    outputs:
-    - name: screen
-      tag: Test_Inverter
-  - command: QPGS0
-    outputs:
-    - name: screen
-      tag: Test_Inverter
-      filter: ^serial|^work|^charger|^fault
-  - command: Q1
-    outputs:
-    - name: screen
-      tag: Test_Inverter
-      filter: ^inverter_charge
-  - command: QED
-    # f_command: f'QED{(date.today()-timedelta(days=1)).strftime("%Y%m%d")}'
-    f_command: f'QED{(date.today()).strftime("%Y%m%d")}'
-    outputs:
-    - name: screen
-      tag: Test_Inverter
-      filter: ^pv
+
+scheduling:
+  loop: 60
+  schedules:
+  - id: 1
+    device_id: 123456789
+    type: loop
+    run_every_x_loops: 5 #will run every 5 minutes
+    commands:
+    - command: QPIGS
+      outputs:
+      - name: screen
+        tag: Test_Inverter
+    - command: QPIGS2
+      outputs:
+      - name: screen
+        tag: Test_Inverter
+  - id: 2
+    device_id: 123456789
+    type: time
+    time: 15:00:00 #run at 3pm everyday
+    - command: QPGS0
+      outputs:
+      - name: screen
+        tag: Test_Inverter
+        filter: ^serial|^work|^charger|^fault
+    - command: Q1
+      outputs:
+      - name: screen
+        tag: Test_Inverter
+        filter: ^inverter_charge
+    - command: QED
+      # f_command: f'QED{(date.today()-timedelta(days=1)).strftime("%Y%m%d")}'
+      f_command: f'QED{(date.today()).strftime("%Y%m%d")}'
+      outputs:
+      - name: screen
+        tag: Test_Inverter
+        filter: ^pv
 mqttbroker:
   name: localhost
   port: 1883
@@ -49,4 +61,4 @@ daemon:
   type: systemd
   keepalive: 10
 #daemon: initd
-loop: 60
+
