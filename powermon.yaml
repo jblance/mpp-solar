@@ -55,10 +55,10 @@ mqttbroker:
   user: null
   pass: null
   adhoc_commands:
-  topic: Test_Inverter/commands
-  outputs:
-  - name: screen
-    tag: Test_Inverter
+    topic: Test_Inverter/commands
+    outputs:
+    - name: screen
+      tag: Test_Inverter
 daemon:
   type: systemd
   keepalive: 10
