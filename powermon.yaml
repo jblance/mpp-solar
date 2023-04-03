@@ -10,26 +10,42 @@ devices:
     type: test
     protocol: PI30MAX
 
+#Separate the schedule from the device definition
 scheduling:
   loop: 60
   schedules:
-  - id: 1
+  #Define a schedule for a device to listen to adhoc commands
+  - name: adhoc_listener
+    device_id: 123456789
+    type: loop
+    run_every_x_loops: 1 # runs every 60 seconds 
+    commands:
+    - command: adhoc #the command name could be anything
+      type: listen
+      command_topic: /mpp-solar/commands/ #mqtt topic that will listen for commands
+      outputs:
+      - name: mqtt
+        tag: Test_Inverter
+  - name: QPIGS_5_minutes
     device_id: 123456789
     type: loop
     run_every_x_loops: 5 #will run every 5 minutes
     commands:
     - command: QPIGS
+      type: basic #default command type is basic
       outputs:
       - name: screen
         tag: Test_Inverter
     - command: QPIGS2
+      type: basic
       outputs:
       - name: screen
         tag: Test_Inverter
-  - id: 2
+  - name: 3pm_check
     device_id: 123456789
     type: time
     time: 15:00:00 #run at 3pm everyday
+    commands:
     - command: QPGS0
       outputs:
       - name: screen
@@ -41,22 +57,17 @@ scheduling:
         tag: Test_Inverter
         filter: ^inverter_charge
     - command: QED
-      # f_command: f'QED{(date.today()-timedelta(days=1)).strftime("%Y%m%d")}'
       f_command: f'QED{(date.today()).strftime("%Y%m%d")}'
       outputs:
       - name: screen
         tag: Test_Inverter
         filter: ^pv
+
 mqttbroker:
   name: localhost
   port: 1883
   user: null
   pass: null
-  adhoc_commands:
-    topic: Test_Inverter/commands
-    outputs:
-    - name: screen
-      tag: Test_Inverter
 daemon:
   type: systemd
   keepalive: 10
