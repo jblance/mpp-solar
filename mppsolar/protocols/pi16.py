@@ -241,7 +241,11 @@ class pi16(AbstractProtocol):
             "QPI",
         ]
         self.DEFAULT_COMMAND = "QPI"
-        self.ID_COMMANDS = ["QPI", "QGMN", "QVFW"]
+        self.ID_COMMANDS = [
+            ("QPI", "Protocol Version"),
+            ("QGMN", "General Model Name"),
+            ("QVFW", "Main CPU firmware version"),
+        ]
 
     def checksum(self, data):
         # QED20150620106

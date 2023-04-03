@@ -1,4 +1,6 @@
+import subprocess
 import unittest
+
 from mppsolar.protocols.pi30 import pi30 as pi
 
 # Examples
@@ -286,3 +288,20 @@ class test_pi30_decode(unittest.TestCase):
         result = protocol.decode(response, command)
         # print(result)
         self.assertEqual(result, expected)
+
+    def test_pi30_getdevice_id(self):
+        try:
+            expected = "PI30:044:MKS2-8000\n"
+            result = subprocess.run(
+                ["mpp-solar", "-p", "test", "-P", "pi30", "--getDeviceId", "-o", "value"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            # print(result.stdout)
+            self.assertEqual(result.stdout, expected)
+            self.assertEqual(result.returncode, 0)
+        except subprocess.CalledProcessError as error:
+            print(error.stdout)
+            print(error.stderr)
+            raise error

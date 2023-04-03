@@ -1,4 +1,6 @@
+import subprocess
 import unittest
+
 from mppsolar.protocols.pi16 import pi16 as pi
 
 
@@ -6,7 +8,7 @@ class test_pi16_decode(unittest.TestCase):
     maxDiff = None
 
     def test_pi16_QPI(self):
-        """ test the decode of a QPI response"""
+        """test the decode of a QPI response"""
         protocol = pi()
         response = b"(PI16\x9c\xaf\r"
         command = "QPI"
@@ -21,7 +23,7 @@ class test_pi16_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_pi16_QED(self):
-        """ test the decode of a QED response"""
+        """test the decode of a QED response"""
         protocol = pi()
         response = b"(012345\x9c\xaf\r"
         command = "QED12345678"
@@ -36,7 +38,7 @@ class test_pi16_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_pi16_QPIBI(self):
-        """ test the decode of a QPIBI response"""
+        """test the decode of a QPIBI response"""
         protocol = pi()
         response = b"(0 6 1234 12 43\xb7\x6c\r"
         command = "QPIBI"
@@ -55,7 +57,7 @@ class test_pi16_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_pi16_QMOD_badkey(self):
-        """ test the decode of a QMOD response - with a bad key"""
+        """test the decode of a QMOD response - with a bad key"""
         protocol = pi()
         response = b"(012345\x9c\xaf\r"
         command = "QMOD"
@@ -70,7 +72,7 @@ class test_pi16_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_pi16_QMOD(self):
-        """ test the decode of a QMOD response"""
+        """test the decode of a QMOD response"""
         protocol = pi()
         response = b"(B\x9c\xaf\r"
         command = "QMOD"
@@ -85,7 +87,7 @@ class test_pi16_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_pi16_QPIGS(self):
-        """ test the decode of a QPIGS response"""
+        """test the decode of a QPIGS response"""
         protocol = pi()
         response = b"(224.6 000000 49.9 0006.8 232.4 01594 49.9 006.8 029 415.0 415.0 057.9 ---.- 100 00000 00000 ----- 000.0 000.0 ---.- 035.0 D---110001k\xdb\r"
         command = "QPIGS"
@@ -124,7 +126,7 @@ class test_pi16_decode(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_pi16_QPIRI(self):
-        """ test the decode of a QPIRI response"""
+        """test the decode of a QPIRI response"""
         protocol = pi()
         response = b"(230.0 50.0 013.0 230.0 013.0 18.0 048.0 1 10 0\x86\x42\r"
         command = "QPIRI"
@@ -146,3 +148,20 @@ class test_pi16_decode(unittest.TestCase):
         result = protocol.decode(response, command)
         # print(result)
         self.assertEqual(result, expected)
+
+    def test_pi16_getdevice_id(self):
+        try:
+            expected = "PI16:000:00000.27\n"
+            result = subprocess.run(
+                ["mpp-solar", "-p", "test", "-P", "pi16", "--getDeviceId", "-o", "value"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            # print(result.stdout)
+            self.assertEqual(result.stdout, expected)
+            self.assertEqual(result.returncode, 0)
+        except subprocess.CalledProcessError as error:
+            print(error.stdout)
+            print(error.stderr)
+            raise error

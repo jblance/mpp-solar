@@ -111,9 +111,9 @@ COMMANDS = {
             ["int", "Battery weak back voltage in hybrid mode", "0.1V"],
             ["int", "Battery stop charge current level in floating charging", "0.1A"],
             ["int", "Keep charged time of battery catch stop charger current level", "0.1A"],
-            ["int", "Battery voltage of recover to charge when battery stop charger in floating charging", "0.1V"]
+            ["int", "Battery voltage of recover to charge when battery stop charger in floating charging", "0.1V"],
         ],
-        "test_responses": []
+        "test_responses": [],
     },
     "DM": {
         "name": "DM",
@@ -121,12 +121,8 @@ COMMANDS = {
         "description": "Query machine model",
         "help": "For outputs interpretation see documentations",
         "type": "QUERY",
-        "response": [
-            ["string", "model_code", ""]
-        ],
-        "test_response": [
-            b'^D006050h\xdb\r'
-        ]
+        "response": [["string", "model_code", ""]],
+        "test_responses": [b"^D006050h\xdb\r"],
     },
     "INGS": {
         "name": "INGS",
@@ -147,9 +143,7 @@ COMMANDS = {
             ["int", "NBusAvgV", "0.1V"],
             ["int", "NLintCur", "0.1A"],
         ],
-        "test_responses": [
-            b'^D0560020,0019,0021,0002,0004,0005,3809,3809,3810,3807,000\xf1\x1e\r'
-        ]
+        "test_responses": [b"^D0560020,0019,0021,0002,0004,0005,3809,3809,3810,3807,000\xf1\x1e\r"],
     },
     "RTCP": {
         "name": "RTCP",
@@ -158,7 +152,7 @@ COMMANDS = {
         "help": "",
         "type": "QUERY",
         "response": [],
-        "test_responses": []
+        "test_responses": [],
     },
     "EMINFO": {
         "name": "EMINFO",
@@ -172,13 +166,10 @@ COMMANDS = {
             ["int", "ActPvPow", ""],
             ["int", "ActFeedPow", ""],
             ["int", "ReservPow", ""],
-            ["int", "EMLast", ""]
+            ["int", "EMLast", ""],
         ],
-        "test_responses": [
-            b'^D0301,10000,00005,00010,00000,1\xad\xc4\r'
-        ]
+        "test_responses": [b"^D0301,10000,00005,00010,00000,1\xad\xc4\r"],
     },
-
     # "AA,B,C,D,E,F,G,H,I": {   # defined in spec, but does not seems to work
     #     "name": "AA,B,C,D,E,F,G,H,I",
     #     "prefix": "^D019",
@@ -897,6 +888,7 @@ class pi17(AbstractProtocol):
             "HECS",
         ]
         self.DEFAULT_COMMAND = "PI"
+        self.ID_COMMANDS = ["PI", "DM"]
 
     def get_full_command(self, command) -> bytes:
         """

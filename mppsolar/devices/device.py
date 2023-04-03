@@ -131,10 +131,20 @@ class AbstractDevice(ABC):
     def get_device_id(self) -> dict:
         _id = ""
         if self._protocol.ID_COMMANDS:
-            for command in self._protocol.ID_COMMANDS:
+            # print(self._protocol.ID_COMMANDS)
+            for line in self._protocol.ID_COMMANDS:
+                if isinstance(line, tuple):
+                    command = line[0]
+                else:
+                    command = line
                 result = self.run_command(command)
-                last_key = list(result).pop()
-                value = result[last_key][0]
+                if isinstance(line, tuple):
+                    key = line[1]
+                else:
+                    key = list(result).pop()
+
+                # last_key = list(result).pop()
+                value = result[key][0]
 
                 if not _id:
                     _id = f"{value}"

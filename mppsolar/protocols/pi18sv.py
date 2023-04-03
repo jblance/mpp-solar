@@ -113,7 +113,7 @@ COMMANDS = {
             ["int", "Slave 2 CPU version", ""],
         ],
         "test_responses": [
-            b"^D02005402,08025,00000)\xc3\x9d\r",
+            b"^D02005402,08025,00000\xc3\x9d\r",
         ],
     },
     "MCHGCR": {  # On my SV IV, this commands returns 12 values, from 10 to 120 amps
@@ -337,9 +337,7 @@ COMMANDS = {
                 ["disable", "enable"],
             ],
         ],
-        "test_responses": [
-            "^D0682300,500,0,408,540,564,460,540,060,30,0,0,1,0,0,0,1,0,0,1,1,0,1,1Q\xc3\xa6\r"
-        ],
+        "test_responses": ["^D0682300,500,0,408,540,564,460,540,060,30,0,0,1,0,0,0,1,0,0,1,1,0,1,1Q\xc3\xa6\r"],
     },
     "PIRI": {
         "name": "PIRI",

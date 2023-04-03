@@ -1,4 +1,6 @@
+import subprocess
 import unittest
+
 from mppsolar.protocols.pi18 import pi18 as pi
 
 
@@ -200,3 +202,20 @@ class test_pi18_fullcommands(unittest.TestCase):
         expected = b"^S014BUCD440,480\xa5]\r"
         # print(result)
         self.assertEqual(result, expected)
+
+    def test_pi18_getdevice_id(self):
+        try:
+            expected = "18:5220\n"
+            result = subprocess.run(
+                ["mpp-solar", "-p", "test", "-P", "pi18", "--getDeviceId", "-o", "value"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            # print(result.stdout)
+            self.assertEqual(result.stdout, expected)
+            self.assertEqual(result.returncode, 0)
+        except subprocess.CalledProcessError as error:
+            print(error.stdout)
+            print(error.stderr)
+            raise error

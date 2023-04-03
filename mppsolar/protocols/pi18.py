@@ -15,19 +15,17 @@ COMMANDS = {
         "description": "Device Protocol Version inquiry",
         "help": " -- queries the device protocol version \n",
         "type": "QUERY",
-        "response": [
-            ["string", "Protocol Version", ""]
-        ],
+        "response": [["string", "Protocol Version", ""]],
         "test_responses": [
             b"^D00518;\x03\r",
         ],
     },
-#    "T": {
-#        "name": "T",
-#        "prefix": "^P004",
-#        "description": "Queryy current time",
-#        "help": " -- queries the device protocol version \n",
-#    },
+    #    "T": {
+    #        "name": "T",
+    #        "prefix": "^P004",
+    #        "description": "Queryy current time",
+    #        "help": " -- queries the device protocol version \n",
+    #    },
     "ET": {
         "name": "ET",
         "prefix": "^P005",
@@ -36,7 +34,12 @@ COMMANDS = {
         "type": "QUERY",
         "response_type": "SEQUENTIAL",
         "response": [
-            ["int", "Total PV Generated Energy", "Wh", {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"}]
+            [
+                "int",
+                "Total PV Generated Energy",
+                "Wh",
+                {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},
+            ]
         ],
         "test_responses": [
             b"",
@@ -50,7 +53,13 @@ COMMANDS = {
         "type": "QUERY",
         "response_type": "INDEXED",
         "response": [
-            [1, "PV Generated Energy for Year", "int", "Wh", {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"}],
+            [
+                1,
+                "PV Generated Energy for Year",
+                "int",
+                "Wh",
+                {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},
+            ],
             [2, "Year", "info:cv[:4]", ""],
         ],
         "test_responses": [
@@ -66,7 +75,13 @@ COMMANDS = {
         "type": "QUERY",
         "response_type": "INDEXED",
         "response": [
-            [1, "PV Generated Energy for Month", "int", "Wh", {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"}],
+            [
+                1,
+                "PV Generated Energy for Month",
+                "int",
+                "Wh",
+                {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},
+            ],
             [2, "Year", "info:cv[:4]", ""],
             [3, "Month", "info:calendar.month_name[int(cv[4:6])]", ""],
         ],
@@ -99,9 +114,7 @@ COMMANDS = {
         "description": "Device Serial Number inquiry",
         "help": " -- queries the device serial number",
         "type": "QUERY",
-        "response": [
-            ["string", "Serial Number", ""]
-        ],
+        "response": [["string", "Serial Number", ""]],
         "test_responses": [
             b"^D02514012345678901234567\r",
         ],
@@ -128,75 +141,45 @@ COMMANDS = {
         "help": " -- queries rated information",
         "type": "QUERY",
         "response": [
-            ["10int", "AC input rated voltage",          "V",  {"icon": "mdi:power-plug", "device-class": "voltage"} ],
-            ["10int", "AC input rated current",          "A",  {"icon": "mdi:current-ac", "device-class": "current"} ],
-            ["10int", "AC output rated voltage",         "V",  {"icon": "mdi:power-plug", "device-class": "voltage"} ],
-            ["10int", "AC output rated frequency",       "Hz", {"icon": "mdi:sine-wave", "device-class": "frequency"}],
-            ["10int", "AC output rated current",         "A",  {"icon": "mdi:current-ac", "device-class": "current"} ],
-            ["int",   "AC output rating apparent power", "VA", {"icon": "mdi:power-plug", "device-class": "apparent_power"} ],
-            ["int",   "AC output rating active power",   "W",  {"icon": "mdi:power-plug", "device-class": "power"} ],
-            ["10int", "Battery rated voltage",           "V",  {"icon": "mdi:battery-outline", "device-class": "voltage"} ],
-            ["10int", "Battery re-charge voltage",       "V",  {"icon": "mdi:battery-outline", "device-class": "voltage"} ],
-            ["10int", "Battery re-discharge voltage",    "V",  {"icon": "mdi:battery-outline", "device-class": "voltage"} ],
-            ["10int", "Battery under voltage",           "V",  {"icon": "mdi:battery-outline", "device-class": "voltage"} ],
-            ["10int", "Battery bulk voltage",            "V",  {"icon": "mdi:battery-outline", "device-class": "voltage"} ],
-            ["10int", "Battery float voltage",           "V",  {"icon": "mdi:battery-outline", "device-class": "voltage"} ],
-            ["option",
-                "Battery type",
-                ["AGM",
-                 "Flooded",
-                 "User"
-                ]
+            ["10int", "AC input rated voltage", "V", {"icon": "mdi:power-plug", "device-class": "voltage"}],
+            ["10int", "AC input rated current", "A", {"icon": "mdi:current-ac", "device-class": "current"}],
+            ["10int", "AC output rated voltage", "V", {"icon": "mdi:power-plug", "device-class": "voltage"}],
+            ["10int", "AC output rated frequency", "Hz", {"icon": "mdi:sine-wave", "device-class": "frequency"}],
+            ["10int", "AC output rated current", "A", {"icon": "mdi:current-ac", "device-class": "current"}],
+            [
+                "int",
+                "AC output rating apparent power",
+                "VA",
+                {"icon": "mdi:power-plug", "device-class": "apparent_power"},
             ],
-            ["int", "Max AC charging current", "A", {"icon": "mdi:current-dc", "device-class": "current"} ],
-            ["int", "Max charging current", "A" ,   {"icon": "mdi:current-dc", "device-class": "current"}],
-            ["option",
-                "Input voltage rang",
-                ["Appliance",
-                 "UPS"
-                ]
-            ],
-            ["option",
-                "Output source priority",
-                ["Solar-Utility-Battery",
-                 "Solar-Battery-Utility"
-                ]
-            ],
-            ["option",
-                "Charger source priority",
-                ["Solar First",
-                 "Solar and Utility",
-                 "Only Solar"
-                ]
-            ],
+            ["int", "AC output rating active power", "W", {"icon": "mdi:power-plug", "device-class": "power"}],
+            ["10int", "Battery rated voltage", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
+            ["10int", "Battery re-charge voltage", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
+            ["10int", "Battery re-discharge voltage", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
+            ["10int", "Battery under voltage", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
+            ["10int", "Battery bulk voltage", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
+            ["10int", "Battery float voltage", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
+            ["option", "Battery type", ["AGM", "Flooded", "User"]],
+            ["int", "Max AC charging current", "A", {"icon": "mdi:current-dc", "device-class": "current"}],
+            ["int", "Max charging current", "A", {"icon": "mdi:current-dc", "device-class": "current"}],
+            ["option", "Input voltage rang", ["Appliance", "UPS"]],
+            ["option", "Output source priority", ["Solar-Utility-Battery", "Solar-Battery-Utility"]],
+            ["option", "Charger source priority", ["Solar First", "Solar and Utility", "Only Solar"]],
             ["int", "Parallel max num", ""],
-            ["option",
-                "Machine type",
-                ["Off-Grid",
-                 "Grid-Tie"
-                ]
-            ],
-            ["option",
-                "Topology",
-                ["transformerless",
-                 "ransformer"
-                ]
-            ],
-            ["option",
+            ["option", "Machine type", ["Off-Grid", "Grid-Tie"]],
+            ["option", "Topology", ["transformerless", "ransformer"]],
+            [
+                "option",
                 "Output model setting",
-                ["Single module",
-                 "parallel output",
-                 "Phase 1 of three phase output",
-                 "Phase 2 of three phase output",
-                 "Phase 3 of three phase output",
-                ]
+                [
+                    "Single module",
+                    "parallel output",
+                    "Phase 1 of three phase output",
+                    "Phase 2 of three phase output",
+                    "Phase 3 of three phase output",
+                ],
             ],
-            ["option",
-                "Solar power priority",
-                ["Battery-Load-Utiliy + AC Charger",
-                 "Load-Battery-Utiliy"
-                ]
-            ],
+            ["option", "Solar power priority", ["Battery-Load-Utiliy + AC Charger", "Load-Battery-Utiliy"]],
             ["int", "MPPT strings", ""],
         ],
         "test_responses": [
@@ -211,73 +194,60 @@ COMMANDS = {
         "help": " -- Query general status information",
         "type": "QUERY",
         "response": [
-            ["10int", "Grid voltage", "V",                    {"icon": "mdi:transmission-tower", "device-class": "voltage"} ],
-            ["10int", "Grid frequency", "Hz" ,                {"icon": "mdi:sine-wave", "device-class": "frequency"} ],
-            ["10int", "AC output voltage", "V",               {"icon": "mdi:home-lightning-bolt-outline", "device-class": "voltage"} ],
-            ["10int", "AC output frequency", "Hz",            {"icon": "mdi:sine-wave", "device-class": "frequency"} ],
-            ["int",   "AC output apparent power", "VA",       {"icon": "mdi:home-lightning-bolt", "device-class": "apparent_power"} ],
-            ["int",   "AC output active power", "W",          {"icon": "mdi:lightning-bolt", "device-class": "power"} ],
-            ["int",   "Output load percent", "%",             {"icon": "mdi:brightness-percent"} ],
-            ["10int", "Battery voltage", "V",                 {"icon": "mdi:battery-outline", "device-class": "voltage"} ],
-            ["10int", "Battery voltage from SCC", "V",        {"icon": "mdi:battery-outline", "device-class": "voltage"} ],
-            ["10int", "Battery voltage from SCC2", "V",       {"icon": "mdi:battery-outline", "device-class": "voltage"} ],
-            ["int",   "Battery discharge current", "A",       {"icon": "mdi:current-dc", "device-class": "current"} ],
-            ["int",   "Battery charging current", "A",        {"icon": "mdi:current-dc", "device-class": "current"} ],
-            ["int",   "Battery capacity", "%",                {"icon": "mdi:brightness-percent"} ],
-            ["int",   "Inverter heat sink temperature", "°C", {"icon": "mdi:thermometer", "device-class": "temperature"} ],
-            ["int",   "MPPT1 charger temperature", "°C",      {"icon": "mdi:thermometer", "device-class": "temperature"} ],
-            ["int",   "MPPT2 charger temperature", "°C",      {"icon": "mdi:thermometer", "device-class": "temperature"} ],
-            ["int",   "PV1 Input power", "W",                 {"icon": "mdi:solar-power", "device-class": "power"} ],
-            ["int",   "PV2 Input power", "W",                 {"icon": "mdi:solar-power", "device-class": "power"} ],
-            ["10int", "PV1 Input voltage", "V",               {"icon": "mdi:solar-power", "device-class": "voltage"} ],
-            ["10int", "PV2 Input voltage", "V",               {"icon": "mdi:solar-power", "device-class": "voltage"} ],
-            ["option",
+            ["10int", "Grid voltage", "V", {"icon": "mdi:transmission-tower", "device-class": "voltage"}],
+            ["10int", "Grid frequency", "Hz", {"icon": "mdi:sine-wave", "device-class": "frequency"}],
+            [
+                "10int",
+                "AC output voltage",
+                "V",
+                {"icon": "mdi:home-lightning-bolt-outline", "device-class": "voltage"},
+            ],
+            ["10int", "AC output frequency", "Hz", {"icon": "mdi:sine-wave", "device-class": "frequency"}],
+            [
+                "int",
+                "AC output apparent power",
+                "VA",
+                {"icon": "mdi:home-lightning-bolt", "device-class": "apparent_power"},
+            ],
+            ["int", "AC output active power", "W", {"icon": "mdi:lightning-bolt", "device-class": "power"}],
+            ["int", "Output load percent", "%", {"icon": "mdi:brightness-percent"}],
+            ["10int", "Battery voltage", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
+            ["10int", "Battery voltage from SCC", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
+            ["10int", "Battery voltage from SCC2", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
+            ["int", "Battery discharge current", "A", {"icon": "mdi:current-dc", "device-class": "current"}],
+            ["int", "Battery charging current", "A", {"icon": "mdi:current-dc", "device-class": "current"}],
+            ["int", "Battery capacity", "%", {"icon": "mdi:brightness-percent"}],
+            [
+                "int",
+                "Inverter heat sink temperature",
+                "°C",
+                {"icon": "mdi:thermometer", "device-class": "temperature"},
+            ],
+            ["int", "MPPT1 charger temperature", "°C", {"icon": "mdi:thermometer", "device-class": "temperature"}],
+            ["int", "MPPT2 charger temperature", "°C", {"icon": "mdi:thermometer", "device-class": "temperature"}],
+            ["int", "PV1 Input power", "W", {"icon": "mdi:solar-power", "device-class": "power"}],
+            ["int", "PV2 Input power", "W", {"icon": "mdi:solar-power", "device-class": "power"}],
+            ["10int", "PV1 Input voltage", "V", {"icon": "mdi:solar-power", "device-class": "voltage"}],
+            ["10int", "PV2 Input voltage", "V", {"icon": "mdi:solar-power", "device-class": "voltage"}],
+            [
+                "option",
                 "Setting value configuration state",
-                ["Nothing changed",
-                 "Something changed"
-                ],
+                ["Nothing changed", "Something changed"],
             ],
-            ["option",
+            [
+                "option",
                 "MPPT1 charger status",
-                ["abnormal",
-                 "normal but not charged",
-                 "charging"
-                ],
+                ["abnormal", "normal but not charged", "charging"],
             ],
-            ["option",
+            [
+                "option",
                 "MPPT2 charger status",
-                ["abnormal",
-                 "normal but not charged",
-                 "charging"
-                ],
+                ["abnormal", "normal but not charged", "charging"],
             ],
-            ["option",
-                "Load connection",
-                ["disconnect",
-                 "connect"
-                ]
-            ],
-            ["option",
-                "Battery power direction",
-                ["donothing",
-                 "charge",
-                 "discharge"
-                ]
-            ],
-            ["option",
-                "DC/AC power direction",
-                ["donothing",
-                 "AC-DC",
-                 "DC-AC"
-                ]
-            ],
-            ["option",
-                "Line power direction",
-                ["donothing",
-                 "input",
-                 "output"
-                ]
-            ],
+            ["option", "Load connection", ["disconnect", "connect"]],
+            ["option", "Battery power direction", ["donothing", "charge", "discharge"]],
+            ["option", "DC/AC power direction", ["donothing", "AC-DC", "DC-AC"]],
+            ["option", "Line power direction", ["donothing", "input", "output"]],
             ["int", "Local parallel ID", ""],
         ],
         "test_responses": [
@@ -507,9 +477,7 @@ COMMANDS = {
         "description": "Set Battery Max AC Charging Current 			(Manual Option 13)",
         "help": " -- example: MUCHGC0,030 	(set unit 0 [0-9] utility charging current to 30A [002 010 020 030 040 050 060 070 080])",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"",
         ],
@@ -521,9 +489,7 @@ COMMANDS = {
         "description": "Set Battery Type 					(Manual Option 14)",
         "help": " -- example: PBT0 		(set battery as PBT0 [0: AGM], PBT1 [1: FLOODED], PBT2 [2: USER])",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -552,9 +518,7 @@ COMMANDS = {
         "description": "Set Battery Cut-off Voltage	 			(Manual Option 19)",
         "help": " -- example: PSDV450 		(set battery cut-off voltage to 45V [400~480V] for 48V unit)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -567,9 +531,7 @@ COMMANDS = {
         "description": "Set Battery Stop dis,charging when Grid is available (Manual Option 20,21)",
         "help": " -- example: BUCD440,480	(set Stop discharge Voltage [440~510] in 0.1V xxx, Stop Charge Voltage [000(Full) or 480~580] in 0.1V yyy)",
         "type": "SETTER",
-        "response": [
-            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
-        ],
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
@@ -611,15 +573,13 @@ class pi18(AbstractProtocol):
             "MUCHGC",
         ]
         self.DEFAULT_COMMAND = ["PI"]
-        self.ID_COMMANDS = ["ID"]
+        self.ID_COMMANDS = [("PI", "Protocol Version"), ("VFW", "Main CPU Version")]
 
     def get_full_command(self, command) -> bytes:
         """
         Override the default get_full_command as its different
         """
-        log.info(
-            f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
-        )
+        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
