@@ -75,7 +75,6 @@ def processCommandLineOverrides(args):
         _config["debuglevel"] = logging.DEBUG
     return _config
 
-
 def main():
     description = f"Power Device Monitoring Utility, version: {__version__}"
     parser = ArgumentParser(description=description)
@@ -180,6 +179,8 @@ def main():
         log.error(f"No device definition in config. Check {args.configFile}?")
         exit(1)
 
+    
+
     # configure the daemon (optional)
     #     daemon:
     #       type: systemd  # noqa:
@@ -196,7 +197,10 @@ def main():
     #     protocol: PI30MAX
     port_config = device_config["port"].copy()
     log.debug(f"portconfig: {port_config}")
-    port = get_port(port_config)
+    portType = port_config["type"]
+    portPath = port_config["path"]
+    portBaud = port_config["baud"]
+    port = get_port(portType, portPath, portBaud)
     log.debug(f"port: {port}")
     # error out if unable to configure port
     if not port:
@@ -207,14 +211,19 @@ def main():
     protocol = get_protocol(protocol=port_config["protocol"])
     log.debug(f"protocol: {protocol}")
 
+    # Get scheduled commands
+    scheduling_config = config.get("scheduling", None)
     # Get loop timing details
-    loop = config.get("loop", "once")
+    loop = scheduling_config["loop"]
+
     inDelay = False
     delayRemaining = loop
     doLoop = True
 
     # initialize daemon
     daemon.initialize()
+
+    
 
     # Catch keyboard interupt
     try:
@@ -226,44 +235,30 @@ def main():
             # tell the daemon we're still working
             daemon.watchdog()
             # loop through command list
-            for command in device_config["commands"]:
-                # process any adhoc commands first
-                while len(ADHOC_COMMANDS) > 0:
-                    log.debug(f"adhoc command list: {ADHOC_COMMANDS}")
-                    adhoc_command = ADHOC_COMMANDS.popleft().decode()  # FIXME: decode to str #
-                    log.info(f"Processing command: {adhoc_command}")
-                    daemon.log(f"Processing adhoc command: {adhoc_command}")
-                    results = port.process_command(command=adhoc_command, protocol=protocol)
-                    log.debug(f"results {results}")
-
-                    # send to output processor(s)
-                    output_results(
-                        results=results,
-                        command=config["mqttbroker"]["adhoc_commands"],
-                        mqtt_broker=mqtt_broker,
-                        fullconfig=config,
-                    )
-                # process 'normal' commands
-                if not inDelay:
-                    log.info(f"Processing command: {command}")
-                    if "f_command" in command:
-                        _command = command["f_command"]
-                        _command = eval(_command)
-                    else:
-                        _command = command["command"]
-                    # TODO: allow protocol override
-                    results = port.process_command(command=_command, protocol=protocol)
-                    log.debug(f"results {results}")
-                    # send to output processor(s)
-                    output_results(
-                        results=results,
-                        command=command,
-                        mqtt_broker=mqtt_broker,
-                        fullconfig=config,
-                    )
-                    # pause
-                    # pause_time = config["command_pause"]
-                    # log.debug(f"Sleeping for {pause_time}secs")
+            #log.debug(scheduling_config)
+            for schedule in scheduling_config["schedules"]:
+                if not inDelay and schedule["type"] == "loop":
+                    for command in schedule["commands"]:
+                    
+                        log.info(f"Processing command: {command}")
+                        if "f_command" in command:
+                            _command = command["f_command"]
+                            _command = eval(_command)
+                        else:
+                            _command = command["command"]
+                        # TODO: allow protocol override
+                        results = port.process_command(command=_command, protocol=protocol)
+                        log.debug(f"results {results}")
+                        # send to output processor(s)
+                        output_results(
+                            results=results,
+                            command=command,
+                            mqtt_broker=mqtt_broker,
+                            fullconfig=config,
+                        )
+                        # pause
+                        # pause_time = config["command_pause"]
+                        # log.debug(f"Sleeping for {pause_time}secs")
             if loop == "once":
                 doLoop = False
             else:

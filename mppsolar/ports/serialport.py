@@ -3,24 +3,22 @@ import serial
 import time
 
 from .port import Port
-from ..helpers import get_kwargs
 
-log = logging.getLogger("serial")
+log = logging.getLogger("SerialPort")
 
 
-class serialport(Port):
-    def __init__(self, *args, **kwargs) -> None:
-        log.debug(f"Initializing usbserial port args:{args}, kwargs: {kwargs}")
-        self._config = get_kwargs(kwargs, "config")
+class SerialPort(Port):
+    def __init__(self, path, baud) -> None:
+        log.debug(f"Initializing usbserial port. path:{path}, baud: {baud}")
+        self.path = path
+        self.baud = baud
         self.port = None
         self.error = None
 
     def connect(self) -> None:
-        log.debug("usbserial port connecting")
-        port = self._config.get("path")
-        baud = self._config.get("baud")
+        log.debug(f"usbserial port connecting. path:{self.path}, baud:{self.baud}")
         try:
-            self.port = serial.Serial(port, baud, timeout=1, write_timeout=1)
+            self.port = serial.Serial(port=self.path, baudrate=self.baud, timeout=1, write_timeout=1)
         except Exception as e:
             log.warning(f"Error openning serial port: {e}")
             self.error = e
@@ -32,8 +30,7 @@ class serialport(Port):
             self.port.close()
         return
 
-    def send_and_receive(self, *args, **kwargs) -> dict:
-        full_command = get_kwargs(kwargs, "full_command")
+    def send_and_receive(self, full_command) -> dict:
         response_line = None
         log.debug(f"port {self.port}")
         if self.port is None:

@@ -22,13 +22,9 @@ class Port(ABC):
         # Band-aid solution, need to reduce what is sent
         log.debug(f"Command {command}")
         full_command = protocol.get_full_command(command)
+        log.debug(f"Full Command {full_command}")
 
-        raw_response = self.send_and_receive(
-            command=command,
-            full_command=full_command,
-            protocol=protocol,
-            command_defn=protocol.get_command_defn(command),
-        )
+        raw_response = self.send_and_receive(full_command)
         log.debug(f"Send and Receive Response {raw_response}")
 
         # Handle errors

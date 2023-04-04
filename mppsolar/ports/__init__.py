@@ -1,9 +1,12 @@
 import importlib
 import logging
-from enum import Enum, auto
+from mppsolar.ports.serialport import SerialPort
+import mppsolar.ports.testport
+from mppsolar.ports.usbport import USBPort
+from enum import StrEnum, auto
 
 
-class PortType(Enum):
+class PortType(StrEnum):
     UNKNOWN = auto()
     TEST = auto()
     USB = auto()
@@ -19,27 +22,16 @@ class PortType(Enum):
 log = logging.getLogger("ports")
 
 
-def get_port(config):
-    log.info(f"Geting port for config '{config}'")
-    porttype = config.get("type", None)
-
+def get_port(portType, portPath, baud):
     # return None if port type is not defined
-    if porttype is None:
+    if portType is None:
         return None
 
-    # transform porttype for module lookup
-    porttype_id = f"{porttype.lower()}port"
-    # Try to import the porttype module with the supplied name (may not exist)
-    try:
-        port_module = importlib.import_module("mppsolar.ports." + porttype_id, ".")
-    except ModuleNotFoundError:
-        log.error(f"No module found for porttype '{porttype_id}'")
-        return None
-    # Find the protocol class - classname must be the same as the protocol_id
-    try:
-        port_class = getattr(port_module, porttype_id)
-    except AttributeError:
-        log.error(f"Module {port_module} has no attribute {porttype_id}")
-        return None
-    # Return the instantiated class
-    return port_class(config=config)
+    portObject = None
+
+    if portType == PortType.SERIAL:
+        portObject = SerialPort(portPath, baud)
+    elif portType == PortType.USB:
+        portObject = USBPort(portPath, baud)
+
+    return portObject

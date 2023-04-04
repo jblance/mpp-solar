@@ -26,6 +26,9 @@ services:
       - powermon
       - -C
       - /etc/mpp-solar/powermon.yaml #Available due to volume binding above
+      - --debug
+#       - sleep
+#       - infinity
     depends_on:
       - mosquitto
 
