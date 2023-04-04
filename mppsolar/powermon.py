@@ -228,7 +228,7 @@ def main():
     # Catch keyboard interupt
     try:
         # connect to port
-        port.connect()
+        
         while doLoop:
             # Start timer
             start_time = time()
@@ -241,12 +241,9 @@ def main():
                     for command in schedule["commands"]:
                     
                         log.info(f"Processing command: {command}")
-                        if "f_command" in command:
-                            _command = command["f_command"]
-                            _command = eval(_command)
-                        else:
-                            _command = command["command"]
+                        _command = command["command"]
                         # TODO: allow protocol override
+                        port.connect()
                         results = port.process_command(command=_command, protocol=protocol)
                         log.debug(f"results {results}")
                         # send to output processor(s)
@@ -256,23 +253,18 @@ def main():
                             mqtt_broker=mqtt_broker,
                             fullconfig=config,
                         )
-                        # pause
-                        # pause_time = config["command_pause"]
-                        # log.debug(f"Sleeping for {pause_time}secs")
-            if loop == "once":
-                doLoop = False
-            else:
-                # Small pause to ....
-                sleep(0.1)
-                elapsed_time = time() - start_time
-                delayRemaining = delayRemaining - elapsed_time
-                if delayRemaining > 0 and not inDelay:
-                    log.debug(f"delaying for {loop}sec, delayRemaining: {delayRemaining}")
-                    inDelay = True
-                if delayRemaining < 0:
-                    log.debug("setting inDelay to false")
-                    inDelay = False
-                    delayRemaining = loop
+        
+            # Small pause to ....
+            sleep(0.1)
+            elapsed_time = time() - start_time
+            delayRemaining = delayRemaining - elapsed_time
+            if delayRemaining > 0 and not inDelay:
+                log.debug(f"delaying for {loop}sec, delayRemaining: {delayRemaining}")
+                inDelay = True
+            if delayRemaining < 0:
+                log.debug(f"Next loop: {loop}, {delayRemaining}")
+                inDelay = False
+                delayRemaining = loop + delayRemaining
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
     except Exception as e:

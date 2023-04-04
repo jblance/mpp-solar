@@ -6,7 +6,7 @@ from .formats import format_data
 log = logging.getLogger("screen")
 
 
-class screen:
+class Screen:
     def __str__(self):
         return "the screen sender just prints the results to standard out"
 

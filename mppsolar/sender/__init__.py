@@ -1,29 +1,25 @@
 import logging
-import importlib
+from mppsolar.sender.screen import Screen
+from mppsolar.sender.mqtt import MQTT
+from enum import StrEnum, auto
 
-# import pkgutil
-# import re
-
-# from ..helpers import key_wanted, get_kwargs
+class OutputType(StrEnum):
+    SCREEN = auto()
+    MQTT = auto()
 
 log = logging.getLogger("sender")
 
 
 def get_output(output):
-    """
-    Take an output name
-    attempt to find and instantiate the corresponding module
-    """
-    log.info(f"attempting to create output processor: {output}")
-    try:
-        output_module = importlib.import_module("mppsolar.sender." + output, ".")
-        output_class = getattr(output_module, output)
-        return output_class()
-    except ModuleNotFoundError as e:
-        # perhaps raise a Powermon exception here??
-        # maybe warn and keep going, only error if no outputs found?
-        log.critical(f"No module found for output processor {output} Error: {e}")
-    return None
+
+    output_class = None
+
+    if output == OutputType.SCREEN:
+        output_class = Screen()
+    elif output == OutputType.MQTT:
+        output_class = MQTT()
+
+    return output_class
 
 
 def output_results(results, command, mqtt_broker, fullconfig={}):

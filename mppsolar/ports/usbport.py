@@ -44,7 +44,11 @@ class USBPort(Port):
             # Send all at once
             log.debug("1 chunk send")
             time.sleep(0.35)
-            os.write(self.port, to_send)
+            try:
+                os.write(self.port, to_send)
+            except Exception as e:
+                log.debug("USB read error: {}".format(e))
+            
         elif len(to_send) > 8 and len(to_send) < 11:
             log.debug("2 chunk send")
             time.sleep(0.35)
