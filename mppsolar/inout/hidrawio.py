@@ -21,7 +21,7 @@ class HIDRawIO(BaseIO):
         try:
             usb0 = os.open(self._device, os.O_RDWR | os.O_NONBLOCK)
         except Exception as e:
-            log.debug("USB open error: {}".format(e))
+            log.error("USB open error: {}".format(e))
             return {"ERROR": ["USB open error: {}".format(e), ""]}
         # Send the command to the open usb connection
         to_send = full_command
