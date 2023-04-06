@@ -19,8 +19,8 @@ Currently has support for:
   - tested on SmartShunt 500A
 - Daly BMS
 
-## Full Documentation ##
-[See the wiki for more detailed documentation](https://github.com/jblance/mpp-solar/wiki)
+## Documentation ##
+[See the wiki for documentation](https://github.com/jblance/mpp-solar/wiki)
 
 ## Support ##
 If you want to tip me for this work, you can now buy me a coffee
