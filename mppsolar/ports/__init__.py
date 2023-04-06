@@ -22,7 +22,7 @@ class PortType(StrEnum):
 log = logging.getLogger("ports")
 
 
-def get_port(portType, portPath, baud):
+def get_port(portType, portPath, baud, protocol):
     # return None if port type is not defined
     if portType is None:
         return None
@@ -30,8 +30,8 @@ def get_port(portType, portPath, baud):
     portObject = None
 
     if portType == PortType.SERIAL:
-        portObject = SerialPort(portPath, baud)
+        portObject = SerialPort(portPath, baud, protocol)
     elif portType == PortType.USB:
-        portObject = USBPort(portPath, baud)
+        portObject = USBPort(portPath, protocol)
 
     return portObject

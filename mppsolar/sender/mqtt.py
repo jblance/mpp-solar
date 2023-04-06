@@ -10,7 +10,10 @@ log = logging.getLogger("MQTT")
 
 class MQTT:
     
-    def __init__(self) -> None:
+    def __init__(self, mqtt_broker, results_topic, tag) -> None:
+        self.mqtt_broker = mqtt_broker
+        self.results_topic = results_topic
+        self.tag = tag
         log.debug(f"processor.MQTT __init__ ")
     
     def __str__(self):
@@ -27,51 +30,46 @@ class MQTT:
         if "raw_response" in data:
             data.pop("raw_response")
 
-        log.debug("data done")
         # check if config supplied
-        config = get_kwargs(kwargs, "config")
-        if config is not None:
-            log.debug(f"config: {config}")
-            # get results topic
-            results_topic = config.get("results_topic", None)
-            # get formatting info
-            remove_spaces = config.get("remove_spaces", True)
-            keep_case = config.get("keep_case", False)
-            filter = config.get("filter", None)
-            excl_filter = config.get("excl_filter", None)
-            tag = config.get("tag", None)
-        else:
-            results_topic = None
-            # get formatting info
-            remove_spaces = True
-            keep_case = get_kwargs(kwargs, "keep_case")
-            filter = get_kwargs(kwargs, "filter")
-            excl_filter = get_kwargs(kwargs, "excl_filter")
-            tag = get_kwargs(kwargs, "tag")
+#        config = get_kwargs(kwargs, "config")
+#        if config is not None:
+#            log.debug(f"config: {config}")
+#            # get results topic
+#            results_topic = config.get("results_topic", None)
+#            # get formatting info
+#            remove_spaces = config.get("remove_spaces", True)
+#            keep_case = config.get("keep_case", False)
+#            filter = config.get("filter", None)
+#            excl_filter = config.get("excl_filter", None)
+#            tag = config.get("tag", None)
+#        else:
+#            results_topic = None
+#            # get formatting info
+#            remove_spaces = True
+#            keep_case = get_kwargs(kwargs, "keep_case")
+#            filter = get_kwargs(kwargs, "filter")
+#            excl_filter = get_kwargs(kwargs, "excl_filter")
+#            tag = get_kwargs(kwargs, "tag")
 
-        log.debug("config done")
+#        if filter is not None:
+#            filter = re.compile(filter)
+#        if excl_filter is not None:
+#            excl_filter = re.compile(excl_filter)
 
-        if filter is not None:
-            filter = re.compile(filter)
-        if excl_filter is not None:
-            excl_filter = re.compile(excl_filter)
         if tag is None:
             tag = command
 
         # build topic prefix
-        if results_topic is not None:
-            topic_prefix = results_topic
+        if self.results_topic is not None:
+            topic_prefix = self.results_topic
         else:
             topic_prefix = f"{tag}/status"
 
-        log.debug("filter and topic done")
         # build data to output
         _data = {}
         for key in data:
             _values = data[key]
             # remove spaces
-            if remove_spaces:
-                key = key.replace(" ", "_")
             if not keep_case:
                 # make lowercase
                 key = key.lower()
@@ -104,10 +102,8 @@ class MQTT:
         if data is None:
             return
 
-        # get the broker instance
-        mqtt_broker = get_kwargs(kwargs, "mqtt_broker")
         # exit if no broker
-        if mqtt_broker is None:
+        if self.mqtt_broker is None:
             return
 
         # build the messages...
@@ -115,4 +111,4 @@ class MQTT:
         log.debug(f"mqtt.output msgs {msgs}")
 
         # publish
-        mqtt_broker.publishMultiple(msgs)
+        self.mqtt_broker.publishMultiple(msgs)

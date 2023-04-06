@@ -16,13 +16,13 @@ scheduling:
   schedules:
   - name: QPIGS_5_minutes
     type: loop
-    run_every_x_loops: 6 #will run every 1 minute
+    loopCount: 6 #will run every 1 minute
     commands:
-    - command: QPIGS
-      type: basic #default command type is basic
-      outputs:
-      - name: mqtt
-        tag: Test_Inverter
+      - command: QPIGS
+        type: basic #default command type is basic
+        outputs:
+        - type: mqtt
+          tag: Test_Inverter
 mqttbroker:
   name: localhost
   port: 1883
@@ -31,12 +31,8 @@ mqttbroker:
   adhoc_commands:
     topic: Test_Inverter/commands
     outputs:
-    - name: screen
+    - type: screen
       tag: Test_Inverter
 daemon:
   type: systemd
   keepalive: 100
-#daemon: initd
-
-
-

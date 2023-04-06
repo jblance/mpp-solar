@@ -9,10 +9,12 @@ import yaml
 
 from mppsolar.libs.mqttbrokerc import MqttBroker
 from mppsolar.libs.daemon import Daemon
-from mppsolar.sender import output_results
+from mppsolar.sender import get_output
 from mppsolar.ports import get_port
 from mppsolar.protocols import get_protocol
 from mppsolar.version import __version__  # noqa: F401
+
+from mppsolar.libs.schedule import Schedule, LoopCommandSchedule, CommandScheduleType, Command, Output
 
 # from mppsolar.inout import get_port
 
@@ -63,6 +65,37 @@ def readConfigFile(configFile=None):
         except FileNotFoundError as exc:
             log.error(f"Error opening config file: {exc}")
     return _config
+
+def parseScheduleConfig(config, port, mqtt_broker):
+    _loopDuration = config["loop"]
+    _schedules = []
+    for schedule in config["schedules"]:
+        _scheduleType = schedule["type"]
+        if _scheduleType == CommandScheduleType.LOOP:
+            _loopCount = schedule["loopCount"]
+        elif _scheduleType == CommandScheduleType.TIME:
+            _runTime = schedule["runTime"]
+
+        _commands = []
+        for command in schedule["commands"]:
+            _command = command["command"]
+            _commandType = command["type"]
+
+            _outputs = []
+            for output in command["outputs"]:
+                log.debug(f"command: {command}")
+                _output = get_output(output["type"], mqtt_broker)
+                log.debug(f"output: {_output}")
+                _outputs.append(_output)
+            _commands.append(Command(_command, _commandType, _outputs, port))
+        
+        if _scheduleType == CommandScheduleType.LOOP:
+            _schedules.append(LoopCommandSchedule(_loopCount, _commands))
+        else:
+            raise ConfigError(f"Undefined schedule type: {_scheduleType}")
+
+    return Schedule(_schedules, _loopDuration)
+
 
 
 def processCommandLineOverrides(args):
@@ -200,78 +233,42 @@ def main():
     portType = port_config["type"]
     portPath = port_config["path"]
     portBaud = port_config["baud"]
-    port = get_port(portType, portPath, portBaud)
+    # get protocol handler
+    protocol = get_protocol(protocol=port_config["protocol"])
+    log.debug(f"protocol: {protocol}")
+    port = get_port(portType, portPath, portBaud, protocol)
     log.debug(f"port: {port}")
     # error out if unable to configure port
     if not port:
         log.error(f"No port for config '{port_config}' found")
         raise ConfigError(f"No port for config '{port_config}' found")
 
-    # get protocol handler
-    protocol = get_protocol(protocol=port_config["protocol"])
-    log.debug(f"protocol: {protocol}")
+    
 
     # Get scheduled commands
     scheduling_config = config.get("scheduling", None)
-    # Get loop timing details
-    loop = scheduling_config["loop"]
+    schedule = parseScheduleConfig(scheduling_config, port, mqtt_broker)
 
-    inDelay = False
-    delayRemaining = loop
-    doLoop = True
+    log.debug(schedule)
 
     # initialize daemon
     daemon.initialize()
-
     
-
-    # Catch keyboard interupt
+    # Main working loop
+    doLoop = True
     try:
-        # connect to port
-        
         while doLoop:
-            # Start timer
-            start_time = time()
             # tell the daemon we're still working
             daemon.watchdog()
-            # loop through command list
-            #log.debug(scheduling_config)
-            for schedule in scheduling_config["schedules"]:
-                if not inDelay and schedule["type"] == "loop":
-                    for command in schedule["commands"]:
-                    
-                        log.info(f"Processing command: {command}")
-                        _command = command["command"]
-                        # TODO: allow protocol override
-                        port.connect()
-                        results = port.process_command(command=_command, protocol=protocol)
-                        log.debug(f"results {results}")
-                        # send to output processor(s)
-                        output_results(
-                            results=results,
-                            command=command,
-                            mqtt_broker=mqtt_broker,
-                            fullconfig=config,
-                        )
-        
-            # Small pause to ....
-            sleep(0.1)
-            elapsed_time = time() - start_time
-            delayRemaining = delayRemaining - elapsed_time
-            if delayRemaining > 0 and not inDelay:
-                log.debug(f"delaying for {loop}sec, delayRemaining: {delayRemaining}")
-                inDelay = True
-            if delayRemaining < 0:
-                log.debug(f"Next loop: {loop}, {delayRemaining}")
-                inDelay = False
-                delayRemaining = loop + delayRemaining
+            schedule.runLoop()
+   
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
     except Exception as e:
         print(e)
     finally:
         # Disconnect port
-        port.disconnect()
+        #port.disconnect()
         # Disconnect mqtt
         mqtt_broker.stop()
         # Notify the daemon

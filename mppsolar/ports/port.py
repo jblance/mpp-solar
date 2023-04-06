@@ -9,6 +9,11 @@ class Port(ABC):
     @abstractmethod
     def send_and_receive(self, *args, **kwargs) -> dict:
         raise NotImplementedError
+    
+    @property
+    @abstractmethod
+    def protocol(self):
+        pass
 
     def connect(self) -> None:
         log.debug("Port connect not implemented")
@@ -18,10 +23,10 @@ class Port(ABC):
         log.debug("Port disconnect not implemented")
         return
 
-    def process_command(self, command, protocol):
+    def process_command(self, command):
         # Band-aid solution, need to reduce what is sent
         log.debug(f"Command {command}")
-        full_command = protocol.get_full_command(command)
+        full_command = self.protocol.get_full_command(command)
         log.debug(f"Full Command {full_command}")
 
         raw_response = self.send_and_receive(full_command)
@@ -42,7 +47,7 @@ class Port(ABC):
             return raw_response
 
         # Decode response
-        decoded_response = protocol.decode(raw_response, command)
+        decoded_response = self.protocol.decode(raw_response, command)
         log.info(f"Decoded response {decoded_response}")
 
         return decoded_response

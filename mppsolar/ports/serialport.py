@@ -8,10 +8,11 @@ log = logging.getLogger("SerialPort")
 
 
 class SerialPort(Port):
-    def __init__(self, path, baud) -> None:
+    def __init__(self, path, baud, protocol) -> None:
         log.debug(f"Initializing usbserial port. path:{path}, baud: {baud}")
         self.path = path
         self.baud = baud
+        self.protocol = protocol
         self.port = None
         self.error = None
 

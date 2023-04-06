@@ -8,13 +8,16 @@ log = logging.getLogger("USBPort")
 
 
 class USBPort(Port):
-    def __init__(self, path, baud) -> None:
-        log.debug(f"Initializing usb port. path:{path}, baud: {baud}")
+    def __init__(self, path, protocol) -> None:
+        log.debug(f"Initializing usb port. path:{path}, protocol: {protocol}")
         self.path = path
-        self.baud = baud
+        self.protocol = protocol
+
+    def protocol(self):
+        return self.protocol
 
     def connect(self) -> None:
-        log.debug(f"USBPort connecting. path:{self.path}, baud:{self.baud}")
+        log.debug(f"USBPort connecting. path:{self.path}, protocol: {self.protocol}")
         try:
             self.port = os.open(self.path, os.O_RDWR | os.O_NONBLOCK)
             log.debug(f"USBPort port number ${self.port}")

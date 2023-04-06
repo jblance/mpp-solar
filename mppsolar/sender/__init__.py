@@ -10,19 +10,19 @@ class OutputType(StrEnum):
 log = logging.getLogger("sender")
 
 
-def get_output(output):
-
+def get_output(outputType, mqtt_broker):
     output_class = None
-
-    if output == OutputType.SCREEN:
+    log.debug(f"outputType: {outputType}")
+    if outputType == OutputType.SCREEN:
         output_class = Screen()
-    elif output == OutputType.MQTT:
-        output_class = MQTT()
-
+    elif outputType == OutputType.MQTT:
+        output_class = MQTT(mqtt_broker, '/test', None)
+        log.debug(f"output_class: {output_class}")
+        
     return output_class
 
 
-def output_results(results, command, mqtt_broker, fullconfig={}):
+#def output_results(results, command, mqtt_broker, fullconfig={}):
     # "normal command definition"
     # - command: QPIGS
     #   outputs:
@@ -39,21 +39,21 @@ def output_results(results, command, mqtt_broker, fullconfig={}):
     #  - name: screen
 
     # Check if an outputs section was supplied
-    if "outputs" in command:
-        outputs = command["outputs"]
+#    if "outputs" in command:
+#        outputs = command["outputs"]
     # if not default to screen
-    else:
-        outputs["name"] = "screen"
-    for op in outputs:
-        # filter = config.get("CONFIG", "filter")
-        # log.debug(f"Using output filter: {filter}")
-        if "name" in op:
-            output = get_output(op["name"])
-        else:
-            output = get_output("screen")
-        output.output(
-            data=dict(results),
-            config=op,
-            mqtt_broker=mqtt_broker,
-            fullconfig=fullconfig,
-        )
+#    else:
+#        outputs["name"] = "screen"
+#    for op in outputs:
+#        # filter = config.get("CONFIG", "filter")
+#        # log.debug(f"Using output filter: {filter}")
+#        if "name" in op:
+#            output = get_output(op["name"])
+#        else:
+#            output = get_output("screen")
+#        output.output(
+#            data=dict(results),
+#            config=op,
+#            mqtt_broker=mqtt_broker,
+#            fullconfig=fullconfig,
+#        )

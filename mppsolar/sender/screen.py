@@ -10,8 +10,8 @@ class Screen:
     def __str__(self):
         return "the screen sender just prints the results to standard out"
 
-    def __init__(self, *args, **kwargs) -> None:
-        log.debug(f"processor.screen __init__ args: {args}, kwargs: {kwargs}")
+    def __init__(self) -> None:
+        log.debug(f"processor.screen __init__ ")
 
     def output(self, *args, **kwargs):
         log.info("Using output sender: screen")
@@ -34,3 +34,4 @@ class Screen:
                 print(line)
         else:
             print(formatted_data)
+
