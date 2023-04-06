@@ -3,6 +3,7 @@ name = "mppsolar"
 version = "0.15.30"
 description = "Package to communicate with Solar inverters and BMSs"
 authors = ["John Blance"]
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0"
