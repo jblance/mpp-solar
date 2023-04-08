@@ -25,4 +25,4 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 mpp-solar = "mppsolar:main"
 jkbms = "mppsolar:main"
-powermon= "mppsolar.powermon:main"
+powermon= "powermon:main"

@@ -2,11 +2,12 @@
 import logging
 from argparse import ArgumentParser
 
+from mppsolar.version import __version__  # noqa: F401
+
 from .helpers import get_device_class
 from .libs.mqttbrokerc import MqttBroker
 from .outputs import get_outputs, list_outputs
 from .protocols import list_protocols
-from .version import __version__  # noqa: F401
 
 # Set-up logger
 log = logging.getLogger("")
