@@ -19,25 +19,8 @@ Currently has support for:
   - tested on SmartShunt 500A
 - Daly BMS
 
-## Compute hardware support ##
-The python code is designed to run on Linux type python environments using python 3.6 or newer
-
-[Hardware that has been known to work](https://github.com/jblance/mpp-solar/blob/master/docs/hardware.md)
-
-## Installation ##
-* to get the latest stable version: `sudo pip install mppsolar`
-* [more installation options](https://github.com/jblance/mpp-solar/blob/master/docs/installation.md)
-
-## Usage ###
-`$ mpp-solar -h` or `$ jkbms -h` will display the available options
-
-[More detailed usage](https://github.com/jblance/mpp-solar/blob/master/docs/usage.md)
-
-## Troubleshooting ##
-[Troubleshooting](https://github.com/jblance/mpp-solar/blob/master/docs/troubleshooting.md)
-
-## Full Documentation ##
-[More detailed documentation](https://github.com/jblance/mpp-solar/blob/master/docs/README.md)
+## Documentation ##
+[See the wiki for documentation](https://github.com/jblance/mpp-solar/wiki)
 
 ## Support ##
 If you want to tip me for this work, you can now buy me a coffee
