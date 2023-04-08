@@ -1,7 +1,7 @@
 import importlib
 import logging
 from mppsolar.ports.serialport import SerialPort
-import mppsolar.ports.testport
+from mppsolar.ports.testport import TestPort
 from mppsolar.ports.usbport import USBPort
 from enum import StrEnum, auto
 
@@ -33,5 +33,7 @@ def get_port(portType, portPath, baud, protocol):
         portObject = SerialPort(portPath, baud, protocol)
     elif portType == PortType.USB:
         portObject = USBPort(portPath, protocol)
+    elif portType == PortType.TEST:
+        portObject = TestPort()
 
     return portObject

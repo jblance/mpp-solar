@@ -13,6 +13,7 @@ device:
 #Separate the schedule from the device definition
 scheduling:
   loop: 10
+  adhoc_command_topic: mpp-solar/api-client
   schedules:
   - name: QPIGS_5_minutes
     type: loop
@@ -22,17 +23,14 @@ scheduling:
         type: basic #default command type is basic
         outputs:
         - type: mqtt
-          tag: Test_Inverter
+          topic: Test_Inverter
+          tag: QPIGS
 mqttbroker:
   name: localhost
   port: 1883
   user: null
   pass: null
-  adhoc_commands:
-    topic: Test_Inverter/commands
-    outputs:
-    - type: screen
-      tag: Test_Inverter
+  
 daemon:
   type: systemd
   keepalive: 100

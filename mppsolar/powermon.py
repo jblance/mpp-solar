@@ -9,12 +9,11 @@ import yaml
 
 from mppsolar.libs.mqttbrokerc import MqttBroker
 from mppsolar.libs.daemon import Daemon
-from mppsolar.sender import get_output
 from mppsolar.ports import get_port
 from mppsolar.protocols import get_protocol
 from mppsolar.version import __version__  # noqa: F401
 
-from mppsolar.libs.schedule import Schedule, LoopCommandSchedule, CommandScheduleType, Command, Output
+from mppsolar.libs.schedule import Schedule, LoopCommandSchedule, CommandScheduleType, Command
 
 # from mppsolar.inout import get_port
 
@@ -43,16 +42,6 @@ device:
   loop: once
 """
 
-ADHOC_COMMANDS = deque([])
-# SPLIT_TOKEN = ","
-
-
-def mqtt_callback(client, userdata, msg):
-    log.info(f"Received `{msg.payload}` on topic `{msg.topic}`")
-    # TODO: define message format and extract command and config
-    newCommand = msg.payload
-    ADHOC_COMMANDS.append(newCommand)
-
 
 def readConfigFile(configFile=None):
     _config = {}
@@ -66,35 +55,6 @@ def readConfigFile(configFile=None):
             log.error(f"Error opening config file: {exc}")
     return _config
 
-def parseScheduleConfig(config, port, mqtt_broker):
-    _loopDuration = config["loop"]
-    _schedules = []
-    for schedule in config["schedules"]:
-        _scheduleType = schedule["type"]
-        if _scheduleType == CommandScheduleType.LOOP:
-            _loopCount = schedule["loopCount"]
-        elif _scheduleType == CommandScheduleType.TIME:
-            _runTime = schedule["runTime"]
-
-        _commands = []
-        for command in schedule["commands"]:
-            _command = command["command"]
-            _commandType = command["type"]
-
-            _outputs = []
-            for output in command["outputs"]:
-                log.debug(f"command: {command}")
-                _output = get_output(output["type"], mqtt_broker)
-                log.debug(f"output: {_output}")
-                _outputs.append(_output)
-            _commands.append(Command(_command, _commandType, _outputs, port))
-        
-        if _scheduleType == CommandScheduleType.LOOP:
-            _schedules.append(LoopCommandSchedule(_loopCount, _commands))
-        else:
-            raise ConfigError(f"Undefined schedule type: {_scheduleType}")
-
-    return Schedule(_schedules, _loopDuration)
 
 
 
@@ -193,8 +153,7 @@ def main():
     if args.adhoc:
         print("ADHOC is todo")
         return
-    # sub to the adhoc command topic ie listen for 'extra' commands
-    mqtt_broker.setAdhocCommands(config=mqttconfig, callback=mqtt_callback)
+
     # debug dump mqttbroker details
     log.debug(f"mqtt_broker: {mqtt_broker}")
 
@@ -247,7 +206,7 @@ def main():
 
     # Get scheduled commands
     scheduling_config = config.get("scheduling", None)
-    schedule = parseScheduleConfig(scheduling_config, port, mqtt_broker)
+    schedule = Schedule.parseScheduleConfig(scheduling_config, port, mqtt_broker)
 
     log.debug(schedule)
 

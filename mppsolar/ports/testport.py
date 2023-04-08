@@ -10,12 +10,19 @@ from .port import Port
 log = logging.getLogger("test")
 
 
-class testport(Port):
-    def __init__(self, *args, **kwargs) -> None:
+class TestPort(Port):
+    def __init__(self) -> None:
         # self._test_data = None
         # self._counter = 0
         # self._device = get_kwargs(kwargs, "device_path")
-        log.debug(f"Initializing test port args:{args}, kwargs: {kwargs}")
+        #log.debug(f"Initializing test port args:{args}, kwargs: {kwargs}")
+        self.protocol = "test"
+
+    def __str__(self):
+        return "Test port"
+    
+    def protocol(self):
+        return super().protocol()
 
     def connect(self) -> None:
         log.debug("Test port connected")

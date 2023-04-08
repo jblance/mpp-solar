@@ -5,10 +5,10 @@ from ..helpers import get_kwargs
 from ..helpers import key_wanted
 from .formats import format_data
 
-log = logging.getLogger("MQTT")
+log = logging.getLogger("MQTT_JSON")
 
 
-class MQTT:
+class MQTT_JSON:
     
     def __init__(self, mqtt_broker, results_topic, tag) -> None:
         self.mqtt_broker = mqtt_broker
@@ -19,7 +19,6 @@ class MQTT:
     def __str__(self):
         return "outputs the results to the supplied mqtt broker: eg {tag}/status/total_output_active_power/value 1250"
 
-    #TODO: use proper parameters to make the code more readable
     def build_msgs(self, *args, **kwargs):
 
         data = get_kwargs(kwargs, "data")
@@ -60,11 +59,7 @@ class MQTT:
         if self.tag is None:
             self.tag = command
 
-        # build topic prefix
-        if self.results_topic is not None:
-            topic_prefix = self.results_topic + "/" + self.tag
-        else:
-            topic_prefix = f"{self.tag}/status"
+        topic_prefix = f"{self.tag}/status"
 
         # build data to output
         _data = {}
@@ -80,20 +75,20 @@ class MQTT:
 
         # Build array of mqtt messages
         msgs = []
-        # Loop through responses build topics and messages
-        for key in _data:
-            value = _data[key][0]
-            unit = _data[key][1]
-            log.debug(
-                f"build_msgs: prefix {topic_prefix}, key {key}, value {value}, unit {unit}"
-            )
-            msg = {"topic": f"{topic_prefix}/{key}/value", "payload": value}
-            msgs.append(msg)
-            if unit:
-                msg = {"topic": f"{topic_prefix}/{key}/unit", "payload": unit}
-                msgs.append(msg)
-        log.debug(f"build_msgs: {msgs}")
-        return msgs
+        # Loop through responses
+#        for key in _data:
+#            value = _data[key][0]
+#            unit = _data[key][1]
+#            log.debug(
+#                f"build_msgs: prefix {topic_prefix}, key {key}, value {value}, unit {unit}"
+#            )
+#            msg = {"topic": f"{topic_prefix}/{key}/value", "payload": value}
+#            msgs.append(msg)
+#            if unit:
+#                msg = {"topic": f"{topic_prefix}/{key}/unit", "payload": unit}
+#                msgs.append(msg)
+#        log.debug(f"build_msgs: {msgs}")
+        return _data
 
     def output(self, *args, **kwargs):
         log.info("Using output processor: mqtt")
@@ -110,7 +105,6 @@ class MQTT:
         # build the messages...
         msgs = self.build_msgs(**kwargs)
         log.debug(f"mqtt.output msgs {msgs}")
-        topic = self.results_topic + "/" +self.tag
 
         # publish
-        self.mqtt_broker.publishMultiple(msgs)
+        self.mqtt_broker.publish(self.results_topic,str(msgs))

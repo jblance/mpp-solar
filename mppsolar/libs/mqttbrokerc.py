@@ -16,7 +16,7 @@ class MqttBroker:
         else:
             return "MqttBroker DISABLED"
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, config=None):
 
         # mqttbroker:
         #     name: localhost
@@ -25,8 +25,7 @@ class MqttBroker:
         #     pass: null
         #     adhoc_commands:
         #     topic: test/command_topic
-
-        config = get_kwargs(kwargs, "config")
+        self.config = config
         if config is None:
             config = {}
         log.debug(f"mqttbroker config: {config}")
@@ -158,16 +157,6 @@ class MqttBroker:
         except Exception as e:
             log.warning(str(e))
 
-    def setAdhocCommands(self, config={}, callback=None):
-        if not config:
-            return
-
-        adhoc_commands = config.get("adhoc_commands")
-        # sub to command topic if defined
-        adhoc_commands_topic = adhoc_commands.get("topic")
-        if adhoc_commands_topic is not None:
-            log.info(f"Setting adhoc commands topic to {adhoc_commands_topic}")
-            self.subscribe(adhoc_commands_topic, callback)
 
 
 # print("Connecting to "+args.host+" port: "+str(port))

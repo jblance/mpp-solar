@@ -1,0 +1,7 @@
+FROM node:16
+
+# Create app directory
+WORKDIR /api
+
+COPY . .
+RUN npm install
