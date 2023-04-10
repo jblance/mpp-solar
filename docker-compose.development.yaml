@@ -3,9 +3,9 @@ services:
     image: eclipse-mosquitto
     network_mode: host
     volumes:
-      - ../mosquitto/config:/mosquitto/config
-      - ../mosquitto/data:/mosquitto/data
-      - ../mosquitto/log:/mosquitto/log
+      - ./docker/mosquitto/config:/mosquitto/config
+      - ./docker/mosquitto/data:/mosquitto/data
+      - ./docker/mosquitto/log:/mosquitto/log
 
   mppsolar:
     network_mode: host
@@ -14,17 +14,19 @@ services:
     volumes:
     #Bind over the configuration
       - type: bind
-        source: ../mpp-solar/
-        target: /etc/mpp-solar
+        source: ./docker/dev/config/
+        target: /config
     #Bind the code
-      - type: bind
-        source: ../..
-        target: /mpp-solar
-    build: .
+#      - type: bind
+#        source: ../..
+#        target: /mpp-solar
+    build:
+      context: ./
+      dockerfile: docker/dev/Dockerfile
     entrypoint:
       - powermon
       - -C
-      - /etc/mpp-solar/powermon.yaml #Available due to volume binding above
+      - /config/powermon.yaml #Available due to volume binding above
       - --debug
 #       - sleep
 #       - infinity

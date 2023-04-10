@@ -7,5 +7,5 @@ RUN pip install paho-mqtt systemd-python pymongo cysystemd
 RUN apt-get -y install libpq-dev
 RUN pip install psycopg2
 
-COPY . /mpp-solar/
+COPY ../.. /mpp-solar/
 RUN pip install -e /mpp-solar/
