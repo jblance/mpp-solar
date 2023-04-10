@@ -16,7 +16,7 @@ def get_output(output):
     """
     log.info(f"attempting to create output processor: {output}")
     try:
-        output_module = importlib.import_module("mppsolar.sender." + output, ".")
+        output_module = importlib.import_module("powermon.transports." + output, ".")
         output_class = getattr(output_module, output)
         return output_class()
     except ModuleNotFoundError as e:

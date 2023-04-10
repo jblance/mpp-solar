@@ -31,7 +31,7 @@ def get_port(config):
     porttype_id = f"{porttype.lower()}port"
     # Try to import the porttype module with the supplied name (may not exist)
     try:
-        port_module = importlib.import_module("mppsolar.ports." + porttype_id, ".")
+        port_module = importlib.import_module("powermon.ports." + porttype_id, ".")
     except ModuleNotFoundError:
         log.error(f"No module found for porttype '{porttype_id}'")
         return None

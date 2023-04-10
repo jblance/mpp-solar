@@ -3,7 +3,7 @@ import logging
 import importlib
 
 # from time import sleep
-log = logging.getLogger("formatter")
+log = logging.getLogger("formats")
 
 
 def format_data(*args, **kwargs):
@@ -12,7 +12,7 @@ def format_data(*args, **kwargs):
 
     log.info(f"attempting to create output processor: {formatter}")
     try:
-        _module = importlib.import_module("mppsolar.sender.formats." + formatter, ".")
+        _module = importlib.import_module("powermon.formats." + formatter, ".")
         _class = getattr(_module, formatter)
     except ModuleNotFoundError as e:
         # perhaps raise a Powermon exception here??
