@@ -1,17 +1,17 @@
 import logging
 
-from ..helpers import get_kwargs
-from .formats import format_data
+from mppsolar.helpers import get_kwargs
+from powermon.formats import format_data
 
 log = logging.getLogger("screen")
 
 
-class Screen:
+class screen:
     def __str__(self):
-        return "the screen sender just prints the results to standard out"
+        return "the screen transport just prints the results to standard out"
 
-    def __init__(self) -> None:
-        log.debug(f"processor.screen __init__ ")
+    def __init__(self, *args, **kwargs) -> None:
+        log.debug(f"transport.screen __init__ args: {args}, kwargs: {kwargs}")
 
     def output(self, *args, **kwargs):
         log.info("Using output sender: screen")
@@ -34,4 +34,3 @@ class Screen:
                 print(line)
         else:
             print(formatted_data)
-

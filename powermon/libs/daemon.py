@@ -2,7 +2,6 @@ import logging
 from enum import Enum, auto
 from time import time
 
-from ..helpers import get_kwargs
 
 # Set-up logger
 log = logging.getLogger("daemon")
@@ -19,9 +18,7 @@ class Daemon:
     def __str__(self):
         return f"Daemon name: {self.type}"
 
-    def __init__(self, *args, **kwargs):
-
-        config = get_kwargs(kwargs, "config", {})
+    def __init__(self, config={}):
 
         daemon_config = config.get("daemon")
         if daemon_config is None:

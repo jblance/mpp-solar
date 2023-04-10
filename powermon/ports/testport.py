@@ -1,7 +1,7 @@
 import logging
 import random
 
-from ..helpers import get_kwargs
+from mppsolar.helpers import get_kwargs
 from .port import Port
 
 # import re
