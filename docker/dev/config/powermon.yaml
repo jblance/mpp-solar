@@ -1,0 +1,19 @@
+device:
+  name: Test_Inverter
+  id: 123456789
+  model: 8048MAX
+  manufacturer: MPP-Solar
+  port:
+    baud: 2400
+    path: /dev/hidraw0
+    type: USB
+    protocol: PI30
+  commands:
+  - command: QPGS0
+    outputs:
+    - name: screen
+      format: hass
+      entity_id_prefix: inverter42
+      discovery_prefix: homeassistant
+      filter: ^serial|^work|^charger|^fault
+loop: 60
