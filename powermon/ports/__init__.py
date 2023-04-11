@@ -1,8 +1,8 @@
 import importlib
 import logging
-from mppsolar.ports.serialport import SerialPort
-from mppsolar.ports.testport import TestPort
-from mppsolar.ports.usbport import USBPort
+from powermon.ports.serialport import SerialPort
+from powermon.ports.testport import TestPort
+from powermon.ports.usbport import USBPort
 from enum import StrEnum, auto
 
 

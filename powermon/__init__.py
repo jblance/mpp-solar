@@ -13,13 +13,13 @@ from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
 from powermon.ports import get_port
 
-from mppsolar.libs.schedule import Schedule, LoopCommandSchedule, CommandScheduleType, Command
+from powermon.libs.schedule import Schedule, LoopCommandSchedule, CommandScheduleType, Command
 
 # from mppsolar.inout import get_port
 
 
 # Set-up logger
-log = logging.getLogger("")
+log = logging.getLogger("Powermon")
 
 
 class ConfigError(Exception):

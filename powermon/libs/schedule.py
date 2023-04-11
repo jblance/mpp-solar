@@ -2,7 +2,7 @@ from enum import StrEnum, auto
 from time import sleep, time
 import yaml
 import logging
-from mppsolar.sender import get_output
+from powermon.transports import get_output
 
 log = logging.getLogger("schedule")
 
