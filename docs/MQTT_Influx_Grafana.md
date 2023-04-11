@@ -22,7 +22,7 @@ basetopic/subtopic this is the message
 ```
 * If the message displayed in CMD1 window the test has passed. yay!
 
-* Test from mpp-solar, in CMD2 `mpp-solar -q localhost -c QID`
+* Test from mpp-solar, in CMD2 `mpp-solar -q localhost -c QID -o influx2_mqtt`
 * This should display something in CMD1 similar to (the numbers will be different and should match your inverter serial number):
 ```
 QID/serial_number/value 9293333010501
