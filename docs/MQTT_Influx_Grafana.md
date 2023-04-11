@@ -37,7 +37,7 @@ e.g. for cron
 `crontab -e` to edit
 and add a line like
 ```
-* * * * * /usr/local/bin/mpp-solar -q localhost -c QPIGS > /home/pi/cron.out 2>&1
+* * * * * /usr/local/bin/mpp-solar -q localhost -c QPIGS -o influx2_mqtt > /home/pi/cron.out 2>&1
 ```
 which will run the QPIGS command every minute and log errors to /home/pi/cron.out
 
