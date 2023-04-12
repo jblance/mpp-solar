@@ -1,28 +1,20 @@
+from mppsolar.protocols import get_protocol
+
 import importlib
-import logging
+
+from powermon.ports.port import PortType
 from powermon.ports.serialport import SerialPort
-from powermon.ports.testport import TestPort
 from powermon.ports.usbport import USBPort
-from enum import StrEnum, auto
 
+def getPortFromConfig(port_config):
 
-class PortType(StrEnum):
-    UNKNOWN = auto()
-    TEST = auto()
-    USB = auto()
-    ESP32 = auto()
-    SERIAL = auto()
-    JKBLE = auto()
-    MQTT = auto()
-    VSERIAL = auto()
-    DALYSERIAL = auto()
-    BLE = auto()
+    # get protocol handler
+    protocol = get_protocol(protocol=port_config["protocol"])
+    #log.debug(f"protocol: {protocol}")
 
-
-log = logging.getLogger("ports")
-
-
-def get_port(portType, portPath, baud, protocol):
+    portType = port_config["type"]
+    portPath = port_config["path"]
+    portBaud = port_config["baud"]
     # return None if port type is not defined
     if portType is None:
         return None
@@ -30,10 +22,15 @@ def get_port(portType, portPath, baud, protocol):
     portObject = None
 
     if portType == PortType.SERIAL:
-        portObject = SerialPort(portPath, baud, protocol)
+        portObject = SerialPort(portPath, portBaud, protocol)
     elif portType == PortType.USB:
         portObject = USBPort(portPath, protocol)
+
+    #Pattern for port types that cause problems when imported
     elif portType == PortType.TEST:
-        portObject = TestPort()
+        porttype_id = 'testport'
+        port_module = importlib.import_module("powermon.ports." + porttype_id, ".")
+        port_class = getattr(port_module, porttype_id)
+        portObject = port_class()
 
     return portObject

@@ -7,15 +7,14 @@ from time import sleep, time
 
 import yaml
 
-from mppsolar.protocols import get_protocol
+
 from mppsolar.version import __version__  # noqa: F401
 from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
-from powermon.ports import get_port
 
-from powermon.libs.schedule import Schedule, LoopCommandSchedule, CommandScheduleType, Command
+from powermon.libs.schedule import Schedule
 
-# from mppsolar.inout import get_port
+from powermon.ports import getPortFromConfig
 
 
 # Set-up logger
@@ -189,13 +188,9 @@ def main():
     #     protocol: PI30MAX
     port_config = device_config["port"].copy()
     log.debug(f"portconfig: {port_config}")
-    portType = port_config["type"]
-    portPath = port_config["path"]
-    portBaud = port_config["baud"]
-    # get protocol handler
-    protocol = get_protocol(protocol=port_config["protocol"])
-    log.debug(f"protocol: {protocol}")
-    port = get_port(portType, portPath, portBaud, protocol)
+
+    
+    port = getPortFromConfig(port_config)
     log.debug(f"port: {port}")
     # error out if unable to configure port
     if not port:
@@ -219,6 +214,7 @@ def main():
         while doLoop:
             # tell the daemon we're still working
             daemon.watchdog()
+            log.debug("Looping")
             schedule.runLoop()
    
     except KeyboardInterrupt:

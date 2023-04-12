@@ -43,6 +43,7 @@ class Schedule:
         self.scheduledCommands.append(OneTimeCommandSchedule(command))
     
     def runLoop(self):
+        log.debug("runloop")
         start_time = time()
         if(self.inDelay is False):
             for scheduledCommand in self.scheduledCommands:

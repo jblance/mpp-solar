@@ -1,9 +1,22 @@
 from abc import ABC, abstractmethod
 import logging
+import importlib
+from enum import StrEnum, auto
 
 # from time import sleep
 log = logging.getLogger("Port")
 
+class PortType(StrEnum):
+    UNKNOWN = auto()
+    TEST = auto()
+    USB = auto()
+    ESP32 = auto()
+    SERIAL = auto()
+    JKBLE = auto()
+    MQTT = auto()
+    VSERIAL = auto()
+    DALYSERIAL = auto()
+    BLE = auto()
 
 class Port(ABC):
     @abstractmethod
