@@ -10,7 +10,7 @@ def format_data(*args, **kwargs):
 
     formatter = get_kwargs(kwargs, "formatter")
 
-    log.info(f"attempting to create output processor: {formatter}")
+    log.info(f"attempting to create format processor: {formatter}")
     try:
         _module = importlib.import_module("powermon.formats." + formatter, ".")
         _class = getattr(_module, formatter)

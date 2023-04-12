@@ -22,5 +22,5 @@ pypi-upload:
 docker-up:
 	docker-compose up --build
 
-dockerdev-up:
+docker-powermon-dev-up:
 	docker compose -f docker-compose.development.yaml up --build

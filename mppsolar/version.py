@@ -4,5 +4,4 @@
 #version.read("pyproject.toml")
 #__version__ = version["tool.poetry"]["version"].replace('"', "")
 
-__version__ = "0.15.30"
-
+__version__ = "0.15.42"

@@ -7,7 +7,7 @@ device:
   port:
     baud: 2400
     path: /dev/hidraw0
-    type: usb
+    type: USB
     protocol: PI30
 
 #Separate the schedule from the device definition
