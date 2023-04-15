@@ -5,7 +5,6 @@ device:
   model: 1012LV-MK
   manufacturer: MPP-Solar
   port:
-    baud: 2400
     path: /dev/hidraw0
     type: usb
     protocol: PI30

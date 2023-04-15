@@ -32,7 +32,8 @@ class USBPort(Port):
             os.close(self.port)
         return
 
-    def send_and_receive(self, full_command) -> dict:
+    def send_and_receive(self, 
+                         ) -> dict:
         response_line = bytes()
         
         # Send the command to the open usb connection

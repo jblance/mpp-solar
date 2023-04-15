@@ -13,8 +13,8 @@ def getPortFromConfig(port_config):
     #log.debug(f"protocol: {protocol}")
 
     portType = port_config["type"]
-    portPath = port_config["path"]
-    portBaud = port_config["baud"]
+    portPath = port_config.get("path", None)
+    portBaud = port_config.get("baud", None)
     # return None if port type is not defined
     if portType is None:
         return None

@@ -4,7 +4,7 @@ import yaml
 import logging
 from powermon.transports import get_output
 
-log = logging.getLogger("schedule")
+log = logging.getLogger("Schedule")
 
 class Schedule:
     def __init__(self, scheduledCommands, loopDuration, mqtt_broker, port, adhocCommandsTopic=None):
@@ -20,7 +20,7 @@ class Schedule:
             mqtt_broker.subscribe(adhocCommandsTopic, self.adhocCallback)
 
     def __str__(self):
-        return f"Schedules: {self.scheduledCommands}"
+        return f"Schedule: {self.scheduledCommands}, {self.loopDuration}, {self.adhocCommandsTopic}"
     
     def adhocCallback(self, client, userdata, msg):
         log.info(f"Received `{msg.payload}` on topic `{msg.topic}`")
@@ -29,11 +29,11 @@ class Schedule:
         try:
             _command_config = yaml.safe_load(yamlString)
         except yaml.YAMLError as exc:
-            log.error(f"Error processing config file: {exc}")
+            self.log.error(f"Error processing config file: {exc}")
 
         for command in _command_config["commands"]:
-            log.debug(f"command: {command}")
-            log.debug(f"self: {self}")
+            self.log.debug(f"command: {command}")
+            self.log.debug(f"self: {self}")
             self.addOneTimeCommandFromConfig(command)
 
     
@@ -65,19 +65,21 @@ class Schedule:
 
     @classmethod
     def parseCommandConfig(cls, command, mqtt_broker, port):
+        
         _command = command["command"]
         _commandType = command["type"]
         _outputs = []
         for output in command["outputs"]:
-            log.debug(f"command: {command}")
+            logging.debug(f"command: {command}")
             _output = get_output(output["type"], mqtt_broker, output["topic"], output["tag"])
-            log.debug(f"output: {_output}")
+            logging.debug(f"output: {_output}")
             _outputs.append(_output)
 
         return Command(_command, _commandType, _outputs, port)
 
     @classmethod
     def parseScheduleConfig(cls, config, port, mqtt_broker):
+        logging.debug("parseScheduleConfig")
         _loopDuration = config["loop"]
         _adhocCommandsTopic = config["adhoc_command_topic"]
 
@@ -96,15 +98,10 @@ class Schedule:
             if _scheduleType == CommandScheduleType.LOOP:
                 _schedules.append(LoopCommandSchedule(_loopCount, _commands))
             else:
-                raise ConfigError(f"Undefined schedule type: {_scheduleType}")
+                raise KeyError(f"Undefined schedule type: {_scheduleType}")
 
         schedule = Schedule(_schedules, _loopDuration, mqtt_broker, port, _adhocCommandsTopic)
         return schedule
-        
-        
-        
-
-
 
 
 class CommandScheduleType(StrEnum):

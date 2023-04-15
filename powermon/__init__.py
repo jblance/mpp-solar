@@ -18,7 +18,7 @@ from powermon.ports import getPortFromConfig
 
 
 # Set-up logger
-log = logging.getLogger("Powermon")
+log = logging.getLogger()
 
 
 class ConfigError(Exception):
@@ -42,11 +42,11 @@ device:
 """
 
 
-def readConfigFile(configFile=None):
+def readYamlFile(yamlFile=None):
     _config = {}
-    if configFile is not None:
+    if yamlFile is not None:
         try:
-            with open(configFile, "r") as stream:
+            with open(yamlFile, "r") as stream:
                 _config = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             log.error(f"Error processing config file: {exc}")
@@ -128,7 +128,7 @@ def main():
     # build config - start with defaults
     config = yaml.safe_load(sample_config)
     # build config - update with details from config file
-    config.update(readConfigFile(args.configFile))
+    config.update(readYamlFile(args.configFile))
     # build config - override with any command line arguments
     config.update(processCommandLineOverrides(args))
 
@@ -201,6 +201,7 @@ def main():
 
     # Get scheduled commands
     scheduling_config = config.get("scheduling", None)
+    log.debug(f"scheduling_config: {scheduling_config}")
     schedule = Schedule.parseScheduleConfig(scheduling_config, port, mqtt_broker)
 
     log.debug(schedule)
@@ -211,10 +212,11 @@ def main():
     # Main working loop
     doLoop = True
     try:
+        
+        log.debug("Looping")
         while doLoop:
             # tell the daemon we're still working
             daemon.watchdog()
-            log.debug("Looping")
             schedule.runLoop()
    
     except KeyboardInterrupt:
