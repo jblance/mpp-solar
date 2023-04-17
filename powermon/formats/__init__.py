@@ -1,23 +1,26 @@
-from mppsolar.helpers import get_kwargs
-import logging
-import importlib
-
-# from time import sleep
-log = logging.getLogger("formats")
+from .htmltable import htmltable
+from .hass import hass
+from .abstractformat import FormatterType
 
 
-def format_data(*args, **kwargs):
+def getFormatfromConfig(formatConfig, device):
+    #Get values from config
+    #Type is required
+    formatType = formatConfig["type"]
 
-    formatter = get_kwargs(kwargs, "formatter")
+    #Optional format values
+    remove_spaces = formatConfig.get("remove_spaces", True)
+    keep_case = formatConfig.get("keep_case", False)
+    filter = formatConfig.get("filter", None)
+    excl_filter = formatConfig.get("excl_filter", None)
 
-    log.info(f"attempting to create format processor: {formatter}")
-    try:
-        _module = importlib.import_module("powermon.formats." + formatter, ".")
-        _class = getattr(_module, formatter)
-    except ModuleNotFoundError as e:
-        # perhaps raise a Powermon exception here??
-        # maybe warn and keep going, only error if no outputs found?
-        log.critical(f"No module found for formatter processor {formatter} Error: {e}")
-        return
+    if formatType == FormatterType.HTMLTABLE:
+        formatter = htmltable(remove_spaces, keep_case, filter, excl_filter)
+    elif formatType == FormatterType.HASS:
+        discovery_prefix = formatConfig.get("discovery_prefix", "homeassistant")
+        entity_id_prefix = formatConfig.get("entity_id_prefix", "mpp")
+        formatter = hass(remove_spaces, keep_case, filter, excl_filter, discovery_prefix, entity_id_prefix, device.name, device.id, device.model, device.manufacturer)
+    #elif formatType == FormatterType.SIMPLE:
+        #formatter = simple(mqtt_broker, topic, tag)
 
-    return _class.output(**kwargs)
+    return formatter

@@ -3,12 +3,27 @@ import logging
 import re
 from datetime import datetime
 
-from mppsolar.helpers import get_kwargs, key_wanted
+from mppsolar.helpers import key_wanted
 
 log = logging.getLogger("hass")
 
 
 class hass:
+    def __init__(self, remove_spaces=True, keep_case=False, filter=None, excl_filter=None, 
+                 discovery_prefix="homeassistant", entity_id_prefix="mpp", device_name="MPP Solar", 
+                 device_id="mpp-solar", device_model="MPP Solar", device_manufacturer="MPP Solar"):
+        self.remove_spaces = remove_spaces
+        self.keep_case = keep_case
+        self.filter = filter
+        self.excl_filter = excl_filter
+
+        self.discovery_prefix = discovery_prefix
+        self.entity_id_prefix = entity_id_prefix
+        self.device_name = device_name
+        self.device_id = device_id
+        self.device_model = device_model
+        self.device_manufacturer = device_manufacturer
+
     def output(*args, **kwargs):
         log.info("Using output formatter: hass")
         log.debug(f"kwargs {kwargs}")
@@ -32,13 +47,7 @@ class hass:
             filter = config.get("filter", None)
             excl_filter = config.get("excl_filter", None)
             # formatter specific
-            discovery_prefix = config.get("discovery_prefix", "homeassistant")
-            entity_id_prefix = config.get("entity_id_prefix", "mpp")
-            device = fullconfig.get("device", {})
-            device_name = device.get("name", "mppsolar")
-            device_id = device.get("id", "mppsolar")
-            device_model = device.get("model", "mppsolar")
-            device_manufacturer = device.get("manufacturer", "mppsolar")
+            
 
         _filter = None
         _excl_filter = None

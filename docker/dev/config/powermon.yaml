@@ -24,6 +24,8 @@ scheduling:
         - type: mqtt
           topic: Test_Inverter
           tag: QPIGS
+          format: 
+            type: hass
 mqttbroker:
   name: localhost
   port: 1883

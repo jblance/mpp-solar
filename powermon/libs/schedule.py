@@ -2,18 +2,18 @@ from enum import StrEnum, auto
 from time import sleep, time
 import yaml
 import logging
-from powermon.transports import get_output
+from powermon.outputs import getOutputFromConfig
 
 log = logging.getLogger("Schedule")
 
 class Schedule:
-    def __init__(self, scheduledCommands, loopDuration, mqtt_broker, port, adhocCommandsTopic=None):
+    def __init__(self, scheduledCommands, loopDuration, mqtt_broker, device, adhocCommandsTopic=None):
         self.scheduledCommands = scheduledCommands
         self.loopDuration = loopDuration
         self.inDelay = False
         self.delayRemaining = loopDuration
         self.mqtt_broker = mqtt_broker
-        self.port = port
+        self.device = device
         self.adhocCommandsTopic = adhocCommandsTopic
 
         if adhocCommandsTopic is not None:
@@ -37,10 +37,12 @@ class Schedule:
             self.addOneTimeCommandFromConfig(command)
 
     
-    
     def addOneTimeCommandFromConfig(self, commandConfig):
-        command = self.parseCommandConfig(commandConfig, self.mqtt_broker, self.port)
+        command = self.parseCommandConfig(commandConfig, self.mqtt_broker, self.device)
         self.scheduledCommands.append(OneTimeCommandSchedule(command))
+
+    def beforeLoop(self):
+        self.device.port.connect()
     
     def runLoop(self):
         log.debug("runloop")
@@ -64,21 +66,21 @@ class Schedule:
             self.delayRemaining = self.loopDuration
 
     @classmethod
-    def parseCommandConfig(cls, command, mqtt_broker, port):
+    def parseCommandConfig(cls, command, mqtt_broker, device):
         
         _command = command["command"]
         _commandType = command["type"]
         _outputs = []
-        for output in command["outputs"]:
+        for outputConfig in command["outputs"]:
             logging.debug(f"command: {command}")
-            _output = get_output(output["type"], mqtt_broker, output["topic"], output["tag"])
+            _output = getOutputFromConfig(outputConfig,device, mqtt_broker)
             logging.debug(f"output: {_output}")
             _outputs.append(_output)
 
-        return Command(_command, _commandType, _outputs, port)
+        return Command(_command, _commandType, _outputs, device.port)
 
     @classmethod
-    def parseScheduleConfig(cls, config, port, mqtt_broker):
+    def parseScheduleConfig(cls, config, device, mqtt_broker):
         logging.debug("parseScheduleConfig")
         _loopDuration = config["loop"]
         _adhocCommandsTopic = config["adhoc_command_topic"]
@@ -93,14 +95,14 @@ class Schedule:
 
             _commands = []
             for command in schedule["commands"]:
-                _commands.append(cls.parseCommandConfig(command, mqtt_broker, port))
+                _commands.append(cls.parseCommandConfig(command, mqtt_broker, device))
             
             if _scheduleType == CommandScheduleType.LOOP:
                 _schedules.append(LoopCommandSchedule(_loopCount, _commands))
             else:
                 raise KeyError(f"Undefined schedule type: {_scheduleType}")
 
-        schedule = Schedule(_schedules, _loopDuration, mqtt_broker, port, _adhocCommandsTopic)
+        schedule = Schedule(_schedules, _loopDuration, mqtt_broker, device, _adhocCommandsTopic)
         return schedule
 
 
@@ -164,7 +166,6 @@ class Command:
     
     def run(self):
         log.debug(f"Running command: {self.command}")
-        self.port.connect()
         results = self.port.process_command(command=self.command)
         for output in self.outputs:
             log.debug(f"Output: {output}")

@@ -2,17 +2,24 @@ import logging
 import re
 
 from mppsolar.helpers import get_kwargs
-from powermon.formats import format_data
 
 log = logging.getLogger("MQTT")
 
 
 class MQTT:
+
+    @classmethod
+    def buildFromConfig(cls, output_config, mqtt_broker, formatter):
+        log.debug(f"processor.MQTT buildFromConfig {output_config}")
+        results_topic = output_config.get("results_topic", None)
+        tag = output_config.get("tag", None)
+        return cls(mqtt_broker, results_topic, tag, formatter)
     
-    def __init__(self, mqtt_broker, results_topic, tag) -> None:
+    def __init__(self, mqtt_broker, results_topic, tag, formatter) -> None:
         self.mqtt_broker = mqtt_broker
         self.results_topic = results_topic
         self.tag = tag
+        self.formatter = formatter
         log.debug(f"processor.MQTT __init__ ")
     
     def __str__(self):
@@ -109,7 +116,6 @@ class MQTT:
         # build the messages...
         msgs = self.build_msgs(**kwargs)
         log.debug(f"mqtt.output msgs {msgs}")
-        topic = self.results_topic + "/" +self.tag
 
         # publish
         self.mqtt_broker.publishMultiple(msgs)

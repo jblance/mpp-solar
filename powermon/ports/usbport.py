@@ -16,7 +16,7 @@ class USBPort(Port):
     def protocol(self):
         return self.protocol
 
-    def connect(self) -> None:
+    def connect(self) -> int:
         log.debug(f"USBPort connecting. path:{self.path}, protocol: {self.protocol}")
         try:
             self.port = os.open(self.path, os.O_RDWR | os.O_NONBLOCK)
@@ -24,7 +24,7 @@ class USBPort(Port):
         except Exception as e:
             log.warning(f"Error openning usb port: {e}")
             self.error = e
-        return
+        return self.port
 
     def disconnect(self) -> None:
         log.debug(f"USBPort disconnecting {self.port}")
@@ -32,8 +32,7 @@ class USBPort(Port):
             os.close(self.port)
         return
 
-    def send_and_receive(self, 
-                         ) -> dict:
+    def send_and_receive(self, full_command) -> dict:
         response_line = bytes()
         
         # Send the command to the open usb connection
@@ -84,5 +83,4 @@ class USBPort(Port):
                 response_line = response_line[: response_line.find(bytes([13])) + 1]
                 break
         log.debug("usb response was: %s", response_line)
-        os.close(self.port)
         return response_line

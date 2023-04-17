@@ -6,7 +6,13 @@ from mppsolar.helpers import get_kwargs, key_wanted
 log = logging.getLogger("htmltable")
 
 
-class htmltable:
+class htmltable():
+    def __init__(self, remove_spaces=True, keep_case=False, filter=None, excl_filter=None):
+        self.remove_spaces = remove_spaces
+        self.keep_case = keep_case
+        self.filter = filter
+        self.excl_filter = excl_filter
+
     def output(*args, **kwargs):
         log.info("Using output formatter: htmltable")
         log.debug(f"kwargs {kwargs}")
@@ -21,11 +27,7 @@ class htmltable:
         if config is not None:
             log.debug(f"config: {config}")
             # get formatting info
-            remove_spaces = config.get("remove_spaces", True)
-            keep_case = config.get("keep_case", False)
-            # extra_info = config.get("extra_info", False)
-            filter = config.get("filter", None)
-            excl_filter = config.get("excl_filter", None)
+            
 
         _filter = None
         _excl_filter = None

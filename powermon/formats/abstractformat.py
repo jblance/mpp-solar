@@ -1,36 +1,28 @@
 from abc import ABC, abstractmethod
 import logging
-import importlib
+from powermon.formats.htmltable import htmltable
+from powermon.formats.hass import hass
 from enum import StrEnum, auto
 
 # from time import sleep
-log = logging.getLogger("Port")
+log = logging.getLogger("Formatter")
 
-class PortType(StrEnum):
-    UNKNOWN = auto()
-    TEST = auto()
-    USB = auto()
-    ESP32 = auto()
-    SERIAL = auto()
-    JKBLE = auto()
-    MQTT = auto()
-    VSERIAL = auto()
-    DALYSERIAL = auto()
-    BLE = auto()
+class FormatterType(StrEnum):
+    HASS = auto()
+    HTMLTABLE = auto()
+    RAW = auto()
+    SIMPLE = auto()
+    TABLE = auto()
 
-class Port(ABC):
+class AbstractFormat(ABC):
+    @abstractmethod
+    def send_and_receive(self, *args, **kwargs) -> dict:
+        raise NotImplementedError
+    
     @property
     @abstractmethod
     def protocol(self):
         pass
-
-    def connect(self) -> None:
-        log.debug("Port connect not implemented")
-        return
-
-    def disconnect(self) -> None:
-        log.debug("Port disconnect not implemented")
-        return
 
     @abstractmethod
     def send_and_receive(self, full_command) -> dict:

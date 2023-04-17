@@ -13,6 +13,7 @@ from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
 
 from powermon.libs.schedule import Schedule
+from powermon.libs.device import Device
 
 from powermon.ports import getPortFromConfig
 
@@ -186,23 +187,22 @@ def main():
     #     path: /dev/ttyUSB0
     #     type: serial  # noqa:
     #     protocol: PI30MAX
-    port_config = device_config["port"].copy()
-    log.debug(f"portconfig: {port_config}")
+    log.debug(f"deviceconfig: {device_config}")
 
     
-    port = getPortFromConfig(port_config)
-    log.debug(f"port: {port}")
+    device = Device.fromConfig(device_config)
+    log.debug(f"device: {device}")
     # error out if unable to configure port
-    if not port:
-        log.error(f"No port for config '{port_config}' found")
-        raise ConfigError(f"No port for config '{port_config}' found")
+    if not device:
+        log.error(f"No config '{device_config}' found")
+        raise ConfigError(f"No port for config '{device_config}' found")
 
     
 
     # Get scheduled commands
     scheduling_config = config.get("scheduling", None)
     log.debug(f"scheduling_config: {scheduling_config}")
-    schedule = Schedule.parseScheduleConfig(scheduling_config, port, mqtt_broker)
+    schedule = Schedule.parseScheduleConfig(scheduling_config, device, mqtt_broker)
 
     log.debug(schedule)
 
@@ -212,7 +212,7 @@ def main():
     # Main working loop
     doLoop = True
     try:
-        
+        schedule.beforeLoop()
         log.debug("Looping")
         while doLoop:
             # tell the daemon we're still working

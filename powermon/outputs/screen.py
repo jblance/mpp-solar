@@ -1,30 +1,27 @@
 import logging
 
 from mppsolar.helpers import get_kwargs
-from powermon.formats import format_data
+
 
 log = logging.getLogger("screen")
 
 
 class Screen:
+    def __init__(self, formatter):
+        self.formatter = formatter
+
     def __str__(self):
         return "the screen transport just prints the results to standard out"
 
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"transport.screen __init__ args: {args}, kwargs: {kwargs}")
 
-    def output(self, *args, **kwargs):
+    def output(self, data):
         log.info("Using output sender: screen")
-        log.debug(f"kwargs {kwargs}")
-        data = get_kwargs(kwargs, "data")
         if data is None:
             return
 
-        config = get_kwargs(kwargs, "config")
-        fullconfig = get_kwargs(kwargs, "fullconfig")
-        formatter = config.get("format", "table")
-
-        formatted_data = format_data(formatter=formatter, config=config, data=data, fullconfig=fullconfig)
+        formatted_data = self.formatter.format(data)
         if formatted_data is None:
             print("Nothing returned from data formatting")
             return
