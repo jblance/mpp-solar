@@ -1,17 +1,16 @@
 import logging
 import re
+from powermon.formats.abstractformat import AbstractFormat
 
 from mppsolar.helpers import get_kwargs, key_wanted
 
 log = logging.getLogger("htmltable")
 
 
-class htmltable():
-    def __init__(self, remove_spaces=True, keep_case=False, filter=None, excl_filter=None):
-        self.remove_spaces = remove_spaces
-        self.keep_case = keep_case
-        self.filter = filter
-        self.excl_filter = excl_filter
+class htmltable(AbstractFormat):
+    def __init__(self, formatConfig):
+        super().__init__(formatConfig)
+        
 
     def output(*args, **kwargs):
         log.info("Using output formatter: htmltable")

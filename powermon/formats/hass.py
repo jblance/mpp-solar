@@ -2,27 +2,29 @@ import json as js
 import logging
 import re
 from datetime import datetime
+from powermon.formats.abstractformat import AbstractFormat
 
 from mppsolar.helpers import key_wanted
 
 log = logging.getLogger("hass")
 
 
-class hass:
-    def __init__(self, remove_spaces=True, keep_case=False, filter=None, excl_filter=None, 
-                 discovery_prefix="homeassistant", entity_id_prefix="mpp", device_name="MPP Solar", 
-                 device_id="mpp-solar", device_model="MPP Solar", device_manufacturer="MPP Solar"):
-        self.remove_spaces = remove_spaces
-        self.keep_case = keep_case
-        self.filter = filter
-        self.excl_filter = excl_filter
-
-        self.discovery_prefix = discovery_prefix
-        self.entity_id_prefix = entity_id_prefix
-        self.device_name = device_name
-        self.device_id = device_id
-        self.device_model = device_model
-        self.device_manufacturer = device_manufacturer
+class hass(AbstractFormat):
+    def __init__(self, formatConfig, device):
+        super().__init__(formatConfig)
+        self.discovery_prefix = formatConfig.get("discovery_prefix", "homeassistant")
+        self.entity_id_prefix = formatConfig.get("entity_id_prefix", "mpp")
+        if device is None:
+            self.device_name="MPP Solar"
+            self.device_id="mpp-solar"
+            self.device_model="MPP Solar"
+            self.device_manufacturer="MPP Solar"
+        else:
+            self.device_name=device.name
+            self.device_id=device.id
+            self.device_model=device.model
+            self.device_manufacturer=device.manufacturer
+        
 
     def output(*args, **kwargs):
         log.info("Using output formatter: hass")
