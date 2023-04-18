@@ -1,20 +1,15 @@
 import logging
 
 from mppsolar.helpers import get_kwargs
-
+from powermon.outputs.abstractoutput import AbstractOutput
 
 log = logging.getLogger("screen")
 
 
-class Screen:
-    def __init__(self, formatter):
+class Screen(AbstractOutput):
+    def __init__(self, outputConfig, formatter):
+        super().__init__(formatter)
         self.formatter = formatter
-
-    def __str__(self):
-        return "the screen transport just prints the results to standard out"
-
-    def __init__(self, *args, **kwargs) -> None:
-        log.debug(f"transport.screen __init__ args: {args}, kwargs: {kwargs}")
 
     def output(self, data):
         log.info("Using output sender: screen")

@@ -1,10 +1,7 @@
 import json as js
 import logging
-import re
 from datetime import datetime
 from powermon.formats.abstractformat import AbstractFormat
-
-from mppsolar.helpers import key_wanted
 
 log = logging.getLogger("hass")
 
@@ -26,39 +23,15 @@ class hass(AbstractFormat):
             self.device_manufacturer=device.manufacturer
         
 
-    def output(*args, **kwargs):
+    def format(self, data) -> list:
         log.info("Using output formatter: hass")
-        log.debug(f"kwargs {kwargs}")
-        data = get_kwargs(kwargs, "data")
 
         config_msgs = []
         value_msgs = []
         if data is None:
             return []
 
-        # check if config supplied
-        config = get_kwargs(kwargs, "config")
-        fullconfig = get_kwargs(kwargs, "fullconfig")
-        # print(fullconfig)
-        if config is not None:
-            log.debug(f"config: {config}")
-            # get formatting info
-            remove_spaces = config.get("remove_spaces", True)
-            keep_case = config.get("keep_case", False)
-            # extra_info = config.get("extra_info", False)
-            filter = config.get("filter", None)
-            excl_filter = config.get("excl_filter", None)
-            # formatter specific
-            
-
-        _filter = None
-        _excl_filter = None
-
-        if filter is not None:
-            _filter = re.compile(filter)
-
-        if excl_filter is not None:
-            _excl_filter = re.compile(excl_filter)
+        
 
         # remove raw response
         if "raw_response" in data:
@@ -72,16 +45,9 @@ class hass(AbstractFormat):
 
         # build data to display
         for key in data:
-            f_key = key
+            formattedKey = self.formatKey(key)
 
-            # remove spaces
-            if remove_spaces:
-                f_key = f_key.replace(" ", "_")
-            if not keep_case:
-                # make lowercase
-                f_key = f_key.lower()
-
-            if key_wanted(f_key, _filter, _excl_filter):
+            if self.isKeyWanted(formattedKey):
                 # Get key data
                 value = data[key][0]
                 unit = data[key][1]
@@ -115,15 +81,15 @@ class hass(AbstractFormat):
                     state_class = data[key][2]["state_class"]
 
                 # Object ID
-                object_id = f"{entity_id_prefix}_{f_key}".lower()
+                object_id = f"{self.entity_id_prefix}_{formattedKey}".lower()
 
-                name = f"{entity_id_prefix} {key}"
+                name = f"{self.entity_id_prefix} {key}"
 
                 # Home Assistant MQTT Auto Discovery Message
                 #
                 # Topic
                 # <discovery_prefix>/<component>/[<node_id>/]<object_id>/config, eg homeassistant/binary_sensor/garden/config
-                topic_base = f"{discovery_prefix}/{component}/{object_id}".replace(" ", "_")
+                topic_base = f"{self.discovery_prefix}/{component}/{object_id}".replace(" ", "_")
                 topic = f"{topic_base}/config"
                 state_topic = f"{topic_base}/state"
 
@@ -140,10 +106,10 @@ class hass(AbstractFormat):
                 # Add device info
                 # payload["device"] = {"name": f"{device_name}", "identifiers": ["mppsolar"], "model": "PIP6048MAX", "manufacturer": "MPP-Solar"}
                 payload["device"] = {
-                    "name": device_name,
-                    "identifiers": [device_id],
-                    "model": device_model,
-                    "manufacturer": device_manufacturer,
+                    "name": self.device_name,
+                    "identifiers": [self.device_id],
+                    "model": self.device_model,
+                    "manufacturer": self.device_manufacturer,
                 }
 
                 # Add unit of measurement

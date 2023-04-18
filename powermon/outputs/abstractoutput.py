@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 import logging
-from powermon.outputs.screen import Screen
-from powermon.outputs.mqtt import MQTT
 from enum import StrEnum, auto
 
 
@@ -12,8 +10,14 @@ class OutputType(StrEnum):
     MQTT = auto()
 
 class AbstractOutput(ABC):
+
+
     def __init__(self, formatter):
         self.formatter = formatter
 
-    def filter(self, data):
+
+    @abstractmethod
+    def output(self, data):
         pass
+
+    

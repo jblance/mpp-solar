@@ -14,9 +14,9 @@ def getOutputFromConfig(outputConfig, device, mqtt_broker):
 
     output_class = None
     if outputType == OutputType.SCREEN:
-        output_class = Screen.buildFromConfig(outputConfig, format)
+        output_class = Screen(outputConfig, format)
     elif outputType == OutputType.MQTT:
-        output_class = MQTT.buildFromConfig(outputConfig, mqtt_broker, format)
+        output_class = MQTT(outputConfig, mqtt_broker, format)
         
 
     return output_class

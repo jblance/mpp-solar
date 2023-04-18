@@ -22,10 +22,10 @@ scheduling:
         type: basic #default command type is basic
         outputs:
         - type: mqtt
-          topic: Test_Inverter
-          tag: QPIGS
           format: 
-            type: hass
+            type: topics
+            topic: Test_Inverter
+            tag: QPIGS
 mqttbroker:
   name: localhost
   port: 1883
