@@ -19,7 +19,7 @@ from powermon.ports import getPortFromConfig
 
 
 # Set-up logger
-log = logging.getLogger()
+log = logging.getLogger("")
 
 
 class ConfigError(Exception):
@@ -44,16 +44,16 @@ device:
 
 
 def readYamlFile(yamlFile=None):
-    _config = {}
+    _yaml = {}
     if yamlFile is not None:
         try:
             with open(yamlFile, "r") as stream:
-                _config = yaml.safe_load(stream)
+                _yaml = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
-            log.error(f"Error processing config file: {exc}")
+            log.error(f"Error processing yaml file: {exc}")
         except FileNotFoundError as exc:
-            log.error(f"Error opening config file: {exc}")
-    return _config
+            log.error(f"Error opening yaml file: {exc}")
+    return _yaml
 
 
 
