@@ -6,6 +6,24 @@ from powermon.outputs import getOutputFromConfig
 
 log = logging.getLogger("Schedule")
 
+class Command:
+    def __init__(self, command, commandType, outputs, port):
+        self.command = command
+        self.commandType = commandType
+        self.outputs = outputs
+        self.port = port
+
+    def __str__(self):
+        return f"Command: {self.command}, CommandType: {self.commandType}, Outputs: {self.outputs}"
+    
+    def run(self):
+        log.debug(f"Running command: {self.command}")
+        results = self.port.process_command(command=self.command)
+        for output in self.outputs:
+            log.debug(f"Output: {output}")
+            output.output(data=results)
+    
+
 class Schedule:
     def __init__(self, scheduledCommands, loopDuration, mqtt_broker, device, adhocCommandsTopic=None):
         self.scheduledCommands = scheduledCommands
@@ -33,17 +51,17 @@ class Schedule:
         try:
             _command_config = yaml.safe_load(yamlString)
         except yaml.YAMLError as exc:
-            self.log.error(f"Error processing config file: {exc}")
+            log.error(f"Error processing config file: {exc}")
 
         for command in _command_config["commands"]:
-            self.log.debug(f"command: {command}")
-            self.log.debug(f"self: {self}")
+            log.debug(f"command: {command}")
+            log.debug(f"self: {self}")
             self.addOneTimeCommandFromConfig(command)
 
     
     def addOneTimeCommandFromConfig(self, commandConfig):
         command = self.parseCommandConfig(commandConfig, self.mqtt_broker, self.device)
-        self.scheduledCommands.append(OneTimeCommandSchedule(command))
+        self.scheduledCommands.append(OneTimeCommandSchedule({command}))
 
     #The hook for the port to connect before the main loops starts
     def beforeLoop(self):
@@ -75,8 +93,9 @@ class Schedule:
         else:
             return True
 
+    #TODO: this should follow the same pattern as the other parsers
     @classmethod
-    def parseCommandConfig(cls, command, mqtt_broker, device):
+    def parseCommandConfig(cls, command, mqtt_broker, device) -> Command:
         
         _command = command["command"]
         _commandType = command["type"]
@@ -89,6 +108,7 @@ class Schedule:
 
         return Command(_command, _commandType, _outputs, device.port)
 
+    #TODO: this should follow the same pattern as the other parsers
     @classmethod
     def parseScheduleConfig(cls, config, device, mqtt_broker):
         logging.debug("parseScheduleConfig")
@@ -166,20 +186,3 @@ class OneTimeCommandSchedule(InformalScheduledCommandInterface):
             return True
 
 
-class Command:
-    def __init__(self, command, commandType, outputs, port):
-        self.command = command
-        self.commandType = commandType
-        self.outputs = outputs
-        self.port = port
-
-    def __str__(self):
-        return f"Command: {self.command}, CommandType: {self.commandType}, Outputs: {self.outputs}"
-    
-    def run(self):
-        log.debug(f"Running command: {self.command}")
-        results = self.port.process_command(command=self.command)
-        for output in self.outputs:
-            log.debug(f"Output: {output}")
-            output.output(data=results)
-    

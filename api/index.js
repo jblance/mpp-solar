@@ -60,9 +60,11 @@ app.get("/runCommand", (req, res, next) => {
   "- command: " + command + "\n" +
   "  type: basic" + "\n" +
   "  outputs:" + "\n" +
-  "  - type: mqtt_html" + "\n" +
+  "  - type: mqtt" + "\n" +
   "    tag: " + tag + "\n" +
-  "    topic: " + responseTopic + "\n";
+  "    topic: " + responseTopic + "\n" +
+  "    format: " + "\n" +
+  "      type: htmltable" + "\n";
   //const commandJSON = JSON.stringify(commandObj);
   console.log(commandString);
 
