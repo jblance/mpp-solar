@@ -26,7 +26,7 @@ services:
     entrypoint:
       - powermon
       - -C
-      - /config/powermon.yaml #Available due to volume binding above
+      - /config/powermon-qpigs.yaml #Available due to volume binding above
       - --debug
 #       - sleep
 #       - infinity

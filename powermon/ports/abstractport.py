@@ -18,22 +18,22 @@ class PortType(StrEnum):
     DALYSERIAL = auto()
     BLE = auto()
 
-class Port(ABC):
-    @property
-    @abstractmethod
-    def protocol(self):
-        pass
+class AbstractPort(ABC):
+    def __init__(self, protocol):
+        self.protocol = protocol
 
+    @abstractmethod
     def connect(self) -> None:
         log.debug("Port connect not implemented")
         return
 
+    @abstractmethod
     def disconnect(self) -> None:
         log.debug("Port disconnect not implemented")
         return
 
     @abstractmethod
-    def send_and_receive(self, full_command) -> dict:
+    def send_and_receive(self, command) -> dict:
         raise NotImplementedError
 
     # Question: Should we make this an abstract method?
@@ -43,7 +43,7 @@ class Port(ABC):
         full_command = self.protocol.get_full_command(command)
         log.debug(f"Full Command {full_command}")
 
-        raw_response = self.send_and_receive(full_command)
+        raw_response = self.send_and_receive(command)
         log.debug(f"Send and Receive Response {raw_response}")
 
         # Handle errors

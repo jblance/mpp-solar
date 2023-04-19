@@ -6,11 +6,13 @@ log = logging.getLogger("Topics")
 
 
 class Topics(AbstractFormat):
-    def __init__(self, formatConfig):
+    def __init__(self, formatConfig, topic, tag):
         super().__init__(formatConfig)
-        self.results_topic = formatConfig.get("topic", None)
-        self.tag = formatConfig.get("tag", None)
+        self.results_topic = topic
+        self.tag = tag
 
+    def sendsMultipleMessages(self) -> bool:
+        return True
 
     def format(self, data):
         log.info("Using output formatter: Topics")

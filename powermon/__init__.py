@@ -210,14 +210,13 @@ def main():
     daemon.initialize()
     
     # Main working loop
-    doLoop = True
+    keepLooping = True
     try:
         schedule.beforeLoop()
-        log.debug("Looping")
-        while doLoop:
+        while keepLooping:
             # tell the daemon we're still working
             daemon.watchdog()
-            schedule.runLoop()
+            keepLooping = schedule.runLoop()
    
     except KeyboardInterrupt:
         print("KeyboardInterrupt")

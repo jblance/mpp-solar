@@ -2,12 +2,12 @@ import logging
 import os
 import time
 
-from .port import Port
+from .abstractport import AbstractPort
 
 log = logging.getLogger("USBPort")
 
 
-class USBPort(Port):
+class USBPort(AbstractPort):
     def __init__(self, path, protocol) -> None:
         log.debug(f"Initializing usb port. path:{path}, protocol: {protocol}")
         self.path = path
@@ -32,7 +32,8 @@ class USBPort(Port):
             os.close(self.port)
         return
 
-    def send_and_receive(self, full_command) -> dict:
+    def send_and_receive(self, command) -> dict:
+        full_command = self.protocol.get_full_command(command)
         response_line = bytes()
         
         # Send the command to the open usb connection

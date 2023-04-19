@@ -6,7 +6,7 @@ device:
   manufacturer: MPP-Solar
   port:
     path: /dev/hidraw0
-    type: usb
+    type: test
     protocol: PI30
 
 #Separate the schedule from the device definition
@@ -22,10 +22,11 @@ scheduling:
         type: basic #default command type is basic
         outputs:
         - type: mqtt
+          topic: TEST_INVERTER
+          tag: QPIGS
           format: 
-            type: topics
-            topic: Test_Inverter
-            tag: QPIGS
+            type: htmltable
+            filter: ^ac|^pv
 mqttbroker:
   name: localhost
   port: 1883

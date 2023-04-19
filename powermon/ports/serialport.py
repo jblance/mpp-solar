@@ -2,12 +2,12 @@ import logging
 import serial
 import time
 
-from .port import Port
+from .abstractport import AbstractPort
 
 log = logging.getLogger("SerialPort")
 
 
-class SerialPort(Port):
+class SerialPort(AbstractPort):
     def __init__(self, path, baud, protocol) -> None:
         log.debug(f"Initializing usbserial port. path:{path}, baud: {baud}")
         self.path = path
@@ -31,7 +31,8 @@ class SerialPort(Port):
             self.serialPort.close()
         return
 
-    def send_and_receive(self, full_command) -> dict:
+    def send_and_receive(self, command) -> dict:
+        full_command = self.protocol.get_full_command(command)
         response_line = None
         log.debug(f"port {self.serialPort}")
         if self.serialPort is None:

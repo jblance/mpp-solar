@@ -35,6 +35,10 @@ class AbstractFormat(ABC):
     def format(self, data):
         pass
 
+    #Override this if the format sends multiple messages
+    def sendsMultipleMessages(self) -> bool:
+        return False
+
     def formatAndFilterData(self, data):
         #TODO: should we make data a proper object so it's easy to get the data we want?
         # remove raw response

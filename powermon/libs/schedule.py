@@ -11,10 +11,14 @@ class Schedule:
         self.scheduledCommands = scheduledCommands
         self.loopDuration = loopDuration
         self.inDelay = False
-        self.delayRemaining = loopDuration
         self.mqtt_broker = mqtt_broker
         self.device = device
         self.adhocCommandsTopic = adhocCommandsTopic
+
+        if(loopDuration == "once"):
+            self.delayRemaining = 0
+        else:
+            self.delayRemaining = loopDuration
 
         if adhocCommandsTopic is not None:
             mqtt_broker.subscribe(adhocCommandsTopic, self.adhocCallback)
@@ -41,10 +45,11 @@ class Schedule:
         command = self.parseCommandConfig(commandConfig, self.mqtt_broker, self.device)
         self.scheduledCommands.append(OneTimeCommandSchedule(command))
 
+    #The hook for the port to connect before the main loops starts
     def beforeLoop(self):
         self.device.port.connect()
     
-    def runLoop(self):
+    def runLoop(self) -> bool:
         start_time = time()
         if(self.inDelay is False):
             for scheduledCommand in self.scheduledCommands:
@@ -64,6 +69,12 @@ class Schedule:
             self.inDelay = False
             self.delayRemaining = self.loopDuration
 
+        if self.loopDuration == "once":
+            log.debug("loopDuration is once, returning False")
+            return False
+        else:
+            return True
+
     @classmethod
     def parseCommandConfig(cls, command, mqtt_broker, device):
         
@@ -82,7 +93,7 @@ class Schedule:
     def parseScheduleConfig(cls, config, device, mqtt_broker):
         logging.debug("parseScheduleConfig")
         _loopDuration = config["loop"]
-        _adhocCommandsTopic = config["adhoc_command_topic"]
+        _adhocCommandsTopic = config.get("adhoc_command_topic", None)
 
         _schedules = []
         for schedule in config["schedules"]:
@@ -98,6 +109,8 @@ class Schedule:
             
             if _scheduleType == CommandScheduleType.LOOP:
                 _schedules.append(LoopCommandSchedule(_loopCount, _commands))
+            elif _scheduleType == CommandScheduleType.ONCE:
+                _schedules.append(OneTimeCommandSchedule(_commands))
             else:
                 raise KeyError(f"Undefined schedule type: {_scheduleType}")
 
@@ -135,9 +148,9 @@ class LoopCommandSchedule(InformalScheduledCommandInterface):
         
 
 class OneTimeCommandSchedule(InformalScheduledCommandInterface):
-    def __init__(self, command):
+    def __init__(self, _commands):
         self.scheduleType = CommandScheduleType.ONCE
-        self.commands = [command]
+        self.commands = _commands
         self.has_run = False
     
     def __str__(self):
