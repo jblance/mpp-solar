@@ -33,14 +33,16 @@ services:
     depends_on:
       - mosquitto
 
-  mppsolar-api:
+  api:
     network_mode: host
+    volumes:
+    #Bind over the configuration
+      - type: bind
+        source: ./api/
+        target: /app/
     build: 
       context: api
       dockerfile: Dockerfile.development
-    entrypoint: 
-      - node
-      - index.js
     depends_on:
       - mppsolar
 
