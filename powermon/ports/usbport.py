@@ -2,24 +2,21 @@ import logging
 import os
 import time
 
-from mppsolar.helpers import get_kwargs
-
-from .port import Port
+from .abstractport import AbstractPort
 
 log = logging.getLogger("USBPort")
 
 
-class usbport(Port):
-    def __init__(self, *args, **kwargs) -> None:
-        config = get_kwargs(kwargs, "config")
-        self.path = config["path"]
-        self.protocol = config["protocol"]
-        log.debug(f"Initializing usb port. path:{self.path}, protocol: {self.protocol}")
+class USBPort(AbstractPort):
+    def __init__(self, path, protocol) -> None:
+        log.debug(f"Initializing usb port. path:{path}, protocol: {protocol}")
+        self.path = path
+        self.protocol = protocol
 
     def protocol(self):
         return self.protocol
 
-    def connect(self) -> None:
+    def connect(self) -> int:
         log.debug(f"USBPort connecting. path:{self.path}, protocol: {self.protocol}")
         try:
             self.port = os.open(self.path, os.O_RDWR | os.O_NONBLOCK)
@@ -27,15 +24,17 @@ class usbport(Port):
         except Exception as e:
             log.warning(f"Error openning usb port: {e}")
             self.error = e
-        return
+        return self.port
 
     def disconnect(self) -> None:
         log.debug(f"USBPort disconnecting {self.port}")
+        if self.port is not None:
+            os.close(self.port)
+        return
 
-    def send_and_receive(self, *args, **kwargs) -> dict:
-        full_command = get_kwargs(kwargs, "full_command")
+    def send_and_receive(self, command) -> dict:
+        full_command = self.protocol.get_full_command(command)
         response_line = bytes()
-        self.connect()
         
         # Send the command to the open usb connection
         to_send = full_command
@@ -85,5 +84,4 @@ class usbport(Port):
                 response_line = response_line[: response_line.find(bytes([13])) + 1]
                 break
         log.debug("usb response was: %s", response_line)
-        os.close(self.port)
         return response_line

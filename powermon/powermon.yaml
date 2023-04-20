@@ -9,32 +9,46 @@ device:
     path: /dev/ttyUSB0
     type: test
     protocol: PI30MAX
-  commands:
-  - command: QPIGS
-    outputs:
-    - name: screen
-      tag: Test_Inverter
-  - command: QPIGS2
-    outputs:
-    - name: screen
-      tag: Test_Inverter
-  - command: QPGS0
-    outputs:
-    - name: screen
-      tag: Test_Inverter
-      filter: ^serial|^work|^charger|^fault
-  - command: Q1
-    outputs:
-    - name: screen
-      tag: Test_Inverter
-      filter: ^inverter_charge
-  - command: QED
-    # f_command: f'QED{(date.today()-timedelta(days=1)).strftime("%Y%m%d")}'
-    f_command: f'QED{(date.today()).strftime("%Y%m%d")}'
-    outputs:
-    - name: screen
-      tag: Test_Inverter
-      filter: ^pv
+
+#Separate the schedule from the device definition
+scheduling:
+  loop: 60
+  schedules:
+  - name: QPIGS_5_minutes
+    type: loop
+    run_every_x_loops: 5 #will run every 5 minutes
+    commands:
+    - command: QPIGS
+      type: basic #default command type is basic
+      outputs:
+      - name: screen
+        tag: Test_Inverter
+    - command: QPIGS2
+      type: basic
+      outputs:
+      - name: screen
+        tag: Test_Inverter
+  - name: 3pm_check
+    type: time
+    time: 15:00:00 #run at 3pm everyday
+    commands:
+    - command: QPGS0
+      outputs:
+      - name: screen
+        tag: Test_Inverter
+        filter: ^serial|^work|^charger|^fault
+    - command: Q1
+      outputs:
+      - name: screen
+        tag: Test_Inverter
+        filter: ^inverter_charge
+    - command: QED
+      f_command: f'QED{(date.today()).strftime("%Y%m%d")}'
+      outputs:
+      - name: screen
+        tag: Test_Inverter
+        filter: ^pv
+
 mqttbroker:
   name: localhost
   port: 1883
@@ -49,4 +63,4 @@ daemon:
   type: systemd
   keepalive: 10
 #daemon: initd
-loop: 60
+

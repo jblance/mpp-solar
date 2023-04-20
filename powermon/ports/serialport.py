@@ -2,52 +2,51 @@ import logging
 import serial
 import time
 
-from .port import Port
-from ..helpers import get_kwargs
+from .abstractport import AbstractPort
 
-log = logging.getLogger("serial")
+log = logging.getLogger("SerialPort")
 
 
-class serialport(Port):
-    def __init__(self, *args, **kwargs) -> None:
-        log.debug(f"Initializing usbserial port args:{args}, kwargs: {kwargs}")
-        self._config = get_kwargs(kwargs, "config")
-        self.port = None
+class SerialPort(AbstractPort):
+    def __init__(self, path, baud, protocol) -> None:
+        log.debug(f"Initializing usbserial port. path:{path}, baud: {baud}")
+        self.path = path
+        self.baud = baud
+        self.protocol = protocol
+        self.serialPort = None
         self.error = None
 
     def connect(self) -> None:
-        log.debug("usbserial port connecting")
-        port = self._config.get("path")
-        baud = self._config.get("baud")
+        log.debug(f"usbserial port connecting. path:{self.path}, baud:{self.baud}")
         try:
-            self.port = serial.Serial(port, baud, timeout=1, write_timeout=1)
+            self.serialPort = serial.Serial(port=self.path, baudrate=self.baud, timeout=1, write_timeout=1)
         except Exception as e:
-            log.warning(f"Error openning serial port: {e}")
+            log.error(f"Error openning serial port: {e}")
             self.error = e
         return
 
     def disconnect(self) -> None:
         log.debug("usbserial port disconnecting")
-        if self.port is not None:
-            self.port.close()
+        if self.serialPort is not None:
+            self.serialPort.close()
         return
 
-    def send_and_receive(self, *args, **kwargs) -> dict:
-        full_command = get_kwargs(kwargs, "full_command")
+    def send_and_receive(self, command) -> dict:
+        full_command = self.protocol.get_full_command(command)
         response_line = None
-        log.debug(f"port {self.port}")
-        if self.port is None:
+        log.debug(f"port {self.serialPort}")
+        if self.serialPort is None:
             log.error("Port not available")
             return {"ERROR": [f"Serial command execution failed {self.error}", ""]}
         try:
             log.debug("Executing command via usbserial...")
-            self.port.reset_input_buffer()
-            self.port.reset_output_buffer()
-            c = self.port.write(full_command)
+            self.serialPort.reset_input_buffer()
+            self.serialPort.reset_output_buffer()
+            c = self.serialPort.write(full_command)
             log.debug(f"Wrote {c} bytes")
-            self.port.flush()
+            self.serialPort.flush()
             time.sleep(0.1)  # give serial port time to receive the data
-            response_line = self.port.read_until(b"\r")
+            response_line = self.serialPort.read_until(b"\r")
             log.debug("serial response was: %s", response_line)
             return response_line
         except Exception as e:

@@ -1,23 +1,22 @@
-from mppsolar.helpers import get_kwargs
-import logging
-import importlib
-
-# from time import sleep
-log = logging.getLogger("formats")
+from .abstractformat import FormatterType
 
 
-def format_data(*args, **kwargs):
+def getFormatfromConfig(formatConfig, device, topic, tag):
+    #Get values from config
+    #Type is required
+    formatType = formatConfig["type"]
 
-    formatter = get_kwargs(kwargs, "formatter")
+    if formatType == FormatterType.HTMLTABLE:
+        from .htmltable import htmltable
+        formatter = htmltable(formatConfig)
+    elif formatType == FormatterType.HASS:
+        from .hass import hass
+        formatter = hass(formatConfig, device)
+    elif formatType == FormatterType.TOPICS:
+        from .topics import Topics
+        formatter = Topics(formatConfig, topic, tag)
+    elif formatType == FormatterType.SIMPLE:
+        from .simple import simple
+        formatter = simple(formatConfig)
 
-    log.info(f"attempting to create format processor: {formatter}")
-    try:
-        _module = importlib.import_module("powermon.formats." + formatter, ".")
-        _class = getattr(_module, formatter)
-    except ModuleNotFoundError as e:
-        # perhaps raise a Powermon exception here??
-        # maybe warn and keep going, only error if no outputs found?
-        log.critical(f"No module found for formatter processor {formatter} Error: {e}")
-        return
-
-    return _class.output(**kwargs)
+    return formatter

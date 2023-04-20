@@ -1,45 +1,37 @@
+from mppsolar.protocols import get_protocol
+
 import importlib
-import logging
-from enum import Enum, auto
 
+from powermon.ports.abstractport import PortType
+from powermon.ports.serialport import SerialPort
+from powermon.ports.usbport import USBPort
 
-class PortType(Enum):
-    UNKNOWN = auto()
-    TEST = auto()
-    USB = auto()
-    ESP32 = auto()
-    SERIAL = auto()
-    JKBLE = auto()
-    MQTT = auto()
-    VSERIAL = auto()
-    DALYSERIAL = auto()
-    BLE = auto()
+def getPortFromConfig(port_config):
 
+    # get protocol handler
+    protocol = get_protocol(protocol=port_config["protocol"])
+    #log.debug(f"protocol: {protocol}")
 
-log = logging.getLogger("ports")
-
-
-def get_port(config):
-    log.info(f"Geting port for config '{config}'")
-    porttype = config.get("type", None)
-
+    portType = port_config["type"]
+    #Only port type is mandatory
+    #TODO: move configuration parsing into port class constructors
+    portPath = port_config.get("path", None)
+    portBaud = port_config.get("baud", None)
     # return None if port type is not defined
-    if porttype is None:
+    if portType is None:
         return None
 
-    # transform porttype for module lookup
-    porttype_id = f"{porttype.lower()}port"
-    # Try to import the porttype module with the supplied name (may not exist)
-    try:
-        port_module = importlib.import_module("powermon.ports." + porttype_id, ".")
-    except ModuleNotFoundError:
-        log.error(f"No module found for porttype '{porttype_id}'")
-        return None
-    # Find the protocol class - classname must be the same as the protocol_id
-    try:
-        port_class = getattr(port_module, porttype_id)
-    except AttributeError:
-        log.error(f"Module {port_module} has no attribute {porttype_id}")
-        return None
-    # Return the instantiated class
-    return port_class(config=config)
+    portObject = None
+
+    if portType == PortType.SERIAL:
+        portObject = SerialPort(portPath, portBaud, protocol)
+    elif portType == PortType.USB:
+        portObject = USBPort(portPath, protocol)
+
+    #Pattern for port types that cause problems when imported
+    elif portType == PortType.TEST:
+        from powermon.ports.testport import TestPort
+        portObject = TestPort(protocol)
+ 
+
+    return portObject

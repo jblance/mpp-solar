@@ -7,14 +7,15 @@ from time import sleep, time
 
 import yaml
 
-from mppsolar.protocols import get_protocol
+
 from mppsolar.version import __version__  # noqa: F401
 from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
-from powermon.ports import get_port
-from powermon.transports import output_results
 
-# from mppsolar.inout import get_port
+from powermon.libs.schedule import Schedule
+from powermon.libs.device import Device
+
+from powermon.ports import getPortFromConfig
 
 
 # Set-up logger
@@ -41,16 +42,6 @@ device:
   loop: once
 """
 
-ADHOC_COMMANDS = deque([])
-# SPLIT_TOKEN = ","
-
-
-def mqtt_callback(client, userdata, msg):
-    log.info(f"Received `{msg.payload}` on topic `{msg.topic}`")
-    # TODO: define message format and extract command and config
-    newCommand = msg.payload
-    ADHOC_COMMANDS.append(newCommand)
-
 
 def readYamlFile(yamlFile=None):
     _yaml = {}
@@ -65,6 +56,8 @@ def readYamlFile(yamlFile=None):
     return _yaml
 
 
+
+
 def processCommandLineOverrides(args):
     _config = {}
     if args.once:
@@ -74,7 +67,6 @@ def processCommandLineOverrides(args):
     if args.debug:
         _config["debuglevel"] = logging.DEBUG
     return _config
-
 
 def main():
     description = f"Power Device Monitoring Utility, version: {__version__}"
@@ -161,8 +153,7 @@ def main():
     if args.adhoc:
         print("ADHOC is todo")
         return
-    # sub to the adhoc command topic ie listen for 'extra' commands
-    mqtt_broker.setAdhocCommands(config=mqttconfig, callback=mqtt_callback)
+
     # debug dump mqttbroker details
     log.debug(f"mqtt_broker: {mqtt_broker}")
 
@@ -180,6 +171,8 @@ def main():
         log.error(f"No device definition in config. Check {args.configFile}?")
         exit(1)
 
+    
+
     # configure the daemon (optional)
     #     daemon:
     #       type: systemd  # noqa:
@@ -194,97 +187,44 @@ def main():
     #     path: /dev/ttyUSB0
     #     type: serial  # noqa:
     #     protocol: PI30MAX
-    port_config = device_config["port"].copy()
-    log.debug(f"portconfig: {port_config}")
-    port = get_port(port_config)
-    log.debug(f"port: {port}")
+    log.debug(f"deviceconfig: {device_config}")
+
+    
+    device = Device.fromConfig(device_config)
+    log.debug(f"device: {device}")
     # error out if unable to configure port
-    if not port:
-        log.error(f"No port for config '{port_config}' found")
-        raise ConfigError(f"No port for config '{port_config}' found")
+    if not device:
+        log.error(f"No config '{device_config}' found")
+        raise ConfigError(f"No port for config '{device_config}' found")
 
-    # get protocol handler
-    protocol = get_protocol(protocol=port_config["protocol"])
-    log.debug(f"protocol: {protocol}")
+    
 
-    # Get loop timing details
-    loop = config.get("loop", "once")
-    inDelay = False
-    delayRemaining = loop
-    doLoop = True
+    # Get scheduled commands
+    scheduling_config = config.get("scheduling", None)
+    log.debug(f"scheduling_config: {scheduling_config}")
+    schedule = Schedule.parseScheduleConfig(scheduling_config, device, mqtt_broker)
+
+    log.debug(schedule)
 
     # initialize daemon
     daemon.initialize()
-
-    # Catch keyboard interupt
+    
+    # Main working loop
+    keepLooping = True
     try:
-        # connect to port
-        port.connect()
-        while doLoop:
-            # Start timer
-            start_time = time()
+        schedule.beforeLoop()
+        while keepLooping:
             # tell the daemon we're still working
             daemon.watchdog()
-            # loop through command list
-            for command in device_config["commands"]:
-                # process any adhoc commands first
-                while len(ADHOC_COMMANDS) > 0:
-                    log.debug(f"adhoc command list: {ADHOC_COMMANDS}")
-                    adhoc_command = ADHOC_COMMANDS.popleft().decode()  # FIXME: decode to str #
-                    log.info(f"Processing command: {adhoc_command}")
-                    daemon.log(f"Processing adhoc command: {adhoc_command}")
-                    results = port.process_command(command=adhoc_command, protocol=protocol)
-                    log.debug(f"results {results}")
-
-                    # send to output processor(s)
-                    output_results(
-                        results=results,
-                        command=config["mqttbroker"]["adhoc_commands"],
-                        mqtt_broker=mqtt_broker,
-                        fullconfig=config,
-                    )
-                # process 'normal' commands
-                if not inDelay:
-                    log.info(f"Processing command: {command}")
-                    if "f_command" in command:
-                        _command = command["f_command"]
-                        _command = eval(_command)
-                    else:
-                        _command = command["command"]
-                    # TODO: allow protocol override
-                    results = port.process_command(command=_command, protocol=protocol)
-                    log.debug(f"results {results}")
-                    # send to output processor(s)
-                    output_results(
-                        results=results,
-                        command=command,
-                        mqtt_broker=mqtt_broker,
-                        fullconfig=config,
-                    )
-                    # pause
-                    # pause_time = config["command_pause"]
-                    # log.debug(f"Sleeping for {pause_time}secs")
-            if loop == "once":
-                doLoop = False
-            else:
-                # Small pause to ....
-                sleep(0.1)
-                elapsed_time = time() - start_time
-                delayRemaining = delayRemaining - elapsed_time
-                if delayRemaining > 0 and not inDelay:
-                    log.debug(f"delaying for {loop}sec, delayRemaining: {delayRemaining}")
-                    inDelay = True
-                if delayRemaining < 0:
-                    log.debug("setting inDelay to false")
-                    inDelay = False
-                    delayRemaining = loop
+            keepLooping = schedule.runLoop()
+   
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
     except Exception as e:
         print(e)
     finally:
         # Disconnect port
-        port.disconnect()
+        #port.disconnect()
         # Disconnect mqtt
         mqtt_broker.stop()
         # Notify the daemon
