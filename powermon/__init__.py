@@ -1,9 +1,13 @@
 # !/usr/bin/python3
+"""main powermon code"""
+
 import logging
 from argparse import ArgumentParser
-from collections import deque
+
+# from collections import deque
 from datetime import date, timedelta  # noqa: F401
-from time import sleep, time
+
+# from time import sleep, time
 
 import yaml
 
@@ -15,7 +19,7 @@ from powermon.libs.mqttbroker import MqttBroker
 from powermon.libs.schedule import Schedule
 from powermon.libs.device import Device
 
-from powermon.ports import getPortFromConfig
+# from powermon.ports import getPortFromConfig
 
 
 # Set-up logger
@@ -23,13 +27,13 @@ log = logging.getLogger("")
 
 
 class ConfigError(Exception):
-    pass
+    """Exception for invaild configurations"""
 
 
-sample_config = """
+SAMPLE_CONFIG = """
 device:
   name: Test_Inverter
-  id: 123456789
+  serial_id: 123456789
   port:
     path: /dev/ttyUSB0
     type: test
@@ -43,22 +47,22 @@ device:
 """
 
 
-def readYamlFile(yamlFile=None):
+def read_yaml_file(yaml_file=None):
+    """function to read a yaml file and return dict"""
     _yaml = {}
-    if yamlFile is not None:
+    if yaml_file is not None:
         try:
-            with open(yamlFile, "r") as stream:
+            with open(yaml_file, "r", encoding="utf-8") as stream:
                 _yaml = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
-            log.error(f"Error processing yaml file: {exc}")
+            log.error("Error processing yaml file: %s", exc)
         except FileNotFoundError as exc:
-            log.error(f"Error opening yaml file: {exc}")
+            log.error("Error opening yaml file: %s", exc)
     return _yaml
 
 
-
-
-def processCommandLineOverrides(args):
+def process_command_line_overrides(args):
+    """override config with command line options"""
     _config = {}
     if args.once:
         _config["loop"] = "once"
@@ -68,7 +72,9 @@ def processCommandLineOverrides(args):
         _config["debuglevel"] = logging.DEBUG
     return _config
 
+
 def main():
+    """main entry point for powermon command"""
     description = f"Power Device Monitoring Utility, version: {__version__}"
     parser = ArgumentParser(description=description)
 
@@ -125,13 +131,13 @@ def main():
         return None
 
     # Build configuration from defaults, config file and command line overrides
-    log.info(f"Using config file: {args.configFile}")
+    log.info("Using config file: %s", args.configFile)
     # build config - start with defaults
-    config = yaml.safe_load(sample_config)
+    config = yaml.safe_load(SAMPLE_CONFIG)
     # build config - update with details from config file
-    config.update(readYamlFile(args.configFile))
+    config.update(read_yaml_file(args.configFile))
     # build config - override with any command line arguments
-    config.update(processCommandLineOverrides(args))
+    config.update(process_command_line_overrides(args))
 
     # logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     log.setLevel(config.get("debuglevel", logging.WARNING))
@@ -142,89 +148,53 @@ def main():
         print("# default location ./powermon.yaml")
         print(yaml.dump(config))
         return
+    # debug config
+    log.info("config: %s", config)
 
-    # debug dump config
-    log.info(f"config: {config}")
+    # build mqtt broker object (optional)
+    mqtt_broker = MqttBroker(config=config.get("mqttbroker", {}))
+    log.debug("mqtt_broker: %s", mqtt_broker)
 
-    # Build mqtt broker
-    mqttconfig = config.get("mqttbroker", {})
-    mqtt_broker = MqttBroker(config=mqttconfig)
     # is this just a call to send an adhoc command to the queue?
+    # TODO: sort the use of powermon command line to send adhoc command
     if args.adhoc:
         print("ADHOC is todo")
         return
 
-    # debug dump mqttbroker details
-    log.debug(f"mqtt_broker: {mqtt_broker}")
+    # build device object (required)
+    device = Device(config=config.get("device", None))
+    log.debug("device: %s", device)
 
-    # get the device config
-    # this is required, and contains:
-    #     device:
-    #       name:
-    #       id:
-    #       model:
-    #       manufacturer:
-    #       port:
-    #       commands:
-    device_config = config.get("device", None)
-    if not device_config:
-        log.error(f"No device definition in config. Check {args.configFile}?")
-        exit(1)
-
-    
-
-    # configure the daemon (optional)
-    #     daemon:
-    #       type: systemd  # noqa:
-    #       keepalive: 10
+    # build the daemon object (optional)
     daemon = Daemon(config=config)
-    log.debug(f"daemon: {daemon}")
-
-    # config the port (required)
-    # config depends on port type
-    #   port:
-    #     baud: 2400
-    #     path: /dev/ttyUSB0
-    #     type: serial  # noqa:
-    #     protocol: PI30MAX
-    log.debug(f"deviceconfig: {device_config}")
-
-    
-    device = Device.fromConfig(device_config)
-    log.debug(f"device: {device}")
-    # error out if unable to configure port
-    if not device:
-        log.error(f"No config '{device_config}' found")
-        raise ConfigError(f"No port for config '{device_config}' found")
-
-    
+    log.debug("daemon: %s", daemon)
 
     # Get scheduled commands
     scheduling_config = config.get("scheduling", None)
-    log.debug(f"scheduling_config: {scheduling_config}")
+    log.debug("scheduling_config: %s", scheduling_config)
     schedule = Schedule.parseScheduleConfig(scheduling_config, device, mqtt_broker)
 
     log.debug(schedule)
 
     # initialize daemon
     daemon.initialize()
-    
+
     # Main working loop
-    keepLooping = True
+    keep_looping = True
     try:
         schedule.beforeLoop()
-        while keepLooping:
+        while keep_looping:
             # tell the daemon we're still working
             daemon.watchdog()
-            keepLooping = schedule.runLoop()
-   
+            keep_looping = schedule.runLoop()
+
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
-    except Exception as e:
-        print(e)
+    except Exception as general_exception:
+        print(general_exception)
     finally:
         # Disconnect port
-        #port.disconnect()
+        # port.disconnect()
         # Disconnect mqtt
         mqtt_broker.stop()
         # Notify the daemon
