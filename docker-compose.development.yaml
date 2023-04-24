@@ -44,6 +44,8 @@ services:
       - "0.0.0.0"
       - --port
       - "80"  
+      - --timeout-keep-alive
+      - "30"
     # depends_on:
     #   - mppsolar
 
