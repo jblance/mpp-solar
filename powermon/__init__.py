@@ -18,6 +18,7 @@ from powermon.libs.mqttbroker import MqttBroker
 
 from powermon.libs.schedule import Schedule
 from powermon.libs.device import Device
+from powermon.libs.apicoordinator import ApiCoordinator
 
 # from powermon.ports import getPortFromConfig
 
@@ -155,12 +156,6 @@ def main():
     mqtt_broker = MqttBroker(config=config.get("mqttbroker", {}))
     log.debug("mqtt_broker: %s", mqtt_broker)
 
-    # is this just a call to send an adhoc command to the queue?
-    # TODO: sort the use of powermon command line to send adhoc command
-    if args.adhoc:
-        print("ADHOC is todo")
-        return
-
     # build device object (required)
     device = Device(config=config.get("device", None))
     log.debug("device: %s", device)
@@ -175,6 +170,10 @@ def main():
     schedule = Schedule.parseScheduleConfig(scheduling_config, device, mqtt_broker)
 
     log.debug(schedule)
+
+    # setup api coordinator
+    api_coordinator = ApiCoordinator(config=config.get("api", None), device=device, mqtt_broker=mqtt_broker, schedule=schedule)
+
 
     # initialize daemon
     daemon.initialize()

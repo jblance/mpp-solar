@@ -5,11 +5,12 @@ import sys
 
 from mppsolar.protocols import get_protocol
 from powermon.ports import getPortFromConfig
-from powermon import ConfigError
 
 # Set-up logger
 log = logging.getLogger("Device")
 
+class ConfigError(Exception):
+    """Exception for invaild configurations"""
 
 class Device:
     """

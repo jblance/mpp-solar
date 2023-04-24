@@ -40,9 +40,6 @@ def get_mqtthandler():
     handler = MQTTHandler()
     return handler
 
-receivedTopic = "test_topic"
-receivedPayload = "test_payload"
-
 @mqtt.on_connect()
 def connect(client, flags, rc, properties):
     topic = "mqtt/#"
@@ -53,10 +50,9 @@ def connect(client, flags, rc, properties):
 async def message(client, topic, payload, qos, properties):
     print("Received message for DB and long poll: ",topic, payload.decode(), qos, properties)
     db = SessionLocal()
-    crud.create_mqtt_message(db, schemas.MQTTMessage(id=1,topic=topic, message=payload.decode()))
-
+    mqtt_message = crud.create_mqtt_message(db, schemas.MQTTMessage(id=1,topic=topic, message=payload.decode()))
     handler = MQTTHandler()
-    handler.recieved_message(topic, payload.decode())
+    handler.recieved_message(mqtt_message)
     
 
 @mqtt.on_disconnect()
@@ -73,7 +69,7 @@ templates = Jinja2Templates(directory="app/templates")
 
 @app.get("/")
 def read_root():
-    return {receivedTopic: receivedPayload}
+    return {"test": "receivedPayload"}
 
 @app.get("/messages/", response_model=list[schemas.MQTTMessage])
 def read_messages(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
@@ -84,12 +80,12 @@ def read_messages(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
 @app.get("/messages/{message_id}", response_model=schemas.MQTTMessage)
 def read_message(message_id: int, db: Session = Depends(get_db)):
     
-    db_user = crud.get_mqtt_message(db, mqtt_message_id=message_id)
-    if db_user is None:
+    mqtt_message = crud.get_mqtt_message(db, mqtt_message_id=message_id)
+    if mqtt_message is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+    return mqtt_message
 
-@app.get("/command/{command_code}")
+@app.get("/command/{command_code}", response_model=schemas.MQTTMessage)
 async def read_message(command_code: str, handler: MQTTHandler = Depends(get_mqtthandler)):
     result = None
 

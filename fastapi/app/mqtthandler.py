@@ -1,5 +1,7 @@
 
 import asyncio
+from .db.models import MQTTMessage
+
 class MQTTHandler(object):
     _instance = None
     _commandDictionary = {
@@ -30,15 +32,15 @@ class MQTTHandler(object):
                     return result
             await asyncio.sleep(1)
     
-    def recieved_message(self, topic, payload):
-        command = self._commandDictionary[topic]
+    def recieved_message(self, mqtt_message):
+        command = self._commandDictionary[mqtt_message.topic]
         print("Command Recieved: ", command, self._commandRequests)
         if(command not in self._commandRequests):
             print("Command not registered: ", command)
             return
 
         for request in self._commandRequests[command]:
-            request.result = payload
+            request.result = mqtt_message
             request.done = True
 
     
