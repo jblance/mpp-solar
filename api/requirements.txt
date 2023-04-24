@@ -1,1 +1,2 @@
 Flask>=2.2.3
+flask-mqtt>=1.1.1

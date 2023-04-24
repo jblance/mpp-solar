@@ -7,43 +7,44 @@ services:
       - ./docker/mosquitto/data:/mosquitto/data
       - ./docker/mosquitto/log:/mosquitto/log
 
-  mppsolar:
-    network_mode: host
-    devices:
-     - /dev/hidraw0:/dev/hidraw0
-    volumes:
-    #Bind over the configuration
-      - type: bind
-        source: ./docker/dev/config/
-        target: /config
-    #Bind the code
-#      - type: bind
-#        source: ../..
-#        target: /mpp-solar
-    build:
-      context: ./
-      dockerfile: docker/dev/Dockerfile
-    entrypoint:
-      - powermon
-      - -C
-      - /config/powermon-qpigs.yaml #Available due to volume binding above
-      - --debug
-#       - sleep
-#       - infinity
-    depends_on:
-      - mosquitto
+  # mppsolar:
+  #   network_mode: host
+  #   devices:
+  #    - /dev/hidraw0:/dev/hidraw0
+  #   volumes:
+  #   #Bind over the configuration
+  #     - type: bind
+  #       source: ./docker/dev/config/
+  #       target: /config
+  #   build:
+  #     context: ./
+  #     dockerfile: docker/dev/Dockerfile
+  #   entrypoint:
+  #     - powermon
+  #     - -C
+  #     - /config/powermon-qpigs.yaml #Available due to volume binding above
+  #     - --debug
+  #   depends_on:
+  #     - mosquitto
 
-  api:
+  fastapi:
     network_mode: host
     volumes:
     #Bind over the configuration
       - type: bind
-        source: ./api/
-        target: /app/
+        source: ./fastapi/
+        target: /code/
     build: 
-      context: api
+      context: fastapi
       dockerfile: Dockerfile.development
-    depends_on:
-      - mppsolar
+    entrypoint:
+      - uvicorn
+      - app.main:app
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "80"  
+    # depends_on:
+    #   - mppsolar
 
 
