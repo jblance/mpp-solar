@@ -1,6 +1,6 @@
 device:
   name: Test_Inverter
-  id: 123456789
+  serial_id: 123456789
   model: 8048MAX
   manufacturer: MPP-Solar
   port:
