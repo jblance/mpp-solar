@@ -1,5 +1,7 @@
-FROM tiangolo/uwsgi-nginx-flask:latest
-ENV STATIC_URL /static
-ENV STATIC_PATH /app/static
-COPY ./requirements.txt /app/requirements.txt
-RUN pip install -r /app/requirements.txt
+FROM python:latest
+ 
+WORKDIR /code
+ 
+COPY ./requirements.txt /code/requirements.txt
+ 
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt

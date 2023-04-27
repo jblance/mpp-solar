@@ -115,4 +115,4 @@ docker/mosquitto/config/mosquitto.passwd
 api/node_modules/
 
 # ignore sqlite database
-fastapi/sql_app.db
+api/sql_app.db
