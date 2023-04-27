@@ -35,6 +35,10 @@ class AbstractPort(ABC):
     @abstractmethod
     def send_and_receive(self, command) -> dict:
         raise NotImplementedError
+    
+    @abstractmethod
+    def toJSON(self):
+        raise NotImplementedError
 
     # Question: Should we make this an abstract method?
     def process_command(self, command):

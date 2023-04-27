@@ -16,6 +16,7 @@ log = logging.getLogger("AbstractProtocol")
 
 
 class AbstractProtocol(metaclass=abc.ABCMeta):
+
     def __init__(self, *args, **kwargs) -> None:
         self._command = None
         self._command_dict = None
@@ -25,6 +26,16 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         self.DEFAULT_COMMAND = None
         self.ID_COMMANDS = None
         self._protocol_id = None
+
+    def toJSON(self):
+        return {
+            "protocol_id": self._protocol_id,
+            # "commands": self.COMMANDS,
+            # "status_commands": self.STATUS_COMMANDS,
+            # "settings_commands": self.SETTINGS_COMMANDS,
+            # "default_command": self.DEFAULT_COMMAND,
+            # "id_commands": self.ID_COMMANDS,
+        }
 
     def list_commands(self):
         # print(f"{'Parameter':<30}\t{'Value':<15} Unit")

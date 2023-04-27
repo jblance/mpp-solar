@@ -1,5 +1,6 @@
 import yaml
 import logging
+import json
 from powermon.libs.schedule import Schedule
 
 log = logging.getLogger("APICoordinator")
@@ -13,7 +14,7 @@ class ApiCoordinator:
 
         mqtt_broker.subscribe(self.adhocTopic, self.adhocCallback)
 
-        mqtt_broker.publish(self.announceTopic, self.schedule.getScheduleConfigAsYaml())
+        #mqtt_broker.publish(self.announceTopic, self.schedule.getScheduleConfigAsJSON())
 
     def adhocCallback(self, client, userdata, msg):
         log.info(f"Received `{msg.payload}` on topic `{msg.topic}`")
@@ -28,3 +29,11 @@ class ApiCoordinator:
             log.debug(f"command: {command}")
             log.debug(f"self: {self}")
             self.schedule.addOneTimeCommandFromConfig(command)
+
+    def run(self):
+        log.info("Starting APICoordinator")
+        self.announceDevice()
+
+    def announceDevice(self):
+        deviceJSON = self.device.toJSON()
+        self.mqtt_broker.publish(self.announceTopic, str(deviceJSON))

@@ -33,3 +33,12 @@ class Device:
         if not self.port:
             log.error("Invalid port config '%s' found", config)
             raise ConfigError(f"Invalid port config '{config}' found")
+
+    def toJSON(self):
+        return {
+            "name": self.name,
+            "identifier": self.identifier,
+            "model": self.model,
+            "manufacturer": self.manufacturer,
+            "port": self.port.toJSON(),
+        }

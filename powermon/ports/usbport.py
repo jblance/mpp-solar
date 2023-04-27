@@ -13,6 +13,13 @@ class USBPort(AbstractPort):
         self.path = path
         self.protocol = protocol
 
+    def toJSON(self):
+        return {
+            "type": "usb",
+            "path": self.path,
+            "protocol": self.protocol.toJSON(),
+        }
+
     def protocol(self):
         return self.protocol
 

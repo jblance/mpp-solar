@@ -42,8 +42,8 @@ def get_mqtthandler():
 
 @mqtt.on_connect()
 def connect(client, flags, rc, properties):
-    topic = "mqtt/#"
-    mqtt.client.subscribe(topic) #subscribing mqtt topic
+    topic = "powermon/"
+    #mqtt.client.subscribe(topic) #subscribing mqtt topic
     print("Connected: ", client, flags, rc, properties, topic)
 
 @mqtt.on_message()
@@ -53,6 +53,11 @@ async def message(client, topic, payload, qos, properties):
     mqtt_message = crud.create_mqtt_message(db, schemas.MQTTMessage(id=1,topic=topic, message=payload.decode()))
     handler = MQTTHandler()
     handler.recieved_message(mqtt_message)
+
+@mqtt.subscribe("powermon/announce")
+async def listen_to_announcements(client, topic, payload, qos, properties):
+    handler = MQTTHandler()
+    handler.recieved_announcement(payload.decode())
     
 
 @mqtt.on_disconnect()
@@ -68,8 +73,10 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
 @app.get("/")
-def read_root():
-    return {"test": "receivedPayload"}
+def read_root(request: Request):
+    handler = MQTTHandler()
+    print(handler.get_devices())
+    return templates.TemplateResponse("home.html", {"request": request, "devices": handler.get_devices()})
 
 @app.get("/messages/", response_model=list[schemas.MQTTMessage])
 def read_messages(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):

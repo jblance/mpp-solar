@@ -16,6 +16,14 @@ class SerialPort(AbstractPort):
         self.serialPort = None
         self.error = None
 
+    def toJSON(self):
+        return {
+            "type": "usbserial",
+            "path": self.path,
+            "baud": self.baud,
+            "protocol": self.protocol.toJSON(),
+        }
+
     def connect(self) -> None:
         log.debug(f"usbserial port connecting. path:{self.path}, baud:{self.baud}")
         try:

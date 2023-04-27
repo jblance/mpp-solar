@@ -1,0 +1,18 @@
+<html>
+<head>
+    <title>Powermon Home</title>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <h1>Devices Found</h1>
+    {% if devices is not defined %}
+    <p>No devices found</p>
+    {% else %}
+    <ul>
+        {% for device in devices %}
+        <li>{{ device }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</body>
+</html>

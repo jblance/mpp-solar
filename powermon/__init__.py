@@ -173,7 +173,8 @@ def main():
 
     # setup api coordinator
     api_coordinator = ApiCoordinator(config=config.get("api", None), device=device, mqtt_broker=mqtt_broker, schedule=schedule)
-
+    #TODO: run in the schedule loop
+    api_coordinator.run()
 
     # initialize daemon
     daemon.initialize()

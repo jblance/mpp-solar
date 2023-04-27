@@ -21,6 +21,12 @@ class TestPort(AbstractPort):
     def __str__(self):
         return "Test port"
     
+    def toJSON(self):
+        return {
+            "type": "test",
+            "protocol": self.protocol.toJSON(),
+        }
+    
     def protocol(self):
         return super().protocol()
 

@@ -54,7 +54,7 @@ class Schedule:
         command = self.parseCommandConfig(commandConfig, self.mqtt_broker, self.device)
         self.scheduledCommands.append(OneTimeCommandSchedule({command}))
 
-    def getScheduleConfigAsYaml(self):
+    def getScheduleConfigAsJSON(self):
         dictionary = {
             "loopDuration": self.loopDuration,
             "schedules": []
