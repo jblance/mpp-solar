@@ -32,10 +32,10 @@ services:
     volumes:
     #Bind over the configuration
       - type: bind
-        source: ./fastapi/
+        source: ./api/
         target: /code/
     build: 
-      context: fastapi
+      context: api
       dockerfile: Dockerfile.development
     entrypoint:
       - uvicorn
