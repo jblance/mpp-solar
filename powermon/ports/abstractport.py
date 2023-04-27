@@ -3,6 +3,8 @@ import logging
 import importlib
 from enum import StrEnum, auto
 
+from mppsolar.protocols.abstractprotocol import AbstractProtocol
+
 # from time import sleep
 log = logging.getLogger("Port")
 
@@ -19,7 +21,7 @@ class PortType(StrEnum):
     BLE = auto()
 
 class AbstractPort(ABC):
-    def __init__(self, protocol):
+    def __init__(self, protocol : AbstractProtocol):
         self.protocol = protocol
 
     @abstractmethod
@@ -37,7 +39,7 @@ class AbstractPort(ABC):
         raise NotImplementedError
     
     @abstractmethod
-    def toJSON(self):
+    def toDictionary(self):
         raise NotImplementedError
 
     # Question: Should we make this an abstract method?

@@ -46,6 +46,7 @@ services:
       - "80"  
       - --timeout-keep-alive
       - "30"
+      - --reload
     depends_on:
       - mppsolar
 

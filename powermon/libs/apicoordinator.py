@@ -9,9 +9,11 @@ class ApiCoordinator:
         self.device = device
         self.mqtt_broker = mqtt_broker
         self.schedule = schedule
+        self.count = 0
         self.adhocTopic = config.get("adhoc_topic", "powermon/adhoc")
         self.announceTopic = config.get("announce_topic", "powermon/announce")
 
+        self.announceDevice()
         mqtt_broker.subscribe(self.adhocTopic, self.adhocCallback)
 
         #mqtt_broker.publish(self.announceTopic, self.schedule.getScheduleConfigAsJSON())
@@ -31,9 +33,14 @@ class ApiCoordinator:
             self.schedule.addOneTimeCommandFromConfig(command)
 
     def run(self):
-        log.info("Starting APICoordinator")
-        self.announceDevice()
+        if(self.count > 20):
+            log.info("Starting APICoordinator")
+            self.announceDevice()
+            self.count = 0
+
+        self.count += 1
 
     def announceDevice(self):
-        deviceJSON = self.device.toJSON()
-        self.mqtt_broker.publish(self.announceTopic, str(deviceJSON))
+        deviceJSON = self.device.toDictionary()
+        deviceJSON["schedule"] = self.schedule.getScheduleConfigAsJSON()
+        self.mqtt_broker.publish(self.announceTopic, json.dumps(deviceJSON, default=str))

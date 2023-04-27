@@ -4,15 +4,17 @@
     <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
 </head>
 <body>
-    <h1>Devices Found</h1>
-    {% if devices is not defined %}
-    <p>No devices found</p>
-    {% else %}
-    <ul>
+    <h1>Devices</h1>
+    {% if devices is defined and devices|length %}
         {% for device in devices %}
-        <li>{{ device }}</li>
+            <h2>{{ device["name"] }}</h2>
+            <ul>
+                <li>Model: {{ device["model"] }}</li>
+            </ul>
+            <p></p>
         {% endfor %}
-    </ul>
+    {% else %}
+    <p>No devices found</p>
     {% endif %}
 </body>
 </html>

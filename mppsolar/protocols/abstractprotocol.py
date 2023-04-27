@@ -27,7 +27,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         self.ID_COMMANDS = None
         self._protocol_id = None
 
-    def toJSON(self):
+    def toDictionary(self):
         return {
             "protocol_id": self._protocol_id,
             # "commands": self.COMMANDS,

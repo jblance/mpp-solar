@@ -174,7 +174,7 @@ def main():
     # setup api coordinator
     api_coordinator = ApiCoordinator(config=config.get("api", None), device=device, mqtt_broker=mqtt_broker, schedule=schedule)
     #TODO: run in the schedule loop
-    api_coordinator.run()
+    
 
     # initialize daemon
     daemon.initialize()
@@ -187,6 +187,7 @@ def main():
             # tell the daemon we're still working
             daemon.watchdog()
             keep_looping = schedule.runLoop()
+            api_coordinator.run()
 
     except KeyboardInterrupt:
         print("KeyboardInterrupt")

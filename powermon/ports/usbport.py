@@ -13,11 +13,11 @@ class USBPort(AbstractPort):
         self.path = path
         self.protocol = protocol
 
-    def toJSON(self):
+    def toDictionary(self):
         return {
             "type": "usb",
             "path": self.path,
-            "protocol": self.protocol.toJSON(),
+            "protocol": self.protocol.toDictionary(),
         }
 
     def protocol(self):

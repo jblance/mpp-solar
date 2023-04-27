@@ -62,7 +62,7 @@ class Schedule:
         for scheduledCommand in self.scheduledCommands:
             dictionary["schedules"].append(scheduledCommand.toDictionary())
 
-        return json.dumps(dictionary)
+        return dictionary
 
     #The hook for the port to connect before the main loops starts
     def beforeLoop(self):

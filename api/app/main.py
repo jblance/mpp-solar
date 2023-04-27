@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi_mqtt import FastMQTT, MQTTConfig
+import json
 import asyncio
 
 from sqlalchemy.orm import Session
@@ -75,8 +76,9 @@ templates = Jinja2Templates(directory="app/templates")
 @app.get("/")
 def read_root(request: Request):
     handler = MQTTHandler()
-    print(handler.get_devices())
-    return templates.TemplateResponse("home.html", {"request": request, "devices": handler.get_devices()})
+    devices = handler.get_devices()
+    print(devices)
+    return templates.TemplateResponse("home.html", {"request": request, "devices": devices})
 
 @app.get("/messages/", response_model=list[schemas.MQTTMessage])
 def read_messages(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):

@@ -1,5 +1,6 @@
 
 import asyncio
+import json
 from .db.models import MQTTMessage
 
 class MQTTHandler(object):
@@ -46,7 +47,11 @@ class MQTTHandler(object):
 
     def recieved_announcement(self, message):
         print("Announcement Recieved: ", message)
-        self._devices.append(message)
+        device = json.loads(message)
+        deviceId = device.get("identifier", None)
+        print("Device ID: ", deviceId)
+        if(device not in self._devices):
+            self._devices.append(device)
 
     def get_devices(self):
         return self._devices

@@ -16,12 +16,12 @@ class SerialPort(AbstractPort):
         self.serialPort = None
         self.error = None
 
-    def toJSON(self):
+    def toDictionary(self):
         return {
             "type": "usbserial",
             "path": self.path,
             "baud": self.baud,
-            "protocol": self.protocol.toJSON(),
+            "protocol": self.protocol.toDictionary(),
         }
 
     def connect(self) -> None:
