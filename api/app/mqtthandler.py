@@ -2,10 +2,11 @@
 import asyncio
 import json
 from .db.models import MQTTMessage
+from dto.scheduleDTO import ScheduleDTO
 
 class MQTTHandler(object):
     _instance = None
-    _devices = []
+    _schedules = []
     _commandDictionary = {
             "mqtt/QPIGS": "QPIGS",
         }
@@ -47,14 +48,14 @@ class MQTTHandler(object):
 
     def recieved_announcement(self, message):
         print("Announcement Recieved: ", message)
-        device = json.loads(message)
-        deviceId = device.get("identifier", None)
+        schedule = ScheduleDTO.parse_raw(message)
+        deviceId = schedule.device.identifier
         print("Device ID: ", deviceId)
-        if(device not in self._devices):
-            self._devices.append(device)
+        if(schedule not in self._schedules):
+            self._schedules.append(schedule)
 
-    def get_devices(self):
-        return self._devices
+    def get_schedules(self):
+        return self._schedules
 
     
 class CommandRequest:

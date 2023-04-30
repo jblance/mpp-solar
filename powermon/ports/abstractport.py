@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 import logging
-import importlib
 from enum import StrEnum, auto
 
 from mppsolar.protocols.abstractprotocol import AbstractProtocol
@@ -39,7 +38,7 @@ class AbstractPort(ABC):
         raise NotImplementedError
     
     @abstractmethod
-    def toDictionary(self):
+    def toDTO(self):
         raise NotImplementedError
 
     # Question: Should we make this an abstract method?

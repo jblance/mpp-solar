@@ -41,6 +41,5 @@ class ApiCoordinator:
         self.count += 1
 
     def announceDevice(self):
-        deviceJSON = self.device.toDictionary()
-        deviceJSON["schedule"] = self.schedule.getScheduleConfigAsJSON()
-        self.mqtt_broker.publish(self.announceTopic, json.dumps(deviceJSON, default=str))
+        scheduleDTO = self.schedule.toDTO()
+        self.mqtt_broker.publish(self.announceTopic, scheduleDTO.json())

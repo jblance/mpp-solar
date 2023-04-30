@@ -69,16 +69,16 @@ def disconnect(client, packet, exc=None):
 def subscribe(client, mid, qos, properties):
     print("subscribed", client, mid, qos, properties)
 
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/static", StaticFiles(directory="api/app/static"), name="static")
 
-templates = Jinja2Templates(directory="app/templates")
+templates = Jinja2Templates(directory="api/app/templates")
 
 @app.get("/")
 def read_root(request: Request):
     handler = MQTTHandler()
-    devices = handler.get_devices()
+    devices = handler.get_schedules()
     print(devices)
-    return templates.TemplateResponse("home.html", {"request": request, "devices": devices})
+    return templates.TemplateResponse("home.html.j2", {"request": request, "schedules": devices})
 
 @app.get("/messages/", response_model=list[schemas.MQTTMessage])
 def read_messages(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):

@@ -1,6 +1,7 @@
 import logging
 import serial
 import time
+from dto.portDTO import PortDTO
 
 from .abstractport import AbstractPort
 
@@ -16,13 +17,9 @@ class SerialPort(AbstractPort):
         self.serialPort = None
         self.error = None
 
-    def toDictionary(self):
-        return {
-            "type": "usbserial",
-            "path": self.path,
-            "baud": self.baud,
-            "protocol": self.protocol.toDictionary(),
-        }
+    def toDTO(self) -> PortDTO:
+        dto = PortDTO(type="serial", path=self.path, baud=self.baud, protocol=self.protocol.toDTO())
+        return dto
 
     def connect(self) -> None:
         log.debug(f"usbserial port connecting. path:{self.path}, baud:{self.baud}")

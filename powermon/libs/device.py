@@ -3,8 +3,9 @@
 import logging
 import sys
 
-from mppsolar.protocols import get_protocol
 from powermon.ports import getPortFromConfig
+
+from dto.deviceDTO import DeviceDTO
 
 # Set-up logger
 log = logging.getLogger("Device")
@@ -33,11 +34,11 @@ class Device:
             log.error("Invalid port config '%s' found", config)
             raise ConfigError(f"Invalid port config '{config}' found")
 
-    def toDictionary(self):
-        return {
-            "name": self.name,
-            "identifier": self.identifier,
-            "model": self.model,
-            "manufacturer": self.manufacturer,
-            "port": self.port.toDictionary(),
-        }
+    def toDTO(self) -> DeviceDTO:
+        dto = DeviceDTO(
+            name=self.name, 
+            identifier=self.identifier, 
+            model=self.model, 
+            manufacturer=self.manufacturer, 
+            port=self.port.toDTO())
+        return dto

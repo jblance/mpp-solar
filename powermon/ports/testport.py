@@ -4,6 +4,8 @@ import random
 from mppsolar.helpers import get_kwargs
 from .abstractport import AbstractPort
 
+from dto.portDTO import PortDTO
+
 # import re
 
 
@@ -21,11 +23,9 @@ class TestPort(AbstractPort):
     def __str__(self):
         return "Test port"
     
-    def toDictionary(self):
-        return {
-            "type": "test",
-            "protocol": self.protocol.toDictionary(),
-        }
+    def toDTO(self) -> PortDTO:
+        dto = PortDTO(type="test", protocol=self.protocol.toDTO())
+        return dto
     
     def protocol(self):
         return super().protocol()

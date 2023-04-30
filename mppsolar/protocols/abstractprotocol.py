@@ -3,6 +3,7 @@ import calendar  # noqa: F401
 import logging
 import re
 from typing import Tuple
+from dto.protocolDTO import ProtocolDTO
 
 from ..helpers import get_resp_defn, get_value
 from .protocol_helpers import BigHex2Short, BigHex2Float  # noqa: F401
@@ -27,17 +28,11 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         self.ID_COMMANDS = None
         self._protocol_id = None
 
-    def toDictionary(self):
-        return {
-            "protocol_id": self._protocol_id,
-            # "commands": self.COMMANDS,
-            # "status_commands": self.STATUS_COMMANDS,
-            # "settings_commands": self.SETTINGS_COMMANDS,
-            # "default_command": self.DEFAULT_COMMAND,
-            # "id_commands": self.ID_COMMANDS,
-        }
+    def toDTO(self) -> ProtocolDTO:
+        dto = ProtocolDTO(protocol_id=self._protocol_id, commands=self.list_commands())
+        return dto
 
-    def list_commands(self):
+    def list_commands(self) -> dict:
         # print(f"{'Parameter':<30}\t{'Value':<15} Unit")
         if self._protocol_id is None:
             log.error("Attempted to list commands with no protocol defined")

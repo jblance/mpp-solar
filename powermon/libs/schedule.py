@@ -5,6 +5,12 @@ import json
 import logging
 from powermon.outputs import getOutputFromConfig
 
+from dto.scheduleDTO import ScheduleDTO
+from dto.commandDTO import CommandDTO
+from dto.commandScheduleDTO import CommandScheduleDTO
+from .device import Device
+
+
 log = logging.getLogger("Schedule")
 
 class Command:
@@ -17,12 +23,12 @@ class Command:
     def __str__(self):
         return f"Command: {self.command}, CommandType: {self.commandType}, Outputs: {self.outputs}"
     
-    def toDictionary(self):
-        dictionary = {
-            "command": self.command,
-            "commandType": self.commandType,
-        }
-        return dictionary
+    def toDTO(self):
+        dto = CommandDTO(
+            command=self.command,
+            commandType=self.commandType,
+        )
+        return dto
 
     def run(self):
         log.debug(f"Running command: {self.command}")
@@ -34,7 +40,7 @@ class Command:
     
 
 class Schedule:
-    def __init__(self, scheduledCommands, loopDuration, mqtt_broker, device):
+    def __init__(self, scheduledCommands, loopDuration, mqtt_broker, device: Device):
         self.scheduledCommands = scheduledCommands
         self.loopDuration = loopDuration
         self.inDelay = False
@@ -48,21 +54,19 @@ class Schedule:
 
     def __str__(self):
         return f"Schedule: {self.scheduledCommands}, {self.loopDuration}"
+    
+    def toDTO(self) -> ScheduleDTO:
+        commandSchedules = []
+        for scheduledCommand in self.scheduledCommands:
+            commandSchedules.append(scheduledCommand.toDTO())
+        dto = ScheduleDTO(loopDuration=self.loopDuration, device=self.device.toDTO(), schedulesCommands=commandSchedules)
+        return dto
 
     
     def addOneTimeCommandFromConfig(self, commandConfig):
         command = self.parseCommandConfig(commandConfig, self.mqtt_broker, self.device)
         self.scheduledCommands.append(OneTimeCommandSchedule({command}))
 
-    def getScheduleConfigAsJSON(self):
-        dictionary = {
-            "loopDuration": self.loopDuration,
-            "schedules": []
-        }
-        for scheduledCommand in self.scheduledCommands:
-            dictionary["schedules"].append(scheduledCommand.toDictionary())
-
-        return dictionary
 
     #The hook for the port to connect before the main loops starts
     def beforeLoop(self):
@@ -159,17 +163,12 @@ class LoopCommandSchedule(InformalScheduledCommandInterface):
     def __str__(self):
         return f"ScheduleType: {self.scheduleType}, LoopCount: {self.loopCount}, Commands: {self.commands}"
 
-    def toDictionary(self):
-        dictionary = {
-            "scheduleType": self.scheduleType,
-            "loopCount": self.loopCount,
-            "commands": []
-        }
+    def toDTO(self):
+        commandDTOs = []
         for command in self.commands:
-            dictionary["commands"].append(command.toDictionary())
-
-        return dictionary
-        
+            commandDTOs.append(command.toDTO())
+        dto = CommandScheduleDTO(type=self.scheduleType, commands=commandDTOs)
+        return dto
 
     def is_due(self):
         if self.currentLoopCount < self.loopCount:
@@ -189,15 +188,12 @@ class OneTimeCommandSchedule(InformalScheduledCommandInterface):
     def __str__(self):
         return f"ScheduleType: {self.scheduleType}, Commands: {self.commands}"
     
-    def toDictionary(self):
-        dictionary = {
-            "scheduleType": self.scheduleType,
-            "commands": []
-        }
+    def toDTO(self):
+        commandDTOs = []
         for command in self.commands:
-            dictionary["commands"].append(command.toDictionary())
-
-        return dictionary
+            commandDTOs.append(command.toDTO())
+        dto = CommandScheduleDTO(scheduleType=self.scheduleType, commands=commandDTOs)
+        return dto
     
     def is_due(self):
         if self.has_run:

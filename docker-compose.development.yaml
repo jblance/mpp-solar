@@ -33,13 +33,16 @@ services:
     #Bind over the configuration
       - type: bind
         source: ./api/
-        target: /code/
+        target: /code/api/
+      - type: bind
+        source: ./dto/
+        target: /code/dto/
     build: 
       context: api
       dockerfile: Dockerfile.development
     entrypoint:
       - uvicorn
-      - app.main:app
+      - api.app.main:app
       - --host
       - "0.0.0.0"
       - --port
