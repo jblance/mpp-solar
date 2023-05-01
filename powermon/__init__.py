@@ -26,27 +26,6 @@ from powermon.libs.device import Device
 log = logging.getLogger("")
 
 
-class ConfigError(Exception):
-    """Exception for invaild configurations"""
-
-
-SAMPLE_CONFIG = """
-device:
-  name: Test_Inverter
-  serial_id: 123456789
-  port:
-    path: /dev/ttyUSB0
-    type: test
-    baud: 2400
-    protocol: PI30
-  commands:
-    - command: QPI
-      outputs:
-      - name: screen
-  loop: once
-"""
-
-
 def read_yaml_file(yaml_file=None):
     """function to read a yaml file and return dict"""
     _yaml = {}
@@ -130,12 +109,10 @@ def main():
         print(description)
         return None
 
-    # Build configuration from defaults, config file and command line overrides
+    # Build configuration from config file and command line overrides
     log.info("Using config file: %s", args.configFile)
-    # build config - start with defaults
-    config = yaml.safe_load(SAMPLE_CONFIG)
-    # build config - update with details from config file
-    config.update(read_yaml_file(args.configFile))
+    # build config with details from config file
+    config = read_yaml_file(args.configFile)
     # build config - override with any command line arguments
     config.update(process_command_line_overrides(args))
 

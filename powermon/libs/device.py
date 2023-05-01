@@ -3,9 +3,9 @@
 import logging
 import sys
 
-from mppsolar.protocols import get_protocol
+# from mppsolar.protocols import get_protocol
 from powermon.ports import getPortFromConfig
-from powermon import ConfigError
+from powermon.libs.errors import ConfigError
 
 # Set-up logger
 log = logging.getLogger("Device")
@@ -26,7 +26,7 @@ class Device:
         self.model = config.get("model", "mppsolar")
         self.manufacturer = config.get("manufacturer", "mppsolar")
         self.port = getPortFromConfig(config.get("port", None))
-        self.protocol = get_protocol(config.get("protocol", None))  # TODO: move to port
+        # self.protocol = get_protocol(config.get("protocol", None))  # TODO: move to port
 
         # error out if unable to configure port
         if not self.port:
