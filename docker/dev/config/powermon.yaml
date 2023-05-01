@@ -11,8 +11,7 @@ device:
 
 #Separate the schedule from the device definition
 scheduling:
-  loop: 10
-  adhoc_command_topic: mpp-solar/api-client
+  loop: 10 #seconds
   schedules:
   - name: QPIGS_5_minutes
     type: loop
@@ -32,6 +31,10 @@ mqttbroker:
   port: 1883
   user: null
   pass: null
+
+api:
+  announce_topic: powermon/announce
+  adhoc_topic: powermon/adhoc
   
 daemon:
   type: systemd

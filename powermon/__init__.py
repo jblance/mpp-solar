@@ -18,6 +18,7 @@ from powermon.libs.mqttbroker import MqttBroker
 
 from powermon.libs.schedule import Schedule
 from powermon.libs.device import Device
+from powermon.libs.apicoordinator import ApiCoordinator
 
 # from powermon.ports import getPortFromConfig
 
@@ -66,7 +67,9 @@ def main():
         const="./powermon.yaml",
         default=None,
     )
-    parser.add_argument("-v", "--version", action="store_true", help="Display the version")
+    parser.add_argument(
+        "-v", "--version", action="store_true", help="Display the version"
+    )
     parser.add_argument(
         "-d",
         "--dumpConfig",
@@ -85,7 +88,9 @@ def main():
         action="store_true",
         help="Enable Debug and above (i.e. all) messages",
     )
-    parser.add_argument("-I", "--info", action="store_true", help="Enable Info and above level messages")
+    parser.add_argument(
+        "-I", "--info", action="store_true", help="Enable Info and above level messages"
+    )
     parser.add_argument(
         "--adhoc",
         type=str,
@@ -132,12 +137,6 @@ def main():
     mqtt_broker = MqttBroker(config=config.get("mqttbroker", {}))
     log.debug("mqtt_broker: %s", mqtt_broker)
 
-    # is this just a call to send an adhoc command to the queue?
-    # TODO: sort the use of powermon command line to send adhoc command
-    if args.adhoc:
-        print("ADHOC is todo")
-        return
-
     # build device object (required)
     device = Device(config=config.get("device", None))
     log.debug("device: %s", device)
@@ -153,6 +152,15 @@ def main():
 
     log.debug(schedule)
 
+    # setup api coordinator
+    api_coordinator = ApiCoordinator(
+        config=config.get("api", None),
+        device=device,
+        mqtt_broker=mqtt_broker,
+        schedule=schedule,
+    )
+    # TODO: run in the schedule loop
+
     # initialize daemon
     daemon.initialize()
 
@@ -164,6 +172,7 @@ def main():
             # tell the daemon we're still working
             daemon.watchdog()
             keep_looping = schedule.runLoop()
+            api_coordinator.run()
 
     except KeyboardInterrupt:
         print("KeyboardInterrupt")

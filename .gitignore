@@ -113,3 +113,6 @@ docker/mosquitto/config/mosquitto.passwd
 
 # ignore the node_modules folder
 api/node_modules/
+
+# ignore sqlite database
+api/sql_app.db

@@ -16,31 +16,40 @@ services:
       - type: bind
         source: ./docker/dev/config/
         target: /config
-    #Bind the code
-#      - type: bind
-#        source: ../..
-#        target: /mpp-solar
     build:
       context: ./
       dockerfile: docker/dev/Dockerfile
     entrypoint:
       - powermon
       - -C
-      - /config/powermon-qpigs.yaml #Available due to volume binding above
+      - /config/powermon.yaml #Available due to volume binding above
       - --debug
-#       - sleep
-#       - infinity
     depends_on:
       - mosquitto
 
-  mppsolar-api:
+  fastapi:
     network_mode: host
+    volumes:
+    #Bind over the configuration
+      - type: bind
+        source: ./api/
+        target: /code/api/
+      - type: bind
+        source: ./dto/
+        target: /code/dto/
     build: 
       context: api
       dockerfile: Dockerfile.development
-    entrypoint: 
-      - node
-      - index.js
+    entrypoint:
+      - uvicorn
+      - api.app.main:app
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "80"  
+      - --timeout-keep-alive
+      - "30"
+      - --reload
     depends_on:
       - mppsolar
 

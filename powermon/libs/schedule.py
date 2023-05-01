@@ -1,8 +1,15 @@
 from enum import StrEnum, auto
 from time import sleep, time
 import yaml
+import json
 import logging
 from powermon.outputs import getOutputFromConfig
+
+from dto.scheduleDTO import ScheduleDTO
+from dto.commandDTO import CommandDTO
+from dto.commandScheduleDTO import CommandScheduleDTO
+from .device import Device
+
 
 log = logging.getLogger("Schedule")
 
@@ -16,52 +23,50 @@ class Command:
     def __str__(self):
         return f"Command: {self.command}, CommandType: {self.commandType}, Outputs: {self.outputs}"
     
+    def toDTO(self):
+        dto = CommandDTO(
+            command=self.command,
+            commandType=self.commandType,
+        )
+        return dto
+
     def run(self):
         log.debug(f"Running command: {self.command}")
         results = self.port.process_command(command=self.command)
         for output in self.outputs:
             log.debug(f"Output: {output}")
             output.output(data=results)
+
     
 
 class Schedule:
-    def __init__(self, scheduledCommands, loopDuration, mqtt_broker, device, adhocCommandsTopic=None):
+    def __init__(self, scheduledCommands, loopDuration, mqtt_broker, device: Device):
         self.scheduledCommands = scheduledCommands
         self.loopDuration = loopDuration
         self.inDelay = False
         self.mqtt_broker = mqtt_broker
         self.device = device
-        self.adhocCommandsTopic = adhocCommandsTopic
 
         if(loopDuration == "once"):
             self.delayRemaining = 0
         else:
             self.delayRemaining = loopDuration
 
-        if adhocCommandsTopic is not None:
-            mqtt_broker.subscribe(adhocCommandsTopic, self.adhocCallback)
-
     def __str__(self):
-        return f"Schedule: {self.scheduledCommands}, {self.loopDuration}, {self.adhocCommandsTopic}"
+        return f"Schedule: {self.scheduledCommands}, {self.loopDuration}"
     
-    def adhocCallback(self, client, userdata, msg):
-        log.info(f"Received `{msg.payload}` on topic `{msg.topic}`")
-        yamlString = msg.payload.decode("utf-8")
-        log.debug(f"Yaml string: {yamlString}")
-        try:
-            _command_config = yaml.safe_load(yamlString)
-        except yaml.YAMLError as exc:
-            log.error(f"Error processing config file: {exc}")
-
-        for command in _command_config["commands"]:
-            log.debug(f"command: {command}")
-            log.debug(f"self: {self}")
-            self.addOneTimeCommandFromConfig(command)
+    def toDTO(self) -> ScheduleDTO:
+        commandSchedules = []
+        for scheduledCommand in self.scheduledCommands:
+            commandSchedules.append(scheduledCommand.toDTO())
+        dto = ScheduleDTO(loopDuration=self.loopDuration, device=self.device.toDTO(), schedulesCommands=commandSchedules)
+        return dto
 
     
     def addOneTimeCommandFromConfig(self, commandConfig):
         command = self.parseCommandConfig(commandConfig, self.mqtt_broker, self.device)
         self.scheduledCommands.append(OneTimeCommandSchedule({command}))
+
 
     #The hook for the port to connect before the main loops starts
     def beforeLoop(self):
@@ -113,7 +118,6 @@ class Schedule:
     def parseScheduleConfig(cls, config, device, mqtt_broker):
         logging.debug("parseScheduleConfig")
         _loopDuration = config["loop"]
-        _adhocCommandsTopic = config.get("adhoc_command_topic", None)
 
         _schedules = []
         for schedule in config["schedules"]:
@@ -134,7 +138,7 @@ class Schedule:
             else:
                 raise KeyError(f"Undefined schedule type: {_scheduleType}")
 
-        schedule = Schedule(_schedules, _loopDuration, mqtt_broker, device, _adhocCommandsTopic)
+        schedule = Schedule(_schedules, _loopDuration, mqtt_broker, device)
         return schedule
 
 
@@ -146,9 +150,10 @@ class CommandScheduleType(StrEnum):
 class InformalScheduledCommandInterface:
     def is_due(self):
         raise NotImplementedError
+    
 
 class LoopCommandSchedule(InformalScheduledCommandInterface):
-    def __init__(self, loopCount, commands):
+    def __init__(self, loopCount, commands: list):
         self.scheduleType = CommandScheduleType.LOOP
         self.loopCount = loopCount
         self.commands = commands
@@ -157,6 +162,13 @@ class LoopCommandSchedule(InformalScheduledCommandInterface):
 
     def __str__(self):
         return f"ScheduleType: {self.scheduleType}, LoopCount: {self.loopCount}, Commands: {self.commands}"
+
+    def toDTO(self):
+        commandDTOs = []
+        for command in self.commands:
+            commandDTOs.append(command.toDTO())
+        dto = CommandScheduleDTO(type=self.scheduleType, commands=commandDTOs)
+        return dto
 
     def is_due(self):
         if self.currentLoopCount < self.loopCount:
@@ -175,6 +187,13 @@ class OneTimeCommandSchedule(InformalScheduledCommandInterface):
     
     def __str__(self):
         return f"ScheduleType: {self.scheduleType}, Commands: {self.commands}"
+    
+    def toDTO(self):
+        commandDTOs = []
+        for command in self.commands:
+            commandDTOs.append(command.toDTO())
+        dto = CommandScheduleDTO(scheduleType=self.scheduleType, commands=commandDTOs)
+        return dto
     
     def is_due(self):
         if self.has_run:
