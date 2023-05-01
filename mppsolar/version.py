@@ -1,7 +1,7 @@
-#import configparser
+# import configparser
 
-#version = configparser.ConfigParser()
-#version.read("pyproject.toml")
-#__version__ = version["tool.poetry"]["version"].replace('"', "")
+# version = configparser.ConfigParser()
+# version.read("pyproject.toml")
+# __version__ = version["tool.poetry"]["version"].replace('"', "")
 
-__version__ = "0.15.50"
+__version__ = "0.15.51"

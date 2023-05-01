@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 import logging
-import importlib
 from enum import StrEnum, auto
+
+from mppsolar.protocols.abstractprotocol import AbstractProtocol
 
 # from time import sleep
 log = logging.getLogger("Port")
@@ -19,7 +20,7 @@ class PortType(StrEnum):
     BLE = auto()
 
 class AbstractPort(ABC):
-    def __init__(self, protocol):
+    def __init__(self, protocol : AbstractProtocol):
         self.protocol = protocol
 
     @abstractmethod
@@ -34,6 +35,10 @@ class AbstractPort(ABC):
 
     @abstractmethod
     def send_and_receive(self, command) -> dict:
+        raise NotImplementedError
+    
+    @abstractmethod
+    def toDTO(self):
         raise NotImplementedError
 
     # Question: Should we make this an abstract method?

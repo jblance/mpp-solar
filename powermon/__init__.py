@@ -18,33 +18,13 @@ from powermon.libs.mqttbroker import MqttBroker
 
 from powermon.libs.schedule import Schedule
 from powermon.libs.device import Device
+from powermon.libs.apicoordinator import ApiCoordinator
 
 # from powermon.ports import getPortFromConfig
 
 
 # Set-up logger
 log = logging.getLogger("")
-
-
-class ConfigError(Exception):
-    """Exception for invaild configurations"""
-
-
-SAMPLE_CONFIG = """
-device:
-  name: Test_Inverter
-  serial_id: 123456789
-  port:
-    path: /dev/ttyUSB0
-    type: test
-    baud: 2400
-    protocol: PI30
-  commands:
-    - command: QPI
-      outputs:
-      - name: screen
-  loop: once
-"""
 
 
 def read_yaml_file(yaml_file=None):
@@ -87,7 +67,9 @@ def main():
         const="./powermon.yaml",
         default=None,
     )
-    parser.add_argument("-v", "--version", action="store_true", help="Display the version")
+    parser.add_argument(
+        "-v", "--version", action="store_true", help="Display the version"
+    )
     parser.add_argument(
         "-d",
         "--dumpConfig",
@@ -106,7 +88,9 @@ def main():
         action="store_true",
         help="Enable Debug and above (i.e. all) messages",
     )
-    parser.add_argument("-I", "--info", action="store_true", help="Enable Info and above level messages")
+    parser.add_argument(
+        "-I", "--info", action="store_true", help="Enable Info and above level messages"
+    )
     parser.add_argument(
         "--adhoc",
         type=str,
@@ -130,12 +114,12 @@ def main():
         print(description)
         return None
 
-    # Build configuration from defaults, config file and command line overrides
+
+    # Build configuration from config file and command line overrides
     log.info("Using config file: %s", args.configFile)
-    # build config - start with defaults
-    config = yaml.safe_load(SAMPLE_CONFIG)
-    # build config - update with details from config file
-    config.update(read_yaml_file(args.configFile))
+    # build config with details from config file
+    config = read_yaml_file(args.configFile)
+
     # build config - override with any command line arguments
     config.update(process_command_line_overrides(args))
 
@@ -155,12 +139,6 @@ def main():
     mqtt_broker = MqttBroker(config=config.get("mqttbroker", {}))
     log.debug("mqtt_broker: %s", mqtt_broker)
 
-    # is this just a call to send an adhoc command to the queue?
-    # TODO: sort the use of powermon command line to send adhoc command
-    if args.adhoc:
-        print("ADHOC is todo")
-        return
-
     # build device object (required)
     device = Device(config=config.get("device", None))
     log.debug("device: %s", device)
@@ -176,6 +154,15 @@ def main():
 
     log.debug(schedule)
 
+    # setup api coordinator
+    api_coordinator = ApiCoordinator(
+        config=config.get("api", None),
+        device=device,
+        mqtt_broker=mqtt_broker,
+        schedule=schedule,
+    )
+    # TODO: run in the schedule loop
+
     # initialize daemon
     daemon.initialize()
 
@@ -187,6 +174,8 @@ def main():
             # tell the daemon we're still working
             daemon.watchdog()
             keep_looping = schedule.runLoop()
+            api_coordinator.run()
+
 
     except KeyboardInterrupt:
         print("KeyboardInterrupt")

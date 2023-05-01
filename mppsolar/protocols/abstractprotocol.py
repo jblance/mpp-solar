@@ -3,6 +3,7 @@ import calendar  # noqa: F401
 import logging
 import re
 from typing import Tuple
+from dto.protocolDTO import ProtocolDTO
 
 from ..helpers import get_resp_defn, get_value
 from .protocol_helpers import BigHex2Short, BigHex2Float  # noqa: F401
@@ -16,6 +17,7 @@ log = logging.getLogger("AbstractProtocol")
 
 
 class AbstractProtocol(metaclass=abc.ABCMeta):
+
     def __init__(self, *args, **kwargs) -> None:
         self._command = None
         self._command_dict = None
@@ -26,7 +28,11 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         self.ID_COMMANDS = None
         self._protocol_id = None
 
-    def list_commands(self):
+    def toDTO(self) -> ProtocolDTO:
+        dto = ProtocolDTO(protocol_id=self._protocol_id, commands=self.list_commands())
+        return dto
+
+    def list_commands(self) -> dict:
         # print(f"{'Parameter':<30}\t{'Value':<15} Unit")
         if self._protocol_id is None:
             log.error("Attempted to list commands with no protocol defined")

@@ -1,0 +1,6 @@
+fastapi>=0.68.0
+pydantic>=1.8.0
+uvicorn>=0.15.0
+jinja2>=3.0.0
+fastapi-mqtt>=1.0.7
+sqlalchemy>=2.0.10

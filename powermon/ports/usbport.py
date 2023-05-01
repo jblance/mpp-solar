@@ -2,6 +2,8 @@ import logging
 import os
 import time
 
+from dto.portDTO import PortDTO
+
 from .abstractport import AbstractPort
 
 log = logging.getLogger("USBPort")
@@ -12,6 +14,10 @@ class USBPort(AbstractPort):
         log.debug(f"Initializing usb port. path:{path}, protocol: {protocol}")
         self.path = path
         self.protocol = protocol
+
+    def toDTO(self):
+        dto = PortDTO(type="usb", path=self.path, protocol=self.protocol.toDTO())
+        return dto
 
     def protocol(self):
         return self.protocol
