@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import logging
 from enum import auto
-from strenum import StrEnum
+from strenum import LowercaseStrEnum
 
 from mppsolar.protocols.abstractprotocol import AbstractProtocol
 
@@ -9,7 +9,7 @@ from mppsolar.protocols.abstractprotocol import AbstractProtocol
 log = logging.getLogger("Port")
 
 
-class PortType(StrEnum):
+class PortType(LowercaseStrEnum):
     UNKNOWN = auto()
     TEST = auto()
     USB = auto()
