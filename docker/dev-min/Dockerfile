@@ -9,4 +9,5 @@ RUN pip install pyserial paho-mqtt PyYAML
 # RUN pip install psycopg2
 
 COPY ./ /mpp-solar/
+
 RUN pip install -e /mpp-solar/

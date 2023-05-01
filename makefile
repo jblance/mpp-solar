@@ -31,3 +31,4 @@ m-build:
 m-run:
 	docker-compose -f docker-compose.dev-min.yaml run mppsolar mpp-solar -p test -c QID -D
 	# docker-compose -f docker-compose.dev-min.yaml run mppsolar -p test -c QID
+

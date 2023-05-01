@@ -174,7 +174,6 @@ def main():
             daemon.watchdog()
             keep_looping = schedule.runLoop()
             api_coordinator.run()
-
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
     except Exception as general_exception:
