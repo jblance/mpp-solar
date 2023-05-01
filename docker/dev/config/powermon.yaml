@@ -1,6 +1,8 @@
 # yaml config for powermon
+name: testmon
+loop: 10 #seconds
+
 device:
-  name: Test_Inverter
   id: 123456789
   model: 1012LV-MK
   manufacturer: MPP-Solar
@@ -10,22 +12,19 @@ device:
     protocol: PI30
 
 #Separate the schedule from the device definition
-scheduling:
-  loop: 10 #seconds
-  schedules:
-  - name: QPIGS_5_minutes
-    type: loop
-    loopCount: 6 #will run every 1 minute
-    commands:
-      - command: QPIGS
-        type: basic #default command type is basic
-        outputs:
-        - type: mqtt
-          topic: TEST_INVERTER
-          tag: QPIGS
-          format: 
-            type: htmltable
-            filter: ^ac|^pv
+schedules:
+- name: QPIGS_5_minutes
+  type: loop
+  loopCount: 6 #will run every 1 minute
+  command:
+    command_query: QPIGS
+    type: basic #default command type is basic
+    outputs:
+    - type: api_mqtt
+      format: 
+        type: htmltable
+        filter: ^ac|^pv
+          
 mqttbroker:
   name: localhost
   port: 1883

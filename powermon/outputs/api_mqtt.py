@@ -1,17 +1,19 @@
 import logging
 import re
 
-from mppsolar.helpers import get_kwargs
 from powermon.outputs.abstractoutput import AbstractOutput
+from dto.resultDTO import ResultDTO
+from dto.scheduleDTO import ScheduleDTO
 
-log = logging.getLogger("MQTT")
+log = logging.getLogger("API_MQTT")
 
 
-class MQTT(AbstractOutput):
+class API_MQTT(AbstractOutput):
     
-    def __init__(self, output_config, topic, mqtt_broker, formatter) -> None:
+    def __init__(self, output_config, topic, schedule_name: str, mqtt_broker, formatter) -> None:
         super().__init__(formatter)
         self.mqtt_broker = mqtt_broker
+        self.schedule_name = schedule_name
         self.results_topic = output_config.get("topic_override", None)
 
         if self.results_topic is None:
@@ -21,7 +23,7 @@ class MQTT(AbstractOutput):
         return "outputs the results to the supplied mqtt broker: eg powermon/status/total_output_active_power/value 1250"
 
     def output(self, data):
-        log.info("Using output processor: mqtt")
+        log.info("Using output processor: api_mqtt")
         # exit if no data
         if data is None:
             return
@@ -36,8 +38,6 @@ class MQTT(AbstractOutput):
         formattedData = self.formatter.format(data)
         log.debug(f"mqtt.output msgs {formattedData}")
 
-        # publish
-        if (self.formatter.sendsMultipleMessages()):
-            self.mqtt_broker.publishMultiple(formattedData)
-        else:
-            self.mqtt_broker.publish(self.topic_prefix, formattedData)
+        result = ResultDTO(schedule_name=self.schedule_name, result=formattedData)
+
+        self.mqtt_broker.publish(self.results_topic, result.json())

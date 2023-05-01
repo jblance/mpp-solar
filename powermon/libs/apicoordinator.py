@@ -1,11 +1,11 @@
 import yaml
 import logging
 import json
-from powermon.libs.schedule import Schedule
+from powermon.libs.schedule import Coordinator
 
 log = logging.getLogger("APICoordinator")
 class ApiCoordinator:
-    def __init__(self, config, device, mqtt_broker, schedule : Schedule):
+    def __init__(self, config, device, mqtt_broker, schedule : Coordinator):
         self.device = device
         self.mqtt_broker = mqtt_broker
         self.schedule = schedule
@@ -33,7 +33,7 @@ class ApiCoordinator:
             self.schedule.addOneTimeCommandFromConfig(command)
 
     def run(self):
-        if(self.count > 20):
+        if(self.count > 100):
             log.info("Starting APICoordinator")
             self.announceDevice()
             self.count = 0

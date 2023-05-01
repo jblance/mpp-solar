@@ -23,7 +23,6 @@ class Device:
         if not config:
             log.error("No device definition in config. Check configFile?")
             sys.exit(1)
-        self.name = config.get("name", "mppsolar")
         self.identifier = config.get("identifier", "mppsolar")
         self.model = config.get("model", "mppsolar")
         self.manufacturer = config.get("manufacturer", "mppsolar")
@@ -36,7 +35,6 @@ class Device:
 
     def toDTO(self) -> DeviceDTO:
         dto = DeviceDTO(
-            name=self.name, 
             identifier=self.identifier, 
             model=self.model, 
             manufacturer=self.manufacturer, 

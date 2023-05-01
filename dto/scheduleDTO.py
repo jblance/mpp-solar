@@ -1,8 +1,8 @@
 from pydantic import BaseModel
-from .commandScheduleDTO import CommandScheduleDTO
-from .deviceDTO import DeviceDTO
+from .commandDTO import CommandDTO
 
 class ScheduleDTO(BaseModel):
-    loopDuration: int
-    device: DeviceDTO
-    schedulesCommands: list[CommandScheduleDTO]
+    name: str
+    type: str
+    loopCount: int
+    command: CommandDTO

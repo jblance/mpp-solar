@@ -1,7 +1,7 @@
 from .abstractformat import FormatterType
 
 
-def getFormatfromConfig(formatConfig, device, topic, tag):
+def getFormatfromConfig(formatConfig, device, topic):
     #Get values from config
     #Type is required
     formatType = formatConfig["type"]
@@ -14,7 +14,7 @@ def getFormatfromConfig(formatConfig, device, topic, tag):
         formatter = hass(formatConfig, device)
     elif formatType == FormatterType.TOPICS:
         from .topics import Topics
-        formatter = Topics(formatConfig, topic, tag)
+        formatter = Topics(formatConfig, topic)
     elif formatType == FormatterType.SIMPLE:
         from .simple import simple
         formatter = simple(formatConfig)

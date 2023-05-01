@@ -9,21 +9,12 @@ class Topics(AbstractFormat):
     def __init__(self, formatConfig, topic, tag):
         super().__init__(formatConfig)
         self.results_topic = topic
-        self.tag = tag
 
     def sendsMultipleMessages(self) -> bool:
         return True
 
     def format(self, data):
         log.info("Using output formatter: Topics")
-        
-
-        # build topic prefix
-        if self.results_topic is not None:
-            topic_prefix = self.results_topic + "/" + self.tag
-        else:
-            topic_prefix = f"{self.tag}/status"
-
 
         _data = self.formatAndFilterData(data)
 
@@ -34,12 +25,12 @@ class Topics(AbstractFormat):
             value = _data[key][0]
             unit = _data[key][1]
             log.debug(
-                f"build_msgs: prefix {topic_prefix}, key {key}, value {value}, unit {unit}"
+                f"build_msgs: prefix {self.results_topic}, key {key}, value {value}, unit {unit}"
             )
-            msg = {"topic": f"{topic_prefix}/{key}/value", "payload": value}
+            msg = {"topic": f"{self.results_topic}/{key}/value", "payload": value}
             msgs.append(msg)
             if unit:
-                msg = {"topic": f"{topic_prefix}/{key}/unit", "payload": unit}
+                msg = {"topic": f"{self.results_topic}/{key}/unit", "payload": unit}
                 msgs.append(msg)
         log.debug(f"build_msgs: {msgs}")
         return msgs

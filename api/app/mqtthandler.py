@@ -2,11 +2,13 @@
 import asyncio
 import json
 from .db.models import MQTTMessage
-from dto.scheduleDTO import ScheduleDTO
+from dto.powermonDTO import PowermonDTO
+from dto.resultDTO import ResultDTO
 
 class MQTTHandler(object):
     _instance = None
-    _schedules = []
+    _power_monitors = []
+    _results = []
     _commandDictionary = {
             "mqtt/QPIGS": "QPIGS",
         }
@@ -35,27 +37,34 @@ class MQTTHandler(object):
                     return result
             await asyncio.sleep(1)
     
-    def recieved_message(self, mqtt_message):
-        command = self._commandDictionary.get(mqtt_message.topic, None)
-        print("Command Recieved: ", command, self._commandRequests)
-        if(command is None or command not in self._commandRequests):
-            print("Command not registered: ", command)
-            return
+    def recieved_result(self, result: ResultDTO):
+        # command = self._commandDictionary.get(mqtt_message.topic, None)
+        # print("Command Recieved: ", command, self._commandRequests)
+        # if(command is None or command not in self._commandRequests):
+        #     print("Command not registered: ", command)
+        #     return
 
-        for request in self._commandRequests[command]:
-            request.result = mqtt_message
-            request.done = True
+        self._results.append(result)
 
     def recieved_announcement(self, message):
         print("Announcement Recieved: ", message)
-        schedule = ScheduleDTO.parse_raw(message)
+        schedule = PowermonDTO.parse_raw(message)
         deviceId = schedule.device.identifier
         print("Device ID: ", deviceId)
-        if(schedule not in self._schedules):
-            self._schedules.append(schedule)
+        if(schedule not in self._power_monitors):
+            self._power_monitors.append(schedule)
 
-    def get_schedules(self):
-        return self._schedules
+    async def get_powermon_instances(self):
+        return self._power_monitors
+    
+    async def get_powermon_instance(self, powermon_name) -> PowermonDTO:
+        for powermon in self._power_monitors:
+            if(powermon.name == powermon_name):
+                return powermon
+        return None
+    
+    async def get_results(self):
+        return self._results
 
     
 class CommandRequest:

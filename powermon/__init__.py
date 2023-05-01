@@ -16,7 +16,7 @@ from mppsolar.version import __version__  # noqa: F401
 from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
 
-from powermon.libs.schedule import Schedule
+from powermon.libs.schedule import Coordinator
 from powermon.libs.device import Device
 from powermon.libs.apicoordinator import ApiCoordinator
 
@@ -165,9 +165,9 @@ def main():
     log.debug("daemon: %s", daemon)
 
     # Get scheduled commands
-    scheduling_config = config.get("scheduling", None)
-    log.debug("scheduling_config: %s", scheduling_config)
-    schedule = Schedule.parseScheduleConfig(scheduling_config, device, mqtt_broker)
+    schedule_config = config.get("schedules", None)
+    log.debug("schedules: %s", schedule_config)
+    schedule = Coordinator.parseCoordinatorConfig(config, device, mqtt_broker)
 
     log.debug(schedule)
 

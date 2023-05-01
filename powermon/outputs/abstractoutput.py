@@ -8,6 +8,7 @@ log = logging.getLogger("Output")
 class OutputType(StrEnum):
     SCREEN = auto()
     MQTT = auto()
+    API_MQTT = auto()
 
 class AbstractOutput(ABC):
 
