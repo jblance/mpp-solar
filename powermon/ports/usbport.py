@@ -10,9 +10,9 @@ log = logging.getLogger("USBPort")
 
 
 class USBPort(AbstractPort):
-    def __init__(self, path, protocol) -> None:
-        log.debug(f"Initializing usb port. path:{path}, protocol: {protocol}")
-        self.path = path
+    def __init__(self, config=None, protocol=None) -> None:
+        log.debug(f"Initializing usb port. config:{config}, protocol: {protocol}")
+        self.path = config.get("path", None)
         self.protocol = protocol
 
     def toDTO(self):
@@ -41,7 +41,7 @@ class USBPort(AbstractPort):
     def send_and_receive(self, command) -> dict:
         full_command = self.protocol.get_full_command(command)
         response_line = bytes()
-        
+
         # Send the command to the open usb connection
         to_send = full_command
         try:
@@ -58,7 +58,7 @@ class USBPort(AbstractPort):
                 os.write(self.port, to_send)
             except Exception as e:
                 log.debug("USB read error: {}".format(e))
-            
+
         elif len(to_send) > 8 and len(to_send) < 11:
             log.debug("2 chunk send")
             time.sleep(0.35)

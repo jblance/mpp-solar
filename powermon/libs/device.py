@@ -16,7 +16,6 @@ from dto.deviceDTO import DeviceDTO
 log = logging.getLogger("Device")
 
 
-
 class ConfigError(Exception):
     """Exception for invaild configurations"""
 
@@ -43,7 +42,6 @@ class Device:
         if not self.port:
             log.error("Invalid port config '%s' found", config)
             raise ConfigError(f"Invalid port config '{config}' found")
-
 
     def toDTO(self) -> DeviceDTO:
         dto = DeviceDTO(
