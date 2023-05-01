@@ -114,10 +114,12 @@ def main():
         print(description)
         return None
 
+
     # Build configuration from config file and command line overrides
     log.info("Using config file: %s", args.configFile)
     # build config with details from config file
     config = read_yaml_file(args.configFile)
+
     # build config - override with any command line arguments
     config.update(process_command_line_overrides(args))
 
@@ -173,6 +175,7 @@ def main():
             daemon.watchdog()
             keep_looping = schedule.runLoop()
             api_coordinator.run()
+
 
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
