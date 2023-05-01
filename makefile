@@ -25,5 +25,9 @@ docker-up:
 docker-powermon-dev-up:
 	docker-compose -f docker-compose.development.yaml up --build
 
-docker-dev-min-up:
-	docker-compose -f docker-compose.dev-min.yaml up --build
+m-build:
+	docker-compose -f docker-compose.dev-min.yaml up --build 
+
+m-run:
+	docker-compose -f docker-compose.dev-min.yaml run mppsolar mpp-solar -p test -c QID -D
+	# docker-compose -f docker-compose.dev-min.yaml run mppsolar -p test -c QID

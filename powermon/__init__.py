@@ -114,7 +114,6 @@ def main():
         print(description)
         return None
 
-
     # Build configuration from config file and command line overrides
     log.info("Using config file: %s", args.configFile)
     # build config with details from config file
@@ -175,7 +174,6 @@ def main():
             daemon.watchdog()
             keep_looping = schedule.runLoop()
             api_coordinator.run()
-
 
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
