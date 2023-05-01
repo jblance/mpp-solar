@@ -11,8 +11,8 @@ log = logging.getLogger("test")
 
 class TestPort(AbstractPort):
     def __init__(self, config=None, protocol=None):
-        super().__init__(protocol)
         log.debug(f"Initializing test port. config:{config}, protocol: {protocol}")
+        self.protocol = protocol
 
     def __str__(self):
         return "Test port"

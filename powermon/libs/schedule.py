@@ -1,16 +1,15 @@
-from enum import auto
-from strenum import StrEnum
-from time import sleep, time
-# import yaml
-# import json
 import logging
-from powermon.outputs import getOutputFromConfig
+from enum import auto
+from time import sleep, time
 
-from dto.scheduleDTO import ScheduleDTO
+from strenum import LowercaseStrEnum
+
 from dto.commandDTO import CommandDTO
 from dto.commandScheduleDTO import CommandScheduleDTO
-from .device import Device
+from dto.scheduleDTO import ScheduleDTO
+from powermon.outputs import getOutputFromConfig
 
+from .device import Device
 
 log = logging.getLogger("Schedule")
 
@@ -120,8 +119,11 @@ class Schedule:
     # TODO: this should follow the same pattern as the other parsers
     @classmethod
     def parseScheduleConfig(cls, config, device, mqtt_broker):
-        logging.debug("parseScheduleConfig")
-        _loopDuration = config["loop"]
+        logging.debug("parseScheduleConfig: config: %s, device: %s, mqtt_broker: %s" % (config, device, mqtt_broker))
+        if not config:
+            log.info("no schedule config supplied, defaulting")
+            config = {"loop": "once"}
+        _loopDuration = config.get("loop")
 
         _schedules = []
         for schedule in config["schedules"]:
@@ -146,7 +148,7 @@ class Schedule:
         return schedule
 
 
-class CommandScheduleType(StrEnum):
+class CommandScheduleType(LowercaseStrEnum):
     LOOP = auto()
     TIME = auto()
     ONCE = auto()
