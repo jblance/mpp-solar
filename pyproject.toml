@@ -1,9 +1,14 @@
 [tool.poetry]
 name = "mppsolar"
-version = "0.15.55"
+version = "0.15.56"
 description = "Package to communicate with Solar inverters and BMSs"
 authors = ["John Blance"]
 readme = "README.md"
+packages = [
+            {include = "mppsolar"},
+            {include = "powermon"},
+            {include = "dto"},
+            ]
 
 [tool.poetry.dependencies]
 python = ">=3.8.1,<4.00"
