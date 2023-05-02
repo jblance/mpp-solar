@@ -1,23 +1,30 @@
 [tool.poetry]
 name = "mppsolar"
-version = "0.15.53"
+version = "0.15.55"
 description = "Package to communicate with Solar inverters and BMSs"
 authors = ["John Blance"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.7,<4.0"
+python = ">=3.8.1,<4.00"
 pyserial = ">3"
 paho-mqtt = ">=1.6"
 PyYAML = ">=6"
-#bleak = "*"
 pydantic = "^1.10.7"
+strenum = "^0.4.10"
 
-[tool.poetry.dev-dependencies]
-check-manifest = "*"
-flake8 = "*"
-coverage = "*"
-black = "*"
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+twine = "^4.0.2"
+flake8 = "^6.0.0"
+black = "^23.3.0"
+coverage = "^7.2.5"
+
+
+[tool.poetry.group.ble.dependencies]
+bleak = "^0.20.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
