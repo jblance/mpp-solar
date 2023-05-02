@@ -918,6 +918,7 @@ class pi18sv(pi18):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"PI18SV"
+        self.NOCRC = True
         self.COMMANDS = COMMANDS
         self.COMMANDS.update(SETTER_COMMANDS)
         self.STATUS_COMMANDS = [
@@ -968,6 +969,7 @@ class pi18sv(pi18):
             "DAT",
         ]
         self.DEFAULT_COMMAND = "GS"
+        self.ID_COMMANDS = [("PI", "Protocol Version"), ("VFW", "Main CPU Version")]
 
 
 # Bugs / Not working

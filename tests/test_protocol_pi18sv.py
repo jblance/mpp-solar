@@ -70,7 +70,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command ED"""
         protocol = pi()
         result = protocol.get_full_command("ED20231217")
-        expected = b"^P013ED20231217\xba\xd2\r"
+        expected = b"^P013ED20231217\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -86,7 +86,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command VFW"""
         protocol = pi()
         result = protocol.get_full_command("VFW")
-        expected = b"^P006VFW\xf6\xe6\r"
+        expected = b"^P006VFW\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -94,7 +94,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command MCHGCR"""
         protocol = pi()
         result = protocol.get_full_command("MCHGCR")
-        expected = b'^P009MCHGCR\xee"\r'
+        expected = b'^P009MCHGCR\r'
         # print(result)
         self.assertEqual(result, expected)
 
@@ -102,7 +102,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command MUCHGCR"""
         protocol = pi()
         result = protocol.get_full_command("MUCHGCR")
-        expected = b"^P010MUCHGCR\xb5\x8b\r"
+        expected = b"^P010MUCHGCR\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -110,7 +110,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PRI"""
         protocol = pi()
         result = protocol.get_full_command("PRI0")
-        expected = b"^P007PRI0m\x9d\r"
+        expected = b"^P007PRI0\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -118,7 +118,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PGS"""
         protocol = pi()
         result = protocol.get_full_command("PGS0")
-        expected = b"^P007PGS0)\xb6\r"
+        expected = b"^P007PGS0\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -126,7 +126,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command FWS"""
         protocol = pi()
         result = protocol.get_full_command("FWS")
-        expected = b"^P005FWS^\x9f\r"
+        expected = b"^P005FWS\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -142,7 +142,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PIRI"""
         protocol = pi()
         result = protocol.get_full_command("PIRI")
-        expected = b"^P007PIRI\xee8\r"
+        expected = b"^P007PIRI\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -158,7 +158,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command MOD"""
         protocol = pi()
         result = protocol.get_full_command("MOD")
-        expected = b"^P006MOD\xdd\xbe\r"
+        expected = b"^P006MOD\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -166,7 +166,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command FLAG"""
         protocol = pi()
         result = protocol.get_full_command("FLAG")
-        expected = b"^P007FLAG\x8e\x18\r"
+        expected = b"^P007FLAG\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -174,7 +174,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command ACCT"""
         protocol = pi()
         result = protocol.get_full_command("ACCT")
-        expected = b"^P005ACCT\xf3\xb7\r"
+        expected = b"^P005ACCT\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -182,7 +182,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command ACLT"""
         protocol = pi()
         result = protocol.get_full_command("ACLT")
-        expected = b"^P005ACLT\xe3\x89\r"
+        expected = b"^P005ACLT\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -190,7 +190,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command LON"""
         protocol = pi()
         result = protocol.get_full_command("LON0")
-        expected = b"^S007LON0i\xd8\r"
+        expected = b"^S007LON0\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -198,7 +198,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PEA"""
         protocol = pi()
         result = protocol.get_full_command("PEA")
-        expected = b"^S006PEA\xbb`\r"
+        expected = b"^S006PEA\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -206,7 +206,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PDA"""
         protocol = pi()
         result = protocol.get_full_command("PDA")
-        expected = b"^S006PDA\x88Q\r"
+        expected = b"^S006PDA\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -214,7 +214,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PEB"""
         protocol = pi()
         result = protocol.get_full_command("PEB")
-        expected = b"^S006PEB\x8b\x03\r"
+        expected = b"^S006PEB\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -222,7 +222,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PDB"""
         protocol = pi()
         result = protocol.get_full_command("PDB")
-        expected = b"^S006PDB\xb82\r"
+        expected = b"^S006PDB\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -230,7 +230,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PEC"""
         protocol = pi()
         result = protocol.get_full_command("PEC")
-        expected = b'^S006PEC\x9b"\r'
+        expected = b'^S006PEC\r'
         # print(result)
         self.assertEqual(result, expected)
 
@@ -238,7 +238,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PDC"""
         protocol = pi()
         result = protocol.get_full_command("PDC")
-        expected = b"^S006PDC\xa8\x13\r"
+        expected = b"^S006PDC\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -246,7 +246,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PED"""
         protocol = pi()
         result = protocol.get_full_command("PED")
-        expected = b"^S006PED\xeb\xc5\r"
+        expected = b"^S006PED\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -254,7 +254,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PDD"""
         protocol = pi()
         result = protocol.get_full_command("PDD")
-        expected = b"^S006PDD\xd8\xf4\r"
+        expected = b"^S006PDD\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -262,7 +262,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PEE"""
         protocol = pi()
         result = protocol.get_full_command("PEE")
-        expected = b"^S006PEE\xfb\xe4\r"
+        expected = b"^S006PEE\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -270,7 +270,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PDE"""
         protocol = pi()
         result = protocol.get_full_command("PDE")
-        expected = b"^S006PDE\xc8\xd5\r"
+        expected = b"^S006PDE\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -278,7 +278,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PEF"""
         protocol = pi()
         result = protocol.get_full_command("PEF")
-        expected = b"^S006PEF\xcb\x87\r"
+        expected = b"^S006PEF\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -286,7 +286,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PDF"""
         protocol = pi()
         result = protocol.get_full_command("PDF")
-        expected = b"^S006PDF\xf8\xb6\r"
+        expected = b"^S006PDF\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -294,7 +294,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PEG"""
         protocol = pi()
         result = protocol.get_full_command("PEG")
-        expected = b"^S006PEG\xdb\xa6\r"
+        expected = b"^S006PEG\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -302,7 +302,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PDG"""
         protocol = pi()
         result = protocol.get_full_command("PDG")
-        expected = b"^S006PDG\xe8\x97\r"
+        expected = b"^S006PDG\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -310,7 +310,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PEH"""
         protocol = pi()
         result = protocol.get_full_command("PEH")
-        expected = b"^S006PEH*I\r"
+        expected = b"^S006PEH\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -318,7 +318,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PDH"""
         protocol = pi()
         result = protocol.get_full_command("PDH")
-        expected = b"^S006PDH\x19x\r"
+        expected = b"^S006PDH\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -326,7 +326,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PEI"""
         protocol = pi()
         result = protocol.get_full_command("PEI")
-        expected = b"^S006PEI:h\r"
+        expected = b"^S006PEI\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -334,7 +334,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PDI"""
         protocol = pi()
         result = protocol.get_full_command("PDI")
-        expected = b"^S006PDI\tY\r"
+        expected = b"^S006PDI\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -342,7 +342,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command PF"""
         protocol = pi()
         result = protocol.get_full_command("PF")
-        expected = b"^S005PFN\x84\r"
+        expected = b"^S005PF\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -366,7 +366,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command MCHGV"""
         protocol = pi()
         result = protocol.get_full_command("MCHGV564,540")
-        expected = b"^S015MCHGV564,540\x8b\x8d\r"
+        expected = b"^S015MCHGV564,540\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -374,7 +374,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command DAT"""
         protocol = pi()
         result = protocol.get_full_command("DAT190518224530")
-        expected = b"^S018DAT190518224530\xc4\xf4\r"
+        expected = b"^S018DAT190518224530\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -382,7 +382,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command POP"""
         protocol = pi()
         result = protocol.get_full_command("POP0")
-        expected = b"^S007POP0\x1d1\r"
+        expected = b"^S007POP0\r"
         # print(result)
         self.assertEqual(result, expected)
 
@@ -390,7 +390,7 @@ class test_pi18sv_fullcommands(unittest.TestCase):
         """test the build of full command BUCD"""
         protocol = pi()
         result = protocol.get_full_command("BUCD440,480")
-        expected = b"^S014BUCD440,480\xa5]\r"
+        expected = b"^S014BUCD440,480\r"
         # print(result)
         self.assertEqual(result, expected)
 
