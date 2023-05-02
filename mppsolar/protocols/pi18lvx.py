@@ -2,7 +2,7 @@ import logging
 
 from .pi18 import pi18
 
-log = logging.getLogger("pi18sv")
+log = logging.getLogger("pi18lvx")
 
 COMMANDS = {
     "PI": {
@@ -913,13 +913,14 @@ SETTER_COMMANDS = {
 }
 
 
-class pi18sv(pi18):
+class pi18lvx(pi18):
     def __str__(self):
-        return "PI18 protocol handler for Easun SV inverters"
+        return "PI18 protocol handler for LVX inverters"
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
-        self._protocol_id = b"PI18SV"
+        self._protocol_id = b"PI18LVX"
+        self.NOCRC = True
         self.COMMANDS = COMMANDS
         self.COMMANDS.update(SETTER_COMMANDS)
         self.STATUS_COMMANDS = [
@@ -970,7 +971,4 @@ class pi18sv(pi18):
             "DAT",
         ]
         self.DEFAULT_COMMAND = "GS"
-
-
-# Bugs / Not working
-# EMYYYYDD returns an error
+        self.ID_COMMANDS = [("PI", "Protocol Version"), ("VFW", "Main CPU Version")]

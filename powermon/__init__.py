@@ -134,13 +134,13 @@ def main():
     # debug config
     log.info("config: %s", config)
 
-    # build mqtt broker object (optional)
-    mqtt_broker = MqttBroker(config=config.get("mqttbroker", {}))
-    log.debug("mqtt_broker: %s", mqtt_broker)
-
     # build device object (required)
     device = Device(config=config.get("device", None))
     log.debug("device: %s", device)
+
+    # build mqtt broker object (optional)
+    mqtt_broker = MqttBroker(config=config.get("mqttbroker", {}))
+    log.debug("mqtt_broker: %s", mqtt_broker)
 
     # build the daemon object (optional)
     daemon = Daemon(config=config)
@@ -150,8 +150,7 @@ def main():
     scheduling_config = config.get("scheduling", None)
     log.debug("scheduling_config: %s", scheduling_config)
     schedule = Schedule.parseScheduleConfig(scheduling_config, device, mqtt_broker)
-
-    log.debug(schedule)
+    log.debug("schedule: %s", schedule)
 
     # setup api coordinator
     api_coordinator = ApiCoordinator(

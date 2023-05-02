@@ -1,13 +1,15 @@
 from abc import ABC, abstractmethod
 import logging
-from enum import StrEnum, auto
+from enum import auto
+from strenum import LowercaseStrEnum
 
 from mppsolar.protocols.abstractprotocol import AbstractProtocol
 
 # from time import sleep
 log = logging.getLogger("Port")
 
-class PortType(StrEnum):
+
+class PortType(LowercaseStrEnum):
     UNKNOWN = auto()
     TEST = auto()
     USB = auto()
@@ -19,8 +21,9 @@ class PortType(StrEnum):
     DALYSERIAL = auto()
     BLE = auto()
 
+
 class AbstractPort(ABC):
-    def __init__(self, protocol : AbstractProtocol):
+    def __init__(self, config, protocol: AbstractProtocol):
         self.protocol = protocol
 
     @abstractmethod
@@ -36,7 +39,7 @@ class AbstractPort(ABC):
     @abstractmethod
     def send_and_receive(self, command) -> dict:
         raise NotImplementedError
-    
+
     @abstractmethod
     def toDTO(self):
         raise NotImplementedError
