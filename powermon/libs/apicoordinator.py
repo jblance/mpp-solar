@@ -1,11 +1,11 @@
 import yaml
 import logging
 import json
-from powermon.libs.schedule import Coordinator
+from powermon.libs.powermonController import PowermonController
 
 log = logging.getLogger("APICoordinator")
 class ApiCoordinator:
-    def __init__(self, config, device, mqtt_broker, schedule : Coordinator):
+    def __init__(self, config, device, mqtt_broker, schedule : PowermonController):
         self.device = device
         self.mqtt_broker = mqtt_broker
         self.schedule = schedule

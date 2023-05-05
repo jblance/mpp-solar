@@ -16,7 +16,7 @@ from mppsolar.version import __version__  # noqa: F401
 from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
 
-from powermon.libs.schedule import Coordinator
+from powermon.libs.powermonController import PowermonController
 from powermon.libs.device import Device
 from powermon.libs.apicoordinator import ApiCoordinator
 
@@ -167,12 +167,12 @@ def main():
     # Get scheduled commands
     schedule_config = config.get("schedules", None)
     log.debug("schedules: %s", schedule_config)
-    schedule = Coordinator.parseCoordinatorConfig(config, device, mqtt_broker)
+    controller = PowermonController.parseControllerConfig(config, device, mqtt_broker)
 
-    log.debug(schedule)
+    log.debug(controller)
 
     # setup api coordinator
-    api_coordinator = ApiCoordinator(config=config.get("api", None), device=device, mqtt_broker=mqtt_broker, schedule=schedule)
+    api_coordinator = ApiCoordinator(config=config.get("api", None), device=device, mqtt_broker=mqtt_broker, schedule=controller)
     #TODO: run in the schedule loop
     
 
@@ -182,11 +182,11 @@ def main():
     # Main working loop
     keep_looping = True
     try:
-        schedule.beforeLoop()
+        controller.beforeLoop()
         while keep_looping:
             # tell the daemon we're still working
             daemon.watchdog()
-            keep_looping = schedule.runLoop()
+            keep_looping = controller.runLoop()
             api_coordinator.run()
 
     except KeyboardInterrupt:
