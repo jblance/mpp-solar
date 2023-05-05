@@ -2,8 +2,8 @@
 import asyncio
 import json
 from .db.models import MQTTMessage
-from dto.powermonDTO import PowermonDTO
-from dto.resultDTO import ResultDTO
+from powermon.model.dto.powermonDTO import PowermonDTO
+from powermon.model.dto.resultDTO import ResultDTO
 
 class MQTTHandler(object):
     _instance = None

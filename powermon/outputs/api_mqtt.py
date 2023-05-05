@@ -2,8 +2,8 @@ import logging
 import re
 
 from powermon.outputs.abstractoutput import AbstractOutput
-from dto.resultDTO import ResultDTO
-from dto.scheduleDTO import ScheduleDTO
+from powermon.model.dto.resultDTO import ResultDTO
+from powermon.model.dto.scheduleDTO import ScheduleDTO
 
 log = logging.getLogger("API_MQTT")
 

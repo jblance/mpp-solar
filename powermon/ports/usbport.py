@@ -2,7 +2,7 @@ import logging
 import os
 import time
 
-from dto.portDTO import PortDTO
+from powermon.model.dto.portDTO import PortDTO
 
 from .abstractport import AbstractPort
 

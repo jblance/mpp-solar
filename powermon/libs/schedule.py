@@ -5,9 +5,9 @@ import json
 import logging
 from powermon.outputs import getOutputFromConfig
 
-from dto.powermonDTO import PowermonDTO
-from dto.commandDTO import CommandDTO
-from dto.scheduleDTO import ScheduleDTO
+from powermon.model.dto.powermonDTO import PowermonDTO
+from powermon.model.dto.commandDTO import CommandDTO
+from powermon.model.dto.scheduleDTO import ScheduleDTO
 from .device import Device
 from powermon.libs.mqttbroker import MqttBroker
 
