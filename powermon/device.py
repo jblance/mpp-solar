@@ -4,7 +4,7 @@ import logging
 import sys
 
 from powermon.ports import getPortFromConfig
-from powermon.model.dto.deviceDTO import DeviceDTO
+from powermon.dto.deviceDTO import DeviceDTO
 
 # Set-up logger
 log = logging.getLogger("Device")

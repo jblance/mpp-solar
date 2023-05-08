@@ -4,6 +4,6 @@ from .deviceDTO import DeviceDTO
 
 class PowermonDTO(BaseModel):
     name: str
-    loopDuration: int
+    loop_duration: int
     device: DeviceDTO
-    schedulesCommands: list[ScheduleDTO]
+    schedules: list[ScheduleDTO]

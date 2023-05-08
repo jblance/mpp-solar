@@ -12,9 +12,9 @@ from .db import crud, models, schemas
 from .db.database import SessionLocal, engine
 from .mqtthandler import MQTTHandler
 
-from powermon.model.dto.powermonDTO import PowermonDTO
-from powermon.model.dto.scheduleDTO import ScheduleDTO
-from powermon.model.dto.resultDTO import ResultDTO
+from powermon.dto.powermonDTO import PowermonDTO
+from powermon.dto.scheduleDTO import ScheduleDTO
+from powermon.dto.resultDTO import ResultDTO
 
 models.Base.metadata.create_all(bind=engine)
 

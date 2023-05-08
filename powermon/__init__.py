@@ -16,9 +16,11 @@ from mppsolar.version import __version__  # noqa: F401
 from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
 
-from powermon.libs.powermonController import PowermonController
-from powermon.libs.device import Device
+from powermon.scheduling.scheduleController import ScheduleController
+from powermon.device import Device
 from powermon.libs.apicoordinator import ApiCoordinator
+
+from powermon.libs.configurationManager import ConfigurationManager
 
 # from powermon.ports import getPortFromConfig
 
@@ -134,9 +136,9 @@ def main():
     # Build configuration from defaults, config file and command line overrides
     log.info("Using config file: %s", args.configFile)
     # build config - start with defaults
-    config = yaml.safe_load(SAMPLE_CONFIG)
+    #config = yaml.safe_load(SAMPLE_CONFIG)
     # build config - update with details from config file
-    config.update(read_yaml_file(args.configFile))
+    config = read_yaml_file(args.configFile)
     # build config - override with any command line arguments
     config.update(process_command_line_overrides(args))
 
@@ -167,7 +169,7 @@ def main():
     # Get scheduled commands
     schedule_config = config.get("schedules", None)
     log.debug("schedules: %s", schedule_config)
-    controller = PowermonController.parseControllerConfig(config, device, mqtt_broker)
+    controller = ConfigurationManager.parseControllerConfig(config, device, mqtt_broker)
 
     log.debug(controller)
 

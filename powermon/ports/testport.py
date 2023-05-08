@@ -4,7 +4,7 @@ import random
 from mppsolar.helpers import get_kwargs
 from .abstractport import AbstractPort
 
-from powermon.model.dto.portDTO import PortDTO
+from powermon.dto.portDTO import PortDTO
 
 # import re
 

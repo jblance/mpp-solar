@@ -1,6 +1,6 @@
 # yaml config for powermon
 name: testmon
-loop: 10 #seconds
+loop_duration: 10 #seconds
 
 device:
   id: 123456789
@@ -13,17 +13,20 @@ device:
 
 #Separate the schedule from the device definition
 schedules:
-- name: QPIGS_5_minutes
+- name: one_minute
   type: loop
-  loopCount: 6 #will run every 1 minute
-  command:
-    command_query: QPIGS
-    type: basic #default command type is basic
-    outputs:
-    - type: api_mqtt
-      format: 
-        type: htmltable
-        filter: ^ac|^pv
+  loop_count: 6 #will run every 1 minute
+
+commands:
+- name: QPIGS_every_minute
+  command_query: QPIGS #Must be in the protocol command list
+  type: poll
+  schedule_name: one_minute
+  loops: 6 #will run every 60 seconds
+  outputs:
+  - type: api_mqtt
+    format: 
+      type: htmltable
           
 mqttbroker:
   name: localhost

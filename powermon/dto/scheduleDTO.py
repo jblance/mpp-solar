@@ -5,4 +5,4 @@ class ScheduleDTO(BaseModel):
     name: str
     type: str
     loopCount: int
-    command: CommandDTO
+    commands: list[CommandDTO]
