@@ -8,9 +8,8 @@ from powermon.scheduling.schedules.abstractSchedule import AbstractSchedule
 from powermon.scheduling.schedules.abstractSchedule import ScheduleType
 from powermon.scheduling.schedules.onetimeSchedule import OneTimeSchedule
 from powermon.scheduling.schedules.loopSchedule import LoopSchedule
-from ..libs.mqttbroker import MqttBroker
-from ..device import Device
-from ..commands.command import Command
+from powermon.libs.mqttbroker import MqttBroker
+from powermon.device import Device
 
 log = logging.getLogger("ScheduleController")
 

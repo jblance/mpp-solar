@@ -6,6 +6,8 @@ import sys
 from powermon.ports import getPortFromConfig
 from powermon.dto.deviceDTO import DeviceDTO
 
+from powermon.ports.abstractport import AbstractPort
+
 # Set-up logger
 log = logging.getLogger("Device")
 
@@ -31,6 +33,9 @@ class Device:
         if not self.port:
             log.error("Invalid port config '%s' found", config)
             raise ConfigError(f"Invalid port config '{config}' found")
+        
+    def get_port(self) -> AbstractPort:
+        return self.port
 
     def toDTO(self) -> DeviceDTO:
         dto = DeviceDTO(

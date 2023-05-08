@@ -6,7 +6,8 @@ from powermon.scheduling.schedules.abstractSchedule import AbstractSchedule
 from powermon.scheduling.schedules.abstractSchedule import ScheduleType
 from powermon.scheduling.schedules.loopSchedule import LoopSchedule
 from powermon.scheduling.schedules.onetimeSchedule import OneTimeSchedule
-from powermon.commands.command import Command
+from powermon.commands.abstractCommand import AbstractCommand, CommandType
+from powermon.commands.pollCommand import PollCommand
 
 from powermon.libs.mqttbroker import MqttBroker
 
@@ -101,7 +102,11 @@ class ConfigurationManager:
             logging.debug(f"output: {_output}")
             _outputs.append(_output)
 
-        return Command(_command_query, _commandType, _schedule_name, _outputs, device.port)
+        _command = None
+        if _commandType == CommandType.POLL:
+            _command = PollCommand(_command_query, _commandType, _schedule_name, _outputs, device.get_port())
+        
+        return _command
     
     @staticmethod
     def parseControllerConfig(config : dict, device : Device, mqtt_broker : MqttBroker) -> ScheduleController:

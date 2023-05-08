@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from powermon.commands.command import Command
+from powermon.commands.abstractCommand import AbstractCommand
 
 class ScheduleType():
     LOOP = "loop"
@@ -15,7 +15,11 @@ class AbstractSchedule(ABC):
     def is_due(self):
         pass
 
-    def add_command(self, command : Command):
+    @abstractmethod
+    def toDTO(self):
+        pass
+
+    def add_command(self, command : AbstractCommand):
         if command.get_schedule_name() == self.name:
             self.commands.append(command)
         else:

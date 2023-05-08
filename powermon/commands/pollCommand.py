@@ -1,30 +1,25 @@
-
 from powermon.dto.commandDTO import CommandDTO
 import logging
+
+from powermon.commands.abstractCommand import AbstractCommand
+from powermon.ports.abstractport import AbstractPort
+from powermon.outputs.abstractoutput import AbstractOutput
 
 
 log = logging.getLogger("Command")
 
-class Command:
-    def __init__(self, command_query, commandType, schedule_name, outputs, port):
+class PollCommand(AbstractCommand):
+    def __init__(self, command_query, commandType, schedule_name, outputs : list[AbstractOutput], port : AbstractPort):
+        super().__init__(schedule_name, outputs, port)
         self.command_query = command_query
         self.commandType = commandType
-        self.schedule_name = schedule_name
-        self.outputs = outputs
-        self.port = port
 
-    def __str__(self):
-        return f"Command: {self.command_query}, CommandType: {self.commandType}, Outputs: {self.outputs}"
-    
     def toDTO(self):
         dto = CommandDTO(
             command=self.command_query,
             commandType=self.commandType,
         )
         return dto
-    
-    def get_schedule_name(self):
-        return self.schedule_name
 
     def run(self):
         log.debug(f"Running command: {self.command_query}")
