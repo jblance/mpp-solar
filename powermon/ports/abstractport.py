@@ -5,8 +5,6 @@ from strenum import LowercaseStrEnum
 
 from mppsolar.protocols.abstractprotocol import AbstractProtocol
 
-from mppsolar.protocols.abstractprotocol import AbstractProtocol
-
 # from time import sleep
 log = logging.getLogger("Port")
 

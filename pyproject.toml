@@ -7,7 +7,6 @@ readme = "README.md"
 packages = [
             {include = "mppsolar"},
             {include = "powermon"},
-            {include = "dto"},
             ]
 
 [tool.poetry.dependencies]

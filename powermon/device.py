@@ -20,7 +20,7 @@ class Device:
     also contains the name, model and id of the device
     """
 
-    def __init__(self, config=None):
+    def __init__(self, config):
         if not config:
             log.error("No device definition in config. Check configFile?")
             sys.exit(1)
