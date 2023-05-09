@@ -2,13 +2,13 @@ from abc import ABC, abstractmethod
 import logging
 import re
 from enum import auto
-from strenum import StrEnum
+from strenum import LowercaseStrEnum
 
 # from time import sleep
 log = logging.getLogger("Formatter")
 
 
-class FormatterType(StrEnum):
+class FormatterType(LowercaseStrEnum):
     HASS = auto()
     HTMLTABLE = auto()
     RAW = auto()
