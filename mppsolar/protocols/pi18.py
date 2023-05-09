@@ -49,7 +49,7 @@ COMMANDS = {
         "name": "EY",
         "prefix": "^P009",
         "description": "Yearly PV Generated Energy Inquiry",
-        "help": " -- display Yearly PV generated energy, format is EDyyyy",
+        "help": " -- display Yearly PV generated energy, format is EYyyyy",
         "type": "QUERY",
         "response_type": "INDEXED",
         "response": [
@@ -548,6 +548,7 @@ class pi18(AbstractProtocol):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"PI18"
+        self.NOCRC = False
         self.COMMANDS = COMMANDS
         self.STATUS_COMMANDS = [
             "ET",
@@ -612,15 +613,27 @@ class pi18(AbstractProtocol):
         # _pre_cmd = bytes(auto_prefix, "utf-8") + _cmd
         log.debug(f"_pre_cmd: {_pre_cmd}")
 
+        # Determine if crc is needed or not
+        CRC = True
         # For commands that dont need CRC
         if "nocrc" in self._command_defn and self._command_defn["nocrc"] is True:
-            full_command = _pre_cmd + bytes([13])
-        # crc commands
-        else:
+            CRC = False
+        # for protocols that mostly dont need CRC
+        if self.NOCRC:
+            CRC = False
+        # override to allow crc
+        if "nocrc" in self._command_defn and self._command_defn["nocrc"] is False:
+            CRC = True
+        log.debug("CRC: %s" % CRC)
+
+        if CRC:
             # calculate the CRC
             crc_high, crc_low = crc(_pre_cmd)
             # combine byte_cmd, CRC , return
             full_command = _pre_cmd + bytes([crc_high, crc_low, 13])
+        else:
+            full_command = _pre_cmd + bytes([13])
+
         log.debug(f"full command: {full_command}")
         return full_command
 

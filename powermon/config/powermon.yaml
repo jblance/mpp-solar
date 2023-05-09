@@ -5,8 +5,6 @@ device:
   model: 8048MAX
   manufacturer: MPP-Solar
   port:
-    baud: 2400
-    path: /dev/ttyUSB0
     type: test
     protocol: PI30MAX
 

@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
 import logging
 import re
-from enum import StrEnum, auto
+from enum import auto
+from strenum import StrEnum
 
 # from time import sleep
 log = logging.getLogger("Formatter")
+
 
 class FormatterType(StrEnum):
     HASS = auto()
@@ -14,12 +16,12 @@ class FormatterType(StrEnum):
     TABLE = auto()
     TOPICS = auto()
 
-class AbstractFormat(ABC):
 
+class AbstractFormat(ABC):
     def __init__(self, formatConfig):
         self.remove_spaces = formatConfig.get("remove_spaces", True)
         self.keep_case = formatConfig.get("keep_case", False)
-        
+
         self._keyFilter = None
         _keyFilterString = formatConfig.get("filter", None)
         if _keyFilterString is not None:
@@ -30,17 +32,16 @@ class AbstractFormat(ABC):
         if _keyExclusionFilterString is not None:
             self._keyExclusionfilter = re.compile(_keyExclusionFilterString)
 
-   
     @abstractmethod
     def format(self, data):
         pass
 
-    #Override this if the format sends multiple messages
+    # Override this if the format sends multiple messages
     def sendsMultipleMessages(self) -> bool:
         return False
 
     def formatAndFilterData(self, data):
-        #TODO: should we make data a proper object so it's easy to get the data we want?
+        # TODO: should we make data a proper object so it's easy to get the data we want?
         # remove raw response
         if "raw_response" in data:
             data.pop("raw_response")
@@ -67,7 +68,9 @@ class AbstractFormat(ABC):
 
     def isKeyWanted(self, key) -> bool:
         # remove any specifically excluded keys
-        if self._keyExclusionfilter is not None and self._keyExclusionfilter.search(key):
+        if self._keyExclusionfilter is not None and self._keyExclusionfilter.search(
+            key
+        ):
             # log.debug(f"key_wanted: key {key} matches excl_filter {excl_filter} so key excluded")
             return False
         if self._keyFilter is None:

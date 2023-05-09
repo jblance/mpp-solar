@@ -1,0 +1,26 @@
+services:
+  mppsolar:
+    network_mode: none
+    # devices:
+    #  - /dev/hidraw0:/dev/hidraw0
+    # volumes:
+    #   #Bind over the configuration
+    #   # - type: bind
+    #   #   source: ./docker/dev/config/
+    #   #   target: /config
+    #   #Bind the code
+    #   - type: bind
+    #     source: ../..
+    #     target: /mpp-solar
+    build:
+      context: ./
+      dockerfile: docker/dev-min/Dockerfile
+    entrypoint:
+      #
+      # /bin/sh
+      - mpp-solar
+      # - -v
+      # - /config/powermon-qpigs.yaml #Available due to volume binding above
+      # - --debug
+      #       - sleep
+      #       - infinity

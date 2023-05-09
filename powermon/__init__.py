@@ -29,27 +29,6 @@ from powermon.libs.configurationManager import ConfigurationManager
 log = logging.getLogger("")
 
 
-class ConfigError(Exception):
-    """Exception for invaild configurations"""
-
-
-SAMPLE_CONFIG = """
-device:
-  name: Test_Inverter
-  serial_id: 123456789
-  port:
-    path: /dev/ttyUSB0
-    type: test
-    baud: 2400
-    protocol: PI30
-  commands:
-    - command: QPI
-      outputs:
-      - name: screen
-  loop: once
-"""
-
-
 def read_yaml_file(yaml_file=None):
     """function to read a yaml file and return dict"""
     _yaml = {}
@@ -90,7 +69,9 @@ def main():
         const="./powermon.yaml",
         default=None,
     )
-    parser.add_argument("-v", "--version", action="store_true", help="Display the version")
+    parser.add_argument(
+        "-v", "--version", action="store_true", help="Display the version"
+    )
     parser.add_argument(
         "-d",
         "--dumpConfig",
@@ -109,7 +90,9 @@ def main():
         action="store_true",
         help="Enable Debug and above (i.e. all) messages",
     )
-    parser.add_argument("-I", "--info", action="store_true", help="Enable Info and above level messages")
+    parser.add_argument(
+        "-I", "--info", action="store_true", help="Enable Info and above level messages"
+    )
     parser.add_argument(
         "--adhoc",
         type=str,
@@ -133,12 +116,11 @@ def main():
         print(description)
         return None
 
-    # Build configuration from defaults, config file and command line overrides
+    # Build configuration from config file and command line overrides
     log.info("Using config file: %s", args.configFile)
-    # build config - start with defaults
-    #config = yaml.safe_load(SAMPLE_CONFIG)
-    # build config - update with details from config file
+    # build config with details from config file
     config = read_yaml_file(args.configFile)
+
     # build config - override with any command line arguments
     config.update(process_command_line_overrides(args))
 
@@ -154,13 +136,13 @@ def main():
     # debug config
     log.info("config: %s", config)
 
-    # build mqtt broker object (optional)
-    mqtt_broker = MqttBroker(config=config.get("mqttbroker", {}))
-    log.debug("mqtt_broker: %s", mqtt_broker)
-
     # build device object (required)
     device = Device(config=config.get("device", None))
     log.debug("device: %s", device)
+
+    # build mqtt broker object (optional)
+    mqtt_broker = MqttBroker(config=config.get("mqttbroker", {}))
+    log.debug("mqtt_broker: %s", mqtt_broker)
 
     # build the daemon object (optional)
     daemon = Daemon(config=config)
