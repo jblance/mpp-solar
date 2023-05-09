@@ -573,7 +573,7 @@ class pi18(AbstractProtocol):
             "MCHGV",
             "MUCHGC",
         ]
-        self.DEFAULT_COMMAND = ["PI"]
+        self.DEFAULT_COMMAND = "PI"
         self.ID_COMMANDS = [("PI", "Protocol Version"), ("VFW", "Main CPU Version")]
 
     def get_full_command(self, command) -> bytes:

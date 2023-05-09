@@ -12,11 +12,14 @@ Currently has support for:
   - Voltronic Axpert MKS 5KVA Off-grid Inverter-Chargers
   - LV5048
 - JK BMS
-  - JK-B2A24S (HW version 3.0)
-  - JK-B1A24S (HW version 3.0)
 - Victron VE Direct Devices:
   - tested on SmartShunt 500A
 - Daly BMS
+
+## Install ##
+- `pip install mppsolar` (minimal install)
+- `pip install mppsolar[ble]` (install including BLE support aka jkbms)
+
 
 ## Documentation ##
 [See the wiki for documentation](https://github.com/jblance/mpp-solar/wiki)
