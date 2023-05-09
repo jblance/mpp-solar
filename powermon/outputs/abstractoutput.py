@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 import logging
 from enum import auto
-from strenum import StrEnum
+from strenum import LowercaseStrEnum
 
 
 log = logging.getLogger("Output")
 
 
-class OutputType(StrEnum):
+class OutputType(LowercaseStrEnum):
     SCREEN = auto()
     MQTT = auto()
     API_MQTT = auto()

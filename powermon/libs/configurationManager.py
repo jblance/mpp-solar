@@ -46,6 +46,7 @@ class ConfigurationManager:
         #Type is required
         formatType = formatConfig["type"]
 
+        formatter = None
         if formatType == FormatterType.HTMLTABLE:
             from powermon.formats.htmltable import htmltable
             formatter = htmltable(formatConfig)
@@ -99,7 +100,7 @@ class ConfigurationManager:
         _outputs = []
         for outputConfig in command_config["outputs"]:
             _output = ConfigurationManager.parseOutputConfig(outputConfig, results_topic, _schedule_name, device, mqtt_broker)
-            logging.debug(f"output: {_output}")
+            logging.debug(f"output type: {_output}")
             _outputs.append(_output)
 
         _command = None

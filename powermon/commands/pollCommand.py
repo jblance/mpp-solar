@@ -25,5 +25,5 @@ class PollCommand(AbstractCommand):
         log.debug(f"Running command: {self.command_query}")
         results = self.port.process_command(command=self.command_query)
         for output in self.outputs:
-            log.debug(f"Output: {output}")
+            log.debug(f"Using Output: {output}")
             output.output(data=results)

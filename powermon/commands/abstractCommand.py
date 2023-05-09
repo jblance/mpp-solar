@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
-from powermon.dto.commandDTO import CommandDTO
 import logging
+from enum import auto
+from strenum import LowercaseStrEnum
 
 
 log = logging.getLogger("Command")
 
-class CommandType():
-    POLL = "poll"
+class CommandType(LowercaseStrEnum):
+    POLL = auto()
 
 class AbstractCommand(ABC):
     def __init__(self,  schedule_name, outputs, port):
