@@ -1,7 +1,7 @@
 import logging
 
-from .abstractprotocol import AbstractProtocol
-from .protocol_helpers import crcPI as crc
+from mppsolar.protocols.abstractprotocol import AbstractProtocol
+from mppsolar.protocols.protocol_helpers import crcPI as crc
 
 log = logging.getLogger("pi30")
 

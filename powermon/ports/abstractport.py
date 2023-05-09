@@ -3,7 +3,7 @@ import logging
 from enum import auto
 from strenum import LowercaseStrEnum
 
-from mppsolar.protocols.abstractprotocol import AbstractProtocol
+# from mppsolar.protocols.abstractprotocol import AbstractProtocol
 
 # from time import sleep
 log = logging.getLogger("Port")
@@ -23,7 +23,7 @@ class PortType(LowercaseStrEnum):
 
 
 class AbstractPort(ABC):
-    def __init__(self, config, protocol: AbstractProtocol):
+    def __init__(self, config, protocol):
         self.protocol = protocol
 
     @abstractmethod
