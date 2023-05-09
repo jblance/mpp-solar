@@ -12,6 +12,10 @@ from .db import crud, models, schemas
 from .db.database import SessionLocal, engine
 from .mqtthandler import MQTTHandler
 
+from powermon.dto.powermonDTO import PowermonDTO
+from powermon.dto.scheduleDTO import ScheduleDTO
+from powermon.dto.resultDTO import ResultDTO
+
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -47,13 +51,16 @@ def connect(client, flags, rc, properties):
     #mqtt.client.subscribe(topic) #subscribing mqtt topic
     print("Connected: ", client, flags, rc, properties, topic)
 
-@mqtt.on_message()
-async def message(client, topic, payload, qos, properties):
+@mqtt.subscribe("powermon/testmon/results/#")
+async def listen_to_results(client, topic, payload, qos, properties):
     print("Received message for DB and long poll: ",topic, payload.decode(), qos, properties)
-    db = SessionLocal()
-    mqtt_message = crud.create_mqtt_message(db, schemas.MQTTMessage(id=1,topic=topic, message=payload.decode()))
+    # db = SessionLocal()
+    # mqtt_message = crud.create_mqtt_message(db, schemas.MQTTMessage(id=1,topic=topic, message=payload.decode()))
+    
+    result = ResultDTO.parse_raw(payload.decode())
+    print(f"Result: {result}")
     handler = MQTTHandler()
-    handler.recieved_message(mqtt_message)
+    handler.recieved_result(result)
 
 @mqtt.subscribe("powermon/announce")
 async def listen_to_announcements(client, topic, payload, qos, properties):
@@ -76,7 +83,7 @@ templates = Jinja2Templates(directory="api/app/templates")
 @app.get("/")
 def read_root(request: Request):
     handler = MQTTHandler()
-    devices = handler.get_schedules()
+    devices = handler.get_powermon_instances()
     print(devices)
     return templates.TemplateResponse("home.html.j2", {"request": request, "schedules": devices})
 
@@ -101,4 +108,39 @@ async def read_message(command_code: str, handler: MQTTHandler = Depends(get_mqt
     result = await handler.register_command(command_code)
     
     return result
+
+@app.get("/powermons/", response_model=list[PowermonDTO])
+async def read_power_monitors(handler: MQTTHandler = Depends(get_mqtthandler)):
+    result = None
+
+    result = await handler.get_powermon_instances()
     
+    return result
+    
+@app.get("/powermons/{powermon_name}", response_model=PowermonDTO)
+async def read_power_monitors(powermon_name: str, handler: MQTTHandler = Depends(get_mqtthandler)):
+    result = None
+
+    result = await handler.get_powermon_instance(powermon_name)
+    
+    return result
+   
+@app.get("/powermons/{powermon_name}/schedules", response_model=list[ScheduleDTO])
+async def read_schedules(powermon_name: str, handler: MQTTHandler = Depends(get_mqtthandler)):
+    result = None
+
+    result = await handler.get_powermon_instance(powermon_name)
+    
+    if(result == None):
+        raise HTTPException(status_code=404, detail="Powermon not found")
+    return result.schedulesCommands
+
+@app.get("/results/", response_model=list[ResultDTO])
+async def read_results(handler: MQTTHandler = Depends(get_mqtthandler)):
+    result = None
+
+    result = await handler.get_results()
+    if(result == None):
+        raise HTTPException(status_code=404, detail="No command results found")
+    
+    return result

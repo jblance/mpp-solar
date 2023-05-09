@@ -3,7 +3,10 @@ import random
 
 # from mppsolar.helpers import get_kwargs
 from .abstractport import AbstractPort
-from dto.portDTO import PortDTO
+
+from powermon.dto.portDTO import PortDTO
+
+# import re
 
 
 log = logging.getLogger("test")
@@ -16,11 +19,11 @@ class TestPort(AbstractPort):
 
     def __str__(self):
         return "Test port"
-
+    
     def toDTO(self) -> PortDTO:
         dto = PortDTO(type="test", protocol=self.protocol.toDTO())
         return dto
-
+    
     def protocol(self):
         return super().protocol()
 

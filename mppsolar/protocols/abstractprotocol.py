@@ -3,7 +3,7 @@ import calendar  # noqa: F401
 import logging
 import re
 from typing import Tuple
-from dto.protocolDTO import ProtocolDTO
+from powermon.dto.protocolDTO import ProtocolDTO
 
 from ..helpers import get_resp_defn, get_value
 from .protocol_helpers import BigHex2Short, BigHex2Float  # noqa: F401

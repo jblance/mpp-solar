@@ -35,8 +35,8 @@ services:
         source: ./api/
         target: /code/api/
       - type: bind
-        source: ./dto/
-        target: /code/dto/
+        source: ./powermon/dto/
+        target: /code/powermon/dto/
     build: 
       context: api
       dockerfile: Dockerfile.development

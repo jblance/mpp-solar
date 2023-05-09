@@ -1,7 +1,7 @@
 import logging
 import serial
 import time
-from dto.portDTO import PortDTO
+from powermon.dto.portDTO import PortDTO
 
 from .abstractport import AbstractPort
 
