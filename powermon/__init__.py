@@ -151,11 +151,11 @@ def main():
     # TODO: follow same pattern as others, eg
     # scheduleController = ScheduleController(config=config.get("schedules"), device=, mqtt_broker=)
     controller = ConfigurationManager.parseControllerConfig(config, device, mqtt_broker)
-    log.info("controller: %s" % controller)
+    log.info(controller)
 
     # build api coordinator
     api_coordinator = ApiCoordinator(config=config.get("api"), device=device, mqtt_broker=mqtt_broker, schedule=controller)
-    log.info("api_coordinator: %s" % api_coordinator)
+    log.info(api_coordinator)
     # TODO: run in the schedule loop
 
     # initialize daemon

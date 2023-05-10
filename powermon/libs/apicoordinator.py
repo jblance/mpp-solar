@@ -7,17 +7,23 @@ log = logging.getLogger("APICoordinator")
 
 
 class ApiCoordinator:
+    def __str__(self):
+        if self.disabled:
+            return "ApiCoordinator DISABLED"
+        return f"ApiCoordinator: adhocTopic: {self.adhocTopic}, announceTopic: {self.announceTopic}, schedule: {self.schedule}"
+
     def __init__(self, config, device, mqtt_broker, schedule: ScheduleController):
+        log.debug(f"config: {config}")
         self.device = device
         self.mqtt_broker = mqtt_broker
         self.schedule = schedule
         self.count = 0
         if not config:
-            log.info("api disabled")
             self.disabled = True
             return
         self.adhocTopic = config.get("adhoc_topic", "powermon/adhoc")
         self.announceTopic = config.get("announce_topic", "powermon/announce")
+        self.disabled = False
 
         self.announceDevice()
         mqtt_broker.subscribe(self.adhocTopic, self.adhocCallback)

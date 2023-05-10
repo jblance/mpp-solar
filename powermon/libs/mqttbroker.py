@@ -28,6 +28,7 @@ class MqttBroker:
         if self.name is None:
             self.disabled = True
         else:
+            self.disabled = False
             self.mqttc = mqtt_client.Client()
 
     def on_connect(self, client, userdata, flags, rc):

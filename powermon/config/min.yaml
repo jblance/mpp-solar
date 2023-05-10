@@ -30,6 +30,6 @@ commands:
     #   filter: ^ac|^pv
 - command: QPI
 
-# daemon:
-#   type: systemd
-#   keepalive: 100
+daemon:
+  # type: initd
+  # keepalive: 100

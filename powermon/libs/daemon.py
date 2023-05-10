@@ -28,6 +28,7 @@ class Daemon:
             self.disabled = True
             log.debug("daemon not configured, disabling")
         if config is not None:
+            self.disabled = False
             self.type = config.get("type", None)
             self.keepalive = config.get("keepalive", 60)
             log.debug(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
