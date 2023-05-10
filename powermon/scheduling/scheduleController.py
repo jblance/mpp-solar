@@ -15,6 +15,8 @@ log = logging.getLogger("ScheduleController")
 
 class ScheduleController:
     def __init__(self, name, schedules: list[AbstractSchedule], loop_duration: int, mqtt_broker: MqttBroker, device: Device):
+        if not name:
+            name = "default"
         self._name = name
         self._schedules = schedules
         self._loop_duration = loop_duration
@@ -30,6 +32,7 @@ class ScheduleController:
         schedule_dtos = []
         for scheduledCommand in self._schedules:
             schedule_dtos.append(scheduledCommand.toDTO())
+        log.debug(f"name={self._name}, loop_duration={self._loop_duration}, device={self.device.toDTO()}, schedules={schedule_dtos}")
         dto = PowermonDTO(name=self._name, loop_duration=self._loop_duration, device=self.device.toDTO(), schedules=schedule_dtos)
         return dto
 

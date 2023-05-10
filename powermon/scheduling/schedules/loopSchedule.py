@@ -2,14 +2,16 @@ from .abstractSchedule import AbstractSchedule
 from .abstractSchedule import ScheduleType
 from powermon.dto.scheduleDTO import ScheduleDTO
 
+
 class LoopSchedule(AbstractSchedule):
     def __init__(self, name: str, loopCount: int):
         super().__init__(name)
         self.loopCount = loopCount
-        self.currentLoopCount = loopCount # Set to loopCount so that the first loop will run
+        self.currentLoopCount = loopCount  # Set to loopCount so that the first loop will run
+        self.scheduleType = ScheduleType.LOOP
 
     def __str__(self):
-        return f"ScheduleType: {self.scheduleType}, LoopCount: {self.loopCount}, Commands: {self.command}"
+        return f"ScheduleType: {self.scheduleType}, LoopCount: {self.loopCount}, Commands: {self.commands}"
 
     def toDTO(self):
         _command_dtos = []
