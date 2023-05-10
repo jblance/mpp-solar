@@ -141,7 +141,7 @@ class ConfigurationManager:
         logging.debug("parseCoordinatorConfig")
         logging.debug(f"config: {config}")
         _name = config.get("name")
-        _loopDuration = config.get("loop_duration", 60)
+        _loopDuration = config.get("loop_duration", 0)
         if _loopDuration == "once":
             _loopDuration = 0
 
