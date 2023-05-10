@@ -16,18 +16,21 @@ class dummyNotification(Enum):
 
 class Daemon:
     def __str__(self):
+        if self.disabled:
+            return "Daemon DISABLED"
         return f"Daemon name: {self.type}"
 
     def __init__(self, config={}):
 
         if config is None:
-            self.type = None
-            self.keepalive = 60
+            self.type = "disabled"
+            self.keepalive = 0
+            self.disabled = True
+            log.debug("daemon not configured, disabling")
         if config is not None:
             self.type = config.get("type", None)
             self.keepalive = config.get("keepalive", 60)
-
-        log.debug(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
+            log.debug(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
 
         if self.type == "systemd":
             try:
@@ -49,11 +52,15 @@ class Daemon:
         self.notify(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
 
     def initialize(self, *args, **kwargs):
+        if self.disabled:
+            return
         # Send READY=1
         self._notify(self._Notification.READY)
         self._lastNotify = time()
 
     def watchdog(self, *args, **kwargs):
+        if self.disabled:
+            return
         elapsed = time() - self._lastNotify
         if (elapsed) > self.keepalive:
             self._notify(self._Notification.WATCHDOG)
@@ -61,6 +68,8 @@ class Daemon:
             self._journal(f"Daemon notify at {self._lastNotify}")
 
     def notify(self, *args, **kwargs):
+        if self.disabled:
+            return
         # Send status
         if args:
             status = args[0]
@@ -69,10 +78,14 @@ class Daemon:
         self._notify(self._Notification.STATUS, status)
 
     def stop(self, *args, **kwargs):
+        if self.disabled:
+            return
         # Send stopping
         self._notify(self._Notification.STOPPING)
 
     def log(self, *args, **kwargs):
+        if self.disabled:
+            return
         # Print log message
         if args:
             self._journal(args[0])
@@ -81,4 +94,4 @@ class Daemon:
         # Print log message
         # if args:
         #     print(args[0])
-        pass
+        return
