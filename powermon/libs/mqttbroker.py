@@ -27,6 +27,7 @@ class MqttBroker:
         if self.name is None:
             log.info("mqttbroker not configured")
             self.enabled = False
+            self._isConnected = False
         else:
             self.mqttc = mqtt_client.Client()
             self.enabled = True
@@ -111,6 +112,8 @@ class MqttBroker:
     def subscribe(self, topic, callback):
         # subscribe to mqtt topic
         if not self.name:
+            return
+        if not self.enabled:
             return
         # check if connected, connect if not
         if not self._isConnected:
