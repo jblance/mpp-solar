@@ -26,7 +26,7 @@ class ScheduleController:
         self.delayRemaining = loop_duration
 
     def __str__(self):
-        return f"Schedule: {self._schedules}, {self._loop_duration}"
+        return f"Schedule: {self._schedules}, loop duration: {self._loop_duration}"
 
     def toDTO(self) -> PowermonDTO:
         schedule_dtos = []
