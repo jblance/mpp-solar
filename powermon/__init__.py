@@ -184,7 +184,7 @@ def main():
         print(general_exception)
     finally:
         # disconnect device
-        # device.disconnect()
+        device.finalize()
 
         # disconnect mqtt
         mqtt_broker.stop()

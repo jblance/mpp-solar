@@ -53,3 +53,6 @@ class Device:
 
     def initialize(self):
         return
+
+    def finalize(self):
+        return
