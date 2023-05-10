@@ -20,15 +20,14 @@ class Daemon:
 
     def __init__(self, config={}):
 
-        daemon_config = config.get("daemon")
-        if daemon_config is None:
+        if config is None:
             self.type = None
             self.keepalive = 60
-        if daemon_config is not None:
-            self.type = daemon_config.get("type", None)
-            self.keepalive = daemon_config.get("keepalive", 60)
+        if config is not None:
+            self.type = config.get("type", None)
+            self.keepalive = config.get("keepalive", 60)
 
-        log.info(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
+        log.debug(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
 
         if self.type == "systemd":
             try:

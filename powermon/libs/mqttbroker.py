@@ -16,14 +16,16 @@ class MqttBroker:
 
     # def __init__(self, *args, **kwargs):
     def __init__(self, config={}):
-
         log.debug(f"mqttbroker config: {config}")
-        self.name = config.get("name")
-        self.port = config.get("port", 1883)
-        self.username = config.get("user")
-        self.password = config.get("pass")
-        self._isConnected = False
+        self.name = None
+        if config:
+            self.name = config.get("name")
+            self.port = config.get("port", 1883)
+            self.username = config.get("user")
+            self.password = config.get("pass")
+            self._isConnected = False
         if self.name is None:
+            log.info("mqttbroker not configured")
             self.enabled = False
         else:
             self.mqttc = mqtt_client.Client()

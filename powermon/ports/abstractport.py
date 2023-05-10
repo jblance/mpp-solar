@@ -1,11 +1,12 @@
-from abc import ABC, abstractmethod
 import logging
+from abc import ABC, abstractmethod
 from enum import auto
+
 from strenum import LowercaseStrEnum
 
-# from mppsolar.protocols.abstractprotocol import AbstractProtocol
+from mppsolar.protocols import get_protocol
 
-# from time import sleep
+
 log = logging.getLogger("Port")
 
 
@@ -23,7 +24,9 @@ class PortType(LowercaseStrEnum):
 
 
 class AbstractPort(ABC):
-    def __init__(self, config, protocol):
+    def __init__(self, config):
+        # get protocol handler
+        protocol = get_protocol(protocol=config.get("protocol"))
         self.protocol = protocol
 
     @abstractmethod
@@ -44,7 +47,7 @@ class AbstractPort(ABC):
     def toDTO(self):
         raise NotImplementedError
 
-    # Question: Should we make this an abstract method?
+    # QUESTION: Should we make this an abstract method?
     def process_command(self, command):
         # Band-aid solution, need to reduce what is sent
         log.debug(f"Command {command}")
@@ -65,7 +68,7 @@ class AbstractPort(ABC):
                 ]
             }
         # dict is returned on exception
-        # Question: What case is this covering?
+        # QUESTION: What case is this covering?
         if isinstance(raw_response, dict):
             return raw_response
 

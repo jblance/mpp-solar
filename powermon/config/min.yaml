@@ -1,0 +1,35 @@
+# yaml config for powermon
+device:
+  name: Test_Inverter
+  id: 123456789
+  model: 8048MAX
+  manufacturer: MPP-Solar
+  port:
+    type: test
+    protocol: PI30MAX
+
+commands:
+- command: QPIGS
+  type: basic #so far not neccessary, might remove
+  trigger: # default to something sensible
+  - loop: 6 # run every 6 loops
+  - at: "15:00" # run at/near to 3pm localtime
+  - every: 60 # run every 60 seconds (approx)
+  - ondemand: True # (maybe) to allow config to be setup in advance??
+  outputs:
+  - type: screen
+    # format: hass
+    # format: raw
+    format: simple
+    # format: table
+    # format: 
+    #   type: htmltable
+    #   #keep_case: True
+    #   #remove_spaces: False
+    #   #extra_info: True
+    #   filter: ^ac|^pv
+- command: QPI
+
+# daemon:
+#   type: systemd
+#   keepalive: 100
