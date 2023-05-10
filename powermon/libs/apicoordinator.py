@@ -13,7 +13,9 @@ class ApiCoordinator:
         self.schedule = schedule
         self.count = 0
         if not config:
-            config = {"adhoc_topic": "powermon/adhoc"}
+            log.info("api disabled")
+            self.disabled = True
+            return
         self.adhocTopic = config.get("adhoc_topic", "powermon/adhoc")
         self.announceTopic = config.get("announce_topic", "powermon/announce")
 
@@ -37,6 +39,8 @@ class ApiCoordinator:
             self.schedule.addOneTimeCommandFromConfig(command)
 
     def run(self):
+        if self.disabled:
+            return
         if self.count > 100:
             log.info("Starting APICoordinator")
             self.announceDevice()
