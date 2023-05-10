@@ -110,13 +110,16 @@ class ConfigurationManager:
 
     @staticmethod
     def parseCommandConfig(command_config: dict, topic_prefix: str, mqtt_broker: MqttBroker, device: Device):
-        _command_query = command_config["command_query"]
-        _commandType = command_config["type"]
-        _schedule_name = command_config["schedule_name"]
+        _command_query = command_config.get("command_query")
+        if not _command_query:
+            log.warn(f"No command_query for config: {command_config}")
+            return None
+        _commandType = command_config.get("type")
+        _schedule_name = command_config.get("schedule_name")
         results_topic = topic_prefix + _schedule_name + "/results/" + _command_query
 
         _outputs = []
-        for outputConfig in command_config["outputs"]:
+        for outputConfig in command_config.get("outputs"):
             _output = ConfigurationManager.parseOutputConfig(outputConfig, results_topic, _schedule_name, device, mqtt_broker)
             logging.debug(f"output type: {_output}")
             _outputs.append(_output)
@@ -148,9 +151,9 @@ class ConfigurationManager:
             _commands.append(ConfigurationManager.parseCommandConfig(command_config, topic_prefix, mqtt_broker, device))
 
         _schedules = []
-        for schedule in config["schedules"]:
-            _schedule_type = schedule["type"]
-            _schedule_name = schedule["name"]
+        for schedule in config.get("schedules", [{"type": "once"}]):
+            _schedule_type = schedule.get("type")
+            _schedule_name = schedule.get("name", "default")
             if _schedule_type == ScheduleType.LOOP:
                 _loopCount = schedule["loop_count"]
             elif _schedule_type == ScheduleType.TIME:
@@ -164,7 +167,7 @@ class ConfigurationManager:
                 raise KeyError(f"Undefined schedule type: {_schedule_type}")
 
             for command in _commands:
-                if command.schedule_name == _schedule_name:
+                if command and command.schedule_name == _schedule_name:
                     log.info("Adding command: %s" % command)
                     _schedule.add_command(command)
 

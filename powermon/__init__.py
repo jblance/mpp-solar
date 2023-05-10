@@ -132,20 +132,20 @@ def main():
 
     # build device object (required)
     device = Device(config=config.get("device"))
-    log.info("device: %s" % device)
+    log.info(device)
 
     # build mqtt broker object (optional)
     mqtt_broker = MqttBroker(config=config.get("mqttbroker"))
-    log.info("mqtt_broker: %s" % mqtt_broker)
+    log.info(mqtt_broker)
 
     # build the daemon object (optional)
     daemon = Daemon(config=config.get("daemon"))
-    log.info("daemon: %s" % daemon)
+    log.info(daemon)
 
     # build queue of commands
     # QUESTION: should mqtt_broker and controller/command queue be part of device...
     device.commandQueue = CommandQueue(config=config.get("commands"))
-    log.info("device: %s" % device)
+    log.info(device.commandQueue)
 
     # build controller
     # TODO: follow same pattern as others, eg
@@ -161,8 +161,8 @@ def main():
     # initialize daemon
     daemon.initialize()
 
-    # connect to device
-    # device.connect()
+    # initialize device
+    device.initialize()
     controller.beforeLoop()
 
     # Main working loop
