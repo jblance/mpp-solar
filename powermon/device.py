@@ -56,3 +56,10 @@ class Device:
 
     def finalize(self):
         return
+
+    def runLoop(self):
+        for command in self.commandQueue.commands:
+            if command.dueToRun():
+                command.run(device=self)
+
+        return True

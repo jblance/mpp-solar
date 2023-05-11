@@ -156,7 +156,6 @@ def main():
     # build api coordinator
     api_coordinator = ApiCoordinator(config=config.get("api"), device=device, mqtt_broker=mqtt_broker, schedule=controller)
     log.info(api_coordinator)
-    # TODO: run in the schedule loop
 
     # initialize daemon
     daemon.initialize()
@@ -173,7 +172,7 @@ def main():
             daemon.watchdog()
 
             # run schedule loop
-            keep_looping = controller.runLoop()
+            keep_looping = controller.runLoop() or device.runLoop()
 
             # run api coordinator ...
             api_coordinator.run()

@@ -11,11 +11,14 @@ device:
 commands:
 - command: QPIGS
   type: basic #so far not neccessary, might remove
-  trigger: # default to something sensible (only one of the below is needed/used)
-  - loop: 6 # run every 6 loops
-  - at: "15:00" # run at/near to 3pm localtime
-  - every: 60 # run every 60 seconds (approx)
-  - ondemand: True # (maybe) to allow config to be setup in advance??
+  # trigger: # default to something sensible (only one of the below is needed/used)
+  # - loops: 6 # run every 6 loops
+  # trigger:
+  # - at: "15:00" # run at/near to 3pm localtime
+  trigger:
+    every: 25 # run every 60 seconds (approx)
+  # trigger: ondemand # (maybe) to allow config to be setup in advance??
+  # trigger: disabled # excludes from 'once' runs
   outputs:
   - type: screen
     # format: hass
@@ -29,6 +32,12 @@ commands:
     #   #extra_info: True
     #   filter: ^ac|^pv
 - command: QPI
+- command: QID
+  trigger:
+    at: "12:56"
+- command: QMON
+  trigger:
+    loops: 50
 
 daemon:
   # type: initd
