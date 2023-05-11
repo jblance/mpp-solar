@@ -7,6 +7,8 @@ log = logging.getLogger("Command")
 
 class Command:
     def __str__(self):
+        if self.command is None:
+            return "empty command object"
         if self.last_run is None:
             last_run = "Not yet run"
         else:
@@ -21,9 +23,13 @@ class Command:
     def __init__(self, config):
         if not config:
             log.warning("Invalid command config")
-            return None
+            raise TypeError("Invalid command config")
+            # return None
 
         self.command = config.get("command")
+        if self.command is None:
+            log.warning("command must be defined")
+            raise TypeError("command must be defined")
         self.type = config.get("type", "basic")
         self.last_run = None
         self.trigger = Trigger(config=config.get("trigger"))

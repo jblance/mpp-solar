@@ -16,4 +16,9 @@ class CommandQueue:
         log.debug(f"commandQueue, config: {config}")
         self.commands = []
         for command in config:
-            self.commands.append(Command(config=command))
+            try:
+                _command = Command(config=command)
+            except TypeError:
+                _command = None
+            if _command is not None:
+                self.commands.append(_command)

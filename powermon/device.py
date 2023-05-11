@@ -58,8 +58,11 @@ class Device:
         return
 
     def runLoop(self):
-        for command in self.commandQueue.commands:
-            if command.dueToRun():
-                command.run(device=self)
-
-        return True
+        if self.commandQueue.commands:
+            for command in self.commandQueue.commands:
+                if command.dueToRun():
+                    command.run(device=self)
+            return True
+        else:
+            log.info("no commands in queue")
+            return False
