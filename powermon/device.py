@@ -52,9 +52,11 @@ class Device:
         return dto
 
     def initialize(self):
+        log.info("initializing device")
         return
 
     def finalize(self):
+        log.info("finalizing device")
         return
 
     def runLoop(self):
