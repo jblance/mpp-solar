@@ -1,22 +1,34 @@
 import yaml
 import logging
-import json
+# import json
 from powermon.scheduling.scheduleController import ScheduleController
 
 log = logging.getLogger("APICoordinator")
+
+
 class ApiCoordinator:
-    def __init__(self, config, device, mqtt_broker, schedule : ScheduleController):
+    def __str__(self):
+        if self.disabled:
+            return "ApiCoordinator DISABLED"
+        return f"ApiCoordinator: adhocTopic: {self.adhocTopic}, announceTopic: {self.announceTopic}, schedule: {self.schedule}"
+
+    def __init__(self, config, device, mqtt_broker, schedule: ScheduleController):
+        log.debug(f"config: {config}")
         self.device = device
         self.mqtt_broker = mqtt_broker
         self.schedule = schedule
         self.count = 0
+        if not config:
+            self.disabled = True
+            return
         self.adhocTopic = config.get("adhoc_topic", "powermon/adhoc")
         self.announceTopic = config.get("announce_topic", "powermon/announce")
+        self.disabled = False
 
         self.announceDevice()
         mqtt_broker.subscribe(self.adhocTopic, self.adhocCallback)
 
-        #mqtt_broker.publish(self.announceTopic, self.schedule.getScheduleConfigAsJSON())
+        # mqtt_broker.publish(self.announceTopic, self.schedule.getScheduleConfigAsJSON())
 
     def adhocCallback(self, client, userdata, msg):
         log.info(f"Received `{msg.payload}` on topic `{msg.topic}`")
@@ -33,7 +45,9 @@ class ApiCoordinator:
             self.schedule.addOneTimeCommandFromConfig(command)
 
     def run(self):
-        if(self.count > 100):
+        if self.disabled:
+            return
+        if self.count > 100:
             log.info("Starting APICoordinator")
             self.announceDevice()
             self.count = 0

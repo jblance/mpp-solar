@@ -8,8 +8,9 @@ from powermon.outputs.abstractoutput import AbstractOutput
 
 log = logging.getLogger("Command")
 
+
 class PollCommand(AbstractCommand):
-    def __init__(self, command_query, commandType, schedule_name, outputs : list[AbstractOutput], port : AbstractPort):
+    def __init__(self, command_query, commandType, schedule_name, outputs: list[AbstractOutput], port: AbstractPort):
         super().__init__(schedule_name, outputs, port)
         self.command_query = command_query
         self.commandType = commandType

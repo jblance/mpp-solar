@@ -7,21 +7,19 @@ from argparse import ArgumentParser
 # from collections import deque
 from datetime import date, timedelta  # noqa: F401
 
-# from time import sleep, time
-
 import yaml
 
-
 from mppsolar.version import __version__  # noqa: F401
+
+# from powermon.scheduling.scheduleController import ScheduleController
+from powermon.device import Device
+from powermon.libs.apicoordinator import ApiCoordinator
+from powermon.libs.commandQueue import CommandQueue
+from powermon.libs.configurationManager import ConfigurationManager
 from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
 
-from powermon.scheduling.scheduleController import ScheduleController
-from powermon.device import Device
-from powermon.libs.apicoordinator import ApiCoordinator
-
-from powermon.libs.configurationManager import ConfigurationManager
-
+# from time import sleep, time
 # from powermon.ports import getPortFromConfig
 
 
@@ -69,9 +67,7 @@ def main():
         const="./powermon.yaml",
         default=None,
     )
-    parser.add_argument(
-        "-v", "--version", action="store_true", help="Display the version"
-    )
+    parser.add_argument("-v", "--version", action="store_true", help="Display the version")
     parser.add_argument(
         "-d",
         "--dumpConfig",
@@ -90,9 +86,7 @@ def main():
         action="store_true",
         help="Enable Debug and above (i.e. all) messages",
     )
-    parser.add_argument(
-        "-I", "--info", action="store_true", help="Enable Info and above level messages"
-    )
+    parser.add_argument("-I", "--info", action="store_true", help="Enable Info and above level messages")
     parser.add_argument(
         "--adhoc",
         type=str,
@@ -134,43 +128,53 @@ def main():
         print(yaml.dump(config))
         return
     # debug config
-    log.info("config: %s", config)
+    log.info("config: %s" % config)
 
     # build device object (required)
-    device = Device(config=config.get("device", None))
-    log.debug("device: %s", device)
+    device = Device(config=config.get("device"))
+    log.info(device)
 
     # build mqtt broker object (optional)
-    mqtt_broker = MqttBroker(config=config.get("mqttbroker", {}))
-    log.debug("mqtt_broker: %s", mqtt_broker)
+    mqtt_broker = MqttBroker(config=config.get("mqttbroker"))
+    log.info(mqtt_broker)
 
     # build the daemon object (optional)
-    daemon = Daemon(config=config)
-    log.debug("daemon: %s", daemon)
+    daemon = Daemon(config=config.get("daemon"))
+    log.info(daemon)
 
-    # Get scheduled commands
-    schedule_config = config.get("schedules", None)
-    log.debug("schedules: %s", schedule_config)
+    # build queue of commands
+    # QUESTION: should mqtt_broker and controller/command queue be part of device...
+    device.commandQueue = CommandQueue(config=config.get("commands"))
+    log.info(device.commandQueue)
+
+    # build controller
+    # TODO: follow same pattern as others, eg
+    # scheduleController = ScheduleController(config=config.get("schedules"), device=, mqtt_broker=)
     controller = ConfigurationManager.parseControllerConfig(config, device, mqtt_broker)
+    log.info(controller)
 
-    log.debug(controller)
-
-    # setup api coordinator
-    api_coordinator = ApiCoordinator(config=config.get("api", None), device=device, mqtt_broker=mqtt_broker, schedule=controller)
-    #TODO: run in the schedule loop
-    
+    # build api coordinator
+    api_coordinator = ApiCoordinator(config=config.get("api"), device=device, mqtt_broker=mqtt_broker, schedule=controller)
+    log.info(api_coordinator)
 
     # initialize daemon
     daemon.initialize()
 
+    # initialize device
+    device.initialize()
+    controller.beforeLoop()
+
     # Main working loop
     keep_looping = True
     try:
-        controller.beforeLoop()
         while keep_looping:
             # tell the daemon we're still working
             daemon.watchdog()
-            keep_looping = controller.runLoop()
+
+            # run schedule loop
+            keep_looping = controller.runLoop() or device.runLoop()
+
+            # run api coordinator ...
             api_coordinator.run()
 
     except KeyboardInterrupt:
@@ -178,9 +182,11 @@ def main():
     except Exception as general_exception:
         print(general_exception)
     finally:
-        # Disconnect port
-        # port.disconnect()
-        # Disconnect mqtt
+        # disconnect device
+        device.finalize()
+
+        # disconnect mqtt
         mqtt_broker.stop()
-        # Notify the daemon
+
+        # stop the daemon
         daemon.stop()

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mppsolar"
-version = "0.15.57"
+version = "0.15.58"
 description = "Package to communicate with Solar inverters and BMSs"
 authors = ["John Blance"]
 readme = "README.md"
@@ -39,3 +39,6 @@ build-backend = "poetry.core.masonry.api"
 mpp-solar = "mppsolar:main"
 jkbms = "mppsolar:main"
 powermon= "powermon:main"
+
+[tool.black]
+line-length = 149

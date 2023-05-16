@@ -9,26 +9,27 @@ log = logging.getLogger("mqttbroker")
 
 class MqttBroker:
     def __str__(self):
-        if self.enabled:
-            return f"MqttBroker name: {self.name}, port: {self.port}, user: {self.username}"
-        else:
+        if self.disabled:
             return "MqttBroker DISABLED"
+        else:
+            return f"MqttBroker name: {self.name}, port: {self.port}, user: {self.username}"
 
     # def __init__(self, *args, **kwargs):
     def __init__(self, config={}):
-
         log.debug(f"mqttbroker config: {config}")
-        self.name = config.get("name")
-        self.port = config.get("port", 1883)
-        self.username = config.get("user")
-        self.password = config.get("pass")
+        self.name = None
         self._isConnected = False
+        if config:
+            self.name = config.get("name")
+            self.port = config.get("port", 1883)
+            self.username = config.get("user")
+            self.password = config.get("pass")
+
         if self.name is None:
-            self.enabled = False
+            self.disabled = True
         else:
+            self.disabled = False
             self.mqttc = mqtt_client.Client()
-            self.enabled = True
-            self._isConnected = False
 
     def on_connect(self, client, userdata, flags, rc):
         # 0: Connection successful
@@ -57,11 +58,11 @@ class MqttBroker:
         self._isConnected = False
 
     def connect(self):
-        if not self.enabled:
+        if self.disabled:
             log.info(f"MQTT broker not enabled, was a broker name defined? '{self.name}'")
             return
         if not self.name:
-            log.info(f"MQTT did not connect as no broker name '{self.name}'")
+            log.info(f"MQTT could not connect as no broker name '{self.name}'")
             return
         self.mqttc.on_connect = self.on_connect
         self.mqttc.on_disconnect = self.on_disconnect
@@ -86,11 +87,15 @@ class MqttBroker:
             log.warn(f"{self.name} refused connection '{exc}'")
 
     def start(self):
+        if self.disabled:
+            return
         if self._isConnected:
             self.mqttc.loop_start()
 
     def stop(self):
         log.debug("Stopping mqttbroker connection")
+        if self.disabled:
+            return
         if self.name:
             self.mqttc.loop_stop()
             if self._isConnected:
@@ -110,6 +115,8 @@ class MqttBroker:
         # subscribe to mqtt topic
         if not self.name:
             return
+        if self.disabled:
+            return
         # check if connected, connect if not
         if not self._isConnected:
             log.debug("Not connected, connecting")
@@ -124,10 +131,16 @@ class MqttBroker:
             log.warn(f"Did not subscribe to topic {topic} as not connected to broker")
 
     def publishMultiple(self, data):
+        if self.disabled:
+            log.debug("Cannot publish msgs as mqttbroker disabled")
+            return
         for msg in data:
             self.publish(msg["topic"], msg["payload"])
 
     def publish(self, topic, payload):
+        if self.disabled:
+            log.debug("Cannot publish msg as mqttbroker disabled")
+            return
         log.debug(f"Publishing '{payload}' to '{topic}'")
         if self.name == "screen":
             print(f"mqtt debug output only as broker name is 'screen' - topic: '{topic}', payload: '{payload}'")
@@ -149,6 +162,9 @@ class MqttBroker:
     def setAdhocCommands(self, config={}, callback=None):
         if not config:
             return
+        if self.disabled:
+            log.debug("Cannot setAdhocCommands as mqttbroker disabled")
+            return
 
         adhoc_commands = config.get("adhoc_commands")
         # sub to command topic if defined
@@ -156,26 +172,3 @@ class MqttBroker:
         if adhoc_commands_topic is not None:
             log.info(f"Setting adhoc commands topic to {adhoc_commands_topic}")
             self.subscribe(adhoc_commands_topic, callback)
-
-
-# print("Connecting to "+args.host+" port: "+str(port))
-# mqttc.connect(args.host, port, args.keepalive)
-
-# mqttc.loop_start()
-
-# for x in range (0, args.nummsgs):
-#     msg_txt = '{"msgnum": "'+str(x)+'"}'
-#     print("Publishing: "+msg_txt)
-#     infot = mqttc.publish(args.topic, msg_txt, qos=args.qos)
-#     infot.wait_for_publish()
-
-#     time.sleep(args.delay)
-
-# mqttc.disconnect()
-
-
-if __name__ == "__main__":
-    broker = MqttBroker("brokername")
-    print(broker)
-    broker.name = "test1"
-    print(broker)
