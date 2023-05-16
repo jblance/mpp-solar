@@ -18,6 +18,7 @@ COMMANDS = {
         "response": [["string", "Protocol Version", ""]],
         "test_responses": [
             b"^D00518;\x03\r",
+            b"",
         ],
     },
     #    "T": {
@@ -641,6 +642,8 @@ class pi18(AbstractProtocol):
         """
         Override the default get_responses as its different for PI18
         """
+        if not response:
+            return ["No response"]
         responses = response.split(b",")
         if responses[0] == b"^0\x1b\xe3\r":
             # is a reject response
