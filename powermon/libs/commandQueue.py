@@ -15,6 +15,10 @@ class CommandQueue:
     def __init__(self, config={}):
         log.debug(f"commandQueue, config: {config}")
         self.commands = []
+        if not config:
+            log.debug("no commands config passed to commandQueue")
+            return
+
         for command in config:
             try:
                 _command = Command(config=command)

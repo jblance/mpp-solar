@@ -147,7 +147,7 @@ class ConfigurationManager:
 
         _commands = []
         topic_prefix = f"powermon/{_name}/results/"
-        for command_config in config["commands"]:
+        for command_config in config.get("commands", {}):
             _commands.append(ConfigurationManager.parseCommandConfig(command_config, topic_prefix, mqtt_broker, device))
 
         _schedules = []
