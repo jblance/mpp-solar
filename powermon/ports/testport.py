@@ -1,13 +1,8 @@
 import logging
 import random
 
-# from mppsolar.helpers import get_kwargs
-from .abstractport import AbstractPort
-
 from powermon.dto.portDTO import PortDTO
-
-# import re
-
+from powermon.ports.abstractport import AbstractPort
 
 log = logging.getLogger("test")
 

@@ -12,16 +12,16 @@ class hass(AbstractFormat):
         self.discovery_prefix = formatConfig.get("discovery_prefix", "homeassistant")
         self.entity_id_prefix = formatConfig.get("entity_id_prefix", "mpp")
         if device is None:
-            self.device_name="MPP Solar"
-            self.device_id="mpp-solar"
-            self.device_model="MPP Solar"
-            self.device_manufacturer="MPP Solar"
+            self.device_name = "MPP Solar"
+            self.device_id = "mpp-solar"
+            self.device_model = "MPP Solar"
+            self.device_manufacturer = "MPP Solar"
         else:
-            self.device_name=device.name
-            self.device_id=device.id
-            self.device_model=device.model
-            self.device_manufacturer=device.manufacturer
-        
+            self.device_name = device.name
+            self.device_id = device.id
+            self.device_model = device.model
+            self.device_manufacturer = device.manufacturer
+
     def sendsMultipleMessages(self) -> bool:
         return True
 
@@ -32,12 +32,11 @@ class hass(AbstractFormat):
         value_msgs = []
         if data is None:
             return []
-        
+
         displayData = self.formatAndFilterData(data)
 
         # build data to display
         for key in displayData:
-            
             # Get key data
             value = displayData[key][0]
             unit = displayData[key][1]
@@ -117,19 +116,6 @@ class hass(AbstractFormat):
             # Add state_class
             if state_class:
                 payload["state_class"] = state_class
-
-            # TODO move to protocol defs
-            # if unit == "W":
-            #    payload.update({"state_class": "measurement", "device_class": "power"})
-            # TODO move to protocol defs
-            # if unit == "Wh" or unit == "kWh":
-            #     payload.update(
-            #         {
-            #             "icon": "mdi:counter",
-            #             "device_class": "energy",
-            #             "state_class": "total",
-            #         }
-            #     )
 
             payloads = js.dumps(payload)
             # print(payloads)
