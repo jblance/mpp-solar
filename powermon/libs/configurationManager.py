@@ -1,23 +1,14 @@
 import logging
 
-from powermon.scheduling.scheduleController import ScheduleController
-from powermon.scheduling.schedules.abstractSchedule import AbstractSchedule
-from powermon.scheduling.schedules.abstractSchedule import ScheduleType
-from powermon.scheduling.schedules.loopSchedule import LoopSchedule
-from powermon.scheduling.schedules.onetimeSchedule import OneTimeSchedule
 from powermon.commands.abstractCommand import CommandType
 from powermon.commands.pollCommand import PollCommand
-
-from powermon.libs.mqttbroker import MqttBroker
-
-from powermon.formats.abstractformat import AbstractFormat
-from powermon.formats.abstractformat import FormatterType
-
-from powermon.outputs.abstractoutput import AbstractOutput
-from powermon.outputs.abstractoutput import OutputType
-
 from powermon.device import Device
-
+from powermon.libs.mqttbroker import MqttBroker
+from powermon.outputs import parseOutputConfig
+from powermon.scheduling.scheduleController import ScheduleController
+from powermon.scheduling.schedules.abstractSchedule import AbstractSchedule, ScheduleType
+from powermon.scheduling.schedules.loopSchedule import LoopSchedule
+from powermon.scheduling.schedules.onetimeSchedule import OneTimeSchedule
 
 log = logging.getLogger("ConfigurationManager")
 
@@ -40,79 +31,10 @@ class ConfigurationManager:
         return schedules
 
     @staticmethod
-    def getFormatfromConfig(formatConfig, device, topic) -> AbstractFormat:
-        # Get values from config
-        # Type is required
-        formatType = formatConfig["type"]
-
-        formatter = None
-        if formatType == FormatterType.HTMLTABLE:
-            from powermon.formats.htmltable import htmltable
-
-            formatter = htmltable(formatConfig)
-        elif formatType == FormatterType.HASS:
-            from powermon.formats.hass import hass
-
-            formatter = hass(formatConfig, device)
-        elif formatType == FormatterType.TOPICS:
-            from powermon.formats.topics import Topics
-
-            formatter = Topics(formatConfig, topic)
-        elif formatType == FormatterType.SIMPLE:
-            from powermon.formats.simple import simple
-
-            formatter = simple(formatConfig)
-        elif formatType == FormatterType.TABLE:
-            from powermon.formats.table import table
-
-            formatter = table(formatConfig)
-
-        else:
-            log.warning("No formatter found for: %s" % formatType)
-            formatter = None
-
-        return formatter
-
-    @staticmethod
-    def parseOutputConfig(
-        outputConfig: dict,
-        topic: str,
-        schedule_name: str,
-        device: Device,
-        mqtt_broker: MqttBroker,
-    ) -> AbstractOutput:
-        outputType = outputConfig["type"]
-
-        formatConfig = outputConfig["format"]
-        topic_override = outputConfig.get("topic_override", None)
-        # use topic override from the config
-        if topic_override is not None:
-            topic = topic_override
-
-        format = ConfigurationManager.getFormatfromConfig(formatConfig, device, topic)
-
-        output_class = None
-        # Only import the required class
-        if outputType == OutputType.SCREEN:
-            from powermon.outputs.screen import Screen
-
-            output_class = Screen(outputConfig, format)
-        elif outputType == OutputType.MQTT:
-            from powermon.outputs.mqtt import MQTT
-
-            output_class = MQTT(outputConfig, topic, mqtt_broker, format)
-        elif outputType == OutputType.API_MQTT:
-            from powermon.outputs.api_mqtt import API_MQTT
-
-            output_class = API_MQTT(outputConfig, topic, schedule_name, mqtt_broker, format)
-
-        return output_class
-
-    @staticmethod
     def parseCommandConfig(command_config: dict, topic_prefix: str, mqtt_broker: MqttBroker, device: Device):
         _command_query = command_config.get("command_query")
         if not _command_query:
-            log.warn(f"No command_query for config: {command_config}")
+            log.info(f"No command_query for config: {command_config}")
             return None
         _commandType = command_config.get("type")
         _schedule_name = command_config.get("schedule_name")
@@ -120,7 +42,7 @@ class ConfigurationManager:
 
         _outputs = []
         for outputConfig in command_config.get("outputs"):
-            _output = ConfigurationManager.parseOutputConfig(outputConfig, results_topic, _schedule_name, device, mqtt_broker)
+            _output = parseOutputConfig(outputConfig, results_topic, _schedule_name, device, mqtt_broker)
             logging.debug(f"output type: {_output}")
             _outputs.append(_output)
 
