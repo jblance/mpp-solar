@@ -8,6 +8,7 @@ log = logging.getLogger("table")
 class table(AbstractFormat):
     def __init__(self, formatConfig):
         super().__init__(formatConfig)
+        self.name = "table"
         self.extra_info = formatConfig.get("extra_info", False)
 
     def format(self, data):

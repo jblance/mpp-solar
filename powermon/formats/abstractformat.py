@@ -1,24 +1,18 @@
 from abc import ABC, abstractmethod
 import logging
 import re
-from enum import auto
-from strenum import LowercaseStrEnum
+
 
 # from time import sleep
 log = logging.getLogger("Formatter")
 
 
-class FormatterType(LowercaseStrEnum):
-    HASS = auto()
-    HTMLTABLE = auto()
-    RAW = auto()
-    SIMPLE = auto()
-    TABLE = auto()
-    TOPICS = auto()
-
-
 class AbstractFormat(ABC):
+    def __str__(self):
+        return f"Format: {self.name}"
+
     def __init__(self, formatConfig):
+        self.name = "AbstractFormat"
         self.remove_spaces = formatConfig.get("remove_spaces", True)
         self.keep_case = formatConfig.get("keep_case", False)
 
@@ -68,9 +62,7 @@ class AbstractFormat(ABC):
 
     def isKeyWanted(self, key) -> bool:
         # remove any specifically excluded keys
-        if self._keyExclusionfilter is not None and self._keyExclusionfilter.search(
-            key
-        ):
+        if self._keyExclusionfilter is not None and self._keyExclusionfilter.search(key):
             # log.debug(f"key_wanted: key {key} matches excl_filter {excl_filter} so key excluded")
             return False
         if self._keyFilter is None:

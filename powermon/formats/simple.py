@@ -7,6 +7,7 @@ log = logging.getLogger("simple")
 class simple(AbstractFormat):
     def __init__(self, formatConfig):
         super().__init__(formatConfig)
+        self.name = "simple"
         self.extra_info = formatConfig.get("extra_info", False)
 
     def format(self, data):
