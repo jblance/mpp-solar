@@ -18,7 +18,6 @@ COMMANDS = {
         "response": [["string", "Protocol Version", ""]],
         "test_responses": [
             b"^D00518;\x03\r",
-            b"",
         ],
     },
     #    "T": {
