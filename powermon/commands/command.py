@@ -1,6 +1,7 @@
 import logging
 from time import localtime, time, strftime
 from powermon.commands.trigger import Trigger
+from powermon.outputs import getOutputs
 
 log = logging.getLogger("Command")
 
@@ -12,15 +13,23 @@ class Command:
         if self.last_run is None:
             last_run = "Not yet run"
         else:
-            last_run = strftime('%d %b %Y %H:%M:%S', localtime(self.last_run))
+            last_run = strftime("%d %b %Y %H:%M:%S", localtime(self.last_run))
         if self.next_run is None:
             next_run = "unknown"
         else:
-            next_run = strftime('%d %b %Y %H:%M:%S', localtime(self.next_run))
+            next_run = strftime("%d %b %Y %H:%M:%S", localtime(self.next_run))
 
-        return f"Command: {self.command}, type: {self.type}, last run: {last_run}, next run: {next_run}, {self.trigger}"
+        _outs = ""
+        for output in self.outputs:
+            _outs += str(output)
+
+        return f"Command: {self.command}, type: {self.type}, outputs: [{_outs}] last run: {last_run}, next run: {next_run}, {self.trigger}"
 
     def __init__(self, config):
+        # need to have a config defined
+        # minimum is
+        # - command: QPI
+
         if not config:
             log.warning("Invalid command config")
             raise TypeError("Invalid command config")
@@ -28,9 +37,10 @@ class Command:
 
         self.command = config.get("command")
         if self.command is None:
-            log.warning("command must be defined")
+            log.info("command must be defined")
             raise TypeError("command must be defined")
         self.type = config.get("type", "basic")
+        self.outputs = getOutputs(config.get("outputs", ""))
         self.last_run = None
         self.trigger = Trigger(config=config.get("trigger"))
         self.next_run = self.trigger.nextRun(command=self)
@@ -44,4 +54,8 @@ class Command:
         self.last_run = time()
         # update next run time
         self.next_run = self.trigger.nextRun(command=self)
-        print(f"TODO: running command {self}")
+        # print(f"TODO: running command {self}")
+        results = device.port.process_command(command=self.command)
+        for output in self.outputs:
+            log.debug(f"Using Output: {output}")
+            output.output(data=results)
