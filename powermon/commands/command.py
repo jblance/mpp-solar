@@ -1,5 +1,5 @@
 import logging
-from time import localtime, time, strftime
+from time import localtime, strftime, time
 from powermon.commands.trigger import Trigger
 from powermon.outputs import getOutputs
 
@@ -8,7 +8,7 @@ log = logging.getLogger("Command")
 
 class Command:
     def __str__(self):
-        if self.command is None:
+        if self.name is None:
             return "empty command object"
         if self.last_run is None:
             last_run = "Not yet run"
@@ -23,7 +23,7 @@ class Command:
         for output in self.outputs:
             _outs += str(output)
 
-        return f"Command: {self.command}, type: {self.type}, outputs: [{_outs}] last run: {last_run}, next run: {next_run}, {self.trigger}"
+        return f"Command: {self.name}, type: {self.type}, outputs: [{_outs}] last run: {last_run}, next run: {next_run}, {self.trigger}, defn: {self.command_defn}"
 
     def __init__(self, config):
         # need to have a config defined
@@ -35,8 +35,8 @@ class Command:
             raise TypeError("Invalid command config")
             # return None
 
-        self.command = config.get("command")
-        if self.command is None:
+        self.name = config.get("command")
+        if self.name is None:
             log.info("command must be defined")
             raise TypeError("command must be defined")
         self.type = config.get("type", "basic")
@@ -44,18 +44,15 @@ class Command:
         self.last_run = None
         self.trigger = Trigger(config=config.get("trigger"))
         self.next_run = self.trigger.nextRun(command=self)
+        self.full_command = None
+        self.command_defn = None
         log.debug(self)
 
     def dueToRun(self):
         return self.trigger.isDue(command=self)
 
-    def run(self, device):
+    def touch(self):
         # store run time (as secs since epoch)
         self.last_run = time()
         # update next run time
         self.next_run = self.trigger.nextRun(command=self)
-        # print(f"TODO: running command {self}")
-        results = device.port.process_command(command=self.command)
-        for output in self.outputs:
-            log.debug(f"Using Output: {output}")
-            output.output(data=results)

@@ -11,7 +11,6 @@ import yaml
 from mppsolar.version import __version__  # noqa: F401
 from powermon.device import Device
 from powermon.libs.apicoordinator import ApiCoordinator
-from powermon.libs.commandQueue import CommandQueue
 from powermon.libs.configurationManager import ConfigurationManager
 from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
@@ -124,21 +123,17 @@ def main():
     log.info("config: %s" % config)
 
     # build device object (required)
-    device = Device(config=config.get("device"))
+    device = Device(config=config.get("device"), commandConfig=config.get("commands"))
     log.info(device)
 
     # build mqtt broker object (optional)
+    # QUESTION: should mqtt_broker be part of device...
     mqtt_broker = MqttBroker(config=config.get("mqttbroker"))
     log.info(mqtt_broker)
 
     # build the daemon object (optional)
     daemon = Daemon(config=config.get("daemon"))
     log.info(daemon)
-
-    # build queue of commands
-    # QUESTION: should mqtt_broker and controller/command queue be part of device...
-    device.commandQueue = CommandQueue(config=config.get("commands"))
-    log.info(device.commandQueue)
 
     # build controller
     # TODO: follow same pattern as others, eg

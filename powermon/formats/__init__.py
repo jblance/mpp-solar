@@ -4,7 +4,6 @@ from enum import auto
 from strenum import LowercaseStrEnum
 
 from powermon.formats.abstractformat import AbstractFormat
-from powermon.device import Device
 
 log = logging.getLogger("formats")
 
@@ -20,7 +19,7 @@ class FormatterType(LowercaseStrEnum):
     TOPICS = auto()
 
 
-def getFormatfromConfig(formatConfig: dict, device: Device, topic: str) -> AbstractFormat:
+def getFormatfromConfig(formatConfig, device, topic) -> AbstractFormat:
     # Get values from config
     log.debug("getFormatfromConfig, formatConfig: %s, device: %s, topic: %s" % (formatConfig, device, topic))
 

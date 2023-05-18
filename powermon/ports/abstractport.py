@@ -5,6 +5,8 @@ from enum import auto
 from strenum import LowercaseStrEnum
 
 from mppsolar.protocols import get_protocol
+# f`/rom powermon.commands.command import Command
+from powermon.libs.result import Result
 
 
 log = logging.getLogger("Port")
@@ -47,7 +49,17 @@ class AbstractPort(ABC):
     def toDTO(self):
         raise NotImplementedError
 
-    # QUESTION: Should we make this an abstract method?
+    def run_command(self, command):
+        # takes a command object, runs the command and returns a result object (replaces process_command)
+        log.debug(f"Command {command}")
+        result = Result(command)
+        result.raw_response = self.send_and_receive(command.name)
+        log.debug(f"after send_and_receive {result}")
+        # # Decode response
+        # result.decoded_response = self.protocol.decode_result(result, command)
+        # log.info(f"Decoded response {result.decoded_response}")
+        return result
+
     def process_command(self, command):
         # Band-aid solution, need to reduce what is sent
         log.debug(f"Command {command}")

@@ -28,13 +28,3 @@ class CommandQueue:
                 _command = None
             if _command is not None:
                 self.commands.append(_command)
-
-    def run_loop(self, device):
-        if self.commands:
-            for command in self.commands:
-                if command.dueToRun():
-                    command.run(device=device)
-            return True
-        else:
-            log.info("no commands in queue")
-            return False

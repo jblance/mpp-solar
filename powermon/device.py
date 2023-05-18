@@ -2,6 +2,7 @@
 import logging
 
 from powermon.dto.deviceDTO import DeviceDTO
+from powermon.libs.commandQueue import CommandQueue
 from powermon.ports import getPortFromConfig
 from powermon.ports.abstractport import AbstractPort
 
@@ -22,7 +23,7 @@ class Device:
     def __str__(self):
         return f"Device: {self.devicename}, identifier: {self.identifier}, model: {self.model}, manufacturer: {self.manufacturer}, port: {self.port}, queue: {self.commandQueue}"
 
-    def __init__(self, config):
+    def __init__(self, config=None, commandConfig={}):
         if not config:
             log.warning("No device definition in config. Check configFile argument?")
             config = {"identifier": "unsupplied"}
@@ -33,7 +34,11 @@ class Device:
         self.manufacturer = config.get("manufacturer")
         self.port = getPortFromConfig(config.get("port"))
 
-        self.commandQueue = None
+        # build queue of commands
+        if commandConfig is not None:
+            self.commandQueue = CommandQueue(config=commandConfig)
+        else:
+            self.commandQueue = None
 
         # error out if unable to configure port
         if not self.port:
@@ -61,4 +66,29 @@ class Device:
         return
 
     def runLoop(self):
-        return self.commandQueue.run_loop(device=self)
+        if self.commandQueue.commands is None:
+            log.info("no commands in queue")
+            return False
+        else:
+            for command in self.commandQueue.commands:
+                if command.dueToRun():
+                    # update run times
+                    command.touch()
+                    # check for definition
+                    if command.command_defn is None:
+                        command.command_defn = self.port.protocol.get_command_defn(command.name)
+                        log.debug("command_defn: %s" % command.command_defn)
+                    # update full_command - expand any template / add crc etc
+                    command.full_command = self.port.protocol.get_full_command(command.name)
+                    log.debug("full_command: %s" % command.full_command)
+                    # run command
+                    result = self.port.run_command(command)
+                    # decode result
+                    result.decoded_response = self.port.protocol.decode(result.raw_response, command.name)
+                    # loop each output and process result
+                    for output in command.outputs:
+                        log.debug(f"Using Output: {output}")
+                        output.output(data=result.decoded_response)
+                        # TODO: update outputer
+                        # output.process(result=result)
+            return True

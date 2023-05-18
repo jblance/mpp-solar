@@ -17,7 +17,6 @@ log = logging.getLogger("AbstractProtocol")
 
 
 class AbstractProtocol(metaclass=abc.ABCMeta):
-
     def __init__(self, *args, **kwargs) -> None:
         self._command = None
         self._command_dict = None
@@ -216,6 +215,22 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             data_name = eval(data_name)
         return [(data_name, r, data_units, extra_info)]
 
+    def decode_result(self, result, command):
+        log.info("decode_result: raw: %s, command: %s" % (result.raw_response, command.name))
+
+        # TODO: sort this so it isnt so carp
+        data = self.decode(result.raw_response, command.name)
+        # remove raw response
+        if "raw_response" in data:
+            data.pop("raw_response")
+        # remove command details
+        if "_command" in data:
+            data.pop("_command")
+        if "_command_description" in data:
+            data.pop("_command_description")
+        result.decoded_response = data
+        return result
+
     def decode(self, response, command) -> dict:
         """
         Take the raw response and turn it into a dict of name: value, unit entries
@@ -395,7 +410,6 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             frame_count = 1
 
         for frame_number, frame in enumerate(frames):
-
             for i, response in enumerate(frame):
                 extra_info = None
                 if response_type == "KEYED":
@@ -505,9 +519,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 # Check for lookup
                 if data_type.startswith("lookup"):
                     log.debug("processing lookup...")
-                    log.info(
-                        f"Processing data_type: '{data_type}' for data_name: '{data_name}', raw_value '{raw_value}'"
-                    )
+                    log.info(f"Processing data_type: '{data_type}' for data_name: '{data_name}', raw_value '{raw_value}'")
                     m = msgs
                     template = data_type.split(":", 1)[1]
                     log.debug(f"Got template {template} for {data_name} {raw_value}")

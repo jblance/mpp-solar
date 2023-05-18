@@ -12,6 +12,27 @@ class Screen(AbstractOutput):
         self.name = "Screen"
         # self.formatter = formatter
 
+    def process(self, result):
+        log.info("Using output sender: screen")
+        log.debug("formatter: %s" % self.formatter)
+
+        # TODO: sort to use result object properly
+        data = result.decoded_response
+        if data is None:
+            print("No data supplied")
+            return
+
+        formatted_data = self.formatter.process(data)
+        if formatted_data is None:
+            print("Nothing returned from data formatting")
+            return
+
+        if isinstance(formatted_data, list):
+            for line in formatted_data:
+                print(line)
+        else:
+            print(formatted_data)
+
     def output(self, data):
         log.info("Using output sender: screen")
         log.debug("formatter: %s" % self.formatter)
@@ -19,6 +40,8 @@ class Screen(AbstractOutput):
             print("No data supplied")
             return
 
+        # TODO: update for result object
+        # formatted_data = self.formatter.process(data)
         formatted_data = self.formatter.format(data)
         if formatted_data is None:
             print("Nothing returned from data formatting")
