@@ -1,11 +1,14 @@
 from pydantic import BaseModel
 
+
 class MQTTMessageBase(BaseModel):
     topic: str
     message: str
 
+
 class MQTTMessageCreate(MQTTMessageBase):
     pass
+
 
 class MQTTMessage(MQTTMessageBase):
     id: int
@@ -14,10 +17,11 @@ class MQTTMessage(MQTTMessageBase):
         orm_mode = True
 
 
-#Demo code
+# Demo code
 class ItemBase(BaseModel):
     title: str
-    description: str | None = None
+    # description: str | None = None
+    description: str
 
 
 class ItemCreate(ItemBase):
