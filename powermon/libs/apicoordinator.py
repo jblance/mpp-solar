@@ -1,6 +1,8 @@
-import yaml
 import logging
-# import json
+from time import time
+
+import yaml
+
 from powermon.scheduling.scheduleController import ScheduleController
 
 log = logging.getLogger("APICoordinator")
@@ -8,22 +10,28 @@ log = logging.getLogger("APICoordinator")
 
 class ApiCoordinator:
     def __str__(self):
-        if self.disabled:
+        if not self.enabled:
             return "ApiCoordinator DISABLED"
         return f"ApiCoordinator: adhocTopic: {self.adhocTopic}, announceTopic: {self.announceTopic}, schedule: {self.schedule}"
 
     def __init__(self, config, device, mqtt_broker, schedule: ScheduleController):
-        log.debug(f"config: {config}")
+        log.debug(f"ApiCoordinator config: {config}")
         self.device = device
         self.mqtt_broker = mqtt_broker
         self.schedule = schedule
-        self.count = 0
+        self.last_run = None
         if not config:
-            self.disabled = True
+            self.enabled = False
             return
         self.adhocTopic = config.get("adhoc_topic", "powermon/adhoc")
         self.announceTopic = config.get("announce_topic", "powermon/announce")
-        self.disabled = False
+        self.enabled = config.get("enabled", True)  # default to enabled if not specified
+
+        if self.mqtt_broker is None or self.mqtt_broker.disabled:
+            # no use having api running if no mqtt broker
+            log.warn("No mqttbroker (or it is disabled) so disabling ApiCoordinator")
+            self.enabled = False
+            return
 
         self.announceDevice()
         mqtt_broker.subscribe(self.adhocTopic, self.adhocCallback)
@@ -45,14 +53,12 @@ class ApiCoordinator:
             self.schedule.addOneTimeCommandFromConfig(command)
 
     def run(self):
-        if self.disabled:
+        if not self.enabled:
             return
-        if self.count > 100:
+        if not self.last_run or time() - self.last_run > 60:
             log.info("Starting APICoordinator")
             self.announceDevice()
-            self.count = 0
-
-        self.count += 1
+            self.last_run = time()
 
     def announceDevice(self):
         scheduleDTO = self.schedule.toDTO()

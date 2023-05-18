@@ -1,5 +1,6 @@
 FROM python:3.9-buster
 
 RUN pip install mppsolar
-ENTRYPOINT ["mpp-solar"]
+COPY powermon/config/*.yaml .
+ENTRYPOINT ["powermon"]
 CMD ["--help"]
