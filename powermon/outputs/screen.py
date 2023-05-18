@@ -9,6 +9,7 @@ class Screen(AbstractOutput):
     def __init__(self, outputConfig, formatter):
         log.debug("outputConfig: %s, formatter: %s" % (outputConfig, formatter))
         super().__init__(formatter)
+        self.name = "Screen"
         # self.formatter = formatter
 
     def output(self, data):

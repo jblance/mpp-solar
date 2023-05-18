@@ -25,8 +25,8 @@ class PortType(LowercaseStrEnum):
 
 class AbstractPort(ABC):
     def __init__(self, config):
-        # get protocol handler
-        protocol = get_protocol(protocol=config.get("protocol"))
+        # get protocol handler, default to PI30 if not supplied
+        protocol = get_protocol(protocol=config.get("protocol", "PI30"))
         self.protocol = protocol
 
     @abstractmethod

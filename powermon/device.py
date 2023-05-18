@@ -18,6 +18,7 @@ class Device:
     A device is a port with a protocol
     also contains the name, model and id of the device
     """
+
     def __str__(self):
         return f"Device: {self.devicename}, identifier: {self.identifier}, model: {self.model}, manufacturer: {self.manufacturer}, port: {self.port}, queue: {self.commandQueue}"
 
@@ -26,10 +27,10 @@ class Device:
             log.warning("No device definition in config. Check configFile argument?")
             config = {"identifier": "unsupplied"}
 
-        self.devicename = config.get("name", "mppsolar")
-        self.identifier = config.get("id", "mppsolar")
-        self.model = config.get("model", "mppsolar")
-        self.manufacturer = config.get("manufacturer", "mppsolar")
+        self.devicename = config.get("name", "unnamed_device")
+        self.identifier = config.get("id")
+        self.model = config.get("model")
+        self.manufacturer = config.get("manufacturer")
         self.port = getPortFromConfig(config.get("port"))
 
         self.commandQueue = None
@@ -60,11 +61,4 @@ class Device:
         return
 
     def runLoop(self):
-        if self.commandQueue.commands:
-            for command in self.commandQueue.commands:
-                if command.dueToRun():
-                    command.run(device=self)
-            return True
-        else:
-            log.info("no commands in queue")
-            return False
+        return self.commandQueue.run_loop(device=self)
