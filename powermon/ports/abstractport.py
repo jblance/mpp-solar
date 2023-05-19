@@ -4,10 +4,8 @@ from enum import auto
 
 from strenum import LowercaseStrEnum
 
-from mppsolar.protocols import get_protocol
-# f`/rom powermon.commands.command import Command
 from powermon.libs.result import Result
-
+from powermon.protocols import get_protocol
 
 log = logging.getLogger("Port")
 

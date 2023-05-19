@@ -2,8 +2,8 @@
 device:
   port:
     type: test
-    response_number: 0
+    response_number: 1
     protocol: PI30MAX
 
 commands:
-- command: QDI
+- command: PLEDB4
