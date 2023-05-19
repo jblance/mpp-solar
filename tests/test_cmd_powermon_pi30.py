@@ -4,9 +4,68 @@ import unittest
 
 # from mppsolar.devices.device import AbstractDevice as _abstractdevice
 
+SETTER_COMMANDS = [
+    ("F50", """command_execution=Successful\n"""),
+    ("MCHGC040", """command_execution=Successful\n"""),
+    ("MNCHGC1120", """command_execution=Failed\n"""),
+    ("MUCHGC130", """command_execution=Successful\n"""),
+    ("PBCV44.0", """command_execution=Successful\n"""),
+    ("PBDV48.0", """command_execution=Successful\n"""),
+    ("PBFT58.0", """command_execution=Successful\n"""),
+    ("PBT01", """command_execution=Successful\n"""),
+    ("PCP03", """command_execution=Successful\n"""),
+    ("PCVV48.0", """command_execution=Successful\n"""),
+    ("PEa", """command_execution=Successful\n"""),
+    ("PDb", """command_execution=Successful\n"""),
+    ("PF", """command_execution=Successful\n"""),
+    ("PGR01", """command_execution=Successful\n"""),
+    ("POP02", """command_execution=Successful\n"""),
+    ("POPLG00", """command_execution=Successful\n"""),
+    ("POPM10", """command_execution=Successful\n"""),
+    ("PPCP000", """command_execution=Successful\n"""),
+    ("PPVOKC1", """command_execution=Successful\n"""),
+    ("PSDV40.0", """command_execution=Successful\n"""),
+    ("PSPB0", """command_execution=Successful\n"""),
+    ("PBATCD010", """command_execution=Successful\n"""),
+    ("DAT20230115091533", """command_execution=Successful\n"""),
+    ("PBATMAXDISC150", """command_execution=Successful\n"""),
+]
+
+
+def do_test(self, command, expected, respno=0):
+    try:
+        print(command, end=" ")
+        result = subprocess.run(
+            [
+                "powermon",
+                "--once",
+                "--config",
+                '{"device": {"port":{"type":"test", "response_number": %s, "protocol": "PI30MAX"}}, "commands": [{"command":"%s"}]}' % (respno, command),
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        # print(result.stdout)
+        # print(result.stdout)
+        # print(result.stderr)
+        # print(".")
+        self.assertEqual(f"CMD: {command}\n{result.stdout}", f"CMD: {command}\n{expected}")
+        self.assertEqual(result.returncode, 0)
+        print("OK")
+    except subprocess.CalledProcessError as error:
+        print(error.stdout)
+        print(error.stderr)
+        raise error
+
 
 class test_command_line_powermon(unittest.TestCase):
     maxDiff = 9999
+
+    def test_pi30_setter_commands(self):
+        for command, expected in SETTER_COMMANDS:
+            do_test(self, command, expected, 1)
 
     def test_run_powermon_qpi_cmd(self):
         try:
