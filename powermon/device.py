@@ -45,6 +45,10 @@ class Device:
             log.error("Invalid port config '%s' found", config)
             raise ConfigError(f"Invalid port config '{config}' found")
 
+        # Update commands with definition, now that we have a port / protocol
+        for command in self.commandQueue.commands:
+            command.command_defn = self.port.protocol.get_command_defn(command.name)
+
     def get_port(self) -> AbstractPort:
         return self.port
 
@@ -74,13 +78,8 @@ class Device:
                 if command.dueToRun():
                     # update run times
                     command.touch()
-                    # check for definition
-                    if command.command_defn is None:
-                        command.command_defn = self.port.protocol.get_command_defn(command.name)
-                        log.debug("command_defn: %s" % command.command_defn)
                     # update full_command - expand any template / add crc etc
                     command.full_command = self.port.protocol.get_full_command(command.name)
-                    log.debug("full_command: %s" % command.full_command)
                     # run command
                     result = self.port.run_command(command)
                     # decode result
