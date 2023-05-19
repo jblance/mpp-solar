@@ -362,3 +362,34 @@ def crcPI(data_bytes):
 
     log.debug(f"Generated CRC {crc_high:#04x} {crc_low:#04x} {crc:#06x}")
     return [crc_high, crc_low]
+
+
+def get_value(_list, _index):
+    """
+    get the value from _list or return None if _index is out of bounds
+    """
+    # print(_list, len(_list))
+    if _index >= len(_list):
+        return None
+    return _list[_index]
+
+
+def get_resp_defn(key, defns):
+    """
+    look for a definition for the supplied key
+    """
+    # print(key, defns)
+    if not key:
+        return None
+    if type(key) is bytes:
+        try:
+            key = key.decode("utf-8")
+        except UnicodeDecodeError:
+            log.info(f"key decode error for {key}")
+    for defn in defns:
+        if key == defn[0]:
+            # print(key, defn)
+            return defn
+    # did not find definition for this key
+    log.info(f"No defn found for {key} key")
+    return [key, key, "", ""]
