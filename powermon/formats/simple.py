@@ -10,18 +10,14 @@ class simple(AbstractFormat):
         self.name = "simple"
         self.extra_info = formatConfig.get("extra_info", False)
 
-    def process(self, result):
+    def format(self, result):
         log.info("Using output formatter: %s" % self.name)
-        print(result)
-        # TODO: implement
-
-    def format(self, data):
-        log.info("Using output formatter: simple")
 
         _result = []
+        data = result.decoded_responses
         if data is None:
             return _result
-
+        log.debug(f"data: {data}")
         displayData = self.formatAndFilterData(data)
         log.debug(f"displayData: {displayData}")
 

@@ -16,3 +16,7 @@ class AbstractOutput(ABC):
     @abstractmethod
     def output(self, data):
         pass
+
+    @abstractmethod
+    def process(self, result):
+        pass

@@ -70,6 +70,10 @@ class Device:
         return
 
     def runLoop(self):
+        """
+        the loop that checks for commands to run,
+        runs them
+        """
         if self.commandQueue.commands is None:
             log.info("no commands in queue")
             return False
@@ -83,11 +87,12 @@ class Device:
                     # run command
                     result = self.port.run_command(command)
                     # decode result
-                    result.decoded_response = self.port.protocol.decode(result.raw_response, command.name)
+                    self.port.protocol.decode(result)
+                    print(result)
                     # loop each output and process result
                     for output in command.outputs:
                         log.debug(f"Using Output: {output}")
-                        output.output(data=result.decoded_response)
+                        # output.output(data=result.decoded_response)
                         # TODO: update outputer
-                        # output.process(result=result)
+                        output.process(result=result)
             return True

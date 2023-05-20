@@ -16,22 +16,21 @@ class Screen(AbstractOutput):
         log.info("Using output sender: screen")
         log.debug("formatter: %s" % self.formatter)
 
-        # TODO: sort to use result object properly
-        data = result.decoded_response
-        if data is None:
-            print("No data supplied")
+        # check for error in result and display error if exists
+        if result.error:
+            print(f"Command: {result.command.name} incurred an error or errors during execution or processing")
+            print(f"Error message count: {len(result.error_messages)}")
+            for message in result.error_messages:
+                print(f"{message}")
             return
 
-        formatted_data = self.formatter.process(data)
-        if formatted_data is None:
-            print("Nothing returned from data formatting")
-            return
+        formatted_data = self.formatter.format(result)
+        # if formatted_data is None:
+        #     print("Nothing returned from data formatting")
+        #     return
 
-        if isinstance(formatted_data, list):
-            for line in formatted_data:
-                print(line)
-        else:
-            print(formatted_data)
+        for line in formatted_data:
+            print(line)
 
     def output(self, data):
         log.info("Using output sender: screen")

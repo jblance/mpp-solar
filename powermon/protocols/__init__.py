@@ -7,6 +7,7 @@ log = logging.getLogger("protocols")
 
 
 class ResponseType(Enum):
+    DEFAULT = auto()
     ACK = auto()
     INDEXED = auto()
     MULTIVALUED = auto()

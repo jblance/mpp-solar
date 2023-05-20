@@ -11,41 +11,36 @@ class table(AbstractFormat):
         self.name = "table"
         self.extra_info = formatConfig.get("extra_info", False)
 
-    def format(self, data):
-        log.info("Using output formatter: table")
+    def format(self, result):
+        log.info("Using output formatter: %s" % self.name)
 
         _result = []
+        data = result.decoded_responses
         if data is None:
             return _result
-
-        if "_command" in data:
-            command = data.pop("_command")
-        else:
-            command = "Unknown command"
-        if "_command_description" in data:
-            description = data.pop("_command_description")
-        else:
-            description = "No description found"
 
         displayData = self.formatAndFilterData(data)
         log.debug(f"displayData: {displayData}")
 
-        # build data to display
+        # get sizes data to display
+        maxP = getMaxLen(displayData)
+        if maxP < 9:
+            maxP = 9
+        maxV = getMaxLen(data.values())
+        if maxV > 50:
+            maxV = 50
+        width = maxP + maxV + 8
 
         # build header
-        _result.append(f"Command: {command} - {description}")
+        _result.append(f"Command: {result.command.name} - {result.command.command_defn['description']}")
         # if filter or excl_filter:
         #     _result.append(
         #         f"Using filter: '{filter}' and excl_filter: '{excl_filter}'. {len(displayData)} results retained from {len(data)} in total"
         #     )
-        _result.append("-" * 80)
+        _result.append("-" * width)
 
         # build data
-        maxP = getMaxLen(displayData)
-        if maxP < 9:
-            maxP = 9
-        # maxV = getMaxLen(data.values())
-        _result.append(f"{pad('Parameter', maxP+1)}{'Value':<15}\tUnit")
+        _result.append(f"{pad('Parameter', maxP+2)}{pad('Value', maxV+2)}Unit")
         for key in displayData:
             value = displayData[key][0]
             unit = displayData[key][1]

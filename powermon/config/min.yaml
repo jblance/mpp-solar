@@ -2,8 +2,11 @@
 device:
   port:
     type: test
-    response_number: 1
-    protocol: PI30MAX
+    response_number: 0
+    protocol: PI30
 
 commands:
-- command: PLEDB4
+- command: QMCHGCR
+  outputs:
+  - type: screen
+    format: raw

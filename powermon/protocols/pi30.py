@@ -692,6 +692,15 @@ QUERY_COMMANDS = {
             b"(PI30\x9a\x0b\r",
         ],
     },
+    "QPIz": {
+        "name": "QPIz",
+        "description": "Protocol ID inquiry",
+        "help": " -- queries the device protocol ID. e.g. PI30 for HS series",
+        "response_type": ResponseType.INDEXED,
+        "test_responses": [
+            b"(PI30\x9a\x0b\r",
+        ],
+    },
     "QPIGS": {
         "name": "QPIGS",
         "description": "General Status Parameters inquiry",
@@ -944,27 +953,36 @@ class pi30(AbstractProtocol):
         self.ID_COMMANDS = ["QPI", "QGMN", "QMN"]
         # log.info(f'Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands')
 
-    def check_response_valid(self, response):
-        if response is None:
-            return False, {"validity check": ["Error: Response was empty", ""]}
-        if type(response) is dict:
-            response["validity check"] = ["Error: incorrect response format", ""]
-            return False, response
-        if len(response) <= 3:
-            return False, {"validity check": ["Error: Response to short", ""]}
-
-        if type(response) is str:
-            # if "(NAK" in response:
-            #     return False, {"validity check": ["Error: NAK", ""]}
-            crc_high, crc_low = crc(response[:-3])
-            if [ord(response[-3]), ord(response[-2])] != [crc_high, crc_low]:
-                return False, {"validity check": ["Error: Invalid response CRCs", ""]}
-        elif type(response) is bytes:
-            # if b"(NAK" in response:
-            #     return False, {"validity check": ["Error: NAK", ""]}
-
-            crc_high, crc_low = crc(response[:-3])
-            if response[-3:-1] != bytes([crc_high, crc_low]):
-                return False, {"validity check": ["Error: Invalid response CRCs", ""]}
+    def check_response_valid(self, result):
+        # fail if no response
+        if result.raw_response is None:
+            result.is_valid = False
+            result.error = True
+            result.error_messages.append("failed validity check: response was empty")
+            return
+        # fail if dict??? not sure what this is for
+        if type(result.raw_response) is dict:
+            result.is_valid = False
+            result.error = True
+            result.error_messages.append("failed validity check: incorrect raw_response format (found dict)")
+            return
+        # fail on short responses
+        if len(result.raw_response) <= 3:
+            result.is_valid = False
+            result.error = True
+            result.error_messages.append(f"failed validity check: response to short len was {len(result.raw_response)}")
+            return
+        # check crc matches the calculated one
+        calc_crc_high, calc_crc_low = crc(result.raw_response[:-3])
+        if type(result.raw_response) is str:
+            crc_high, crc_low = ord(result.raw_response[-3]), ord(result.raw_response[-2])
+        else:
+            crc_high, crc_low = result.raw_response[-3], result.raw_response[-2]
+        if [calc_crc_high, calc_crc_low] != [crc_high, crc_low]:
+            result.is_valid = False
+            result.error = True
+            result.error_messages.append(f"failed validity check: response has invalid CRC - got '\\x{crc_high:02x}\\x{crc_low:02x}', calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'")
+            return
+            # if result.raw_response[-3:-1] != bytes([calc_crc_high, calc_crc_low]):
         log.debug("CRCs match")
-        return True, {}
+        return

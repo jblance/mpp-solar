@@ -299,6 +299,7 @@ SETTER_COMMANDS = [
 
 def do_test(self, command, expected, respno=0):
     try:
+        print(command, end=" ")
         result = subprocess.run(
             [
                 "powermon",
@@ -310,13 +311,12 @@ def do_test(self, command, expected, respno=0):
             capture_output=True,
             text=True,
         )
-        # print(command)
         # print(result.stdout)
         # print(result.stdout)
         # print(result.stderr)
-        # print(".")
         self.assertEqual(f"CMD: {command}\n{result.stdout}", f"CMD: {command}\n{expected}")
         self.assertEqual(result.returncode, 0)
+        print("OK")
     except subprocess.CalledProcessError as error:
         print(error.stdout)
         print(error.stderr)

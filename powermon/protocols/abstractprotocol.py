@@ -2,7 +2,7 @@ import abc
 import calendar  # noqa: F401
 import logging
 import re
-from typing import Tuple
+# from typing import Tuple
 
 # from mppsolar.protocols.protocol_helpers import uptime  # noqa: F401
 # from mppsolar.protocols.protocol_helpers import (  # noqa: F401
@@ -20,6 +20,7 @@ from mppsolar.protocols.protocol_helpers import crcPI as crc
 from mppsolar.protocols.protocol_helpers import get_resp_defn, get_value  # noqa: F401
 from powermon.dto.protocolDTO import ProtocolDTO
 from powermon.protocols import ResponseType
+from powermon.libs.result import Result
 
 log = logging.getLogger("AbstractProtocol")
 
@@ -94,13 +95,17 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             return response[1:-3].split(" ")
         return response[1:-3].split(b" ")
 
-    def check_response_valid(self, response) -> Tuple[bool, dict]:
+    def check_response_valid(self, result) -> Result:
         """
         Simplest validity check, CRC checks should be added to individual protocols
         """
-        if response is None:
-            return False, {"validity check": ["Error: Response was empty", ""]}
-        return True, {}
+        if result.raw_response is None:
+            result.is_valid = False
+            result.error = True
+            result.error_messages.append("failed validity check: response was empty")
+        else:
+            result.is_valid = True
+        return
 
     def process_response(
         self,
@@ -257,23 +262,84 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             r = eval(template)
         return [(data_name, r, data_units, extra_info)]
 
-    def decode_result(self, result, command):
-        log.info("decode_result: raw: %s, command: %s" % (result.raw_response, command.name))
+    def decode(self, result: Result):
+        """
+        Take the a result object and decode the raw response
+        into a ??? dict of name: value, unit entries
+        """
 
-        # TODO: sort this so it isnt so carp
-        data = self.decode(result.raw_response, command.name)
-        # remove raw response
-        if "raw_response" in data:
-            data.pop("raw_response")
-        # remove command details
-        if "_command" in data:
-            data.pop("_command")
-        if "_command_description" in data:
-            data.pop("_command_description")
-        result.decoded_response = data
-        return result
+        log.info(f"result.raw_response passed to decode: {result.raw_response}")
 
-    def decode(self, response, command) -> dict:
+        # Check response is valid
+        self.check_response_valid(result)
+        if result.error:
+            return
+
+        # Split the response into individual responses
+        result.responses = self.get_responses(result.raw_response)
+        log.debug(f"trimmed and split responses: {result.responses}")
+
+        # Now need to decode each of the responses as per the protocol definition
+        # currently decoded_responses is dict
+        # - the key is the parameter name
+        # - the value is a list of [value, unit, extra_info(opt)]
+
+        # Cant decode without a definition of the command
+        if result.command.command_defn is None:
+            log.debug(f"No definition for command {result.command.name}")
+            result.error = True
+            result.error_messages.append(f"failed to decode responses: no definition for {result.command.name}")
+            return
+
+        # Cant decode without a definition of the expected response to the command
+        if "response" not in result.command.command_defn:
+            log.debug(f"No definition for the response of command {result.command.name}")
+            result.error = True
+            result.error_messages.append(f"failed to decode responses: no definition for the response of {result.command.name}")
+            return
+
+        # Determine the type of response
+        if "response_type" in result.command.command_defn:
+            response_type = result.command.command_defn["response_type"]
+        else:
+            response_type = ResponseType.DEFAULT
+        log.info(f"Processing response of type {response_type}")
+
+        # Process the response by reponse type
+        # FIXME: result.decoded_responses = {"two letter words": [123, "count"], "three letter words": [456, "count", {"icon": "bob"}]}
+        # QUESTION: should the decode be {"two letter words": {"value": 123, "unit":"count"}, ...}
+        match response_type:
+            case ResponseType.ACK:
+                # Usually for setter type commands
+                # expects a single response, eg b'NAK'
+                data_name = result.command.command_defn["response"][0][1]
+                value = result.command.command_defn["response"][0][3][result.responses[0].decode()]
+                result.decoded_responses = {data_name: [value, ""]}
+            case ResponseType.MULTIVALUED:
+                # Response that while able to be split, makes more sense as a single response
+                # eg Max Charging Current Options: 010 020 030 040 050 060 070 080 090 100 110 120 A
+                data_name = result.command.command_defn["response"][0][1]
+                value = ""
+                for i in result.responses:
+                    value += f"{i.decode()} "
+                data_units = result.command.command_defn["response"][0][3]
+                log.debug(f"{data_name}, {value}, {data_units}")
+                if len(result.command.command_defn["response"][0]) > 4:
+                    extra_info = result.command.command_defn["response"][0][4]
+                    result.decoded_responses = {data_name: [value, data_units, extra_info]}
+                else:
+                    result.decoded_responses = {data_name: [value, data_units]}
+                return
+            case _:
+                log.error(f"bad response type {response_type} for {result.command.name}")
+                result.error = True
+                result.error_messages.append(f"failed to decode responses: bad response type {response_type} for {result.command.name}")
+                return
+
+    #
+    #
+    # TODO: remove all the below function
+    def _decode(self, response, command) -> dict:
         """
         Take the raw response and turn it into a dict of name: value, unit entries
         """
@@ -436,30 +502,6 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 else:
                     log.info(f"Processing unknown response format {result}")
                     msgs[i] = [result, ""]
-            return msgs
-
-        # check for special response types
-        # acknowledgement
-        if response_type == ResponseType.ACK:
-            msgs = {}
-            data_name = command_defn["response"][0][1]
-            value = command_defn["response"][0][3][responses[0].decode()]
-            msgs[data_name] = [value, ""]
-            return msgs
-        # multivalue
-        if response_type == ResponseType.MULTIVALUED:
-            msgs = {}
-            data_name = command_defn["response"][0][1]
-            value = ""
-            for i in responses:
-                value += f"{i.decode()} "
-            data_units = command_defn["response"][0][3]
-            log.debug(f"{data_name}, {value}, {data_units}")
-            if len(command_defn["response"][0]) > 4:
-                extra_info = command_defn["response"][0][4]
-                msgs[data_name] = [value, data_units, extra_info]
-            else:
-                msgs[data_name] = [value, data_units]
             return msgs
 
         # Check for multiple frame type responses
