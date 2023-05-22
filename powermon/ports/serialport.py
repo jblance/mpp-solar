@@ -12,8 +12,8 @@ class SerialPort(AbstractPort):
     def __init__(self, config=None) -> None:
         super().__init__(config)
         log.debug(f"Initializing usbserial port. config:{config}")
-        self.path = config.get("path", None)
-        self.baud = config.get("baud", None)
+        self.path = config.get("path", "/dev/ttyUSB0")
+        self.baud = config.get("baud", 2400)
         self.serialPort = None
         self.error = None
 
