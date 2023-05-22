@@ -24,32 +24,31 @@ class HIDRawIO(BaseIO):
             log.error("USB open error: {}".format(e))
             return {"ERROR": ["USB open error: {}".format(e), ""]}
         # Send the command to the open usb connection
-        to_send = full_command
+        cmd_len = len(full_command)
         try:
-            log.debug(f"length of to_send: {len(to_send)}")
+            log.debug(f"length of to_send: {len(cmd_len)}")
         except:  # noqa: E722
             import pdb
 
             pdb.set_trace()
-        if len(to_send) <= 8:
+        # for command of len < 8 it ok just to send
+        # otherwise need to pack to a multiple of 8 bytes and send 8 at a time
+        if cmd_len <= 8:
             # Send all at once
-            log.debug("1 chunk send")
-            time.sleep(0.35)
-            os.write(usb0, to_send)
-        elif len(to_send) > 8 and len(to_send) < 11:
-            log.debug("2 chunk send")
-            time.sleep(0.35)
-            os.write(usb0, to_send[:5])
-            time.sleep(0.35)
-            os.write(usb0, to_send[5:])
+            log.debug("sending full_command in on shot")
+            time.sleep(0.05)
+            os.write(usb0, full_command)
         else:
-            while len(to_send) > 0:
-                log.debug("multiple chunk send")
-                # Split the byte command into smaller chucks
-                send, to_send = to_send[:8], to_send[8:]
-                log.debug("send: {}, to_send: {}".format(send, to_send))
-                time.sleep(0.35)
-                os.write(usb0, send)
+            log.debug("multiple chunk send")
+            chunks = [full_command[i:i + 8] for i in range(0, len(cmd_len), 8)]
+            for chunk in chunks:
+                # pad chunk to 8 bytes
+                if len(chunk) < 8:
+                    padding = 8 - len(chunk)
+                    chunk += '\x00' * padding
+                log.debug("sending chunk: %s" % (chunk))
+                time.sleep(0.05)
+                os.write(usb0, chunk)
         time.sleep(0.25)
         # Read from the usb connection
         # try to a max of 100 times
