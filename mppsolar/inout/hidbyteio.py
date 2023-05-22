@@ -35,6 +35,8 @@ class HIDByteIO(BaseIO):
         # Send 1 byte at a time
         log.debug("1 byte per send")
         for b in to_send:
+            _b=bytes(b)
+            log.debug("sending %s" % _b)
             os.write(usb0, b)
             time.sleep(0.05)
 
