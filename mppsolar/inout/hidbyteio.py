@@ -34,10 +34,13 @@ class HIDByteIO(BaseIO):
 
         # Send 1 byte at a time
         log.debug("1 byte per send")
-        for b in to_send:
-            _b=bytes(b)
+        
+        # stolen from https://github.com/fah/jk-bms/blob/main/printbms.py
+        for cmd_byte in to_send:
+            hex_byte = ("{0:02x}".format(cmd_byte))
+            _b = bytearray.fromhex(hex_byte))
             log.debug("sending %s" % _b)
-            os.write(usb0, b)
+            os.write(usb0, _b)
             time.sleep(0.05)
 
         time.sleep(0.1)
