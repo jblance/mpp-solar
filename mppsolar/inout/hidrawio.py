@@ -40,7 +40,7 @@ class HIDRawIO(BaseIO):
                 # pad chunk to 8 bytes
                 if len(chunk) < 8:
                     padding = 8 - len(chunk)
-                    chunk += '\x00' * padding
+                    chunk += b'\x00' * padding
                 log.debug("sending chunk: %s" % (chunk))
                 time.sleep(0.05)
                 os.write(usb0, chunk)
