@@ -25,12 +25,7 @@ class HIDRawIO(BaseIO):
             return {"ERROR": ["USB open error: {}".format(e), ""]}
         # Send the command to the open usb connection
         cmd_len = len(full_command)
-        try:
-            log.debug(f"length of to_send: {len(cmd_len)}")
-        except:  # noqa: E722
-            import pdb
-
-            pdb.set_trace()
+        log.debug(f"length of to_send: {cmd_len}")
         # for command of len < 8 it ok just to send
         # otherwise need to pack to a multiple of 8 bytes and send 8 at a time
         if cmd_len <= 8:
