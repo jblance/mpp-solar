@@ -13,7 +13,7 @@ class USBPort(AbstractPort):
     def __init__(self, config=None) -> None:
         super().__init__(config)
         log.debug(f"Initializing usb port. config:{config}")
-        self.path = config.get("path", None)
+        self.path = config.get("path", "/dev/hidraw0")
 
     def toDTO(self):
         dto = PortDTO(type="usb", path=self.path, protocol=self.protocol.toDTO())
