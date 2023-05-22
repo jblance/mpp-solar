@@ -35,7 +35,7 @@ class HIDRawIO(BaseIO):
             os.write(usb0, full_command)
         else:
             log.debug("multiple chunk send")
-            chunks = [full_command[i:i + 8] for i in range(0, len(cmd_len), 8)]
+            chunks = [full_command[i:i + 8] for i in range(0, cmd_len, 8)]
             for chunk in chunks:
                 # pad chunk to 8 bytes
                 if len(chunk) < 8:
