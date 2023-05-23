@@ -3,7 +3,8 @@ import calendar  # noqa: F401
 import logging
 import re
 from typing import Tuple
-from powermon.dto.protocolDTO import ProtocolDTO
+from pydantic import BaseModel
+# from powermon.dto.protocolDTO import ProtocolDTO
 
 from ..helpers import get_resp_defn, get_value
 from .protocol_helpers import BigHex2Short, BigHex2Float  # noqa: F401
@@ -14,6 +15,11 @@ from .protocol_helpers import uptime  # noqa: F401
 from .protocol_helpers import crcPI as crc
 
 log = logging.getLogger("AbstractProtocol")
+
+
+class ProtocolDTO(BaseModel):
+    protocol_id: str
+    commands: dict
 
 
 class AbstractProtocol(metaclass=abc.ABCMeta):

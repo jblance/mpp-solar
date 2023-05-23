@@ -1,3 +1,3 @@
-FROM python:3.10-buster
-COPY ./mpp-solar /mpp-solar/
-RUN pip install -e /mpp-solar/
+FROM python:3.10-slim
+
+RUN pip install mppsolar==0.16.01
