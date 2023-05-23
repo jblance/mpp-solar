@@ -299,10 +299,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             return
 
         # Determine the type of response
-        if "response_type" in result.command.command_defn:
-            response_type = result.command.command_defn["response_type"]
-        else:
-            response_type = ResponseType.DEFAULT
+        response_type = result.command.command_defn.get("response_type", ResponseType.DEFAULT)
         log.info(f"Processing response of type {response_type}")
 
         # Process the response by reponse type
