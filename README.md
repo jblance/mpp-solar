@@ -17,8 +17,9 @@ Currently has support for:
 - Daly BMS
 
 ## Install ##
-- `pip install mppsolar` (minimal install)
-- `pip install mppsolar[ble]` (install including BLE support aka jkbms)
+- `pip install mppsolar` (minimal install), or
+- `pip install mppsolar[ble]` (install including BLE support aka jkbms), or
+- `docker pull jblance/mppsolar:latest` (docker install)
 
 
 ## Documentation ##
