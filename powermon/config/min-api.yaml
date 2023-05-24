@@ -1,0 +1,14 @@
+# minimal config for powermon
+device:
+  port:
+    type: test
+    protocol: PI30MAX
+
+commands:
+- command: QPI
+
+mqttbroker:
+  name: localhost
+  
+api: 
+  enabled: True

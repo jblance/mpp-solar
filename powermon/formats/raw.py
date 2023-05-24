@@ -1,11 +1,18 @@
-from mppsolar.helpers import get_kwargs
+import logging
+from powermon.formats.abstractformat import AbstractFormat
+
+log = logging.getLogger("raw")
 
 
-class raw:
-    def output(*args, **kwargs):
-        # print(args, kwargs)
-        _result = None
-        _data = get_kwargs(kwargs, "data", None)
-        if "raw_response" in _data:
-            _result = _data["raw_response"][0]
-        return _result
+class raw(AbstractFormat):
+    def __init__(self, formatConfig):
+        super().__init__(formatConfig)
+        self.name = "raw"
+        self.extra_info = formatConfig.get("extra_info", False)
+
+    def format(self, result):
+        log.info("Using output formatter: %s" % self.name)
+
+        data = result.raw_response
+        log.debug(f"data: {data}")
+        return [data]

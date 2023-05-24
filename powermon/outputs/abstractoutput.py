@@ -1,22 +1,22 @@
 from abc import ABC, abstractmethod
 import logging
-from enum import auto
-from strenum import LowercaseStrEnum
 
 
 log = logging.getLogger("Output")
 
 
-class OutputType(LowercaseStrEnum):
-    SCREEN = auto()
-    MQTT = auto()
-    API_MQTT = auto()
-
-
 class AbstractOutput(ABC):
+    def __str__(self):
+        return f"Output: {self.name}, {self.formatter}"
+
     def __init__(self, formatter):
+        self.name = "AbstractOutput"
         self.formatter = formatter
 
     @abstractmethod
     def output(self, data):
+        pass
+
+    @abstractmethod
+    def process(self, result):
         pass

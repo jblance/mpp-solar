@@ -1,20 +1,16 @@
 # !/usr/bin/python3
 """main powermon code"""
 
+import json
 import logging
 from argparse import ArgumentParser
-
-# from collections import deque
 from datetime import date, timedelta  # noqa: F401
 
 import yaml
 
 from mppsolar.version import __version__  # noqa: F401
-
-# from powermon.scheduling.scheduleController import ScheduleController
 from powermon.device import Device
 from powermon.libs.apicoordinator import ApiCoordinator
-from powermon.libs.commandQueue import CommandQueue
 from powermon.libs.configurationManager import ConfigurationManager
 from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
@@ -44,6 +40,8 @@ def read_yaml_file(yaml_file=None):
 def process_command_line_overrides(args):
     """override config with command line options"""
     _config = {}
+    if args.config:
+        _config = json.loads(args.config)
     if args.once:
         _config["loop"] = "once"
     if args.info:
@@ -67,13 +65,13 @@ def main():
         const="./powermon.yaml",
         default=None,
     )
-    parser.add_argument("-v", "--version", action="store_true", help="Display the version")
     parser.add_argument(
-        "-d",
-        "--dumpConfig",
-        action="store_true",
-        help="Print the config based on options supplied (including the defaults, config file and any overrides)",
+        "--config",
+        type=str,
+        default=None,
+        help="""Supply config items on the commandline in json format, eg '{"device": {"port":{"type":"test"}}, "commands": [{"command":"QPI"}]}'""",
     )
+    parser.add_argument("-v", "--version", action="store_true", help="Display the version")
     parser.add_argument(
         "-1",
         "--once",
@@ -121,31 +119,21 @@ def main():
     # logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     log.setLevel(config.get("debuglevel", logging.WARNING))
 
-    # if generateConfigFile is true then print config out
-    if args.dumpConfig:
-        print("# yaml config for powermon")
-        print("# default location ./powermon.yaml")
-        print(yaml.dump(config))
-        return
     # debug config
     log.info("config: %s" % config)
 
     # build device object (required)
-    device = Device(config=config.get("device"))
+    device = Device(config=config.get("device"), commandConfig=config.get("commands"))
     log.info(device)
 
     # build mqtt broker object (optional)
+    # QUESTION: should mqtt_broker be part of device...
     mqtt_broker = MqttBroker(config=config.get("mqttbroker"))
     log.info(mqtt_broker)
 
     # build the daemon object (optional)
     daemon = Daemon(config=config.get("daemon"))
     log.info(daemon)
-
-    # build queue of commands
-    # QUESTION: should mqtt_broker and controller/command queue be part of device...
-    device.commandQueue = CommandQueue(config=config.get("commands"))
-    log.info(device.commandQueue)
 
     # build controller
     # TODO: follow same pattern as others, eg
@@ -166,16 +154,28 @@ def main():
 
     # Main working loop
     keep_looping = True
+    controller_looping = True
+    device_looping = True
     try:
         while keep_looping:
             # tell the daemon we're still working
             daemon.watchdog()
 
             # run schedule loop
-            keep_looping = controller.runLoop() or device.runLoop()
+            if controller_looping:
+                controller_looping = controller.runLoop()
+            if device_looping:
+                device_looping = device.runLoop()
+            # stop looping if neither controller or device runLoops return True
+            if not controller_looping and not device_looping:
+                keep_looping = False
 
             # run api coordinator ...
             api_coordinator.run()
+
+            # only run loop once if required
+            if args.once:
+                keep_looping = False
 
     except KeyboardInterrupt:
         print("KeyboardInterrupt")

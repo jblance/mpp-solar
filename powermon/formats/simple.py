@@ -7,15 +7,17 @@ log = logging.getLogger("simple")
 class simple(AbstractFormat):
     def __init__(self, formatConfig):
         super().__init__(formatConfig)
+        self.name = "simple"
         self.extra_info = formatConfig.get("extra_info", False)
 
-    def format(self, data):
-        log.info("Using output formatter: simple")
+    def format(self, result):
+        log.info("Using output formatter: %s" % self.name)
 
         _result = []
+        data = result.decoded_responses
         if data is None:
             return _result
-
+        log.debug(f"data: {data}")
         displayData = self.formatAndFilterData(data)
         log.debug(f"displayData: {displayData}")
 

@@ -9,7 +9,6 @@ class PortType(Enum):
     UNKNOWN = auto()
     TEST = auto()
     USB = auto()
-    TUSB = auto()
     ESP32 = auto()
     SERIAL = auto()
     JKBLE = auto()
@@ -42,9 +41,6 @@ def get_port_type(port):
     elif "mppsolar" in port:
         log.debug("port matches mppsolar")
         return PortType.USB
-    elif "hidfull" in port:
-        log.debug("port matches hidfull")
-        return PortType.TUSB
     # ESP type ports
     elif "esp" in port:
         log.debug("port matches esp")
@@ -98,12 +94,6 @@ def get_port(*args, **kwargs):
         from mppsolar.inout.hidrawio import HIDRawIO
 
         _port = HIDRawIO(device_path=port)
-
-    elif port_type == PortType.TUSB:
-        log.info("Using hidfullio for communications")
-        from mppsolar.inout.hidfullio import HIDFullIO
-
-        _port = HIDFullIO(device_path=port)
 
     elif port_type == PortType.ESP32:
         log.info("Using esp32io for communications")

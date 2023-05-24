@@ -8,7 +8,7 @@ test: tests/*.py
 	coverage html
 
 t: tests/*.py
-	python3 -m unittest 
+	python3 -m unittest -f -v
 
 pypi:
 	rm -rf dist/*

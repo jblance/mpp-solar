@@ -2,24 +2,27 @@ import abc
 import calendar  # noqa: F401
 import logging
 import re
-from typing import Tuple
-from pydantic import BaseModel
-# from powermon.dto.protocolDTO import ProtocolDTO
+# from typing import Tuple
 
-from ..helpers import get_resp_defn, get_value
-from .protocol_helpers import BigHex2Short, BigHex2Float  # noqa: F401
-from .protocol_helpers import LittleHex2Float, LittleHex2Short  # noqa: F401
-from .protocol_helpers import LittleHex2UInt, LittleHex2Int  # noqa: F401
-from .protocol_helpers import Hex2Ascii, Hex2Int, Hex2Str  # noqa: F401
-from .protocol_helpers import uptime  # noqa: F401
-from .protocol_helpers import crcPI as crc
+# from mppsolar.protocols.protocol_helpers import uptime  # noqa: F401
+# from mppsolar.protocols.protocol_helpers import (  # noqa: F401
+#     BigHex2Float,
+#     BigHex2Short,
+#     Hex2Ascii,
+#     Hex2Int,
+#     Hex2Str,
+#     LittleHex2Float,
+#     LittleHex2Int,
+#     LittleHex2Short,
+#     LittleHex2UInt,
+# )
+from mppsolar.protocols.protocol_helpers import crcPI as crc
+from mppsolar.protocols.protocol_helpers import get_resp_defn, get_value  # noqa: F401
+from powermon.dto.protocolDTO import ProtocolDTO
+from powermon.protocols import ResponseType
+from powermon.libs.result import Result
 
 log = logging.getLogger("AbstractProtocol")
-
-
-class ProtocolDTO(BaseModel):
-    protocol_id: str
-    commands: dict
 
 
 class AbstractProtocol(metaclass=abc.ABCMeta):
@@ -92,13 +95,17 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             return response[1:-3].split(" ")
         return response[1:-3].split(b" ")
 
-    def check_response_valid(self, response) -> Tuple[bool, dict]:
+    def check_response_valid(self, result) -> Result:
         """
         Simplest validity check, CRC checks should be added to individual protocols
         """
-        if response is None:
-            return False, {"validity check": ["Error: Response was empty", ""]}
-        return True, {}
+        if result.raw_response is None:
+            result.is_valid = False
+            result.error = True
+            result.error_messages.append("failed validity check: response was empty")
+        else:
+            result.is_valid = True
+        return
 
     def process_response(
         self,
@@ -114,7 +121,11 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         if ":" in data_type:
             data_type, template = data_type.split(":", 1)
             log.debug(f"Got template {template} for {data_name} {raw_value}")
-        log.debug(f"Processing data_type: {data_type} for data_name: {data_name}, raw_value {raw_value}")
+        if "{" in data_name:
+            # eg "f'Frame Number {f:02d}'"
+            f = frame_number  # noqa: F841
+            data_name = eval(data_name)
+        log.debug(f"Processing data_type: {data_type}, template: {template} for data_name: {data_name}, raw_value {raw_value}")
         if data_type == "loop":
             log.warning("loop not implemented...")
             return [(data_name, None, data_units, extra_info)]
@@ -142,8 +153,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         if data_type == "flags":
             log.debug("flags defn")
             # [
-            #     "flags",
             #     "Device Status",
+            #     "flags",
             #     [
             #         "Is SBU Priority Version Added",
             #         "Is SCC Firmware Updated",
@@ -152,11 +163,45 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             # ],
             return_value = []
             for i, flag in enumerate(raw_value):
-                return_value.append((data_units[i], int(chr(flag)), "bool", None))
+                if data_units[i]:  # only append value if flag name is present
+                    return_value.append((data_units[i], int(chr(flag)), "bool", None))
 
             # if flag != "" and flag != b'':
             # msgs[resp_format[2][j]] = [int(flag), "bool"]
             # print(j, int(flag))
+            return return_value
+        if data_type == "enflags":
+            log.debug("enflags defn")
+            # "Device Status",
+            #     "enflags",
+            #     {
+            #         "a": {"name": "Buzzer", "state": "disabled"},
+            #         "b": {"name": "Overload Bypass", "state": "disabled"},
+            #         "j": {"name": "Power Saving", "state": "disabled"},
+            #         "k": {"name": "LCD Reset to Default", "state": "disabled"},
+            #         "u": {"name": "Overload Restart", "state": "disabled"},
+            #         "v": {"name": "Over Temperature Restart", "state": "disabled"},
+            #         "x": {"name": "LCD Backlight", "state": "disabled"},
+            #         "y": {
+            #             "name": "Primary Source Interrupt Alarm",
+            #             "state": "disabled",
+            #         },
+            #         "z": {"name": "Record Fault Code", "state": "disabled"},
+            #     },
+            return_value = []
+            status = "unknown"
+            for i, item in enumerate(raw_value):
+                item = chr(item)
+                if item == "E":
+                    status = "enabled"
+                elif item == "D":
+                    status = "disabled"
+                else:
+                    if item in data_units:
+                        _key = data_units[item]["name"]
+                    else:
+                        _key = f"unknown_{i}"
+                    return_value.append((_key, status, "", None))
             return return_value
         if data_type == "keyed":
             log.debug("keyed defn")
@@ -215,29 +260,83 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         if template is not None:
             # eg template=r/1000
             r = eval(template)
-        if "{" in data_name:
-            # eg "f'Frame Number {f:02d}'"
-            f = frame_number  # noqa: F841
-            data_name = eval(data_name)
         return [(data_name, r, data_units, extra_info)]
 
-    def decode_result(self, result, command):
-        log.info("decode_result: raw: %s, command: %s" % (result.raw_response, command.name))
+    def decode(self, result: Result):
+        """
+        Take the a result object and decode the raw response
+        into a ??? dict of name: value, unit entries
+        """
 
-        # TODO: sort this so it isnt so carp
-        data = self.decode(result.raw_response, command.name)
-        # remove raw response
-        if "raw_response" in data:
-            data.pop("raw_response")
-        # remove command details
-        if "_command" in data:
-            data.pop("_command")
-        if "_command_description" in data:
-            data.pop("_command_description")
-        result.decoded_response = data
-        return result
+        log.info(f"result.raw_response passed to decode: {result.raw_response}")
 
-    def decode(self, response, command) -> dict:
+        # Check response is valid
+        self.check_response_valid(result)
+        if result.error:
+            return
+
+        # Split the response into individual responses
+        result.responses = self.get_responses(result.raw_response)
+        log.debug(f"trimmed and split responses: {result.responses}")
+
+        # Now need to decode each of the responses as per the protocol definition
+        # currently decoded_responses is dict
+        # - the key is the parameter name
+        # - the value is a list of [value, unit, extra_info(opt)]
+
+        # Cant decode without a definition of the command
+        if result.command.command_defn is None:
+            log.debug(f"No definition for command {result.command.name}")
+            result.error = True
+            result.error_messages.append(f"failed to decode responses: no definition for {result.command.name}")
+            return
+
+        # Cant decode without a definition of the expected response to the command
+        if "response" not in result.command.command_defn:
+            log.debug(f"No definition for the response of command {result.command.name}")
+            result.error = True
+            result.error_messages.append(f"failed to decode responses: no definition for the response of {result.command.name}")
+            return
+
+        # Determine the type of response
+        response_type = result.command.command_defn.get("response_type", ResponseType.DEFAULT)
+        log.info(f"Processing response of type {response_type}")
+
+        # Process the response by reponse type
+        # FIXME: result.decoded_responses = {"two letter words": [123, "count"], "three letter words": [456, "count", {"icon": "bob"}]}
+        # QUESTION: should the decode be {"two letter words": {"value": 123, "unit":"count"}, ...}
+        match response_type:
+            case ResponseType.ACK:
+                # Usually for setter type commands
+                # expects a single response, eg b'NAK'
+                data_name = result.command.command_defn["response"][0][1]
+                value = result.command.command_defn["response"][0][3][result.responses[0].decode()]
+                result.decoded_responses = {data_name: [value, ""]}
+            case ResponseType.MULTIVALUED:
+                # Response that while able to be split, makes more sense as a single response
+                # eg Max Charging Current Options: 010 020 030 040 050 060 070 080 090 100 110 120 A
+                data_name = result.command.command_defn["response"][0][1]
+                value = ""
+                for i in result.responses:
+                    value += f"{i.decode()} "
+                data_units = result.command.command_defn["response"][0][3]
+                log.debug(f"{data_name}, {value}, {data_units}")
+                if len(result.command.command_defn["response"][0]) > 4:
+                    extra_info = result.command.command_defn["response"][0][4]
+                    result.decoded_responses = {data_name: [value, data_units, extra_info]}
+                else:
+                    result.decoded_responses = {data_name: [value, data_units]}
+                return
+            case _:
+                log.error(f"bad response type {response_type} for {result.command.name}")
+                result.error = True
+                result.error_messages.append(f"failed to decode responses: bad response type {response_type} for {result.command.name}")
+                return
+
+    #
+    #
+    # TODO: remove all the below function
+    def _decode(self, response, command) -> dict:
         """
         Take the raw response and turn it into a dict of name: value, unit entries
         """
@@ -297,8 +396,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         # TODO: fix this - move into new approach
         # DEFAULT - responses are determined by the order they are returned
         if response_type == "DEFAULT":
-            log.info("Processing DEFAULT type responses")
-            # print("Processing DEFAULT type responses")
+            log.error("Processing DEFAULT type responses")
+            print("Processing DEFAULT type responses")
             for i, result in enumerate(responses):
                 # decode result
                 if type(result) is bytes:
@@ -438,7 +537,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     data_units = response_defn[2]  # 3
 
                 elif response_type == "SEQUENTIAL":
-                    log.debug("Processing SEQUENTIAL type responses")
+                    log.warn("Processing SEQUENTIAL type responses")
+                    print("Processing SEQUENTIAL type responses")
                     # check for extra definitions...
                     extra_responses_needed = len(command_defn["response"]) - len(frame)
                     if extra_responses_needed > 0:
@@ -458,7 +558,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     data_name = response_defn[1]  # 2
                     data_units = response_defn[2]  # 3
 
-                elif response_type == "INDEXED":
+                elif response_type == ResponseType.INDEXED:
                     log.debug("Processing INDEXED type responses")
                     # [1, "AC Input Voltage", "float", "V", {icon: blah}]
                     # check for extra definitions...

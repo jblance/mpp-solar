@@ -8,9 +8,9 @@ class test_command_line(unittest.TestCase):
 
     def test_run_mppsolar(self):
         try:
-            expected = "Command: QID - Device Serial Number inquiry\n--------------------------------------------------------------------------------\nParameter      Value          \tUnit\nerror          Serial command execution failed\t    \nvalidity_check Error: incorrect response format\t    \n"
+            expected = "serial_number=9293333010501\n"
             result = subprocess.run(
-                ["mpp-solar", "-c", "QID"], check=True, capture_output=True, text=True
+                ["mpp-solar", "-c", "QID", "-p", "test0", "-o", "simple"], check=True, capture_output=True, text=True
             )
             self.assertEqual(result.stdout, expected)
             self.assertEqual(result.returncode, 0)
