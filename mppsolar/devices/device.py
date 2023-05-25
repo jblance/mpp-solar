@@ -2,6 +2,7 @@
 import logging
 from abc import ABC
 
+from mppsolar.version import __version__  # noqa: F401
 from mppsolar.helpers import get_kwargs
 from mppsolar.inout import get_port
 from mppsolar.protocols import get_protocol
@@ -69,6 +70,8 @@ class AbstractDevice(ABC):
             return self.get_settings()
         if command == "get_device_id":
             return self.get_device_id()
+        if command == "get_version":
+            return self.get_version()
 
         if not command:
             command = self._protocol.DEFAULT_COMMAND
@@ -158,3 +161,10 @@ class AbstractDevice(ABC):
                 "_command_description": "Generate a device id",
                 "DeviceID": ["getDeviceId not supported for this protocol", ""],
             }
+
+    def get_version(self) -> dict:
+        return {
+            "_command": "Get Version",
+            "_command_description": "Output the mpp-solar software version",
+            "MPP-Solar Software Version": [__version__, ""],
+        }
