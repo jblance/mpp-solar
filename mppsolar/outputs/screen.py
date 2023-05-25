@@ -91,3 +91,7 @@ class screen(baseoutput):
                 print(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}\t{extra}")
             else:
                 print(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}")
+
+        # print footer
+        print("-" * 80)
+        print("\n")
