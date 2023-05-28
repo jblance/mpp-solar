@@ -81,17 +81,21 @@ def get_device_class(device_type=None):
     return device_class
 
 
-def getMaxLen(d):
+def getMaxLen(data, index=0):
     _maxLen = 0
-    for i in d:
-        if type(i) == list:
-            i = i[0]
-        if len(i) > _maxLen:
-            _maxLen = len(i)
+    for item in data:
+        if type(item) == list:
+            item = item[index]
+        if type(item) == float or type(item) == int:
+            item = str(item)
+        if len(item) > _maxLen:
+            _maxLen = len(item)
     return _maxLen
 
 
 def pad(text, length):
+    if type(text) == float or type(text) == int:
+        text = str(text)
     if len(text) > length:
         return text
     return text.ljust(length, " ")
