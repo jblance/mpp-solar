@@ -7,8 +7,6 @@ from powermon.formats.abstractformat import AbstractFormat
 
 log = logging.getLogger("formats")
 
-DEFAULT_FORMAT = "simple"
-
 
 class FormatterType(LowercaseStrEnum):
     HASS = auto()
@@ -17,6 +15,9 @@ class FormatterType(LowercaseStrEnum):
     SIMPLE = auto()
     TABLE = auto()
     TOPICS = auto()
+
+
+DEFAULT_FORMAT = FormatterType.SIMPLE
 
 
 def getFormatfromConfig(formatConfig, device, topic) -> AbstractFormat:

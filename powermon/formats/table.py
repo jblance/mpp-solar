@@ -46,7 +46,7 @@ class table(AbstractFormat):
             unit = displayData[key][1]
             if len(displayData[key]) > 2 and displayData[key][2] and self.extra_info:
                 extra = displayData[key][2]
-                _result.append(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}\t{extra}")
+                _result.append(f"{pad(key,maxP+1)}{value:<15} {unit:<4} {extra}")
             else:
-                _result.append(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}")
+                _result.append(f"{pad(key,maxP+1)}{value:<15} {unit:<4}")
         return _result

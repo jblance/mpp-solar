@@ -14,9 +14,5 @@ class AbstractOutput(ABC):
         self.formatter = formatter
 
     @abstractmethod
-    def output(self, data):
-        pass
-
-    @abstractmethod
     def process(self, result):
         pass

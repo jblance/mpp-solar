@@ -311,22 +311,34 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.info(f"Processing response of type {response_type}")
 
         # Process the response by reponse type
-        # FIXME: result.decoded_responses = {"two letter words": [123, "count"], "three letter words": [456, "count", {"icon": "bob"}]}
         # QUESTION: should the decode be {"two letter words": {"value": 123, "unit":"count"}, ...}
         match response_type:
             case ResponseType.ACK:
                 # Usually for setter type commands
                 # expects a single response, eg b'NAK'
-                data_name = result.command.command_defn["response"][0][1]
-                value = result.command.command_defn["response"][0][3][result.responses[0].decode()]
-                result.decoded_responses = {data_name: [value, ""]}
+
+                # get the response definition
+                response_defn = self.get_response_defn(result, index=0)
+
+                # decode the response
+                raw_value = result.responses[0].decode()
+
+                # populate vars from response and response definition
+                data_name = get_value(response_defn, 1)
+                result_dict = get_value(response_defn, 3)
+                extra_info = get_value(response_defn, 4)
+                value = result_dict.get(raw_value)
+
+                # update result object with decoded responses
+                result.decoded_responses = {data_name: [value, "", extra_info]}
+                return
             case ResponseType.MULTIVALUED:
                 # Response that while able to be split, makes more sense as a single response
                 # eg Max Charging Current Options: 010 020 030 040 050 060 070 080 090 100 110 120 A
                 data_name = result.command.command_defn["response"][0][1]
                 value = ""
-                for i in result.responses:
-                    value += f"{i.decode()} "
+                for item in result.responses:
+                    value += f"{item.decode()} "
                 data_units = result.command.command_defn["response"][0][3]
                 log.debug(f"{data_name}, {value}, {data_units}")
                 if len(result.command.command_defn["response"][0]) > 4:

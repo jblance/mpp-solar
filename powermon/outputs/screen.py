@@ -31,23 +31,3 @@ class Screen(AbstractOutput):
 
         for line in formatted_data:
             print(line)
-
-    def output(self, data):
-        log.info("Using output sender: screen")
-        log.debug("formatter: %s" % self.formatter)
-        if data is None:
-            print("No data supplied")
-            return
-
-        # TODO: update for result object
-        # formatted_data = self.formatter.process(data)
-        formatted_data = self.formatter.format(data)
-        if formatted_data is None:
-            print("Nothing returned from data formatting")
-            return
-
-        if isinstance(formatted_data, list):
-            for line in formatted_data:
-                print(line)
-        else:
-            print(formatted_data)
