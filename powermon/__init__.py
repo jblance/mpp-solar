@@ -11,7 +11,6 @@ import yaml
 from mppsolar.version import __version__  # noqa: F401
 from powermon.device import Device
 from powermon.libs.apicoordinator import ApiCoordinator
-from powermon.libs.configurationManager import ConfigurationManager
 from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
 
@@ -135,14 +134,8 @@ def main():
     daemon = Daemon(config=config.get("daemon"))
     log.info(daemon)
 
-    # build controller
-    # TODO: follow same pattern as others, eg
-    # scheduleController = ScheduleController(config=config.get("schedules"), device=, mqtt_broker=)
-    controller = ConfigurationManager.parseControllerConfig(config, device, mqtt_broker)
-    log.info(controller)
-
     # build api coordinator
-    api_coordinator = ApiCoordinator(config=config.get("api"), device=device, mqtt_broker=mqtt_broker, schedule=controller)
+    api_coordinator = ApiCoordinator(config=config.get("api"), device=device, mqtt_broker=mqtt_broker)
     log.info(api_coordinator)
 
     # initialize daemon
@@ -150,25 +143,16 @@ def main():
 
     # initialize device
     device.initialize()
-    controller.beforeLoop()
 
     # Main working loop
     keep_looping = True
-    controller_looping = True
-    device_looping = True
     try:
         while keep_looping:
             # tell the daemon we're still working
             daemon.watchdog()
 
             # run schedule loop
-            if controller_looping:
-                controller_looping = controller.runLoop()
-            if device_looping:
-                device_looping = device.runLoop()
-            # stop looping if neither controller or device runLoops return True
-            if not controller_looping and not device_looping:
-                keep_looping = False
+            keep_looping = device.runLoop()
 
             # run api coordinator ...
             api_coordinator.run()

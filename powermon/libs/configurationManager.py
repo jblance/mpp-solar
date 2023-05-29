@@ -13,6 +13,7 @@ from powermon.scheduling.schedules.onetimeSchedule import OneTimeSchedule
 log = logging.getLogger("ConfigurationManager")
 
 
+# TODO: remove / delete
 class ConfigurationManager:
     @staticmethod
     def parseSchedulesConfig(config) -> list[AbstractSchedule]:

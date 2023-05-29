@@ -84,7 +84,7 @@ class boxdraw(baseoutput):
         if width_v < 6 + _pad:
             width_v = 6 + _pad
         # Width of units column
-        width_u = getMaxLen(data.values(), 1) + _pad  # TODO: fixme
+        width_u = getMaxLen(data.values(), 1) + _pad
         if width_u < 5 + _pad:
             width_u = 5 + _pad
         # Total line length

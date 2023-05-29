@@ -88,11 +88,8 @@ class Device:
                     result = self.port.run_command(command)
                     # decode result
                     self.port.protocol.decode(result)
-                    # print(result)
-                    # loop each output and process result
+                    # loop through each output and process result
                     for output in command.outputs:
                         log.debug(f"Using Output: {output}")
-                        # output.output(data=result.decoded_response)
-                        # TODO: update outputer
                         output.process(result=result)
             return True

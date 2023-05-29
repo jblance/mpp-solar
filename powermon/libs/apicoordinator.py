@@ -3,8 +3,6 @@ from time import time
 
 import yaml
 
-from powermon.scheduling.scheduleController import ScheduleController
-
 log = logging.getLogger("APICoordinator")
 
 
@@ -12,13 +10,12 @@ class ApiCoordinator:
     def __str__(self):
         if not self.enabled:
             return "ApiCoordinator DISABLED"
-        return f"ApiCoordinator: adhocTopic: {self.adhocTopic}, announceTopic: {self.announceTopic}, schedule: {self.schedule}"
+        return f"ApiCoordinator: adhocTopic: {self.adhocTopic}, announceTopic: {self.announceTopic}"
 
-    def __init__(self, config, device, mqtt_broker, schedule: ScheduleController):
+    def __init__(self, config, device, mqtt_broker):
         log.debug(f"ApiCoordinator config: {config}")
         self.device = device
         self.mqtt_broker = mqtt_broker
-        self.schedule = schedule
         self.last_run = None
         if not config:
             self.enabled = False
@@ -50,7 +47,7 @@ class ApiCoordinator:
         for command in _command_config["commands"]:
             log.debug(f"command: {command}")
             log.debug(f"self: {self}")
-            self.schedule.addOneTimeCommandFromConfig(command)
+            # self.schedule.addOneTimeCommandFromConfig(command)
 
     def run(self):
         if not self.enabled:
@@ -61,5 +58,5 @@ class ApiCoordinator:
             self.last_run = time()
 
     def announceDevice(self):
-        scheduleDTO = self.schedule.toDTO()
-        self.mqtt_broker.publish(self.announceTopic, scheduleDTO.json())
+        # scheduleDTO = self.schedule.toDTO()
+        self.mqtt_broker.publish(self.announceTopic, "{'announceDevice':'todo'}")
