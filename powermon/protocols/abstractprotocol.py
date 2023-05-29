@@ -69,6 +69,19 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.debug(f"full command: {full_command}")
         return full_command
 
+    def get_response_defn(self, result, index=None, key=None):
+        definitions_count = len(result.command.command_defn["response"])
+        if index is not None:
+            if index < definitions_count:
+                return result.command.command_defn["response"][index]
+            else:
+                return [index, f"Unknown value in response {index}", "bytes.decode", ""]
+        elif key is not None:
+            log.error("key todo abprotocol line 80")  # TODO: add key type get response defn
+            raise Exception("get_response_defn needs key logic implemented")
+        else:
+            raise Exception("get_response_defn needs index or key")
+
     def get_command_defn(self, command) -> dict:
         log.debug(f"Processing command '{command}'")
         if command in self.COMMANDS and "regex" not in self.COMMANDS[command]:
@@ -91,9 +104,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         Default implementation of split and trim
         """
         # Trim leading '(' + trailing CRC and \r of response, then split
-        if type(response) is str:
-            return response[1:-3].split(" ")
-        return response[1:-3].split(b" ")
+        return response[1:-3].split(None)
 
     def check_response_valid(self, result) -> Result:
         """
@@ -107,15 +118,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             result.is_valid = True
         return
 
-    def process_response(
-        self,
-        data_name=None,
-        data_type=None,
-        data_units=None,
-        raw_value=None,
-        frame_number=0,
-        extra_info=None,
-    ):
+    def process_response(self, data_name=None, data_type=None, data_units=None, raw_value=None, frame_number=0, extra_info=None):
         template = None
         # Check for a format modifying template
         if ":" in data_type:
@@ -125,128 +128,133 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             # eg "f'Frame Number {f:02d}'"
             f = frame_number  # noqa: F841
             data_name = eval(data_name)
-        log.debug(f"Processing data_type: {data_type}, template: {template} for data_name: {data_name}, raw_value {raw_value}")
-        if data_type == "loop":
-            log.warning("loop not implemented...")
-            return [(data_name, None, data_units, extra_info)]
-        if data_type == "exclude" or data_type == "discard" or raw_value == "extra":
+        if raw_value == "extra":
             # Just ignore these ones
             log.debug(f"Discarding {data_name}:{raw_value}")
             return [(None, raw_value, data_units, extra_info)]
-        if data_type == "option":
-            try:
-                key = int(raw_value)
-                r = data_units[key]
-            except ValueError:
-                r = f"Unable to process to int: {raw_value}"
-                return [(None, r, "", None)]
-            except IndexError:
-                r = f"Invalid option: {key}"
-            return [(data_name, r, "", extra_info)]
-        if data_type == "hex_option":
-            key = int(raw_value[0])
-            if key < len(data_units):
-                r = data_units[key]
-            else:
-                r = f"Invalid hex_option: {key}"
-            return [(data_name, r, "", extra_info)]
-        if data_type == "flags":
-            log.debug("flags defn")
-            # [
-            #     "Device Status",
-            #     "flags",
-            #     [
-            #         "Is SBU Priority Version Added",
-            #         "Is SCC Firmware Updated",
-            #         "Is Load On",
-            #     ],
-            # ],
-            return_value = []
-            for i, flag in enumerate(raw_value):
-                if data_units[i]:  # only append value if flag name is present
-                    return_value.append((data_units[i], int(chr(flag)), "bool", None))
-
-            # if flag != "" and flag != b'':
-            # msgs[resp_format[2][j]] = [int(flag), "bool"]
-            # print(j, int(flag))
-            return return_value
-        if data_type == "enflags":
-            log.debug("enflags defn")
-            # "Device Status",
-            #     "enflags",
-            #     {
-            #         "a": {"name": "Buzzer", "state": "disabled"},
-            #         "b": {"name": "Overload Bypass", "state": "disabled"},
-            #         "j": {"name": "Power Saving", "state": "disabled"},
-            #         "k": {"name": "LCD Reset to Default", "state": "disabled"},
-            #         "u": {"name": "Overload Restart", "state": "disabled"},
-            #         "v": {"name": "Over Temperature Restart", "state": "disabled"},
-            #         "x": {"name": "LCD Backlight", "state": "disabled"},
-            #         "y": {
-            #             "name": "Primary Source Interrupt Alarm",
-            #             "state": "disabled",
-            #         },
-            #         "z": {"name": "Record Fault Code", "state": "disabled"},
-            #     },
-            return_value = []
-            status = "unknown"
-            for i, item in enumerate(raw_value):
-                item = chr(item)
-                if item == "E":
-                    status = "enabled"
-                elif item == "D":
-                    status = "disabled"
+        log.debug(f"Processing data_type: {data_type}, template: {template} for data_name: {data_name}, raw_value {raw_value}")
+        match data_type:
+            case "loop":
+                log.warning("loop not implemented...")
+                return [(data_name, None, data_units, extra_info)]
+            case "exclude" | "discard":
+                # Just ignore these ones
+                log.debug(f"Discarding {data_name}:{raw_value}")
+                return [(None, raw_value, data_units, extra_info)]
+            case "option":
+                try:
+                    key = int(raw_value)
+                    r = data_units[key]
+                except ValueError:
+                    r = f"Unable to process to int: {raw_value}"
+                    return [(None, r, "", None)]
+                except IndexError:
+                    r = f"Invalid option: {key}"
+                return [(data_name, r, "", extra_info)]
+            case "hex_option":
+                key = int(raw_value[0])
+                if key < len(data_units):
+                    r = data_units[key]
                 else:
-                    if item in data_units:
-                        _key = data_units[item]["name"]
+                    r = f"Invalid hex_option: {key}"
+                return [(data_name, r, "", extra_info)]
+            case "flags":
+                log.debug("flags defn")
+                # [
+                #     "Device Status",
+                #     "flags",
+                #     [
+                #         "Is SBU Priority Version Added",
+                #         "Is SCC Firmware Updated",
+                #         "Is Load On",
+                #     ],
+                # ],
+                return_value = []
+                for i, flag in enumerate(raw_value):
+                    if data_units[i]:  # only append value if flag name is present
+                        return_value.append((data_units[i], int(chr(flag)), "bool", None))
+
+                # if flag != "" and flag != b'':
+                # msgs[resp_format[2][j]] = [int(flag), "bool"]
+                # print(j, int(flag))
+                return return_value
+            case "enflags":
+                log.debug("enflags defn")
+                # "Device Status",
+                #     "enflags",
+                #     {
+                #         "a": {"name": "Buzzer", "state": "disabled"},
+                #         "b": {"name": "Overload Bypass", "state": "disabled"},
+                #         "j": {"name": "Power Saving", "state": "disabled"},
+                #         "k": {"name": "LCD Reset to Default", "state": "disabled"},
+                #         "u": {"name": "Overload Restart", "state": "disabled"},
+                #         "v": {"name": "Over Temperature Restart", "state": "disabled"},
+                #         "x": {"name": "LCD Backlight", "state": "disabled"},
+                #         "y": {
+                #             "name": "Primary Source Interrupt Alarm",
+                #             "state": "disabled",
+                #         },
+                #         "z": {"name": "Record Fault Code", "state": "disabled"},
+                #     },
+                return_value = []
+                status = "unknown"
+                for i, item in enumerate(raw_value):
+                    item = chr(item)
+                    if item == "E":
+                        status = "enabled"
+                    elif item == "D":
+                        status = "disabled"
                     else:
-                        _key = f"unknown_{i}"
-                    return_value.append((_key, status, "", None))
-            return return_value
-        if data_type == "keyed":
-            log.debug("keyed defn")
-            # [
-            #     "keyed",
-            #     1,
-            #     "Command response flag",
-            #     {
-            #         "00": "OK",
-            #         "01": "Unknown ID",
-            #         "02": "Not supported",
-            #         "04": "Parameter Error",
-            #     },
-            # ],
-            key = ""
-            for x in raw_value:
-                key += f"{x:02x}"
-            if key in data_units:
-                r = data_units[key]
-            else:
-                r = f"Invalid key: {key}"
-            return [(data_name, r, "", None)]
-        if data_type == "str_keyed":
-            log.debug("str_keyed defn")
-            # [
-            #     "str_keyed",
-            #     "Device Mode",
-            #     {
-            #         "B": "Inverter (Battery) Mode",
-            #         "C": "PV charging Mode",
-            #         "D": "Shutdown Mode",
-            #         "F": "Fault Mode",
-            #         "G": "Grid Mode",
-            #         "L": "Line Mode",
-            #         "P": "Power on Mode",
-            #         "S": "Standby Mode",
-            #         "Y": "Bypass Mode",
-            #     },
-            # ]
-            key = raw_value.decode()
-            if key in data_units:
-                r = data_units[key]
-            else:
-                r = f"Invalid key: {key}"
-            return [(data_name, r, "", extra_info)]
+                        if item in data_units:
+                            _key = data_units[item]["name"]
+                        else:
+                            _key = f"unknown_{i}"
+                        return_value.append((_key, status, "", None))
+                return return_value
+            case "keyed":
+                log.debug("keyed defn")
+                # [
+                #     "keyed",
+                #     1,
+                #     "Command response flag",
+                #     {
+                #         "00": "OK",
+                #         "01": "Unknown ID",
+                #         "02": "Not supported",
+                #         "04": "Parameter Error",
+                #     },
+                # ],
+                key = ""
+                for x in raw_value:
+                    key += f"{x:02x}"
+                if key in data_units:
+                    r = data_units[key]
+                else:
+                    r = f"Invalid key: {key}"
+                return [(data_name, r, "", None)]
+            case "str_keyed":
+                log.debug("str_keyed defn")
+                # [
+                #     "str_keyed",
+                #     "Device Mode",
+                #     {
+                #         "B": "Inverter (Battery) Mode",
+                #         "C": "PV charging Mode",
+                #         "D": "Shutdown Mode",
+                #         "F": "Fault Mode",
+                #         "G": "Grid Mode",
+                #         "L": "Line Mode",
+                #         "P": "Power on Mode",
+                #         "S": "Standby Mode",
+                #         "Y": "Bypass Mode",
+                #     },
+                # ]
+                key = raw_value.decode()
+                if key in data_units:
+                    r = data_units[key]
+                else:
+                    r = f"Invalid key: {key}"
+                return [(data_name, r, "", extra_info)]
         format_string = f"{data_type}(raw_value)"
         log.debug(f"Processing format string {format_string}")
         try:
@@ -327,6 +335,82 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 else:
                     result.decoded_responses = {data_name: [value, data_units]}
                 return
+            case ResponseType.INDEXED:
+                # Most common response, items are defined by their order
+                # after splitting responses will be in an ordered list
+                # first definition field contains item index in list
+                # [5, "ChargeAverageCurrent", "bytes.decode", ""],
+                # [6, "SCC PWM temperature", "int", "°C", {"device-class": "temperature"}],
+
+                # initialize decoded responses as dict if None
+                if result.decoded_responses is None:
+                    result.decoded_responses = {}
+
+                # check the number of responses and the number of response definitions
+                len_responses = len(result.responses)
+                len_defns = len(result.command.command_defn["response"])
+                log.debug("got %s responses, %s response definitions" % (len_responses, len_defns))
+
+                # if there are more definitions than responses, the extras may be calculated fields
+                extra_responses_needed = len_defns - len_responses
+                if extra_responses_needed > 0:
+                    for _ in range(extra_responses_needed):
+                        result.responses.append("extra")
+
+                # loop through responses
+                for i, _response in enumerate(result.responses):
+                    # get response defn for this response
+                    # [1, "AC Input Voltage", "float", "V", {icon: blah}]
+                    response_defn = self.get_response_defn(result, index=i)
+
+                    # populate vars from response and response definition
+                    raw_value = _response
+                    # data_posi = get_value(response_defn, 0)
+                    data_name = get_value(response_defn, 1)
+                    data_type = get_value(response_defn, 2)
+                    data_units = get_value(response_defn, 3)
+                    extra_info = get_value(response_defn, 4)
+
+                    #
+                    # Check for lookup
+                    # if data_type.startswith("lookup"):
+                    #     log.debug("processing lookup...")
+                    #     log.info(f"Processing data_type: '{data_type}' for data_name: '{data_name}', raw_value '{raw_value}'")
+                    #     m = msgs
+                    #     template = data_type.split(":", 1)[1]
+                    #     log.debug(f"Got template {template} for {data_name} {raw_value}")
+                    #     lookup = eval(template)
+                    #     log.debug(f"looking up values for: {lookup}")
+                    #     value, data_units = m[lookup]
+                    #     if data_name is not None:
+                    #         msgs[data_name] = [value, data_units, extra_info]
+                    if data_type.startswith("info"):  # TODO: and/or this should move to process_response
+                        log.debug(f"Processing info, {data_type=} for {data_name=}, {data_units=} {_response=}")
+                        template = data_type.split(":", 1)[1]
+                        # Provide cn as shortcut to the command name for info fields
+                        cn = result.command.name  # noqa: F841
+                        value = eval(template)
+                        if data_name is not None:
+                            result.decoded_responses[data_name] = [value, data_units, extra_info]
+                    else:
+                        # Process response  # TODO: this should be collapsed
+                        processed_responses = self.process_response(
+                            data_name=data_name,
+                            raw_value=raw_value,
+                            data_units=data_units,
+                            data_type=data_type,
+                            frame_number=0,
+                            extra_info=extra_info,
+                        )
+                        for item in processed_responses:
+                            data_name, value, data_units, extra_info = item
+                            if data_name is not None:
+                                if extra_info:
+                                    result.decoded_responses[data_name] = [value, data_units, extra_info]
+                                else:
+                                    result.decoded_responses[data_name] = [value, data_units]
+                return
+
             case _:
                 log.error(f"bad response type {response_type} for {result.command.name}")
                 result.error = True
