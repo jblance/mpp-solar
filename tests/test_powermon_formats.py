@@ -1,30 +1,49 @@
 import subprocess
 import unittest
 # import json
+import yaml
+from powermon.device import Device
+from powermon.formats.hass import hass
+from powermon.libs.result import Result
 
 
 class test_powermon_formats(unittest.TestCase):
     maxDiff = 9999
 
     def test_format_hass(self):
-        print("test_format_hass todo")  # TODO: implement
-        # return
-        try:
-            expected = ""
-            result = subprocess.run(
-                ["powermon", "--once", "--config", '{"device": {"port":{"type":"test"}}, "commands": [{"command":"QPI", "outputs": [{"type": "screen", "format": "hass"}]}]} '],
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-            print(result.stdout)
-            return
-            self.assertEqual(result.stdout, expected)
-            self.assertEqual(result.returncode, 0)
-        except subprocess.CalledProcessError as error:
-            print(error.stdout)
-            print(error.stderr)
-            raise error
+
+        config = yaml.safe_load("""device:
+  name: Test_Inverter
+  id: 123456789
+  model: 8048MAX
+  manufacturer: MPP-Solar
+  port:
+    type: test
+    protocol: PI30
+    """)
+        topic0 = "homeassistant/sensor/mpp_protocol_id/config"
+        payload0 = '{"name": "mpp protocol_id", "state_topic": "homeassistant/sensor/mpp_protocol_id/state", "unique_id": "mpp_protocol_id", "force_update": "true", "last_reset": "2023-05-30 03:41:31.850677", "device": {"name": "Test_Inverter", "identifiers": [123456789], "model": "8048MAX", "manufacturer": "MPP-Solar"}}'
+        topic1 = "homeassistant/sensor/mpp_protocol_id/state"
+        payload1 = "PI30"
+        device = Device.fromConfig(config=config.get("device"))
+        # print(device)
+        hass_formatter = hass({}, device)
+        _result = Result()
+        _result.decoded_responses = {"protocol_id": ["PI30", "", ""]}
+        result = hass_formatter.format(_result)
+
+        # print('\n')
+        # print(result[0]['payload'][-90:])
+        # print(payload0[-112:])
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]['topic'], topic0)
+        # need to exclude checking last_reset value as it is time based
+        self.assertEqual(result[0]['payload'][:160], payload0[:160])
+        self.assertEqual(result[0]['payload'][-112:], payload0[-112:])
+
+        self.assertEqual(result[1]['topic'], topic1)
+        self.assertEqual(result[1]['payload'], payload1)
 
     def test_format_htmltable(self):
         try:
@@ -103,23 +122,3 @@ protocol_id PI30
     def test_format_topics(self):
         print("test_format_topics todo")  # TODO: implement
         return
-        try:
-            expected = """Command: QPI - Protocol ID inquiry
------------------------
-Parameter    Value Unit
-protocol_id PI30                
-"""
-            result = subprocess.run(
-                ["powermon", "--once", "--config", '{"device": {"port":{"type":"test"}}, "commands": [{"command":"QPI", "outputs": [{"type": "screen", "format": "topics"}]}]} '],
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-            print(result.stdout)
-            return
-            self.assertEqual(result.stdout, expected)
-            self.assertEqual(result.returncode, 0)
-        except subprocess.CalledProcessError as error:
-            print(error.stdout)
-            print(error.stderr)
-            raise error
