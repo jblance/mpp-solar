@@ -8,6 +8,9 @@ test: tests/*.py
 	coverage html
 
 t: tests/*.py
+	python3 -m unittest -f
+	
+tv: tests/*.py
 	python3 -m unittest -f -v
 
 pypi:

@@ -25,24 +25,33 @@ class Command:
 
         return f"Command: {self.name}, type: {self.type}, outputs: [{_outs}] last run: {last_run}, next run: {next_run}, {self.trigger}, defn: {self.command_defn}"
 
-    def __init__(self, config):
+    @classmethod
+    def fromConfig(cls, config=None):
         # need to have a config defined
         # minimum is
         # - command: QPI
-
         if not config:
             log.warning("Invalid command config")
             raise TypeError("Invalid command config")
             # return None
 
-        self.name = config.get("command")
-        if self.name is None:
+        name = config.get("command")
+        if name is None:
             log.info("command must be defined")
             raise TypeError("command must be defined")
-        self.type = config.get("type", "basic")
-        self.outputs = getOutputs(config.get("outputs", ""))
+        commandtype = config.get("type", "basic")
+        outputs = getOutputs(config.get("outputs", ""))
+        trigger = Trigger(config=config.get("trigger"))
+        return cls(name=name, commandtype=commandtype, outputs=outputs, trigger=trigger)
+
+    def __init__(self, name : str, commandtype: str, outputs: list, trigger : Trigger):
+
+        self.name = name
+        self.type = commandtype
+        self.outputs = outputs
+        self.trigger = trigger
+
         self.last_run = None
-        self.trigger = Trigger(config=config.get("trigger"))
         self.next_run = self.trigger.nextRun(command=self)
         self.full_command = None
         self.command_defn = None

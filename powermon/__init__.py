@@ -13,6 +13,7 @@ from powermon.device import Device
 from powermon.libs.apicoordinator import ApiCoordinator
 from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
+from powermon.commands.command import Command
 
 # from time import sleep, time
 # from powermon.ports import getPortFromConfig
@@ -122,7 +123,13 @@ def main():
     log.info("config: %s" % config)
 
     # build device object (required)
-    device = Device(config=config.get("device"), commandConfig=config.get("commands"))
+    device = Device.fromConfig(config=config.get("device"))
+    log.debug(device)
+    # add commands to device command list
+    for commandConfig in config.get("commands"):
+        command = Command.fromConfig(commandConfig)
+        if command is not None:
+            device.add_command(command)
     log.info(device)
 
     # build mqtt broker object (optional)
