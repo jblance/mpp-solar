@@ -100,10 +100,11 @@ class test_powermon_formats(unittest.TestCase):
 
     def test_format_table(self):
         try:
-            expected = """Command: QPI - Protocol ID inquiry
------------------------
-Parameter    Value Unit
-protocol_id PI30                
+            expected = """-----------------------------------------
+Command: QPI - Protocol ID inquiry     
+-----------------------------------------
+Parameter    Value   Unit           
+protocol_id  PI30                   
 """
             result = subprocess.run(
                 ["powermon", "--once", "--config", '{"device": {"port":{"type":"test"}}, "commands": [{"command":"QPI", "outputs": [{"type": "screen", "format": "table"}]}]} '],
