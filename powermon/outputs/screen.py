@@ -25,9 +25,9 @@ class Screen(AbstractOutput):
             return
 
         formatted_data = self.formatter.format(result)
-        # if formatted_data is None:
-        #     print("Nothing returned from data formatting")
-        #     return
+        if formatted_data is None:
+            print("Nothing returned from data formatting")
+            return
 
         for line in formatted_data:
             print(line)

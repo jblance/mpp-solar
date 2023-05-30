@@ -1,5 +1,9 @@
 # minimal config for powermon
 device:
+  name: Test_Inverter
+  id: 123456789
+  model: 8048MAX
+  manufacturer: MPP-Solar
   port:
     type: test
     response_number: 0
@@ -10,10 +14,12 @@ commands:
 #   outputs:
 #   - type: screen
 #     format: raw
-- command: QPI
+- command: QPIGS
   outputs:
   - type: screen
-    format: hass
+    format:
+      type: table
+      # draw_lines: True
   # type: continuous
   # trigger: # default to something sensible (only one of the below is needed/used)
   # - loops: 1 # run every loop

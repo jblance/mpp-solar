@@ -100,13 +100,13 @@ def parseOutputConfig(outputConfig, topic=None, schedule_name=None, device=None,
         # eg [{'type': 'screen', 'format': 'simple'}], possibly multiple outputs
         # loop through outputs
         log.debug("got list type outputConfig: %s" % (outputConfig))
-        outputs = []
-        for item in outputConfig:
-            _out = parseOutputConfig(item, topic, schedule_name, device, mqtt_broker)
-            if _out is not None:
-                outputs.append(_out)
-        return outputs
+        raise Exception("Problem in outputs init - list type for outputConfig")
 
+        # for item in outputConfig:
+        #     _out = parseOutputConfig(item, topic, schedule_name, device, mqtt_broker)
+        #     if _out is not None:
+        #         outputs.append(_out)
+        # return outputs
     else:
         # miss configured output?
         log.warn("outputConfig (%s) doesnt match expectations, defaulting" % outputConfig)

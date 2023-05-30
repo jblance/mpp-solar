@@ -28,10 +28,10 @@ commands:
     # format: table
     format: 
       type: htmltable
-    #   #keep_case: True
-    #   #remove_spaces: False
-    #   #extra_info: True
-    #   filter: ^ac|^pv
+      # #keep_case: True
+      # #remove_spaces: False
+      # #extra_info: True
+      # filter: ^ac|^pv
 - command: QPI
   outputs:
     format: table

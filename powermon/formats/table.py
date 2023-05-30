@@ -1,4 +1,5 @@
 import logging
+
 from mppsolar.helpers import getMaxLen, pad
 from powermon.formats.abstractformat import AbstractFormat
 
@@ -6,10 +7,14 @@ log = logging.getLogger("table")
 
 
 class table(AbstractFormat):
+    def __str__(self):
+        return "outputs the results to standard out in a table (optionally formatted with line art boxes)"
+
     def __init__(self, formatConfig):
         super().__init__(formatConfig)
         self.name = "table"
         self.extra_info = formatConfig.get("extra_info", False)
+        self.drawlines = formatConfig.get("draw_lines", False)
 
     def format(self, result):
         log.info("Using output formatter: %s" % self.name)
@@ -22,31 +27,66 @@ class table(AbstractFormat):
         displayData = self.formatAndFilterData(data)
         log.debug(f"displayData: {displayData}")
 
-        # get sizes data to display
-        maxP = getMaxLen(displayData)
-        if maxP < 9:
-            maxP = 9
-        maxV = getMaxLen(data.values())
-        if maxV > 50:
-            maxV = 50
-        width = maxP + maxV + 8
-
         # build header
-        _result.append(f"Command: {result.command.name} - {result.command.command_defn['description']}")
-        # if filter or excl_filter:
-        #     _result.append(
-        #         f"Using filter: '{filter}' and excl_filter: '{excl_filter}'. {len(displayData)} results retained from {len(data)} in total"
-        #     )
-        _result.append("-" * width)
+        command = result.command.name
+        description = result.command.command_defn['description']
 
-        # build data
-        _result.append(f"{pad('Parameter', maxP+2)}{pad('Value', maxV+2)}Unit")
+        # Determine column widths
+        _pad = 1
+        # Width of parameter column
+        width_p = getMaxLen(displayData) + _pad
+        if width_p < 9 + _pad:
+            width_p = 9 + _pad
+        # Width of value column
+        width_v = getMaxLen(data.values()) + _pad
+        if width_v < 6 + _pad:
+            width_v = 6 + _pad
+        # Width of units column
+        width_u = getMaxLen(data.values(), 1) + _pad
+        if width_u < 5 + _pad:
+            width_u = 5 + _pad
+        # Total line length
+        line_length = width_p + width_v + width_u + 7
+        # Check if command / description line is longer and extend line if needed
+        cmd_str = f"Command: {command} - {description}"
+        if line_length < (len(cmd_str) + 7):
+            line_length = len(cmd_str) + 7
+        # Check if columns too short and expand units if needed
+        if (width_p + width_v + width_u + 7) < line_length:
+            width_u = line_length - (width_p + width_u + 7) - 1
+
+        # print header
+        if self.drawlines:
+            _result.append("\u2554" + ("\u2550" * (line_length - 2)) + "\u2557")
+            _result.append(f"\u2551 {cmd_str}" + (" " * (line_length - len(cmd_str) - 3)) + "\u2551")
+        else:
+            _result.append("-" * (line_length))
+            _result.append(f"{cmd_str}" + (" " * (line_length - len(cmd_str) - 2)))
+            _result.append("-" * (line_length))
+
+        # print separator
+        if self.drawlines:
+            _result.append("\u2560" + ("\u2550" * (width_p + 1)) + "\u2564" + ("\u2550" * (width_v + 1)) + "\u2564" + ("\u2550" * (width_u + 1)) + "\u2563")
+        # print column headings
+        if self.drawlines:
+            _result.append(f"\u2551 {pad('Parameter', width_p)}\u2502 {pad('Value', width_v)}\u2502 {pad('Unit', width_u)}\u2551")
+        else:
+            _result.append(f"{pad('Parameter', width_p)} {pad('Value', width_v)} {pad('Unit', width_u)}")
+        # print separator
+        if self.drawlines:
+            _result.append("\u255f" + ("\u2500" * (width_p + 1)) + "\u253c" + ("\u2500" * (width_v + 1)) + "\u253c" + ("\u2500" * (width_u + 1)) + "\u2562")
+
+        # print data
         for key in displayData:
             value = displayData[key][0]
             unit = displayData[key][1]
-            if len(displayData[key]) > 2 and displayData[key][2] and self.extra_info:
-                extra = displayData[key][2]
-                _result.append(f"{pad(key,maxP+1)}{value:<15} {unit:<4} {extra}")
+            if self.drawlines:
+                _result.append(f"\u2551 {pad(key, width_p)}\u2502 {pad(value, width_v)}\u2502 {pad(unit, width_u)}\u2551")
             else:
-                _result.append(f"{pad(key,maxP+1)}{value:<15} {unit:<4}")
+                _result.append(f"{pad(key, width_p)} {pad(value, width_v)} {pad(unit, width_u)}")
+
+        # print footer
+        if self.drawlines:
+            _result.append("\u255a" + ("\u2550" * (width_p + 1)) + "\u2567" + ("\u2550" * (width_v + 1)) + "\u2567" + ("\u2550" * (width_u + 1)) + "\u255d")
+        # _result.append("\n")
         return _result
