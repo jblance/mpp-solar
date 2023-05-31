@@ -32,7 +32,13 @@ class Device:
         identifier = config.get("id")
         model = config.get("model")
         manufacturer = config.get("manufacturer")
+
         port = getPortFromConfig(config.get("port"))
+        # error out if unable to configure port
+        if not port:
+            log.error("Invalid port config '%s' found", config)
+            raise ConfigError(f"Invalid port config '{config}' found")
+
         return cls(name=name, identifier=identifier, model=model, manufacturer=manufacturer, port=port)
 
     def __init__(self, name : str, identifier : str = "", model : str = "", manufacturer : str = "", port : AbstractPort = None):
@@ -43,21 +49,6 @@ class Device:
         self.manufacturer = manufacturer
         self.port = port
         self.commands = []
-
-        # build queue of commands
-        # if commandConfig is not None:
-        #     self.commandQueue = CommandQueue(config=commandConfig)
-        # else:
-        #     self.commandQueue = None
-
-        # # error out if unable to configure port
-        # if not self.port:
-        #     log.error("Invalid port config '%s' found", config)
-        #     raise ConfigError(f"Invalid port config '{config}' found")
-
-        # # Update commands with definition, now that we have a port / protocol
-        # for command in self.commandQueue.commands:
-        #     command.command_defn = self.port.protocol.get_command_defn(command.name)
 
     def add_command(self, command: Command = None) -> None:
         """ add a command to the device list of commands """
