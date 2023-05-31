@@ -1,19 +1,30 @@
 import logging
-import serial
 import time
-from powermon.dto.portDTO import PortDTO
 
-from .abstractport import AbstractPort
+import serial
+
+from powermon.dto.portDTO import PortDTO
+from powermon.ports.abstractport import AbstractPort
+from powermon.protocols import get_protocol
 
 log = logging.getLogger("SerialPort")
 
 
 class SerialPort(AbstractPort):
-    def __init__(self, config=None) -> None:
-        super().__init__(config)
-        log.debug(f"Initializing usbserial port. config:{config}")
-        self.path = config.get("path", "/dev/ttyUSB0")
-        self.baud = config.get("baud", 2400)
+    @classmethod
+    def fromConfig(cls, config=None):
+        log.debug(f"building serial port. config:{config}")
+        path = config.get("path", "/dev/ttyUSB0")
+        baud = config.get("baud", 2400)
+        # get protocol handler, default to PI30 if not supplied
+        protocol = get_protocol(protocol=config.get("protocol", "PI30"))
+        return cls(path=path, baud=baud, protocol=protocol)
+
+    def __init__(self, path, baud, protocol) -> None:
+        self.path = path
+        self.baud = baud
+        self.protocol = protocol
+
         self.serialPort = None
         self.error = None
 
@@ -42,7 +53,7 @@ class SerialPort(AbstractPort):
         log.debug(f"port {self.serialPort}")
         if self.serialPort is None:
             log.error("Port not available")
-            return {"ERROR": [f"Serial command execution failed {self.error}", ""]}
+            return {"ERROR": [f"Serial command execution failed {self.error}", ""]}  # FIXME do this properly
         try:
             log.debug("Executing command via usbserial...")
             self.serialPort.reset_input_buffer()
@@ -57,4 +68,4 @@ class SerialPort(AbstractPort):
         except Exception as e:
             log.warning(f"Serial read error: {e}")
         log.info("Command execution failed")
-        return {"ERROR": ["Serial command execution failed", ""]}
+        return {"ERROR": ["Serial command execution failed", ""]}  # FIXME do this properly

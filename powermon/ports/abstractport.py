@@ -5,7 +5,7 @@ from enum import auto
 from strenum import LowercaseStrEnum
 
 from powermon.libs.result import Result
-from powermon.protocols import get_protocol
+
 
 log = logging.getLogger("Port")
 
@@ -24,11 +24,6 @@ class PortType(LowercaseStrEnum):
 
 
 class AbstractPort(ABC):
-    def __init__(self, config):
-        # get protocol handler, default to PI30 if not supplied
-        protocol = get_protocol(protocol=config.get("protocol", "PI30"))
-        self.protocol = protocol
-
     @abstractmethod
     def connect(self) -> None:
         log.debug("Port connect not implemented")

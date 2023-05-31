@@ -27,16 +27,15 @@ def getPortFromConfig(port_config):
 
     # build port object
     if portType == PortType.SERIAL:
-        portObject = SerialPort(config=port_config)
+        portObject = SerialPort.fromConfig(config=port_config)
     elif portType == PortType.USB:
-        portObject = USBPort(config=port_config)
+        portObject = USBPort.fromConfig(config=port_config)
 
     # Pattern for port types that cause problems when imported
     elif portType == PortType.TEST:
         log.debug("portType test found")
         from powermon.ports.testport import TestPort
-
-        portObject = TestPort(config=port_config)
+        portObject = TestPort.fromConfig(config=port_config)
 
     else:
         log.info("port type object not found for %s", portType)

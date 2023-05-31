@@ -3,17 +3,24 @@ import os
 import time
 
 from powermon.dto.portDTO import PortDTO
-
-from .abstractport import AbstractPort
+from powermon.ports.abstractport import AbstractPort
+from powermon.protocols import get_protocol
 
 log = logging.getLogger("USBPort")
 
 
 class USBPort(AbstractPort):
-    def __init__(self, config=None) -> None:
-        super().__init__(config)
-        log.debug(f"Initializing usb port. config:{config}")
-        self.path = config.get("path", "/dev/hidraw0")
+    @classmethod
+    def fromConfig(cls, config=None):
+        log.debug(f"building usb port. config:{config}")
+        path = config.get("path", "/dev/hidraw0")
+        # get protocol handler, default to PI30 if not supplied
+        protocol = get_protocol(protocol=config.get("protocol", "PI30"))
+        return cls(path=path, protocol=protocol)
+
+    def __init__(self, path, protocol) -> None:
+        self.path = path
+        self.protocol = protocol
 
     def toDTO(self):
         dto = PortDTO(type="usb", path=self.path, protocol=self.protocol.toDTO())

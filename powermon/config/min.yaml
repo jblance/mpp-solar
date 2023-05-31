@@ -18,8 +18,8 @@ commands:
   outputs:
   - type: screen
     format:
-      type: table
-      # draw_lines: True
+      type: topics
+      draw_lines: True
   # type: continuous
   # trigger: # default to something sensible (only one of the below is needed/used)
   # - loops: 1 # run every loop
