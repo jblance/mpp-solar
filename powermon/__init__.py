@@ -79,6 +79,11 @@ def main():
         help="Only loop through config once",
     )
     parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force commands to run even if wouldnt be triggered (should only be used with --once)",
+    )
+    parser.add_argument(
         "-D",
         "--debug",
         action="store_true",
@@ -142,7 +147,7 @@ def main():
     log.info(daemon)
 
     # build api coordinator
-    api_coordinator = ApiCoordinator(config=config.get("api"), device=device, mqtt_broker=mqtt_broker)
+    api_coordinator = ApiCoordinator.fromConfig(config=config.get("api"), device=device, mqtt_broker=mqtt_broker)
     log.info(api_coordinator)
 
     # initialize daemon
@@ -159,7 +164,7 @@ def main():
             daemon.watchdog()
 
             # run schedule loop
-            keep_looping = device.runLoop()
+            keep_looping = device.runLoop(args.force)
 
             # run api coordinator ...
             api_coordinator.run()

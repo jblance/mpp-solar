@@ -17,28 +17,32 @@ class TriggerType(LowercaseStrEnum):
 
 class Trigger:
     def __str__(self):
-        if self.trigger == TriggerType.LOOPS:
-            return f"trigger: {self.trigger}, {self.value}, to go: {self.togo}"
-        return f"trigger: {self.trigger}, {self.value}"
+        return f"trigger: {self.trigger} {self.value} loops togo: {self.togo}"
 
-    def __init__(self, config):
+    @classmethod
+    def fromConfig(cls, config=None):
         if not config:
             # no trigger defined, default to every 60 seconds
-            self.trigger = TriggerType.EVERY
-            self.value = 60
+            trigger = TriggerType.EVERY
+            value = 60
         elif TriggerType.EVERY in config:
-            self.trigger = TriggerType.EVERY
-            self.value = config.get(TriggerType.EVERY, 61)
+            trigger = TriggerType.EVERY
+            value = config.get(TriggerType.EVERY, 61)
         elif TriggerType.LOOPS in config:
-            self.trigger = TriggerType.LOOPS
-            self.value = config.get(TriggerType.LOOPS, 101)
-            self.togo = 0
+            trigger = TriggerType.LOOPS
+            value = config.get(TriggerType.LOOPS, 101)
         elif TriggerType.AT in config:
-            self.trigger = TriggerType.AT
-            self.value = config.get(TriggerType.AT, "12:01")
+            trigger = TriggerType.AT
+            value = config.get(TriggerType.AT, "12:01")
         else:
-            self.trigger = TriggerType.DISABLED
-            self.value = None
+            trigger = TriggerType.DISABLED
+            value = None
+        return cls(trigger=trigger, value=value)
+
+    def __init__(self, trigger, value=None):
+        self.trigger = trigger
+        self.value = value
+        self.togo = 0
 
     def isDue(self, command):
         # Store the time now

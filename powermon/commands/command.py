@@ -23,7 +23,7 @@ class Command:
         for output in self.outputs:
             _outs += str(output)
 
-        return f"Command: {self.name}, type: {self.type}, outputs: [{_outs}] last run: {last_run}, next run: {next_run}, {self.trigger}, defn: {self.command_defn}"
+        return f"Command: {self.name}, {self.type=}, [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {self.command_defn=}"
 
     @classmethod
     def fromConfig(cls, config=None):
@@ -41,7 +41,7 @@ class Command:
             raise TypeError("command must be defined")
         commandtype = config.get("type", "basic")
         outputs = getOutputs(config.get("outputs", ""))
-        trigger = Trigger(config=config.get("trigger"))
+        trigger = Trigger.fromConfig(config=config.get("trigger"))
         return cls(name=name, commandtype=commandtype, outputs=outputs, trigger=trigger)
 
     def __init__(self, name : str, commandtype: str, outputs: list, trigger : Trigger):
