@@ -78,7 +78,7 @@ class Device:
         log.info("finalizing device")
         return
 
-    def runLoop(self):
+    def runLoop(self, force=False):
         """
         the loop that checks for commands to run,
         runs them
@@ -88,7 +88,7 @@ class Device:
             return False
         else:
             for command in self.commands:
-                if command.dueToRun():
+                if force or command.dueToRun():
                     # update run times
                     command.touch()
                     # update full_command - expand any template / add crc etc
