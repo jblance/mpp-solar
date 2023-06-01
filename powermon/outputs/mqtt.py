@@ -1,14 +1,11 @@
 import logging
-import re
 
-from mppsolar.helpers import get_kwargs
 from powermon.outputs.abstractoutput import AbstractOutput
 
 log = logging.getLogger("MQTT")
 
 
 class MQTT(AbstractOutput):
-    
     def __init__(self, output_config, topic, mqtt_broker, formatter) -> None:
         super().__init__(formatter)
         self.mqtt_broker = mqtt_broker
@@ -16,7 +13,7 @@ class MQTT(AbstractOutput):
 
         if self.results_topic is None:
             self.results_topic = topic
-    
+
     def __str__(self):
         return "outputs the results to the supplied mqtt broker: eg powermon/status/total_output_active_power/value 1250"
 
@@ -30,7 +27,6 @@ class MQTT(AbstractOutput):
         if self.mqtt_broker is None:
             log.error("No mqtt broker supplied")
             return
-
 
         # build the messages...
         formattedData = self.formatter.format(data)
