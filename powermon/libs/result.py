@@ -5,7 +5,7 @@ log = logging.getLogger("result")
 
 class Result:
     def __str__(self):
-        return f"Result: command: {self.command}, error: {self.error} - {self.error_messages}, raw: {self.raw_response}, decoded: {self.decoded_responses}"
+        return f"Result: {self.command}, {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, {self.decoded_responses=}"
 
     def __init__(self, command=None):
         self.command = command

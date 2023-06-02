@@ -16,7 +16,7 @@ class ApiCoordinator:
     def fromConfig(cls, config=None, device=None, mqtt_broker=None):
         log.debug(f"ApiCoordinator config: {config}")
         if not config:
-            log.warning("No api definition in config")
+            log.info("No api definition in config")
             adhocTopic = "powermon/adhoc"
             announceTopic = "powermon/announce"
             enabled = False
@@ -37,7 +37,7 @@ class ApiCoordinator:
 
         if self.mqtt_broker is None or self.mqtt_broker.disabled:
             # no use having api running if no mqtt broker
-            log.warn("No mqttbroker (or it is disabled) so disabling ApiCoordinator")
+            log.debug("No mqttbroker (or it is disabled) so disabling ApiCoordinator")
             self.enabled = False
             return
 

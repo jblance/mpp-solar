@@ -21,7 +21,7 @@ class Device:
     """
 
     def __str__(self):
-        return f"Device: {self.name}, {self.identifier=}, {self.model=}, {self.manufacturer=}, {self.port=}, {self.commands=}"
+        return f"Device: {self.name}, {self.identifier=}, {self.model=}, {self.manufacturer=}, port: {self.port}, commands:{self.commands}"
 
     @classmethod
     def fromConfig(cls, config=None):
@@ -92,6 +92,7 @@ class Device:
                     # update run times
                     command.touch()
                     # update full_command - expand any template / add crc etc
+                    # updates every run incase something has changed
                     command.full_command = self.port.protocol.get_full_command(command.name)
                     # run command
                     result = self.port.run_command(command)

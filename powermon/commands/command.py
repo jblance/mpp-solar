@@ -23,7 +23,7 @@ class Command:
         for output in self.outputs:
             _outs += str(output)
 
-        return f"Command: {self.name}, {self.type=}, [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {self.command_defn=}"
+        return f"Command: {self.name=} {self.full_command=}, {self.type=}, [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {self.command_defn=}"
 
     @classmethod
     def fromConfig(cls, config=None):
