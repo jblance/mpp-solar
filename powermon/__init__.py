@@ -139,7 +139,7 @@ def main():
 
     # build mqtt broker object (optional)
     # QUESTION: should mqtt_broker be part of device...
-    mqtt_broker = MqttBroker(config=config.get("mqttbroker"))
+    mqtt_broker = MqttBroker.fromConfig(config=config.get("mqttbroker"))
     log.info(mqtt_broker)
 
     # build the daemon object (optional)
