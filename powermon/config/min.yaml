@@ -5,7 +5,8 @@ device:
   model: 8048MAX
   manufacturer: MPP-Solar
   port:
-    type: test
+    type: serial
+    path: /dev/ttyUSB0
     response_number: 0
     protocol: PI30
 

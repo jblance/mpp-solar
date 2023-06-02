@@ -3,6 +3,7 @@ import os
 import time
 
 from powermon.dto.portDTO import PortDTO
+from powermon.libs.result import Result
 from powermon.ports.abstractport import AbstractPort
 from powermon.protocols import get_protocol
 
@@ -45,41 +46,41 @@ class USBPort(AbstractPort):
             os.close(self.port)
         return
 
-    def send_and_receive(self, command) -> dict:
-        full_command = self.protocol.get_full_command(command)
+    def send_and_receive(self, result) -> Result:
+        full_command = result.command.full_command
         response_line = bytes()
 
-        # Send the command to the open usb connection
-        to_send = full_command
+        # Open USB device
+        usb0 = None
         try:
-            log.debug(f"length of to_send: {len(to_send)}")
-        except:  # noqa: E722
-            import pdb
+            usb0 = os.open(self._device, os.O_RDWR | os.O_NONBLOCK)
+        except Exception as e:
+            log.error("USB open error: {}".format(e))
+            result.error = True
+            result.error_messages.append("USB open error: {}".format(e))
+            return result
 
-            pdb.set_trace()
-        if len(to_send) <= 8:
+        # Send the command to the open usb connection
+        cmd_len = len(full_command)
+        log.debug(f"length of to_send: {cmd_len}")
+        # for command of len < 8 it ok just to send
+        # otherwise need to pack to a multiple of 8 bytes and send 8 at a time
+        if cmd_len <= 8:
             # Send all at once
-            log.debug("1 chunk send")
-            time.sleep(0.35)
-            try:
-                os.write(self.port, to_send)
-            except Exception as e:
-                log.debug("USB read error: {}".format(e))
-
-        elif len(to_send) > 8 and len(to_send) < 11:
-            log.debug("2 chunk send")
-            time.sleep(0.35)
-            os.write(self.port, to_send[:5])
-            time.sleep(0.35)
-            os.write(self.port, to_send[5:])
+            log.debug("sending full_command in on shot")
+            time.sleep(0.05)
+            os.write(usb0, full_command)
         else:
-            while len(to_send) > 0:
-                log.debug("multiple chunk send")
-                # Split the byte command into smaller chucks
-                send, to_send = to_send[:8], to_send[8:]
-                log.debug("send: {}, to_send: {}".format(send, to_send))
-                time.sleep(0.35)
-                os.write(self.port, send)
+            log.debug("multiple chunk send")
+            chunks = [full_command[i:i + 8] for i in range(0, cmd_len, 8)]
+            for chunk in chunks:
+                # pad chunk to 8 bytes
+                if len(chunk) < 8:
+                    padding = 8 - len(chunk)
+                    chunk += b'\x00' * padding
+                log.debug("sending chunk: %s" % (chunk))
+                time.sleep(0.05)
+                os.write(usb0, chunk)
         time.sleep(0.25)
         # Read from the usb connection
         # try to a max of 100 times
@@ -87,7 +88,7 @@ class USBPort(AbstractPort):
             # attempt to deal with resource busy and other failures to read
             try:
                 time.sleep(0.15)
-                r = os.read(self.port, 256)
+                r = os.read(usb0, 256)
                 response_line += r
             except Exception as e:
                 log.debug("USB read error: {}".format(e))
@@ -97,4 +98,6 @@ class USBPort(AbstractPort):
                 response_line = response_line[: response_line.find(bytes([13])) + 1]
                 break
         log.debug("usb response was: %s", response_line)
-        return response_line
+        result.raw_response = response_line
+        os.close(usb0)
+        return result
