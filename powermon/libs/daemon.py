@@ -2,6 +2,7 @@ import logging
 from enum import Enum, auto
 from time import time
 
+from strenum import LowercaseStrEnum
 
 # Set-up logger
 log = logging.getLogger("daemon")
@@ -14,62 +15,77 @@ class dummyNotification(Enum):
     WATCHDOG = auto()
 
 
+class DaemonType(LowercaseStrEnum):
+    DISABLED = auto()
+    SYSTEMD = auto()
+
+
 class Daemon:
     def __str__(self):
-        if self.disabled:
+        if not self.enabled:
             return "Daemon DISABLED"
         return f"Daemon name: {self.type}"
 
-    def __init__(self, config={}):
+    @classmethod
+    def fromConfig(cls, config={}):
+        log.debug(f"daemon config: {config}")
 
         if config is None:
-            self.type = "disabled"
-            self.keepalive = 0
-            self.disabled = True
+            _type = DaemonType.DISABLED
+            keepalive = 0
+            enabled = False
             log.debug("daemon not configured, disabling")
         if config is not None:
-            self.disabled = False
-            self.type = config.get("type", None)
-            self.keepalive = config.get("keepalive", 60)
-            log.debug(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
+            enabled = True
+            _type = config.get("type", None)
+            keepalive = config.get("keepalive", 60)
+            log.debug(f"got daemon: {_type=}, {keepalive=}")
 
-        if self.type == "systemd":
-            try:
-                from cysystemd.daemon import Notification, notify
-                from cysystemd import journal
+        return cls(_type=_type, keepalive=keepalive, enabled=enabled)
 
-                self._notify = notify
-                self._journal = journal.write
-                self._Notification = Notification
-            except ModuleNotFoundError as e:
-                print(
-                    f"error: {e}, try 'pip install cysystemd' (which may need 'apt install build-essential libsystemd-dev'), see https://pypi.org/project/cysystemd/ for further info"
-                )
-                exit(1)
-        else:
-            self._notify = self._dummyNotify
-            self._journal = self._dummyNotify
-            self._Notification = dummyNotification
+    def __init__(self, _type, keepalive, enabled):
+
+        self.enabled = enabled
+        self.type = _type
+        self.keepalive = keepalive
+        log.debug(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
+
+        match self.type:
+            case DaemonType.SYSTEMD:
+                try:
+                    from cysystemd import journal
+                    from cysystemd.daemon import Notification, notify
+
+                    self._notify = notify
+                    self._journal = journal.write
+                    self._Notification = Notification
+                except ModuleNotFoundError as e:
+                    print(
+                        f"error: {e}, try 'pip install cysystemd' (which may need 'apt install build-essential libsystemd-dev'), see https://pypi.org/project/cysystemd/ for further info"
+                    )
+                    exit(1)
+            case _:
+                self._notify = self._dummyNotify
+                self._journal = self._dummyNotify
+                self._Notification = dummyNotification
         self.notify(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
 
     def initialize(self, *args, **kwargs):
-        if self.disabled:
-            return
-        # Send READY=1
-        self._notify(self._Notification.READY)
-        self._lastNotify = time()
+        if self.enabled:
+            # Send READY=1
+            self._notify(self._Notification.READY)
+            self._lastNotify = time()
 
     def watchdog(self, *args, **kwargs):
-        if self.disabled:
-            return
-        elapsed = time() - self._lastNotify
-        if (elapsed) > self.keepalive:
-            self._notify(self._Notification.WATCHDOG)
-            self._lastNotify = time()
-            self._journal(f"Daemon notify at {self._lastNotify}")
+        if self.enabled:
+            elapsed = time() - self._lastNotify
+            if (elapsed) > self.keepalive:
+                self._notify(self._Notification.WATCHDOG)
+                self._lastNotify = time()
+                self._journal(f"Daemon notify at {self._lastNotify}")
 
     def notify(self, *args, **kwargs):
-        if self.disabled:
+        if not self.enabled:
             return
         # Send status
         if args:
@@ -79,17 +95,15 @@ class Daemon:
         self._notify(self._Notification.STATUS, status)
 
     def stop(self, *args, **kwargs):
-        if self.disabled:
-            return
-        # Send stopping
-        self._notify(self._Notification.STOPPING)
+        if self.enabled:
+            # Send stopping
+            self._notify(self._Notification.STOPPING)
 
     def log(self, *args, **kwargs):
-        if self.disabled:
-            return
-        # Print log message
-        if args:
-            self._journal(args[0])
+        if self.enabled:
+            # Print log message
+            if args:
+                self._journal(args[0])
 
     def _dummyNotify(self, *args, **kwargs):
         # Print log message

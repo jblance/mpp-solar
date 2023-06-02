@@ -143,7 +143,7 @@ def main():
     log.info(mqtt_broker)
 
     # build the daemon object (optional)
-    daemon = Daemon(config=config.get("daemon"))
+    daemon = Daemon.fromConfig(config=config.get("daemon"))
     log.info(daemon)
 
     # build api coordinator
