@@ -39,7 +39,10 @@ class table(AbstractFormat):
 
         # build header
         command = result.command.name
-        description = result.command.command_defn['description']
+        if result.command.command_defn and "description" in result.command.command_defn:
+            description = result.command.command_defn['description']
+        else:
+            description = "unknown command"
 
         # Determine column widths
         _pad = 1
@@ -59,11 +62,14 @@ class table(AbstractFormat):
         line_length = width_p + width_v + width_u + 7
         # Check if command / description line is longer and extend line if needed
         cmd_str = f"Command: {command} - {description}"
-        if line_length < (len(cmd_str) + 7):
-            line_length = len(cmd_str) + 7
+        width_c = len(cmd_str)
+        log.debug(f"{width_c=}, {line_length=}, {width_p=}, {width_v=}, {width_u=}")
+        if line_length < (width_c + 7):
+            line_length = width_c + 7
         # Check if columns too short and expand units if needed
-        if (width_p + width_v + width_u + 7) < line_length:
-            width_u = line_length - (width_p + width_u + 7) - 1
+        if (width_p + width_v + width_u + 7) <= line_length:
+            width_u = line_length - (width_p + width_v + 7) 
+        log.debug(f"{width_c=}, {line_length=}, {width_p=}, {width_v=}, {width_u=}")
 
         # print header
         if self.drawlines:

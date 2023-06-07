@@ -5,7 +5,7 @@ device:
   model: 8048MAX
   manufacturer: MPP-Solar
   port:
-    type: serial
+    type: test
     path: /dev/ttyUSB0
     response_number: 0
     protocol: PI30
@@ -15,7 +15,7 @@ commands:
 #   outputs:
 #   - type: screen
 #     format: raw
-- command: QPI
+- command: xxx
   trigger:
     every: 10  # every 10 seconds
   outputs:
