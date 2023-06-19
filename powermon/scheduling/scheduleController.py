@@ -28,10 +28,11 @@ class ScheduleController:
     def __str__(self):
         return f"Schedule: {self._schedules}, loop duration: {self._loop_duration}"
 
-    def toDTO(self) -> PowermonDTO:
+    def to_dto(self) -> PowermonDTO:
+        """Return a DTO representation of the schedule for use in the API"""
         schedule_dtos = []
-        for scheduledCommand in self._schedules:
-            schedule_dtos.append(scheduledCommand.toDTO())
+        for scheduled_command in self._schedules:
+            schedule_dtos.append(scheduled_command.toDTO())
         log.debug(f"name={self._name}, loop_duration={self._loop_duration}, device={self.device.toDTO()}, schedules={schedule_dtos}")
         dto = PowermonDTO(name=self._name, loop_duration=self._loop_duration, device=self.device.toDTO(), schedules=schedule_dtos)
         return dto
@@ -41,16 +42,16 @@ class ScheduleController:
         command = self.parseCommandConfig(scheduleConfig["command"], self.mqtt_broker, self.device)
         self._schedules.append(OneTimeSchedule(schedule.name, {command}))
 
-    # The hook for the port to connect before the main loops starts
-    def beforeLoop(self):
+    def before_loop(self):
+        """The hook for the port to connect before the main loops starts"""
         self.device.port.connect()
 
     def runLoop(self) -> bool:
         start_time = time()
         if self.inDelay is False:
-            for scheduledCommand in self._schedules:
-                if scheduledCommand.is_due():
-                    scheduledCommand.runCommands()
+            for scheduled_command in self._schedules:
+                if scheduled_command.is_due():
+                    scheduled_command.runCommands()
 
         # Small pause to ....
         sleep(0.5)
