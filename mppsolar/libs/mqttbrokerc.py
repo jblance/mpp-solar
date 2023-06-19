@@ -28,7 +28,13 @@ class MqttBroker:
             config = {}
         log.debug(f"mqttbroker config: {config}")
         self.name = config.get("name")
-        self.port = config.get("port", 1883)
+        try:
+            _port = config.get("port", 1883)
+            self.port = int(_port)
+        except ValueError:
+            log.info(f"Unable to process port: '{_port}', defaulting to 1883")
+            self.port = 1883
+
         self.username = config.get("user")
         self.password = config.get("pass")
         self._isConnected = False

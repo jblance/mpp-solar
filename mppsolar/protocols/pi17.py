@@ -396,7 +396,11 @@ COMMANDS = {
         "help": " -- queries total generated energy from the Inverter",
         "type": "QUERY",
         "response": [
-            ["int", "Generated energy", "kWh"],
+            ["int", 
+             "Generated energy", 
+             "kWh",
+             {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},
+            ],
         ],
         "test_responses": [
             b"^D01100006591\xba\x10\r",
