@@ -155,6 +155,7 @@ def main():
 
     # initialize device
     device.initialize()
+    controller.before_loop()
 
     # Main working loop
     keep_looping = True

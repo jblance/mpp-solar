@@ -17,7 +17,7 @@ class OutputType(LowercaseStrEnum):
     API_MQTT = auto()
 
 
-def getOutputClass(outputType, _format, outputConfig=None, mqtt_broker=None, topic=None, schedule_name=None):
+def getOutputClass(outputType, _format, outputConfig={}, mqtt_broker=None, topic=None, schedule_name=None):
     output_class = None
     # Only import the required class
     log.debug("outputType %s" % outputType)

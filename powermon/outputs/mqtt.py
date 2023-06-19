@@ -36,4 +36,7 @@ class MQTT(AbstractOutput):
         if (self.formatter.sendsMultipleMessages()):
             self.mqtt_broker.publishMultiple(formattedData)
         else:
-            self.mqtt_broker.publish(self.topic_prefix, formattedData)
+            self.mqtt_broker.publish(self.results_topic, formattedData)
+
+    def process(self, result):
+        self.output(result)

@@ -29,9 +29,6 @@ class TestPort(AbstractPort):
         dto = PortDTO(type="test", protocol=self.protocol.toDTO())
         return dto
 
-    def protocol(self):
-        return super().protocol()
-
     def connect(self) -> None:
         log.debug("Test port connected")
         return

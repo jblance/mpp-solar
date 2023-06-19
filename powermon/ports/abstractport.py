@@ -41,6 +41,9 @@ class AbstractPort(ABC):
     @abstractmethod
     def toDTO(self):
         raise NotImplementedError
+    
+    def get_protocol(self):
+        return self.protocol
 
     def run_command(self, command):
         # takes a command object, runs the command and returns a result object (replaces process_command)
@@ -75,8 +78,9 @@ class AbstractPort(ABC):
     #     if isinstance(raw_response, dict):
     #         return raw_response
 
-    #     # Decode response
-    #     decoded_response = self.protocol.decode(raw_response, command)
-    #     log.info(f"Decoded response {decoded_response}")
+        # Decode response
+        _result = Result(command, raw_response=raw_response)
+        decoded_response = self.get_protocol().decode(_result)
+        log.info(f"Decoded response {decoded_response}")
 
     #     return decoded_response

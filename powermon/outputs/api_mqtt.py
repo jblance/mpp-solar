@@ -37,3 +37,6 @@ class API_MQTT(AbstractOutput):
         result = ResultDTO(schedule_name=self.schedule_name, result=formattedData)
 
         self.mqtt_broker.publish(self.results_topic, result.json())
+
+    def process(self, result):
+        self.output(result)

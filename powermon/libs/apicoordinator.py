@@ -41,7 +41,7 @@ class ApiCoordinator:
             self.enabled = False
             return
 
-        self.announceDevice()
+        self.announce_device()
         mqtt_broker.subscribe(self.adhocTopic, self.adhocCallback)
 
         # mqtt_broker.publish(self.announceTopic, self.schedule.getScheduleConfigAsJSON())
@@ -65,9 +65,10 @@ class ApiCoordinator:
             return
         if not self.last_run or time() - self.last_run > 60:
             log.info("Starting APICoordinator")
-            self.announceDevice()
+            self.announce_device()
             self.last_run = time()
 
-    def announceDevice(self):
-        # scheduleDTO = self.schedule.toDTO()
-        self.mqtt_broker.publish(self.announceTopic, "{'announceDevice':'todo'}")
+    def announce_device(self):
+        """Announce the device on the announce topic"""
+        schedule_dto = self.schedule.to_dto()
+        self.mqtt_broker.publish(self.announceTopic, schedule_dto.json())
