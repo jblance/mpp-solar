@@ -45,5 +45,3 @@ class TestPort(AbstractPort):
         response = self._test_data
         log.debug(f"Raw response {response}")
         return response
-
-    @st
