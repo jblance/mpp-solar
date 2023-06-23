@@ -1,6 +1,9 @@
 # MPP-Solar Device Python Package #
 
-__BREAKING CHANGE - command separator changed to `#`__
+__BREAKING CHANGES__
+- minimum python supported 3.10 for version >=0.16.0
+- command separator changed to `#`
+
 
 Python package with reference library of commands (and responses)
 designed to get information from inverters and other solar inverters and power devices

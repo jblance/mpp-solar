@@ -299,6 +299,29 @@ SETTER_COMMANDS = {
         ],
         "regex": "PBATMAXDISC([01]\\d\\d)$",
     },
+    "BTA": {
+        "name": "BTA",
+        "description": "Calibrate inverter battery voltage",
+        "help": " -- examples: BTA-01 (reduce inverter reading by 0.05V), BTA+09 (increase inverter reading by 0.45V)",
+        "type": "SETTER",
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "BTA([-+]0\\d)$",
+    },
+    "PSAVE": {
+        "name": "PSAVE",
+        "description": "Save EEPROM changes",
+        "help": " -- examples: PSAVE (save changes to eeprom)",
+        "type": "SETTER",
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+    },
 }
 QUERY_COMMANDS = {
     "Q1": {

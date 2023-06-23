@@ -14,9 +14,20 @@ class simple(AbstractFormat):
         log.info("Using output formatter: %s" % self.name)
 
         _result = []
-        data = result.decoded_responses
+
+        # check for error in result
+        if result.error:
+            data = {}
+            data["Error"] = [f"Command: {result.command.name} incurred an error or errors during execution or processing", ""]
+            data["Error Count"] = [len(result.error_messages), ""]
+            for i, message in enumerate(result.error_messages):
+                data[f"Error #{i}"] = [message, ""]
+        else:
+            data = result.decoded_responses
+
         if data is None:
             return _result
+
         log.debug(f"data: {data}")
         displayData = self.formatAndFilterData(data)
         log.debug(f"displayData: {displayData}")

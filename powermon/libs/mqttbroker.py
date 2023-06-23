@@ -14,16 +14,30 @@ class MqttBroker:
         else:
             return f"MqttBroker name: {self.name}, port: {self.port}, user: {self.username}"
 
-    # def __init__(self, *args, **kwargs):
-    def __init__(self, config={}):
+    @classmethod
+    def fromConfig(cls, config={}):
         log.debug(f"mqttbroker config: {config}")
-        self.name = None
-        self._isConnected = False
+
         if config:
-            self.name = config.get("name")
-            self.port = config.get("port", 1883)
-            self.username = config.get("user")
-            self.password = config.get("pass")
+            name = config.get("name")
+            port = config.get("port", 1883)
+            username = config.get("user")
+            password = config.get("pass")
+        else:
+            name = None
+            port = None
+            username = None
+            password = None
+
+        return cls(name=name, port=port, username=username, password=password)
+
+    def __init__(self, name, port=None, username=None, password=None):
+
+        self.name = name
+        self.port = port
+        self.username = username
+        self.password = password
+        self._isConnected = False
 
         if self.name is None:
             self.disabled = True

@@ -29,6 +29,9 @@ SETTER_COMMANDS = [
     ("PBATCD010", """command_execution=Successful\n"""),
     ("DAT20230115091533", """command_execution=Successful\n"""),
     ("PBATMAXDISC150", """command_execution=Successful\n"""),
+    ("BTA-01", """command_execution=Successful\n"""),
+    ("BTA+09", """command_execution=Successful\n"""),
+    ("PSAVE", """command_execution=Successful\n"""),
 ]
 
 

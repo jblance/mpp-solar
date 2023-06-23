@@ -8,6 +8,9 @@ test: tests/*.py
 	coverage html
 
 t: tests/*.py
+	python3 -m unittest -f
+	
+tv: tests/*.py
 	python3 -m unittest -f -v
 
 pypi:
@@ -26,9 +29,9 @@ docker-powermon-dev-up:
 	docker compose -f docker-compose.development.yaml up --build
 
 m-build:
-	docker-compose -f docker-compose.dev-min.yaml up --build 
+	docker compose -f docker-compose.dev-min.yaml up --build 
 
 m-run:
-	docker-compose -f docker-compose.dev-min.yaml run mppsolar mpp-solar -p test -c QID -D
+	docker compose -f docker-compose.dev-min.yaml run mppsolar mpp-solar -p test -c QID -D
 	# docker-compose -f docker-compose.dev-min.yaml run mppsolar -p test -c QID
 

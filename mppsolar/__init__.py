@@ -184,6 +184,7 @@ def main():
     parser.add_argument("--getDeviceId", action="store_true", help="Generate Device ID")
 
     parser.add_argument("-v", "--version", action="store_true", help="Display the version")
+    parser.add_argument("--getVersion", action="store_true", help="Output the software version via the supplied output")
     parser.add_argument(
         "-D",
         "--debug",
@@ -386,6 +387,9 @@ def main():
         elif args.getDeviceId:
             # use get_settings helper
             commands.append("get_device_id")
+        elif args.getVersion:
+            # use get_version helper
+            commands.append("get_version")
         elif args.command is None:
             # run the command
             commands.append("")

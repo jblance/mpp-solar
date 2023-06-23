@@ -1,19 +1,34 @@
 import logging
-import serial
 import time
-from powermon.dto.portDTO import PortDTO
 
-from .abstractport import AbstractPort
+import serial
+
+from powermon.dto.portDTO import PortDTO
+from powermon.libs.result import Result
+from powermon.ports.abstractport import AbstractPort
+from powermon.protocols import get_protocol
 
 log = logging.getLogger("SerialPort")
 
 
 class SerialPort(AbstractPort):
-    def __init__(self, config=None) -> None:
-        super().__init__(config)
-        log.debug(f"Initializing usbserial port. config:{config}")
-        self.path = config.get("path", "/dev/ttyUSB0")
-        self.baud = config.get("baud", 2400)
+    def __str__(self):
+        return f"SerialPort: {self.path=}, {self.baud=}, protocol:{self.protocol}, {self.serialPort=}, {self.error=}"
+
+    @classmethod
+    def fromConfig(cls, config=None):
+        log.debug(f"building serial port. config:{config}")
+        path = config.get("path", "/dev/ttyUSB0")
+        baud = config.get("baud", 2400)
+        # get protocol handler, default to PI30 if not supplied
+        protocol = get_protocol(protocol=config.get("protocol", "PI30"))
+        return cls(path=path, baud=baud, protocol=protocol)
+
+    def __init__(self, path, baud, protocol) -> None:
+        self.path = path
+        self.baud = baud
+        self.protocol = protocol
+
         self.serialPort = None
         self.error = None
 
@@ -27,7 +42,7 @@ class SerialPort(AbstractPort):
             self.serialPort = serial.Serial(port=self.path, baudrate=self.baud, timeout=1, write_timeout=1)
         except Exception as e:
             log.error(f"Error openning serial port: {e}")
-            self.error = e
+            self.error = str(e)
         return
 
     def disconnect(self) -> None:
@@ -36,13 +51,15 @@ class SerialPort(AbstractPort):
             self.serialPort.close()
         return
 
-    def send_and_receive(self, command) -> dict:
-        full_command = self.protocol.get_full_command(command)
+    def send_and_receive(self, result) -> Result:
+        full_command = result.command.full_command
         response_line = None
         log.debug(f"port {self.serialPort}")
         if self.serialPort is None:
             log.error("Port not available")
-            return {"ERROR": [f"Serial command execution failed {self.error}", ""]}
+            result.error = True
+            result.error_messages.append(f"Serial port not available {self.error}")
+            return result
         try:
             log.debug("Executing command via usbserial...")
             self.serialPort.reset_input_buffer()
@@ -53,8 +70,14 @@ class SerialPort(AbstractPort):
             time.sleep(0.1)  # give serial port time to receive the data
             response_line = self.serialPort.read_until(b"\r")
             log.debug("serial response was: %s", response_line)
-            return response_line
+            result.raw_response = response_line
+            return result
         except Exception as e:
             log.warning(f"Serial read error: {e}")
+            result.error = True
+            result.error_messages.append(f"Serial read error {e}")
+            return result
         log.info("Command execution failed")
-        return {"ERROR": ["Serial command execution failed", ""]}
+        result.error = True
+        result.error_messages.append("Serial command execution failed")
+        return result

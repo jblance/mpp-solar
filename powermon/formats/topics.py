@@ -6,7 +6,7 @@ log = logging.getLogger("Topics")
 
 
 class Topics(AbstractFormat):
-    def __init__(self, formatConfig, topic, tag):
+    def __init__(self, formatConfig, topic):
         super().__init__(formatConfig)
         self.name = "topics"
         self.results_topic = topic
@@ -14,17 +14,23 @@ class Topics(AbstractFormat):
     def sendsMultipleMessages(self) -> bool:
         return True
 
-    def format(self, data):
-        log.info("Using output formatter: Topics")
+    def format(self, result):
+        log.info("Using output formatter: %s" % self.name)
 
-        _data = self.formatAndFilterData(data)
+        _result = []
+        data = result.decoded_responses
+        if data is None:
+            return _result
+
+        displayData = self.formatAndFilterData(data)
+        log.debug(f"displayData: {displayData}")
 
         # Build array of mqtt messages
         msgs = []
         # Loop through responses build topics and messages
-        for key in _data:
-            value = _data[key][0]
-            unit = _data[key][1]
+        for key in data:
+            value = data[key][0]
+            unit = data[key][1]
             log.debug(f"build_msgs: prefix {self.results_topic}, key {key}, value {value}, unit {unit}")
             msg = {"topic": f"{self.results_topic}/{key}/value", "payload": value}
             msgs.append(msg)

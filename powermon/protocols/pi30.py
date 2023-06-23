@@ -12,13 +12,8 @@ SETTER_COMMANDS = {
         "description": "Set Device Output Frequency",
         "help": " -- examples: F50 (set output frequency to 50Hz) or F60 (set output frequency to 60Hz)",
         "response_type": ResponseType.ACK,
-        "response": [
-            [1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],
-        ],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "F([56]0)$",
     },
     "MCHGC": {
@@ -26,13 +21,8 @@ SETTER_COMMANDS = {
         "description": "Set Max Charging Current (for parallel units)",
         "help": " -- examples: MCHGC040 (set unit 0 to max charging current of 40A), MCHGC160 (set unit 1 to max charging current of 60A)",
         "response_type": ResponseType.ACK,
-        "response": [
-            [1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],
-        ],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "MCHGC(\\d\\d\\d)$",
     },
     "MNCHGC": {
@@ -40,11 +30,8 @@ SETTER_COMMANDS = {
         "description": "Set Utility Max Charging Current (more than 100A) (for 4000/5000)",
         "help": " -- example: MNCHGC1120 (set unit 1 utility max charging current to 120A)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(ACK\x39\x20\r",
-            b"(NAK\x73\x73\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(ACK\x39\x20\r", b"(NAK\x73\x73\r"],
         "regex": "MNCHGC(\\d\\d\\d\\d)$",
     },
     "MUCHGC": {
@@ -52,11 +39,8 @@ SETTER_COMMANDS = {
         "description": "Set Utility Max Charging Current",
         "help": " -- example: MUCHGC130 (set unit 1 utility max charging current to 30A)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "MUCHGC(\\d\\d\\d)$",
     },
     "PBCV": {
@@ -64,11 +48,8 @@ SETTER_COMMANDS = {
         "description": "Set Battery re-charge voltage",
         "help": " -- example PBCV44.0 - set re-charge voltage to 44V (12V unit: 11V/11.3V/11.5V/11.8V/12V/12.3V/12.5V/12.8V, 24V unit: 22V/22.5V/23V/23.5V/24V/24.5V/25V/25.5V, 48V unit: 44V/45V/46V/47V/48V/49V/50V/51V)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "PBCV(\\d\\d\\.\\d)$",
     },
     "PBDV": {
@@ -76,11 +57,8 @@ SETTER_COMMANDS = {
         "description": "Set Battery re-discharge voltage",
         "help": " -- example PBDV48.0 - set re-discharge voltage to 48V (12V unit: 00.0V/12V/12.3V/12.5V/12.8V/13V/13.3V/13.5V/13.8V/14V/14.3V/14.5, 24V unit: 00.0V/24V/24.5V/25V/25.5V/26V/26.5V/27V/27.5V/28V/28.5V/29V, 48V unit: 00.0V/48V/49V/50V/51V/52V/53V/54V/55V/56V/57V/58V, 00.0V means battery is full(charging in float mode).)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "PBDV(\\d\\d\\.\\d)$",
     },
     "PBFT": {
@@ -88,11 +66,8 @@ SETTER_COMMANDS = {
         "description": "Set Battery Float Charging Voltage",
         "help": " -- example PBFT58.0 - set battery float charging voltage to 58V (48.0 - 58.4V for 48V unit)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "PBFT(\\d\\d\\.\\d)$",
     },
     "PBT": {
@@ -100,11 +75,8 @@ SETTER_COMMANDS = {
         "description": "Set Battery Type",
         "help": " -- examples: PBT00 (set battery as AGM), PBT01 (set battery as FLOODED), PBT02 (set battery as USER)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "PBT(0[012])$",
     },
     "PCP": {
@@ -112,11 +84,8 @@ SETTER_COMMANDS = {
         "description": "Set Device Charger Priority",
         "help": " -- examples: PCP00 (set utility first), PCP01 (set solar first), PCP02 (HS only: set solar and utility), PCP03 (set solar only charging)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "PCP(0[0123])$",
     },
     "PCVV": {
@@ -124,11 +93,8 @@ SETTER_COMMANDS = {
         "description": "Set Battery C.V. (constant voltage) charging voltage",
         "help": " -- example PCVV48.0 - set charging voltage to 48V (48.0 - 58.4V for 48V unit)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "PCVV(\\d\\d\\.\\d)$",
     },
     "PE": {
@@ -136,11 +102,8 @@ SETTER_COMMANDS = {
         "description": "Set the enabled state of an Inverter setting",
         "help": " -- examples: PEa - enable a (buzzer) [a=buzzer, b=overload bypass, j=power saving, K=LCD go to default after 1min, u=overload restart, v=overtemp restart, x=backlight, y=alarm on primary source interrupt, z=fault code record]",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "PE(.+)$",
     },
     "PD": {
@@ -148,11 +111,8 @@ SETTER_COMMANDS = {
         "description": "Set the disabled state of an Inverter setting",
         "help": " -- examples: PDa - disable a (buzzer) [a=buzzer, b=overload bypass, j=power saving, K=LCD go to default after 1min, u=overload restart, v=overtemp restart, x=backlight, y=alarm on primary source interrupt, z=fault code record]",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "PD(.+)$",
     },
     "PF": {
@@ -160,22 +120,16 @@ SETTER_COMMANDS = {
         "description": "Set Control Parameters to Default Values",
         "help": " -- example PF (reset control parameters to defaults)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
     },
     "PGR": {
         "name": "PGR",
         "description": "Set Grid Working Range",
         "help": " -- examples: PCR00 (set device working range to appliance), PCR01 (set device working range to UPS)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "PGR(0[01])$",
     },
     "POP": {
@@ -183,11 +137,8 @@ SETTER_COMMANDS = {
         "description": "Set Device Output Source Priority",
         "help": " -- examples: POP00 (set utility first), POP01 (set solar first), POP02 (set SBU priority)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "POP(0[012])$",
     },
     "POPLG": {
@@ -195,11 +146,8 @@ SETTER_COMMANDS = {
         "description": "Set Device Operation Logic",
         "help": " -- examples: POPLG00 (set Auto mode), POPLG01 (set Online mode), POPLG02 (set ECO mode)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "POPLG(0[012])$",
     },
     "POPM": {
@@ -207,11 +155,8 @@ SETTER_COMMANDS = {
         "description": "Set Device Output Mode (for 4000/5000)",
         "help": " -- examples: POPM01 (set unit 0 to 1 - parallel output), POPM10 (set unit 1 to 0 - single machine output), POPM02 (set unit 0 to 2 - phase 1 of 3), POPM13 (set unit 1 to 3 - phase 2 of 3), POPM24 (set unit 2 to 4 - phase 3 of 3)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "POPM(\\d[01234])$",
     },
     "PPCP": {
@@ -219,11 +164,8 @@ SETTER_COMMANDS = {
         "description": "Set Parallel Device Charger Priority (for 4000/5000)",
         "help": " -- examples: PPCP000 (set unit 1 to 00 - utility first), PPCP101 (set unit 1 to 01 - solar first), PPCP202 (set unit 2 to 02 - solar and utility), PPCP003 (set unit 0 to 03 - solar only charging)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "PPCP(\\d0[0123])$",
     },
     "PPVOKC": {
@@ -231,11 +173,8 @@ SETTER_COMMANDS = {
         "description": "Set PV OK Condition",
         "help": " -- examples: PPVOKC0 (as long as one unit has connected PV, parallel system will consider PV OK), PPVOKC1 (only if all inverters have connected PV, parallel system will consider PV OK)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "PPVOKC([01])$",
     },
     "PSDV": {
@@ -243,11 +182,8 @@ SETTER_COMMANDS = {
         "description": "Set Battery Cut-off Voltage",
         "help": " -- example PSDV40.0 - set battery cut-off voltage to 40V (40.0 - 48.0V for 48V unit)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "PSDV(\\d\\d\\.\\d)$",
     },
     "PSPB": {
@@ -255,11 +191,8 @@ SETTER_COMMANDS = {
         "description": "Set Solar Power Balance",
         "help": " -- examples: PSPB0 (PV input max current will be the max charged current), PSPB1 (PV input max power will be the sum of the max charge power and loads power)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "PSPB([01])$",
     },
     "PBATCD": {
@@ -267,11 +200,8 @@ SETTER_COMMANDS = {
         "description": "Battery charge/discharge controlling command",
         "help": " -- examples: PBATCDxxx (please read description, use carefully)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "PBATCD([01][01][01])$",
     },
     "DAT": {
@@ -279,11 +209,8 @@ SETTER_COMMANDS = {
         "description": "Set Date Time",
         "help": " -- examples: DATYYYYMMDDHHMMSS (14 digits after DAT)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "DAT(\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d)$",
     },
     "PBATMAXDISC": {
@@ -291,61 +218,67 @@ SETTER_COMMANDS = {
         "description": "Battery max discharge current",
         "help": " -- examples: PBATMAXDISCxxx (000- disable or 030-150A)",
         "response_type": ResponseType.ACK,
-        "response": [[1, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}],],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "PBATMAXDISC([01]\\d\\d)$",
     },
+    "BTA": {
+        "name": "BTA",
+        "description": "Calibrate inverter battery voltage",
+        "help": " -- examples: BTA-01 (reduce inverter reading by 0.05V), BTA+09 (increase inverter reading by 0.45V)",
+        "response_type": ResponseType.ACK,
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
+        "regex": "BTA([-+]0\\d)$",
+    },
+    "PSAVE": {
+        "name": "PSAVE",
+        "description": "Save EEPROM changes",
+        "help": " -- examples: PSAVE (save changes to eeprom)",
+        "response_type": ResponseType.ACK,
+        "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r"],
+    },
 }
+
 QUERY_COMMANDS = {
     "Q1": {
         "name": "Q1",
         "description": "Q1 query",
         "response_type": ResponseType.INDEXED,
         "response": [
-            [1, "Time until the end of absorb charging", "int", "sec"],
-            [2, "Time until the end of float charging", "int", "sec"],
+            [0, "Time until the end of absorb charging", "int", "sec"],
+            [1, "Time until the end of float charging", "int", "sec"],
+            [2, "SCC Flag", "option", ["SCC not communicating?", "SCC is powered and communicating"]],
+            [3, "AllowSccOnFlag", "bytes.decode", ""],
+            [4, "ChargeAverageCurrent", "bytes.decode", ""],
+            [5, "SCC PWM temperature", "int", "\u00b0C", {"device-class": "temperature"}],
+            [6, "Inverter temperature", "int", "\u00b0C", {"device-class": "temperature"}],
+            [7, "Battery temperature", "int", "\u00b0C", {"device-class": "temperature"}],
+            [8, "Transformer temperature", "int", "\u00b0C", {"device-class": "temperature"}],
+            [9, "GPIO13", "int", ""],
+            [10, "Fan lock status", "option", ["Not locked", "Locked"]],
+            [11, "Not used", "bytes.decode", ""],
+            [12, "Fan PWM speed", "int", "%"],
+            [13, "SCC charge power", "int", "W", {"icon": "mdi:solar-power", "device-class": "power"}],
+            [14, "Parallel Warning", "bytes.decode", ""],
+            [15, "Sync frequency", "float", ""],
             [
-                3,
-                "SCC Flag",
-                "option",
-                ["SCC not communicating?", "SCC is powered and communicating"],
-            ],
-            [4, "AllowSccOnFlag", "bytes.decode", ""],
-            [5, "ChargeAverageCurrent", "bytes.decode", ""],
-            [6, "SCC PWM temperature", "int", "°C", {"device-class": "temperature"}],
-            [7, "Inverter temperature", "int", "°C", {"device-class": "temperature"}],
-            [8, "Battery temperature", "int", "°C", {"device-class": "temperature"}],
-            [9, "Transformer temperature", "int", "°C", {"device-class": "temperature"}],
-            [10, "GPIO13", "int", ""],
-            [11, "Fan lock status", "option", ["Not locked", "Locked"]],
-            [12, "Not used", "bytes.decode", ""],
-            [13, "Fan PWM speed", "int", "%"],
-            [14, "SCC charge power", "int", "W", {"icon": "mdi:solar-power", "device-class": "power"}],
-            [15, "Parallel Warning", "bytes.decode", ""],
-            [16, "Sync frequency", "float", ""],
-            [
-                17,
+                16,
                 "Inverter charge status",
                 "str_keyed",
                 {"10": "nocharging", "11": "bulk stage", "12": "absorb", "13": "float"},
                 {"icon": "mdi:book-open"},
             ],
         ],
-        "test_responses": [
-            b"(00000 00000 01 01 00 059 045 053 068 00 00 000 0040 0580 0000 50.00 13\x39\xB9\r",
-        ],
+        "test_responses": [b"(00000 00000 01 01 00 059 045 053 068 00 00 000 0040 0580 0000 50.00 139\xb9\r"],
     },
     "QBOOT": {
         "name": "QBOOT",
         "description": "DSP Has Bootstrap inquiry",
         "response_type": ResponseType.INDEXED,
-        "response": [[1, "DSP Has Bootstrap", "option", ["No", "Yes"]]],
-        "test_responses": [
-            b"(0\xb9\x1c\r",
-        ],
+        "response": [[0, "DSP Has Bootstrap", "option", ["No", "Yes"]]],
+        "test_responses": [b"(0\xb9\x1c\r"],
     },
     "QDI": {
         "name": "QDI",
@@ -353,44 +286,34 @@ QUERY_COMMANDS = {
         "help": " -- queries the default settings from the Inverter",
         "response_type": ResponseType.INDEXED,
         "response": [
-            [1, "AC Output Voltage", "float", "V"],
-            [2, "AC Output Frequency", "float", "Hz"],
-            [3, "Max AC Charging Current", "int", "A"],
-            [4, "Battery Under Voltage", "float", "V"],
-            [5, "Battery Float Charge Voltage", "float", "V"],
-            [6, "Battery Bulk Charge Voltage", "float", "V"],
-            [7, "Battery Recharge Voltage", "float", "V"],
-            [8, "Max Charging Current", "int", "A"],
-            [9, "Input Voltage Range", "option", ["Appliance", "UPS"]],
+            [0, "AC Output Voltage", "float", "V"],
+            [1, "AC Output Frequency", "float", "Hz"],
+            [2, "Max AC Charging Current", "int", "A"],
+            [3, "Battery Under Voltage", "float", "V"],
+            [4, "Battery Float Charge Voltage", "float", "V"],
+            [5, "Battery Bulk Charge Voltage", "float", "V"],
+            [6, "Battery Recharge Voltage", "float", "V"],
+            [7, "Max Charging Current", "int", "A"],
+            [8, "Input Voltage Range", "option", ["Appliance", "UPS"]],
+            [9, "Output Source Priority", "option", ["Utility first", "Solar first", "SBU first"]],
             [
                 10,
-                "Output Source Priority",
-                "option",
-                ["Utility first", "Solar first", "SBU first"],
-            ],
-            [
-                11,
                 "Charger Source Priority",
                 "option",
-                [
-                    "Utility first",
-                    "Solar first",
-                    "Solar + Utility",
-                    "Only solar charging permitted",
-                ],
+                ["Utility first", "Solar first", "Solar + Utility", "Only solar charging permitted"],
             ],
-            [12, "Battery Type", "option", ["AGM", "Flooded", "User"]],
-            [13, "Buzzer", "option", ["enabled", "disabled"]],
-            [14, "Power saving", "option", ["disabled", "enabled"]],
-            [15, "Overload restart", "option", ["disabled", "enabled"]],
-            [16, "Over temperature restart", "option", ["disabled", "enabled"]],
-            [17, "LCD Backlight", "option", ["disabled", "enabled"]],
-            [18, "Primary source interrupt alarm", "option", ["disabled", "enabled"]],
-            [19, "Record fault code", "option", ["disabled", "enabled"]],
-            [20, "Overload bypass", "option", ["disabled", "enabled"]],
-            [21, "LCD reset to default", "option", ["disabled", "enabled"]],
+            [11, "Battery Type", "option", ["AGM", "Flooded", "User"]],
+            [12, "Buzzer", "option", ["enabled", "disabled"]],
+            [13, "Power saving", "option", ["disabled", "enabled"]],
+            [14, "Overload restart", "option", ["disabled", "enabled"]],
+            [15, "Over temperature restart", "option", ["disabled", "enabled"]],
+            [16, "LCD Backlight", "option", ["disabled", "enabled"]],
+            [17, "Primary source interrupt alarm", "option", ["disabled", "enabled"]],
+            [18, "Record fault code", "option", ["disabled", "enabled"]],
+            [19, "Overload bypass", "option", ["disabled", "enabled"]],
+            [20, "LCD reset to default", "option", ["disabled", "enabled"]],
             [
-                22,
+                21,
                 "Output mode",
                 "option",
                 [
@@ -404,9 +327,9 @@ QUERY_COMMANDS = {
                     "unknown output phase",
                 ],
             ],
-            [23, "Battery Redischarge Voltage", "float", "V"],
+            [22, "Battery Redischarge Voltage", "float", "V"],
             [
-                24,
+                23,
                 "PV OK condition",
                 "option",
                 [
@@ -415,7 +338,7 @@ QUERY_COMMANDS = {
                 ],
             ],
             [
-                25,
+                24,
                 "PV Power Balance",
                 "option",
                 [
@@ -423,10 +346,10 @@ QUERY_COMMANDS = {
                     "PV input max power will be the sum of the max charged power and loads power",
                 ],
             ],
-            [26, "Unknown Value", "int", ""],
+            [25, "Unknown Value", "int", ""],
         ],
         "test_responses": [
-            b"(230.0 50.0 0030 42.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 0 0 1 0 54.0 0 1 000\x9E\x60\r",
+            b"(230.0 50.0 0030 42.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 0 0 1 0 54.0 0 1 000\x9E\x60\r"
         ],
     },
     "QFLAG": {
@@ -436,7 +359,7 @@ QUERY_COMMANDS = {
         "response_type": ResponseType.INDEXED,
         "response": [
             [
-                1,
+                0,
                 "Device Status",
                 "enflags",
                 {
@@ -447,37 +370,28 @@ QUERY_COMMANDS = {
                     "u": {"name": "Overload Restart", "state": "disabled"},
                     "v": {"name": "Over Temperature Restart", "state": "disabled"},
                     "x": {"name": "LCD Backlight", "state": "disabled"},
-                    "y": {
-                        "name": "Primary Source Interrupt Alarm",
-                        "state": "disabled",
-                    },
+                    "y": {"name": "Primary Source Interrupt Alarm", "state": "disabled"},
                     "z": {"name": "Record Fault Code", "state": "disabled"},
                 },
             ]
         ],
-        "test_responses": [
-            b"(EakxyDbjuvz\x2F\x29\r",
-        ],
+        "test_responses": [b"(EakxyDbjuvz\x2F\x29\r"],
     },
     "QID": {
         "name": "QID",
         "description": "Device Serial Number inquiry",
         "help": " -- queries the device serial number",
         "response_type": ResponseType.INDEXED,
-        "response": [[1, "Serial Number", "bytes.decode", ""]],
-        "test_responses": [
-            b"(9293333010501\xBB\x07\r",
-        ],
+        "response": [[0, "Serial Number", "bytes.decode", ""]],
+        "test_responses": [b"(9293333010501\xbb\x07\r"],
     },
     "QMCHGCR": {
         "name": "QMCHGCR",
         "description": "Max Charging Current Options inquiry",
         "help": " -- queries the maximum charging current setting of the Inverter",
         "response_type": ResponseType.MULTIVALUED,
-        "response": [[1, "Max Charging Current Options", "string", "A"]],
-        "test_responses": [
-            b"(010 020 030 040 050 060 070 080 090 100 110 120\x0c\xcb\r",
-        ],
+        "response": [[0, "Max Charging Current Options", "string", "A"]],
+        "test_responses": [b"(010 020 030 040 050 060 070 080 090 100 110 120\x0c\xcb\r"],
     },
     "QMOD": {
         "name": "QMOD",
@@ -486,50 +400,35 @@ QUERY_COMMANDS = {
         "response_type": ResponseType.INDEXED,
         "response": [
             [
-                1,
+                0,
                 "Device Mode",
                 "str_keyed",
-                {
-                    "P": "Power on",
-                    "S": "Standby",
-                    "L": "Line",
-                    "B": "Battery",
-                    "F": "Fault",
-                    "H": "Power saving",
-                },
+                {"P": "Power on", "S": "Standby", "L": "Line", "B": "Battery", "F": "Fault", "H": "Power saving"},
             ]
         ],
-        "test_responses": [
-            b"(S\xe5\xd9\r",
-        ],
+        "test_responses": [b"(S\xe5\xd9\r"],
     },
     "QMN": {
         "name": "QMN",
         "description": "Model Name Inquiry",
         "response_type": ResponseType.INDEXED,
-        "response": [[1, "Model Name", "bytes.decode", ""]],
-        "test_responses": [
-            b"(MKS2-8000\xb2\x8d\r",
-        ],
+        "response": [[0, "Model Name", "bytes.decode", ""]],
+        "test_responses": [b"(MKS2-8000\xb2\x8d\r",],
     },
     "QGMN": {
         "name": "QGMN",
         "description": "General Model Name Inquiry",
         "response_type": ResponseType.INDEXED,
-        "response": [[1, "General Model Number", "bytes.decode", ""]],
-        "test_responses": [
-            b"(044\xc8\xae\r",
-        ],
+        "response": [[0, "General Model Number", "bytes.decode", ""]],
+        "test_responses": [b"(044\xc8\xae\r",],
     },
     "QMUCHGCR": {
         "name": "QMUCHGCR",
         "description": "Max Utility Charging Current Options inquiry",
         "help": " -- queries the maximum utility charging current setting of the Inverter",
         "response_type": ResponseType.MULTIVALUED,
-        "response": [[1, "Max Utility Charging Current", "string", "A"]],
-        "test_responses": [
-            b"(002 010 020 030 040 050 060 070 080 090 100 110 120\xca#\r",
-        ],
+        "response": [[0, "Max Utility Charging Current", "string", "A"]],
+        "test_responses": [b"(002 010 020 030 040 050 060 070 080 090 100 110 120\xca#\r"],
     },
     "QOPM": {
         "name": "QOPM",
@@ -538,7 +437,7 @@ QUERY_COMMANDS = {
         "response_type": ResponseType.INDEXED,
         "response": [
             [
-                1,
+                0,
                 "Output mode",
                 "option",
                 [
@@ -553,9 +452,7 @@ QUERY_COMMANDS = {
                 ],
             ]
         ],
-        "test_responses": [
-            b"(0\xb9\x1c\r",
-        ],
+        "test_responses": [b"(0\xb9\x1c\r"],
     },
     "QPGS": {
         "name": "QPGS",
@@ -563,10 +460,10 @@ QUERY_COMMANDS = {
         "help": " -- example: QPGS1 queries the values of various metrics from instance 1 of parallel setup Inverters (numbers from 0)",
         "response_type": ResponseType.INDEXED,
         "response": [
-            [1, "Parallel instance number", "option", ["Not valid", "valid"]],
-            [2, "Serial number", "bytes.decode", ""],
+            [0, "Parallel instance number", "option", ["Not valid", "valid"]],
+            [1, "Serial number", "bytes.decode", ""],
             [
-                3,
+                2,
                 "Work mode",
                 "str_keyed",
                 {
@@ -579,7 +476,7 @@ QUERY_COMMANDS = {
                 },
             ],
             [
-                4,
+                3,
                 "Fault code",
                 "str_keyed",
                 {
@@ -614,23 +511,23 @@ QUERY_COMMANDS = {
                     "86": "Parallel output setting different",
                 },
             ],
-            [5, "Grid voltage", "float", "V"],
-            [6, "Grid frequency", "float", "Hz"],
-            [7, "AC output voltage", "float", "V"],
-            [8, "AC output frequency", "float", "Hz"],
-            [9, "AC output apparent power", "int", "VA"],
-            [10, "AC output active power", "int", "W"],
-            [11, "Load percentage", "int", "%"],
-            [12, "Battery voltage", "float", "V"],
-            [13, "Battery charging current", "int", "A"],
-            [14, "Battery capacity", "int", "%"],
-            [15, "PV Input Voltage", "float", "V"],
-            [16, "Total charging current", "int", "A"],
-            [17, "Total AC output apparent power", "int", "VA"],
-            [18, "Total output active power", "int", "W"],
-            [19, "Total AC output percentage", "int", "%"],
+            [4, "Grid voltage", "float", "V"],
+            [5, "Grid frequency", "float", "Hz"],
+            [6, "AC output voltage", "float", "V"],
+            [7, "AC output frequency", "float", "Hz"],
+            [8, "AC output apparent power", "int", "VA"],
+            [9, "AC output active power", "int", "W"],
+            [10, "Load percentage", "int", "%"],
+            [11, "Battery voltage", "float", "V"],
+            [12, "Battery charging current", "int", "A"],
+            [13, "Battery capacity", "int", "%"],
+            [14, "PV Input Voltage", "float", "V"],
+            [15, "Total charging current", "int", "A"],
+            [16, "Total AC output apparent power", "int", "VA"],
+            [17, "Total output active power", "int", "W"],
+            [18, "Total AC output percentage", "int", "%"],
             [
-                20,
+                19,
                 "Inverter Status",
                 "flags",
                 [
@@ -645,7 +542,7 @@ QUERY_COMMANDS = {
                 ],
             ],
             [
-                21,
+                20,
                 "Output mode",
                 "option",
                 [
@@ -660,18 +557,18 @@ QUERY_COMMANDS = {
                 ],
             ],
             [
-                22,
+                21,
                 "Charger source priority",
                 "option",
                 ["Utility first", "Solar first", "Solar + Utility", "Solar only"],
             ],
-            [23, "Max charger current", "int", "A"],
-            [24, "Max charger range", "int", "A"],
-            [25, "Max AC charger current", "int", "A"],
-            [26, "PV input current", "int", "A"],
-            [27, "Battery discharge current", "int", "A"],
-            [28, "Unknown float", ""],
-            [29, "string", "Unknown flags?", ""],
+            [22, "Max charger current", "int", "A"],
+            [23, "Max charger range", "int", "A"],
+            [24, "Max AC charger current", "int", "A"],
+            [25, "PV input current", "int", "A"],
+            [26, "Battery discharge current", "int", "A"],
+            [27, "Unknown float", ""],
+            [28, "string", "Unknown flags?", ""],
         ],
         "test_responses": [
             b"(1 92931701100510 B 00 000.0 00.00 230.6 50.00 0275 0141 005 51.4 001 100 083.3 002 00574 00312 003 10100110 1 2 060 120 10 04 000\xcc#\r",
@@ -685,21 +582,15 @@ QUERY_COMMANDS = {
         "description": "Protocol ID inquiry",
         "help": " -- queries the device protocol ID. e.g. PI30 for HS series",
         "response_type": ResponseType.INDEXED,
-        "response": [
-            [1, "Protocol ID", "bytes.decode", ""],
-        ],
-        "test_responses": [
-            b"(PI30\x9a\x0b\r",
-        ],
+        "response": [[0, "Protocol ID", "bytes.decode", ""]],
+        "test_responses": [b"(PI30\x9a\x0b\r"],
     },
     "QPIz": {
         "name": "QPIz",
         "description": "Protocol ID inquiry",
         "help": " -- queries the device protocol ID. e.g. PI30 for HS series",
         "response_type": ResponseType.INDEXED,
-        "test_responses": [
-            b"(PI30\x9a\x0b\r",
-        ],
+        "test_responses": [b"(PI30\x9a\x0b\r"],
     },
     "QPIGS": {
         "name": "QPIGS",
@@ -707,24 +598,42 @@ QUERY_COMMANDS = {
         "help": " -- queries the value of various metrics from the Inverter",
         "response_type": ResponseType.INDEXED,
         "response": [
-            [1, "AC Input Voltage", "float", "V", {"icon": "mdi:transmission-tower-export", "device-class": "voltage"}],
-            [2, "AC Input Frequency", "float", "Hz", {"icon": "mdi:current-ac", "device-class": "frequency"}],
-            [3, "AC Output Voltage", "float", "V", {"icon": "mdi:power-plug", "device-class": "voltage"}],
-            [4, "AC Output Frequency", "float", "Hz", {"icon": "mdi:current-ac", "device-class": "frequency"}],
-            [5, "AC Output Apparent Power", "int", "VA", {"icon": "mdi:power-plug", "device-class": "apparent_power"}],
-            [6, "AC Output Active Power", "int", "W", {"icon": "mdi:power-plug", "device-class": "power", "state_class": "measurement"}],
-            [7, "AC Output Load", "int", "%", {"icon": "mdi:brightness-percent"}],
-            [8, "BUS Voltage", "int", "V", {"icon": "mdi:details", "device-class": "voltage"}],
-            [9, "Battery Voltage", "float", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
-            [10, "Battery Charging Current", "int", "A", {"icon": "mdi:current-dc", "device-class": "current"}],
-            [11, "Battery Capacity", "int", "%", {"device-class": "battery"}],
-            [12, "Inverter Heat Sink Temperature", "int", "°C", {"icon": "mdi:details", "device-class": "temperature"}],
-            [13, "PV Input Current", "float", "A", {"icon": "mdi:solar-power", "device-class": "current"}],
-            [14, "PV Input Voltage", "float", "V", {"icon": "mdi:solar-power", "device-class": "voltage"}],
-            [15, "Battery Voltage from SCC", "float", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
-            [16, "Battery Discharge Current", "int", "A", {"icon": "mdi:battery-negative", "device-class": "current"}],
             [
-                17,
+                0,
+                "AC Input Voltage",
+                "float",
+                "V",
+                {"icon": "mdi:transmission-tower-export", "device-class": "voltage"},
+            ],
+            [1, "AC Input Frequency", "float", "Hz", {"icon": "mdi:current-ac", "device-class": "frequency"}],
+            [2, "AC Output Voltage", "float", "V", {"icon": "mdi:power-plug", "device-class": "voltage"}],
+            [3, "AC Output Frequency", "float", "Hz", {"icon": "mdi:current-ac", "device-class": "frequency"}],
+            [4, "AC Output Apparent Power", "int", "VA", {"icon": "mdi:power-plug", "device-class": "apparent_power"}],
+            [
+                5,
+                "AC Output Active Power",
+                "int",
+                "W",
+                {"icon": "mdi:power-plug", "device-class": "power", "state_class": "measurement"},
+            ],
+            [6, "AC Output Load", "int", "%", {"icon": "mdi:brightness-percent"}],
+            [7, "BUS Voltage", "int", "V", {"icon": "mdi:details", "device-class": "voltage"}],
+            [8, "Battery Voltage", "float", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
+            [9, "Battery Charging Current", "int", "A", {"icon": "mdi:current-dc", "device-class": "current"}],
+            [10, "Battery Capacity", "int", "%", {"device-class": "battery"}],
+            [
+                11,
+                "Inverter Heat Sink Temperature",
+                "int",
+                "\u00b0C",
+                {"icon": "mdi:details", "device-class": "temperature"},
+            ],
+            [12, "PV Input Current", "float", "A", {"icon": "mdi:solar-power", "device-class": "current"}],
+            [13, "PV Input Voltage", "float", "V", {"icon": "mdi:solar-power", "device-class": "voltage"}],
+            [14, "Battery Voltage from SCC", "float", "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
+            [15, "Battery Discharge Current", "int", "A", {"icon": "mdi:battery-negative", "device-class": "current"}],
+            [
+                16,
                 "Device Status",
                 "flags",
                 [
@@ -738,15 +647,16 @@ QUERY_COMMANDS = {
                     "Is AC Charging On",
                 ],
             ],
-            [18, "RSV1", "int", "A"],
-            [19, "RSV2", "int", "A"],
-            [20, "PV Input Power", "int", "W", {"icon": "mdi:solar-power", "device-class": "power", "state_class": "measurement"}],
+            [17, "RSV1", "int", "A"],
+            [18, "RSV2", "int", "A"],
             [
-                21,
-                "Device Status2",
-                "flags",
-                ["Is Charging to Float", "Is Switched On", "Is Reserved"],
+                19,
+                "PV Input Power",
+                "int",
+                "W",
+                {"icon": "mdi:solar-power", "device-class": "power", "state_class": "measurement"},
             ],
+            [20, "Device Status2", "flags", ["Is Charging to Float", "Is Switched On", "Is Reserved"]],
         ],
         "test_responses": [
             b"(000.0 00.0 230.0 49.9 0161 0119 003 460 57.50 012 100 0069 0014 103.8 57.45 00000 00110110 00 00 00856 010\x24\x8c\r",
@@ -758,20 +668,20 @@ QUERY_COMMANDS = {
         "help": " -- queries the current settings from the Inverter",
         "response_type": ResponseType.INDEXED,
         "response": [
-            [1, "AC Input Voltage", "float", "V"],
-            [2, "AC Input Current", "float", "A"],
-            [3, "AC Output Voltage", "float", "V"],
-            [4, "AC Output Frequency", "float", "Hz"],
-            [5, "AC Output Current", "float", "A"],
-            [6, "AC Output Apparent Power", "int", "VA"],
-            [7, "AC Output Active Power", "int", "W"],
-            [8, "Battery Voltage", "float", "V"],
-            [9, "Battery Recharge Voltage", "float", "V"],
-            [10, "Battery Under Voltage", "float", "V"],
-            [11, "Battery Bulk Charge Voltage", "float", "V"],
-            [12, "Battery Float Charge Voltage", "float", "V"],
+            [0, "AC Input Voltage", "float", "V"],
+            [1, "AC Input Current", "float", "A"],
+            [2, "AC Output Voltage", "float", "V"],
+            [3, "AC Output Frequency", "float", "Hz"],
+            [4, "AC Output Current", "float", "A"],
+            [5, "AC Output Apparent Power", "int", "VA"],
+            [6, "AC Output Active Power", "int", "W"],
+            [7, "Battery Voltage", "float", "V"],
+            [8, "Battery Recharge Voltage", "float", "V"],
+            [9, "Battery Under Voltage", "float", "V"],
+            [10, "Battery Bulk Charge Voltage", "float", "V"],
+            [11, "Battery Float Charge Voltage", "float", "V"],
             [
-                13,
+                12,
                 "Battery Type",
                 "option",
                 [
@@ -786,36 +696,21 @@ QUERY_COMMANDS = {
                     "3rd party Lithium",
                 ],
             ],
-            [14, "Max AC Charging Current", "int", "A"],
-            [15, "Max Charging Current", "int", "A"],
-            [16, "Input Voltage Range", "option", ["Appliance", "UPS"]],
+            [13, "Max AC Charging Current", "int", "A"],
+            [14, "Max Charging Current", "int", "A"],
+            [15, "Input Voltage Range", "option", ["Appliance", "UPS"]],
+            [16, "Output Source Priority", "option", ["Utility first", "Solar first", "SBU first"]],
             [
                 17,
-                "Output Source Priority",
-                "option",
-                ["Utility first", "Solar first", "SBU first"],
-            ],
-            [
-                18,
                 "Charger Source Priority",
                 "option",
-                [
-                    "Utility first",
-                    "Solar first",
-                    "Solar + Utility",
-                    "Only solar charging permitted",
-                ],
+                ["Utility first", "Solar first", "Solar + Utility", "Only solar charging permitted"],
             ],
-            [19, "Max Parallel Units", "int", "units"],
+            [18, "Max Parallel Units", "int", "units"],
+            [19, "Machine Type", "str_keyed", {"00": "Grid tie", "01": "Off Grid", "10": "Hybrid"}],
+            [20, "Topology", "option", ["transformerless", "transformer"]],
             [
-                20,
-                "Machine Type",
-                "str_keyed",
-                {"00": "Grid tie", "01": "Off Grid", "10": "Hybrid"},
-            ],
-            [21, "Topology", "option", ["transformerless", "transformer"]],
-            [
-                22,
+                21,
                 "Output Mode",
                 "option",
                 [
@@ -829,9 +724,9 @@ QUERY_COMMANDS = {
                     "unknown output",
                 ],
             ],
-            [23, "Battery Redischarge Voltage", "float", "V"],
+            [22, "Battery Redischarge Voltage", "float", "V"],
             [
-                24,
+                23,
                 "PV OK Condition",
                 "option",
                 [
@@ -840,7 +735,7 @@ QUERY_COMMANDS = {
                 ],
             ],
             [
-                25,
+                24,
                 "PV Power Balance",
                 "option",
                 [
@@ -848,13 +743,8 @@ QUERY_COMMANDS = {
                     "PV input max power will be the sum of the max charged power and loads power",
                 ],
             ],
-            [26, "Max charging time for CV stage", "int", "min"],
-            [
-                27,
-                "Operation Logic",
-                "option",
-                ["Automatic mode", "On-line mode", "ECO mode"],
-            ],
+            [25, "Max charging time for CV stage", "int", "min"],
+            [26, "Operation Logic", "option", ["Automatic mode", "On-line mode", "ECO mode"]],
         ],
         "test_responses": [
             b"(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1\x6F\x7E\r",
@@ -872,7 +762,7 @@ QUERY_COMMANDS = {
         "response_type": ResponseType.INDEXED,
         "response": [
             [
-                1,
+                0,
                 "Warning",
                 "flags",
                 [
@@ -911,29 +801,23 @@ QUERY_COMMANDS = {
                 ],
             ]
         ],
-        "test_responses": [
-            b"(00000100000000001000000000000000\x56\xA6\r",
-        ],
+        "test_responses": [b"(00000100000000001000000000000000\x56\xA6\r"],
     },
     "QVFW": {
         "name": "QVFW",
         "description": "Main CPU firmware version inquiry",
         "help": " -- queries the main CPU firmware version",
         "response_type": ResponseType.INDEXED,
-        "response": [[1, "Main CPU firmware version", "bytes.decode", ""]],
-        "test_responses": [
-            b"(VERFW:00072.70\x53\xA7\r",
-        ],
+        "response": [[0, "Main CPU firmware version", "bytes.decode", ""]],
+        "test_responses": [b"(VERFW:00072.70\x53\xA7\r"],
     },
     "QVFW2": {
         "name": "QVFW2",
         "description": "Secondary CPU firmware version inquiry",
         "help": " -- queries the secondary CPU firmware version",
         "response_type": ResponseType.INDEXED,
-        "response": [[1, "Secondary CPU firmware version", "bytes.decode", ""]],
-        "test_responses": [
-            b"(VERFW:00072.70\x53\xA7\r",
-        ],
+        "response": [[0, "Secondary CPU firmware version", "bytes.decode", ""]],
+        "test_responses": [b"(VERFW:00072.70\x53\xA7\r"],
     },
 }
 
@@ -970,7 +854,9 @@ class pi30(AbstractProtocol):
         if len(result.raw_response) <= 3:
             result.is_valid = False
             result.error = True
-            result.error_messages.append(f"failed validity check: response to short len was {len(result.raw_response)}")
+            result.error_messages.append(
+                f"failed validity check: response to short len was {len(result.raw_response)}"
+            )
             return
         # check crc matches the calculated one
         calc_crc_high, calc_crc_low = crc(result.raw_response[:-3])
@@ -981,7 +867,9 @@ class pi30(AbstractProtocol):
         if [calc_crc_high, calc_crc_low] != [crc_high, crc_low]:
             result.is_valid = False
             result.error = True
-            result.error_messages.append(f"failed validity check: response has invalid CRC - got '\\x{crc_high:02x}\\x{crc_low:02x}', calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'")
+            result.error_messages.append(
+                f"failed validity check: response has invalid CRC - got '\\x{crc_high:02x}\\x{crc_low:02x}', calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'"
+            )
             return
             # if result.raw_response[-3:-1] != bytes([calc_crc_high, calc_crc_low]):
         log.debug("CRCs match")

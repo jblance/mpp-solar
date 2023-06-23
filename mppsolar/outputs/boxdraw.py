@@ -4,21 +4,21 @@ import re
 from .baseoutput import baseoutput
 from ..helpers import get_kwargs, key_wanted, pad, getMaxLen
 
-log = logging.getLogger("screen")
+log = logging.getLogger("boxdraw")
 
 
-class screen(baseoutput):
+class boxdraw(baseoutput):
     def __str__(self):
-        return "[the default output module] outputs the results to standard out in a slightly formatted way"
+        return "outputs the results to standard out in a table formatted with line art boxes"
 
     def __init__(self, *args, **kwargs) -> None:
-        log.debug(f"processor.screen __init__ kwargs {kwargs}")
+        log.debug(f"processor.boxdraw __init__ kwargs {kwargs}")
 
     def printHeader(command, description):
         pass
 
     def output(self, *args, **kwargs):
-        log.info("Using output processor: screen")
+        log.info("Using output processor: boxdraw")
         log.debug(f"kwargs {kwargs}")
         data = get_kwargs(kwargs, "data")
         if data is None:
@@ -73,25 +73,47 @@ class screen(baseoutput):
                 displayData[key] = _values
         log.debug(f"displayData: {displayData}")
 
+        # Determine column widths
+        _pad = 1
+        # Width of parameter column
+        width_p = getMaxLen(displayData) + _pad
+        if width_p < 9 + _pad:
+            width_p = 9 + _pad
+        # Width of value column
+        width_v = getMaxLen(data.values()) + _pad
+        if width_v < 6 + _pad:
+            width_v = 6 + _pad
+        # Width of units column
+        width_u = getMaxLen(data.values(), 1) + _pad
+        if width_u < 5 + _pad:
+            width_u = 5 + _pad
+        # Total line length
+        line_length = width_p + width_v + width_u + 7
+        # Check if command / description line is longer and extend line if needed
+        cmd_str = f" Command: {command} - {description}"
+        if line_length < (len(cmd_str) + 7):
+            line_length = len(cmd_str) + 7
+        # Check if columns too short and expand units if needed
+        if (width_p + width_v + width_u + 7) < line_length:
+            width_u = line_length - (width_p + width_u + 7) - 1
+
         # print header
-        print(f"Command: {command} - {description}")
-        print("-" * 80)
+        print("\u2554" + ("\u2550" * (line_length - 2)) + "\u2557")
+        print(f"\u2551{cmd_str}" + (" " * (line_length - len(cmd_str) - 2)) + "\u2551")
+
+        # print separator
+        print("\u2560" + ("\u2550" * (width_p + 1)) + "\u2564" + ("\u2550" * (width_v + 1)) + "\u2564" + ("\u2550" * (width_u + 1)) + "\u2563")
+        # print column headings
+        print(f"\u2551 {pad('Parameter', width_p)}\u2502 {pad('Value', width_v)}\u2502 {pad('Unit', width_u)}\u2551")
+        # print separator
+        print("\u255f" + ("\u2500" * (width_p + 1)) + "\u253c" + ("\u2500" * (width_v + 1)) + "\u253c" + ("\u2500" * (width_u + 1)) + "\u2562")
 
         # print data
-        maxP = getMaxLen(displayData)
-        if maxP < 9:
-            maxP = 9
-        # maxV = getMaxLen(data.values())
-        print(f"{pad('Parameter', maxP+1)}{'Value':<15}\tUnit")
         for key in displayData:
             value = displayData[key][0]
             unit = displayData[key][1]
-            if len(displayData[key]) > 2 and displayData[key][2]:
-                extra = displayData[key][2]
-                print(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}\t{extra}")
-            else:
-                print(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}")
+            print(f"\u2551 {pad(key, width_p)}\u2502 {pad(value, width_v)}\u2502 {pad(unit, width_u)}\u2551")
 
         # print footer
-        print("-" * 80)
+        print("\u255a" + ("\u2550" * (width_p + 1)) + "\u2567" + ("\u2550" * (width_v + 1)) + "\u2567" + ("\u2550" * (width_u + 1)) + "\u255d")
         print("\n")

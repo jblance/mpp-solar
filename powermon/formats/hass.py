@@ -9,6 +9,8 @@ log = logging.getLogger("hass")
 class hass(AbstractFormat):
     def __init__(self, formatConfig, device):
         super().__init__(formatConfig)
+        self.name = "hass"
+        self.extra_info = formatConfig.get("extra_info", False)
         self.discovery_prefix = formatConfig.get("discovery_prefix", "homeassistant")
         self.entity_id_prefix = formatConfig.get("entity_id_prefix", "mpp")
         if device is None:
@@ -18,22 +20,26 @@ class hass(AbstractFormat):
             self.device_manufacturer = "MPP Solar"
         else:
             self.device_name = device.name
-            self.device_id = device.id
+            self.device_id = device.identifier
             self.device_model = device.model
             self.device_manufacturer = device.manufacturer
 
     def sendsMultipleMessages(self) -> bool:
         return True
 
-    def format(self, data) -> list:
-        log.info("Using output formatter: hass")
+    def format(self, result) -> list:
+        log.info("Using output formatter: %s" % self.name)
 
         config_msgs = []
         value_msgs = []
-        if data is None:
-            return []
 
+        _result = []
+        data = result.decoded_responses
+        if data is None:
+            return _result
+        log.debug(f"data: {data}")
         displayData = self.formatAndFilterData(data)
+        log.debug(f"displayData: {displayData}")
 
         # build data to display
         for key in displayData:
