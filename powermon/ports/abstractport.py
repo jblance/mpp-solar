@@ -45,6 +45,11 @@ class AbstractPort(ABC):
     def run_command(self, command):
         # takes a command object, runs the command and returns a result object (replaces process_command)
         log.debug(f"Command {command}")
+        # update run times
+        command.touch()
+        # update full_command - expand any template / add crc etc
+        # updates every run incase something has changed
+        command.full_command = self.protocol.get_full_command(command.name)
         result = Result(command)
         # run the command via the 'send_and_receive port function
         result = self.send_and_receive(result)
