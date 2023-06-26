@@ -1,6 +1,5 @@
 # yaml config for powermon
 name: testmon
-loop_duration: 10 #seconds
 
 device:
   name: 1012LV-MK
@@ -30,3 +29,7 @@ mqttbroker:
 api:
   announce_topic: powermon/announce
   adhoc_topic: powermon/adhoc
+  
+daemon:
+  type: systemd
+  keepalive: 100

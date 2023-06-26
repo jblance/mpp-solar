@@ -36,55 +36,55 @@ def getOutputClass(outputType, _format, outputConfig={}, mqtt_broker=None, topic
     return output_class
 
 
-def getOutputs(outputsConfig, topic=None, schedule_name=None, device=None, mqtt_broker=None):
+def getOutputs(outputsConfig, topic=None, device=None, mqtt_broker=None):
     # outputs can be None,
     # str (eg screen),
     # list (eg [{'type': 'screen', 'format': 'simple'}, {'type': 'screen', 'format': {'type': 'htmltable'}}])
     # dict (eg {'format': 'table'})
     # print("outputs %s, type: %s" % (outputs, type(outputs)))
     _outputs = []
-    log.debug("processing outputsConfig: %s" % outputsConfig)
+    log.debug("processing outputsConfig: %s", outputsConfig)
     if outputsConfig is None:
         _outputs.append(parseOutputConfig({"type": "screen", "format": "simple"}))
     elif isinstance(outputsConfig, str):
         # eg 'screen'
-        _outputs.append(parseOutputConfig(outputsConfig))
+        _outputs.append(parseOutputConfig(outputsConfig, mqtt_broker=mqtt_broker, topic=topic))
     elif isinstance(outputsConfig, list):
         # eg [{'type': 'screen', 'format': 'simple'}, {'type': 'screen', 'format': {'type': 'htmltable'}}]
         for outputConfig in outputsConfig:
-            _outputs.append(parseOutputConfig(outputConfig))
+            _outputs.append(parseOutputConfig(outputConfig, mqtt_broker=mqtt_broker, topic=topic))
     elif isinstance(outputsConfig, dict):
         # eg {'format': 'table'}
-        _outputs.append(parseOutputConfig(outputsConfig))
+        _outputs.append(parseOutputConfig(outputsConfig, mqtt_broker=mqtt_broker, topic=topic))
     else:
         pass
     return _outputs
 
 
-def parseOutputConfig(outputConfig, topic=None, schedule_name=None, device=None, mqtt_broker=None):
-    log.debug("parseOutputConfig, config: %s, topic: %s" % (outputConfig, topic))
+def parseOutputConfig(outputConfig, topic=None, device=None, mqtt_broker=None):
+    log.debug("parseOutputConfig, config: %s, topic: %s", outputConfig, topic)
     topic_override = None
     # outputConfig can be None, a str (eg 'screen') a dict (eg {'format': 'table'}) or a list (eg [{'type': 'screen', 'format': 'simple'}])
     if outputConfig is None:
         log.debug("got blank outputConfig")
         outputType = DEFAULT_OUTPUT
         _format = getFormatfromConfig(DEFAULT_FORMAT, device, topic)
-        log.debug("got format: %s" % (_format))
-        _output = getOutputClass(outputType, _format)
-        log.debug("got output: %s" % (_output))
+        log.debug("got format: %s", (_format))
+        _output = getOutputClass(outputType, _format, mqtt_broker=mqtt_broker, topic=topic)
+        log.debug("got output: %s", (_output))
         return _output
     elif isinstance(outputConfig, str):
         # eg 'screen'
-        log.debug("got str type outputConfig: %s" % (outputConfig))
+        log.debug("got str type outputConfig: %s", outputConfig)
         outputType = outputConfig
         _format = getFormatfromConfig(DEFAULT_FORMAT, device, topic)
-        log.debug("got format: %s" % (_format))
-        _output = getOutputClass(outputType, _format)
-        log.debug("got output: %s" % (_output))
+        log.debug("got format: %s", (_format))
+        _output = getOutputClass(outputType, _format, mqtt_broker=mqtt_broker, topic=topic)
+        log.debug("got output: %s", (_output))
         return _output
     elif isinstance(outputConfig, dict):
         # eg {'format': 'table'}
-        log.debug("got dict type outputConfig: %s" % (outputConfig))
+        log.debug("got dict type outputConfig: %s", outputConfig)
         outputType = outputConfig.get("type", DEFAULT_OUTPUT)
         formatConfig = outputConfig.get("format", DEFAULT_FORMAT)
         topic_override = outputConfig.get("topic_override")
@@ -92,14 +92,14 @@ def parseOutputConfig(outputConfig, topic=None, schedule_name=None, device=None,
         if topic_override is not None:
             topic = topic_override
         _format = getFormatfromConfig(formatConfig, device, topic)
-        log.debug("got format: %s" % (_format))
-        _output = getOutputClass(outputType, _format)
-        log.debug("got output: %s" % (_output))
+        log.debug("got format: %s", _format)
+        _output = getOutputClass(outputType, _format, mqtt_broker=mqtt_broker, topic=topic)
+        log.debug("got output: %s", _output)
         return _output
     elif isinstance(outputConfig, list):
         # eg [{'type': 'screen', 'format': 'simple'}], possibly multiple outputs
         # loop through outputs
-        log.debug("got list type outputConfig: %s" % (outputConfig))
+        log.debug("got list type outputConfig: %s", outputConfig)
         raise Exception("Problem in outputs init - list type for outputConfig")
 
         # for item in outputConfig:
@@ -109,9 +109,9 @@ def parseOutputConfig(outputConfig, topic=None, schedule_name=None, device=None,
         # return outputs
     else:
         # miss configured output?
-        log.warn("outputConfig (%s) doesnt match expectations, defaulting" % outputConfig)
+        log.warn("outputConfig (%s) doesnt match expectations, defaulting", outputConfig)
         outputType = DEFAULT_OUTPUT
         formatConfig = DEFAULT_FORMAT
 
     _format = getFormatfromConfig(formatConfig, device, topic)
-    log.debug("got format: %s" % (_format))
+    log.debug("got format: %s", (_format))

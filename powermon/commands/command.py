@@ -26,7 +26,7 @@ class Command:
         return f"Command: {self.name=} {self.full_command=}, {self.type=}, [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {self.command_defn=}"
 
     @classmethod
-    def fromConfig(cls, config=None):
+    def fromConfig(cls, config=None, mqtt_broker=None) -> "Command":
         # need to have a config defined
         # minimum is
         # - command: QPI
@@ -40,7 +40,7 @@ class Command:
             log.info("command must be defined")
             raise TypeError("command must be defined")
         commandtype = config.get("type", "basic")
-        outputs = getOutputs(config.get("outputs", ""))
+        outputs = getOutputs(config.get("outputs", ""), mqtt_broker=mqtt_broker, topic=name)
         trigger = Trigger.fromConfig(config=config.get("trigger"))
         return cls(name=name, commandtype=commandtype, outputs=outputs, trigger=trigger)
 

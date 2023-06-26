@@ -155,7 +155,7 @@ class MqttBroker:
         if self.disabled:
             log.debug("Cannot publish msg as mqttbroker disabled")
             return
-        log.debug(f"Publishing '{payload}' to '{topic}'")
+        log.debug("Publishing '%s' to '%s'", payload, topic)
         if self.name == "screen":
             print(f"mqtt debug output only as broker name is 'screen' - topic: '{topic}', payload: '{payload}'")
             return

@@ -31,11 +31,12 @@ class API_MQTT(AbstractOutput):
             return
 
         # build the messages...
-        formattedData = self.formatter.format(data)
-        log.debug(f"mqtt.output msgs {formattedData}")
+        formatted_data = self.formatter.format(data)
+        log.debug("mqtt.output msgs %s",formatted_data)
 
-        result = ResultDTO(schedule_name=self.schedule_name, result=formattedData)
+        result = ResultDTO(result=formatted_data)
 
+        log.debug("Topic: %s", self.results_topic)
         self.mqtt_broker.publish(self.results_topic, result.json())
 
     def process(self, result):

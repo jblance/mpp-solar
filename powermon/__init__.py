@@ -125,22 +125,23 @@ def main():
     log.setLevel(config.get("debuglevel", logging.WARNING))
 
     # debug config
-    log.info("config: %s" % config)
+    log.info("config: %s", config)
+
+    # build mqtt broker object (optional)
+    # QUESTION: should mqtt_broker be part of device...
+    mqtt_broker = MqttBroker.fromConfig(config=config.get("mqttbroker"))
+    log.info(mqtt_broker)
 
     # build device object (required)
     device = Device.fromConfig(config=config.get("device"))
     log.debug(device)
     # add commands to device command list
     for commandConfig in config.get("commands"):
-        command = Command.fromConfig(commandConfig)
+        command = Command.fromConfig(commandConfig, mqtt_broker=mqtt_broker)
         if command is not None:
             device.add_command(command)
     log.info(device)
 
-    # build mqtt broker object (optional)
-    # QUESTION: should mqtt_broker be part of device...
-    mqtt_broker = MqttBroker.fromConfig(config=config.get("mqttbroker"))
-    log.info(mqtt_broker)
 
     # build the daemon object (optional)
     daemon = Daemon.fromConfig(config=config.get("daemon"))
@@ -155,7 +156,6 @@ def main():
 
     # initialize device
     device.initialize()
-    controller.before_loop()
 
     # Main working loop
     keep_looping = True
