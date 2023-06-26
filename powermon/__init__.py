@@ -127,6 +127,10 @@ def main():
     # debug config
     log.info("config: %s", config)
 
+    # build device object (required)
+    device = Device(config=config.get("device"), commandConfig=config.get("commands"))
+    log.info(device)
+
     # build mqtt broker object (optional)
     # QUESTION: should mqtt_broker be part of device...
     mqtt_broker = MqttBroker.fromConfig(config=config.get("mqttbroker"))

@@ -15,9 +15,9 @@ commands:
 #   outputs:
 #   - type: screen
 #     format: raw
-- command: xxx
+- command: QID
   trigger:
-    every: 10  # every 10 seconds
+    every: 5  # every 5 seconds
   outputs:
   - type: screen
     format:

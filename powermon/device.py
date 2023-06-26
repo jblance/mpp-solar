@@ -89,11 +89,6 @@ class Device:
         else:
             for command in self.commands:
                 if force or command.dueToRun():
-                    # update run times
-                    command.touch()
-                    # update full_command - expand any template / add crc etc
-                    # updates every run incase something has changed
-                    command.full_command = self.port.protocol.get_full_command(command.name)
                     # run command
                     result = self.port.run_command(command)
                     # decode result

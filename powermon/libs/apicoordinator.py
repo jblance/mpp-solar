@@ -68,7 +68,6 @@ class ApiCoordinator:
             self.announce_device()
             self.last_run = time()
 
-    def announce_device(self):
-        """Announce the device on the announce topic"""
-        schedule_dto = self.schedule.to_dto()
-        self.mqtt_broker.publish(self.announceTopic, schedule_dto.json())
+    def announceDevice(self):
+        # scheduleDTO = self.schedule.toDTO()
+        self.mqtt_broker.publish(self.announceTopic, "{'announceDevice':'todo'}")
