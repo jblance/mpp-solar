@@ -124,15 +124,18 @@ def main():
     # build config - override with any command line arguments
     config.update(process_command_line_overrides(args))
 
-    # validate config if requested
-    if args.validate:
-        try:
-            c = ConfigModel(config=config)
-            log.info(f"{c}")
+    # validate config
+    try:
+        c = ConfigModel(config=config)
+        log.info(f"{c}")
+        if args.validate:
+            # if --validate option set, only do validation
             print("Config validation successful")
-        except ValidationError as e:
-            print(f"{config=}")
-            print(e)
+            return None
+    except ValidationError as e:
+        # if config fails to validate, print reason and exit
+        print(f"{config=}")
+        print(e)
         return None
 
     # logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)

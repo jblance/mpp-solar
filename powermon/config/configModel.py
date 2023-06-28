@@ -45,7 +45,7 @@ class PortConfig(BaseModel):
     path: Optional[str]
     baud: Optional[int]
     response_number: Optional[int]
-    protocol: str
+    protocol: Optional[str]
 
     class Config:
         extra = Extra.forbid
@@ -69,6 +69,7 @@ class BaseConfig(BaseModel):
     api: Optional[APIConfig]
     daemon: Optional[DaemonConfig]
     debuglevel: Optional[str]
+    loop: Optional[str | int]
 
     class Config:
         extra = Extra.forbid
