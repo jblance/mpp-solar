@@ -50,7 +50,8 @@ build-backend = "poetry.core.masonry.api"
 mpp-solar = "mppsolar:main"
 mppsolar = "mppsolar:main"
 jkbms = "mppsolar:main"
-powermon= "powermon:main"
+powermon = "powermon:main"
+powermon-api = "powermon-api.api:main"
 
 [tool.black]
 line-length = 149
