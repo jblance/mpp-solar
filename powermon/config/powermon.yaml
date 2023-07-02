@@ -22,6 +22,9 @@ mqttbroker:
   password: null
 
 api:
+  host: "0.0.0.0"
+  port: 5000
+  log_level: "info"
   announce_topic: powermon/announce
   adhoc_topic: powermon/adhoc
   
