@@ -14,7 +14,7 @@ device:
     # f_command: f'QED{(date.today()-timedelta(days=1)).strftime("%Y%m%d")}'
     f_command: f'QED{(date.today()).strftime("%Y%m%d")}'
     outputs:
-    - name: screen
+    - type: screen
       tag: Test_Inverter
       filter: ^pv
 loop: 60

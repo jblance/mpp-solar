@@ -13,8 +13,7 @@ commands:
   type: poll
   outputs:
   - type: screen
-    format: 
-      type: table
+    format: table
           
 mqttbroker:
   name: localhost

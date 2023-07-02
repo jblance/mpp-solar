@@ -23,4 +23,4 @@ commands:
     format:
       type: table
       draw_lines: True
-
+  - type: mqtt
