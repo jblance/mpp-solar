@@ -22,9 +22,13 @@ class MQTTConfig(BaseModel):
 
 
 class APIConfig(BaseModel):
+    host: None | str
+    port: None | int
+    enabled: None | bool
+    log_level: None | str
     announce_topic: None | str
     adhoc_topic: None | str
-    enabled: None | bool
+    refresh_interval: None | int
 
     class Config:
         extra = Extra.forbid
