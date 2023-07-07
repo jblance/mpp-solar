@@ -167,11 +167,16 @@ def main():
     api_coordinator = ApiCoordinator.fromConfig(config=config.get("api"), device=device, mqtt_broker=mqtt_broker)
     log.info(api_coordinator)
 
+    # initialize api coordinator
+    api_coordinator.initialize()
+
     # initialize daemon
     daemon.initialize()
+    api_coordinator.announce(daemon)
 
     # initialize device
     device.initialize()
+    api_coordinator.announce(device)
 
     # Main working loop
     keep_looping = True

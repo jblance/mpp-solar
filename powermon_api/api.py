@@ -4,7 +4,7 @@ import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi_mqtt import FastMQTT, MQTTConfig
+# from fastapi_mqtt import FastMQTT, MQTTConfig
 
 from mppsolar.version import __version__  # noqa: F401
 from powermon import read_yaml_file

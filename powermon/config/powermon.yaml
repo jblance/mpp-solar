@@ -27,6 +27,7 @@ api:
   log_level: "info"
   announce_topic: powermon/announce
   adhoc_topic: powermon/adhoc
+  refresh_interval: 60
   
 # daemon:
 #   type: systemd
