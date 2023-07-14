@@ -53,7 +53,7 @@ NEW_COMMANDS = {
             ["discard", 4, "discard1", ""],
             ["LittleHex2Short:r/1000", 2, "Average_Cell_Voltage", "V"],
             ["LittleHex2Short:r/1000", 2, "Delta_Cell_Voltage", "V"],
-            ["LittleHex2Short:r/1000", 2, "Current_Balancer", ""],
+            ["LittleHex2Short:r/1000", 2, "Current_Balancer", "A"],
             ["LittleHex2Short:r/1000", 2, "Resistance_Cell01", "Ohm"],
             ["LittleHex2Short:r/1000", 2, "Resistance_Cell02", "Ohm"],
             ["LittleHex2Short:r/1000", 2, "Resistance_Cell03", "Ohm"],
@@ -113,8 +113,8 @@ NEW_COMMANDS = {
             ["discard", 2, "Unknown18", ""],
             ["discard", 2, "Unknown19", ""],
             ["discard", 2, "Unknown20", ""],
-            ["LittleHex2Short:r/1000", 2, "Current_Charge", ""],  # Unknown21
-            ["LittleHex2Short:r/1000", 2, "Current_Discharge", ""],  # Unknown22
+            ["LittleHex2Short:r/1000", 2, "Current_Charge", "A"],  # Unknown21
+            ["LittleHex2Short:r/1000", 2, "Current_Discharge", "A"],  # Unknown22
             ["discard", 2, "Unknown23", ""],
             ["discard", 2, "Unknown24", ""],
             ["discard", 2, "Unknown25", ""],
