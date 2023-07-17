@@ -21,8 +21,8 @@ loop: 60
 mqttbroker:
   name: homeassistant.lan
   port: 1883
-  user: null
-  pass: null
+  username: null
+  password: null
   adhoc_commands:
     topic: Test_Inverter/commands
     outputs:
