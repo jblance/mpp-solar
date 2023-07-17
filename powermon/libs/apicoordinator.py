@@ -25,7 +25,7 @@ class ApiCoordinator:
             announceTopic = config.get("announce_topic", "powermon/announce")
             enabled = config.get("enabled", True)  # default to enabled if not specified
 
-        return cls(adhocTopic=adhocTopic, announceTopic=announceTopic, enabled=enabled, device=None, mqtt_broker=None)
+        return cls(adhocTopic=adhocTopic, announceTopic=announceTopic, enabled=enabled, device=device, mqtt_broker=mqtt_broker)
 
     def __init__(self, adhocTopic : str, announceTopic: str, enabled: bool, device=None, mqtt_broker=None):
         self.device = device
@@ -37,6 +37,7 @@ class ApiCoordinator:
 
         if self.mqtt_broker is None or self.mqtt_broker.disabled:
             # no use having api running if no mqtt broker
+            log.debug(self.mqtt_broker)
             log.debug("No mqttbroker (or it is disabled) so disabling ApiCoordinator")
             self.enabled = False
             return
@@ -64,10 +65,10 @@ class ApiCoordinator:
         if not self.enabled:
             return
         if not self.last_run or time() - self.last_run > 60:
-            log.info("Starting APICoordinator")
+            log.info("APICoordinator running")
             self.announce_device()
             self.last_run = time()
 
-    def announceDevice(self):
-        # scheduleDTO = self.schedule.toDTO()
-        self.mqtt_broker.publish(self.announceTopic, "{'announceDevice':'todo'}")
+    def announce_device(self):
+        device_dto = self.device.toDTO()
+        self.mqtt_broker.publish(self.announceTopic, device_dto.json())

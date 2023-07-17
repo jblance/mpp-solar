@@ -150,8 +150,8 @@ def main():
     device = Device.fromConfig(config=config.get("device"))
     log.debug(device)
     # add commands to device command list
-    for commandConfig in config.get("commands"):
-        command = Command.fromConfig(commandConfig, mqtt_broker=mqtt_broker)
+    for command_config in config.get("commands"):
+        command = Command.fromConfig(command_config, mqtt_broker=mqtt_broker)
         if command is not None:
             device.add_command(command)
     log.info(device)

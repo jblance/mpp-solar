@@ -8,7 +8,7 @@ device:
   manufacturer: MPP-Solar
   port:
     path: /dev/hidraw0
-    type: test
+    type: serial
     protocol: PI30
 
 commands:

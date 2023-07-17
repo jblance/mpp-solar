@@ -13,7 +13,6 @@ from .db.database import SessionLocal, engine
 from .mqtthandler import MQTTHandler
 
 from powermon.dto.powermonDTO import PowermonDTO
-from powermon.dto.scheduleDTO import ScheduleDTO
 from powermon.dto.resultDTO import ResultDTO
 
 models.Base.metadata.create_all(bind=engine)
@@ -86,7 +85,7 @@ def read_root(request: Request):
     handler = MQTTHandler()
     devices = handler.get_powermon_instances()
     print(devices)
-    return templates.TemplateResponse("home.html.j2", {"request": request, "schedules": devices})
+    return templates.TemplateResponse("home.html.j2", {"request": request, "devices": devices})
 
 
 @app.get("/messages/", response_model=list[schemas.MQTTMessage])
@@ -129,16 +128,6 @@ async def read_power_monitors(powermon_name: str, handler: MQTTHandler = Depends
 
     return result
 
-
-@app.get("/powermons/{powermon_name}/schedules", response_model=list[ScheduleDTO])
-async def read_schedules(powermon_name: str, handler: MQTTHandler = Depends(get_mqtthandler)):
-    result = None
-
-    result = await handler.get_powermon_instance(powermon_name)
-
-    if result is None:
-        raise HTTPException(status_code=404, detail="Powermon not found")
-    return result.schedulesCommands
 
 
 @app.get("/results/", response_model=list[ResultDTO])

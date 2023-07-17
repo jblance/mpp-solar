@@ -48,11 +48,11 @@ class MQTTHandler(object):
 
     def recieved_announcement(self, message):
         print("Announcement Recieved: ", message)
-        schedule = PowermonDTO.parse_raw(message)
-        deviceId = schedule.device.identifier
+        device = PowermonDTO.parse_raw(message)
+        deviceId = device.identifier 
         print("Device ID: ", deviceId)
-        if(schedule not in self._power_monitors):
-            self._power_monitors.append(schedule)
+        if(device not in self._power_monitors):
+            self._power_monitors.append(device)
 
     async def get_powermon_instances(self):
         return self._power_monitors
