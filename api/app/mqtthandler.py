@@ -2,7 +2,7 @@
 import asyncio
 import json
 from .db.models import MQTTMessage
-from powermon.dto.powermonDTO import PowermonDTO
+from powermon.dto.deviceDTO import DeviceDTO
 from powermon.dto.resultDTO import ResultDTO
 
 class MQTTHandler(object):
@@ -48,16 +48,16 @@ class MQTTHandler(object):
 
     def recieved_announcement(self, message):
         print("Announcement Recieved: ", message)
-        device = PowermonDTO.parse_raw(message)
+        device = DeviceDTO.parse_raw(message)
         deviceId = device.identifier 
         print("Device ID: ", deviceId)
         if(device not in self._power_monitors):
             self._power_monitors.append(device)
 
-    async def get_powermon_instances(self):
+    def get_powermon_instances(self) -> list[DeviceDTO]:
         return self._power_monitors
     
-    async def get_powermon_instance(self, powermon_name) -> PowermonDTO:
+    async def get_powermon_instance(self, powermon_name) -> DeviceDTO:
         for powermon in self._power_monitors:
             if(powermon.name == powermon_name):
                 return powermon

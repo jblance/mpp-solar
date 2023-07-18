@@ -13,6 +13,11 @@
                 <li>Manufacturer: {{ device.manufacturer }}</li>
                 <li>Port Type: {{ device.port.type }}</li>
                 <li>Protocol Id: {{ device.port.protocol.protocol_id }}</li>
+                    <ul>
+                        {% for command in device.port.protocol.commands %}
+                        <li>{{ command }}: {{device.port.protocol.commands[command]}}</li>
+                        {% endfor %}
+                    </ul>
             </ul>
             <p></p>
         {% endfor %}
