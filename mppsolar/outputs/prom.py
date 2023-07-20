@@ -86,6 +86,6 @@ class prom(baseoutput):
             value = displayData[key][0]
             res = type(value) == str
             if res is True:
-                print(f'{name}{{device="{dev}",mode="{key},str="{value}"}} 0')
+                print(f'{name}{{device="{dev}",mode="{key},myStr="{value}"}} 0')
             else:
                 print(f'{name}{{device="{dev}",mode="{key}"}} {value}')
