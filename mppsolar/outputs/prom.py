@@ -21,8 +21,9 @@ class prom(baseoutput):
         log.info("Using output processor: value")
         log.debug(f"kwargs {kwargs}")
         tag = get_kwargs(kwargs, "tag")
-        dev = get_kwargs(kwargs, "dev")
+        dev = get_kwargs(kwargs, "name")
         data = get_kwargs(kwargs, "data")
+        name = get_kwargs(kwargs, "name")
         if data is None:
             return
 
@@ -36,6 +37,7 @@ class prom(baseoutput):
             filter = config.get("filter", None)
             excl_filter = config.get("excl_filter", None)
             tag = config.get("tag", None)
+            name = cconfig.get("name", "mpp_solar")
 
         else:
             # get formatting info
@@ -44,13 +46,14 @@ class prom(baseoutput):
             filter = get_kwargs(kwargs, "filter")
             excl_filter = get_kwargs(kwargs, "excl_filter")
             tag = get_kwargs(kwargs, "tag")
+            name = get_kwargs(kwargs, "name")
 
         if filter is not None:
             filter = re.compile(filter)
         if excl_filter is not None:
             excl_filter = re.compile(excl_filter)
-        if tag is None:
-            tag = mpp_solar
+        if name == "unnamed":
+            name = "mpp_solar"
         # remove raw response
         if "raw_response" in data:
             data.pop("raw_response")
@@ -83,6 +86,6 @@ class prom(baseoutput):
             value = displayData[key][0]
             res = type(value) == str
             if res is True:
-                print(f'{tag}{{device="{dev}",mode="{key},str="{value}"}} 0')
+                print(f'{name}{{device="{dev}",mode="{key},str="{value}"}} 0')
             else:
-                print(f'{tag}{{device="{dev}",mode="{key}"}} {value}')
+                print(f'{name}{{device="{dev}",mode="{key}"}} {value}')
