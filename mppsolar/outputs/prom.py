@@ -58,9 +58,6 @@ class prom(baseoutput):
         cmd = data.pop("_command", None)
 
         # build header
-        if "_command" in data:
-            data.pop("_command")
-
         if "_command_description" in data:
             data.pop("_command_description")
 
