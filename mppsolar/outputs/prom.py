@@ -4,10 +4,10 @@ import re
 from .baseoutput import baseoutput
 from ..helpers import get_kwargs, key_wanted
 
-log = logging.getLogger("prom2")
+log = logging.getLogger("prom")
 
 
-class prom2(baseoutput):
+class prom(baseoutput):
     def __str__(self):
         return "outputs Node exporter prometheus format to standard out"
 
