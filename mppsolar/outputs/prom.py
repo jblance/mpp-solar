@@ -4,10 +4,10 @@ import re
 from .baseoutput import baseoutput
 from ..helpers import get_kwargs, key_wanted
 
-log = logging.getLogger("prom")
+log = logging.getLogger("prom2")
 
 
-class prom(baseoutput):
+class prom2(baseoutput):
     def __str__(self):
         return "outputs Node exporter prometheus format to standard out"
 
@@ -20,8 +20,7 @@ class prom(baseoutput):
     def output(self, *args, **kwargs):
         log.info("Using output processor: value")
         log.debug(f"kwargs {kwargs}")
-        tag = get_kwargs(kwargs, "tag")
-        dev = get_kwargs(kwargs, "name")
+        dev = get_kwargs(kwargs, "dev")
         data = get_kwargs(kwargs, "data")
         name = get_kwargs(kwargs, "name")
         if data is None:
@@ -36,16 +35,14 @@ class prom(baseoutput):
             keep_case = config.get("keep_case", False)
             filter = config.get("filter", None)
             excl_filter = config.get("excl_filter", None)
-            tag = config.get("tag", None)
-            name = cconfig.get("name", "mpp_solar")
-
+            name = config.get("name", "mpp_solar")
+            dev = config.get("dev", "None")
         else:
             # get formatting info
             remove_spaces = True
             keep_case = get_kwargs(kwargs, "keep_case")
             filter = get_kwargs(kwargs, "filter")
             excl_filter = get_kwargs(kwargs, "excl_filter")
-            tag = get_kwargs(kwargs, "tag")
             name = get_kwargs(kwargs, "name")
 
         if filter is not None:
@@ -58,7 +55,7 @@ class prom(baseoutput):
         if "raw_response" in data:
             data.pop("raw_response")
 
-        dev = data.pop("_command", None)
+        cmd = data.pop("_command", None)
 
         # build header
         if "_command" in data:
@@ -84,8 +81,7 @@ class prom(baseoutput):
         # print data
         for key in displayData:
             value = displayData[key][0]
-            res = type(value) == str
-            if res is True:
-                print(f'{name}{{device="{dev}",mode="{key}",myStr="{value}"}} 0')
+            if isinstance(value, str):
+                print(f'{name}_{key}{{device="{dev}",cmd="{cmd}",myStr="{value}"}} 0')
             else:
-                print(f'{name}{{device="{dev}",mode="{key}"}} {value}')
+                print(f'{name}_{key}{{device="{dev}",cmd="{cmd}"}} {value}')
