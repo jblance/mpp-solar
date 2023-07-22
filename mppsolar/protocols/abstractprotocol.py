@@ -312,7 +312,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
                 # key = "{}".format(resp_format[1]).lower().replace(" ", "_")
                 key = resp_format[1]
-                # log.debug(f'result {result}, key {key}, resp_format {resp_format}')
+                log.debug(f'result {result}, key {key}, resp_format {resp_format}')
                 # Process results
                 if result == "NAK":
                     msgs[f"WARNING{i}"] = [

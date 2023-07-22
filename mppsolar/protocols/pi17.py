@@ -396,10 +396,11 @@ COMMANDS = {
         "help": " -- queries total generated energy from the Inverter",
         "type": "QUERY",
         "response": [
-            ["int", 
-             "Generated energy", 
-             "kWh",
-             {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},
+            [
+                "int",
+                "Generated energy",
+                "kWh",
+                {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},
             ],
         ],
         "test_responses": [
@@ -448,6 +449,8 @@ COMMANDS = {
         ],
         "test_responses": [
             b"^D0762000,0584,0576,0000,000,0576,0460,0510,0460,0510,1,,,1,0540,000,2000,0250\x85Y\r",
+            b'^D0941750,0560,0540,0000,060,0530,0420,0480,0480,0540,0,,,0,0480,000,0100,0175,000,000,000,000,0\xc9\xd9\r',
+            b'^D0941750,0560,0540,0000,060,0530,0420,0480,0480,0540,0,,,0,0480,000,0100,0175,010,020,020,080,0mr\r'
         ],
     },
     "HECS": {

@@ -44,9 +44,8 @@ class ApiCoordinator:
             self.enabled = False
             return
 
-        self.announceDevice()
-        mqtt_broker.subscribe(self.adhocTopic, self.adhocCallback)
-
+        # self.announceDevice()
+        mqtt_broker.subscribe(self.adhocTopic, self.adhocCallback)  # QUESTION: why subscribe here?
         # mqtt_broker.publish(self.announceTopic, self.schedule.getScheduleConfigAsJSON())
 
     def adhocCallback(self, client, userdata, msg):
@@ -64,11 +63,12 @@ class ApiCoordinator:
             # self.schedule.addOneTimeCommandFromConfig(command)
 
     def run(self):
+        # QUESTION: do we need a run?
         if not self.enabled:
             return
         if not self.last_run or time() - self.last_run > self.refreshInterval:
             log.info("Starting APICoordinator")
-            self.announceDevice()
+            self.announceDevice()  # QUESTION: what are we announcing here?
             self.last_run = time()
 
     def initialize(self):
@@ -85,4 +85,4 @@ class ApiCoordinator:
     def announce(self, obj):
         if not self.enabled:
             return
-        self.mqtt_broker.publish(self.announceTopic, obj)
+        self.mqtt_broker.publish(self.announceTopic, obj)  # QUESTION: obj or obj.toDTO or obj.????
