@@ -301,6 +301,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             # print("Processing DEFAULT type responses")
             for i, result in enumerate(responses):
                 # decode result
+                if result == b'':
+                    continue
                 if type(result) is bytes:
                     result = result.decode("utf-8")
 

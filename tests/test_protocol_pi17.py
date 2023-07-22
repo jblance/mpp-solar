@@ -37,3 +37,20 @@ class test_pi17_decode(unittest.TestCase):
             print(error.stdout)
             print(error.stderr)
             raise error
+
+    def test_pi17_HECS(self):
+        try:
+            expected = "\n"
+            result = subprocess.run(
+                ["mpp-solar", "-p", "test", "-P", "pi17", "-c", "HECS", "-o", "value"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            print(result.stdout)
+            self.assertEqual(result.stdout, expected)
+            self.assertEqual(result.returncode, 0)
+        except subprocess.CalledProcessError as error:
+            print(error.stdout)
+            print(error.stderr)
+            raise error
