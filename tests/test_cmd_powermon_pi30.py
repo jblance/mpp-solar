@@ -2,8 +2,6 @@ import subprocess
 import unittest
 
 
-# from mppsolar.devices.device import AbstractDevice as _abstractdevice
-
 SETTER_COMMANDS = [
     ("F50", """command_execution=Successful\n"""),
     ("MCHGC040", """command_execution=Successful\n"""),
