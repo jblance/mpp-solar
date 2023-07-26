@@ -76,9 +76,10 @@ class prom(baseoutput):
         log.debug(f"displayData: {displayData}")
 
         # print data
+        print(f'machine_role{{role="mpp_solar"}} 1')
         for key in displayData:
             value = displayData[key][0]
             if isinstance(value, str):
-                print(f'{name}_{key}{{device="{dev}",cmd="{cmd}",myStr="{value}"}} 0')
+                print(f'mpp_solar_{key}{{inverter="{name}",device="{dev}",cmd="{cmd}",myStr="{value}"}} 1')
             else:
-                print(f'{name}_{key}{{device="{dev}",cmd="{cmd}"}} {value}')
+                print(f'mpp_solar_{key}{{inverter="{name}",device="{dev}",cmd="{cmd}"}} {value}')
