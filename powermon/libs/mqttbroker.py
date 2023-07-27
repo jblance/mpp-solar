@@ -21,8 +21,8 @@ class MqttBroker:
         if config:
             name = config.get("name")
             port = config.get("port", 1883)
-            username = config.get("user")
-            password = config.get("pass")
+            username = config.get("username")
+            password = config.get("password")
         else:
             name = None
             port = None

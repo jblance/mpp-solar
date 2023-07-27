@@ -7,6 +7,7 @@ from argparse import ArgumentParser
 from datetime import date, timedelta  # noqa: F401
 
 import yaml
+from pydantic import ValidationError
 
 from mppsolar.version import __version__  # noqa: F401
 from powermon.device import Device
@@ -14,6 +15,7 @@ from powermon.libs.apicoordinator import ApiCoordinator
 from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
 from powermon.commands.command import Command
+from powermon.config.configModel import ConfigModel
 
 # from time import sleep, time
 # from powermon.ports import getPortFromConfig
@@ -71,6 +73,7 @@ def main():
         default=None,
         help="""Supply config items on the commandline in json format, eg '{"device": {"port":{"type":"test"}}, "commands": [{"command":"QPI"}]}'""",
     )
+    parser.add_argument("-V", "--validate", action="store_true", help="Validate the configuration")
     parser.add_argument("-v", "--version", action="store_true", help="Display the version")
     parser.add_argument(
         "-1",
@@ -121,6 +124,20 @@ def main():
     # build config - override with any command line arguments
     config.update(process_command_line_overrides(args))
 
+    # validate config
+    try:
+        c = ConfigModel(config=config)
+        log.info(f"{c}")
+        if args.validate:
+            # if --validate option set, only do validation
+            print("Config validation successful")
+            return None
+    except ValidationError as e:
+        # if config fails to validate, print reason and exit
+        print(f"{config=}")
+        print(e)
+        return None
+
     # logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     log.setLevel(config.get("debuglevel", logging.WARNING))
 
@@ -150,11 +167,16 @@ def main():
     api_coordinator = ApiCoordinator.fromConfig(config=config.get("api"), device=device, mqtt_broker=mqtt_broker)
     log.info(api_coordinator)
 
+    # initialize api coordinator
+    api_coordinator.initialize()
+
     # initialize daemon
     daemon.initialize()
+    api_coordinator.announce(daemon)
 
     # initialize device
     device.initialize()
+    api_coordinator.announce(device)
 
     # Main working loop
     keep_looping = True

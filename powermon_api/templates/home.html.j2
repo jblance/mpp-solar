@@ -1,0 +1,38 @@
+<html>
+<head>
+    <title>Powermon Home</title>
+    <link href="static/styles.css" rel="stylesheet">
+</head>
+<body>
+{% if config %}
+    <h1>Powermon Api</h1>
+    config file: {{ config['configFile'] }}
+    <h2>Web Server Configuration</h2>
+    {% if 'api' in config %}
+        <ul>
+            {% for key in config['api'] %}
+                <li>{{ key }}: {{ config['api'][key] }}</li>
+            {% endfor %}
+        </ul>
+        <p></p>
+    {% else %}
+        <p>No config found</p>
+    {% endif %}
+    <h2>MQTT Broker Configuration</h2>
+    {% if 'mqttbroker' in config %}
+        <ul>
+            {% for key in config['mqttbroker'] %}
+                <li>{{ key }}: {{ config['mqttbroker'][key] }}</li>
+            {% endfor %}
+        </ul>
+        <p></p>
+    {% else %}
+        <p>No mqtt config found</p>
+    {% endif %}
+{% else %}
+    <p>No config found</p>
+{% endif %}
+</body>
+</html>
+
+{# TODO: https://gomakethings.com/four-different-ways-to-inject-text-and-html-into-an-element-with-vanilla-javascript/ #}

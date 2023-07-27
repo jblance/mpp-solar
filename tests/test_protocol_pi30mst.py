@@ -13,10 +13,10 @@ import unittest
 # self.assertListEqual(mppcommand.crc(bytes('196', 'utf-8')), [27, 14])
 
 
-class test_pi30max_decode(unittest.TestCase):
+class test_pi30mst_decode(unittest.TestCase):
     maxDiff = None
 
-    def test_pi30max_getdevice_id(self):
+    def test_pi30mst_getdevice_id(self):
         try:
             expected = "PI30:044:MKS2-8000\n"
             result = subprocess.run(

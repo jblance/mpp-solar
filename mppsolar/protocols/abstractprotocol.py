@@ -30,6 +30,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         self.STATUS_COMMANDS = None
         self.SETTINGS_COMMANDS = None
         self.DEFAULT_COMMAND = None
+        self.PID = None
         self.ID_COMMANDS = None
         self._protocol_id = None
 
@@ -301,6 +302,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             # print("Processing DEFAULT type responses")
             for i, result in enumerate(responses):
                 # decode result
+                if result == b'':
+                    continue
                 if type(result) is bytes:
                     result = result.decode("utf-8")
 
@@ -312,7 +315,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
                 # key = "{}".format(resp_format[1]).lower().replace(" ", "_")
                 key = resp_format[1]
-                # log.debug(f'result {result}, key {key}, resp_format {resp_format}')
+                log.debug(f'result {result}, key {key}, resp_format {resp_format}')
                 # Process results
                 if result == "NAK":
                     msgs[f"WARNING{i}"] = [

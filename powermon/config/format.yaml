@@ -9,7 +9,7 @@ device:
     protocol: PI30MAX
 
 commands:
-- command: QPIGS
+- command: QPIGS  #0
   type: basic #so far not neccessary, might remove
   # trigger: # default to something sensible (only one of the below is needed/used)
   # - loops: 6 # run every 6 loops
@@ -32,14 +32,15 @@ commands:
       # #remove_spaces: False
       # #extra_info: True
       # filter: ^ac|^pv
-- command: QPI
+- command: QPI  #1
   outputs:
+  - type: screen
     format: table
-- command: QID
+- command: QID  #2
   outputs: screen
   trigger:
     at: "12:56"
-- command: QMOD
+- command: QMOD  #3
   trigger:
     loops: 50
 

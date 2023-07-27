@@ -241,6 +241,7 @@ class pi16(AbstractProtocol):
             "QPI",
         ]
         self.DEFAULT_COMMAND = "QPI"
+        self.PID = "QPI"
         self.ID_COMMANDS = [
             ("QPI", "Protocol Version"),
             ("QGMN", "General Model Name"),

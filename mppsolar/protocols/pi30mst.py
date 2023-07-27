@@ -42,7 +42,7 @@ class pi30mst(pi30max):
         super().__init__()
         self._protocol_id = b"PI30MST"
         self.COMMANDS.update(QUERY_COMMANDS)
-        self.STATUS_COMMANDS = ["QPIGS", "QPIGS2"]
-        self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
-        self.DEFAULT_COMMAND = "QPI"
+        # self.STATUS_COMMANDS = ["QPIGS", "QPIGS2"]
+        # self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
+        # self.DEFAULT_COMMAND = "QPI"
         # log.info(f'Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands')
