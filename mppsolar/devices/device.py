@@ -5,7 +5,7 @@ from abc import ABC
 from mppsolar.version import __version__  # noqa: F401
 from mppsolar.helpers import get_kwargs
 from mppsolar.inout import get_port
-from mppsolar.protocols import get_protocol
+from mppsolar.protocols import get_protocol  # , get_device_id
 
 PORT_TYPE_UNKNOWN = 0
 PORT_TYPE_TEST = 1
@@ -69,7 +69,7 @@ class AbstractDevice(ABC):
         if command == "get_settings":
             return self.get_settings()
         if command == "get_device_id":
-            return self.get_device_id()
+            return self._get_device_id()
         if command == "get_version":
             return self.get_version()
 
@@ -131,7 +131,12 @@ class AbstractDevice(ABC):
             data.update(self.run_command(command))
         return data
 
-    def get_device_id(self) -> dict:
+    def _get_device_id(self) -> dict:
+        # Try to work out the 'id' for this device
+        # need to know what port/porttype we are connected to
+        # then ...ABC
+
+        # return get_device_id()
         _id = ""
         if self._protocol.ID_COMMANDS:
             # print(self._protocol.ID_COMMANDS)

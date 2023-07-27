@@ -856,6 +856,7 @@ class pi17(AbstractProtocol):
             "MD",
         ]
         self.DEFAULT_COMMAND = "PI"
+        self.PID = "PI"
         self.ID_COMMANDS = ["PI", "DM"]
 
     def get_full_command(self, command) -> bytes:

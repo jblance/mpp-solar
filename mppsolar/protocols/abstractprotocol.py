@@ -30,6 +30,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         self.STATUS_COMMANDS = None
         self.SETTINGS_COMMANDS = None
         self.DEFAULT_COMMAND = None
+        self.PID = None
         self.ID_COMMANDS = None
         self._protocol_id = None
 
