@@ -52,7 +52,7 @@
           "h": 4,
           "w": 4,
           "x": 0,
-          "y": 24
+          "y": 2
         },
         "id": 8,
         "options": {
@@ -200,7 +200,7 @@
           "h": 4,
           "w": 3,
           "x": 4,
-          "y": 24
+          "y": 2
         },
         "id": 4,
         "links": [],
@@ -319,7 +319,7 @@
           "h": 4,
           "w": 4,
           "x": 7,
-          "y": 24
+          "y": 2
         },
         "id": 2,
         "links": [],
@@ -430,7 +430,7 @@
           "h": 4,
           "w": 4,
           "x": 11,
-          "y": 24
+          "y": 2
         },
         "id": 6,
         "links": [],
@@ -517,7 +517,7 @@
           "h": 4,
           "w": 4,
           "x": 15,
-          "y": 24
+          "y": 2
         },
         "id": 14,
         "options": {
@@ -596,7 +596,7 @@
           "h": 4,
           "w": 5,
           "x": 19,
-          "y": 24
+          "y": 2
         },
         "id": 12,
         "options": {
@@ -694,7 +694,7 @@
           "h": 5,
           "w": 3,
           "x": 0,
-          "y": 28
+          "y": 6
         },
         "id": 10,
         "options": {
@@ -778,7 +778,7 @@
           "h": 5,
           "w": 3,
           "x": 3,
-          "y": 28
+          "y": 6
         },
         "id": 16,
         "options": {
@@ -866,7 +866,7 @@
           "h": 5,
           "w": 3,
           "x": 6,
-          "y": 28
+          "y": 6
         },
         "id": 18,
         "options": {
@@ -950,7 +950,7 @@
           "h": 5,
           "w": 3,
           "x": 9,
-          "y": 28
+          "y": 6
         },
         "id": 20,
         "options": {
@@ -1076,7 +1076,7 @@
           "h": 11,
           "w": 6,
           "x": 18,
-          "y": 28
+          "y": 6
         },
         "id": 40,
         "options": {
@@ -1167,7 +1167,7 @@
           "h": 6,
           "w": 5,
           "x": 0,
-          "y": 33
+          "y": 11
         },
         "id": 36,
         "options": {
@@ -1261,7 +1261,7 @@
           "h": 6,
           "w": 4,
           "x": 5,
-          "y": 33
+          "y": 11
         },
         "id": 48,
         "options": {
@@ -1341,7 +1341,7 @@
           "h": 6,
           "w": 3,
           "x": 9,
-          "y": 33
+          "y": 11
         },
         "id": 42,
         "options": {
@@ -1426,7 +1426,7 @@
           "h": 6,
           "w": 3,
           "x": 12,
-          "y": 33
+          "y": 11
         },
         "id": 24,
         "options": {
@@ -1505,7 +1505,7 @@
           "h": 6,
           "w": 3,
           "x": 15,
-          "y": 33
+          "y": 11
         },
         "id": 22,
         "options": {
@@ -1566,7 +1566,7 @@
           "h": 10,
           "w": 12,
           "x": 0,
-          "y": 40
+          "y": 18
         },
         "hiddenSeries": false,
         "id": 56,
@@ -1692,7 +1692,7 @@
           "h": 10,
           "w": 12,
           "x": 12,
-          "y": 40
+          "y": 18
         },
         "hiddenSeries": false,
         "id": 54,
@@ -1815,7 +1815,7 @@
           "h": 10,
           "w": 12,
           "x": 0,
-          "y": 50
+          "y": 28
         },
         "hiddenSeries": false,
         "id": 32,
@@ -1936,7 +1936,7 @@
           "h": 10,
           "w": 12,
           "x": 12,
-          "y": 50
+          "y": 28
         },
         "hiddenSeries": false,
         "id": 30,
@@ -2044,7 +2044,7 @@
           "h": 10,
           "w": 12,
           "x": 0,
-          "y": 60
+          "y": 38
         },
         "hiddenSeries": false,
         "id": 28,
@@ -2210,7 +2210,7 @@
           "h": 10,
           "w": 12,
           "x": 12,
-          "y": 60
+          "y": 38
         },
         "hiddenSeries": false,
         "id": 26,
@@ -2342,7 +2342,7 @@
           "h": 15,
           "w": 24,
           "x": 0,
-          "y": 101
+          "y": 94
         },
         "hiddenSeries": false,
         "id": 34,
@@ -2504,7 +2504,7 @@
   "liveNow": false,
   "panels": [
     {
-      "collapsed": false,
+      "collapsed": true,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -2512,29 +2512,30 @@
         "y": 0
       },
       "id": 45,
-      "panels": [],
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "gridPos": {
+            "h": 22,
+            "w": 24,
+            "x": 0,
+            "y": 1
+          },
+          "id": 38,
+          "options": {
+            "content": "# MPP_Solar\nThis Dashboard takes avantage of using prom output from mpp_solar with command output from QPGS and QPIGS.\nThis output can be directed to a text file while building the file, then moved to node_exporter folder as a prom file.\n\nDesigned for Rich Solar 6548 and should work for MPP LV6548 and the like. Should also work with other inverters though thresholds should be adjusted for each case based on the models abilities.\n\nAdjust your serial ports as needed. \n\n`Example configurations:`\n```\n# cat /etc/mppsolar/mpp_qpgs.conf\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPGS2\ntag=QPGS2\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPGS1\ntag=QPGS1\noutputs=prom\ndev=SCC1\n```\n\n\n```\n # cat /etc/mppsolar/mpp_qpigs.conf\n # This output required for Inverter heatsink temp, and PV1 charge wattage.\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPIGS\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPIGS\noutputs=prom\ndev=SCC1\n```\n```\n# cat /etc/mppsolar/mpp_qpigs2.conf\n### This config for inverters with more than one PV input, to retrive PV2 Charge Wattage output.\n### Thoogh not a requirement with this dashboard.\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPIGS2\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPIGS2\noutputs=prom\ndev=SCC1\n```\nExecutable in /usr/local/bin/\n```\n# cat /usr/local/bin/mpp-get-data.sh\n#!/bin/ash\ndataFile=\"mppsolar\"\ndataDir=\"/var/lib/node-exporter/mppsolar/\"\n\ncheckpath -d \"$dataDir\" -m 755 -o node_exporter:node_exporter\n\nwhile : ; do\n\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpgs.conf > ${dataDir}${dataFile}.$$` && \\\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpigs.conf >> ${dataDir}${dataFile}.$$` && \\\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpigs2.conf >> ${dataDir}${dataFile}.$$` && \\\n        mv ${dataDir}${dataFile}.$$ ${dataDir}${dataFile}.prom\n        sleep 5\ndone\n```\n\nCreate a SysV or systemd startup for the executable.\n\nFor markdown syntax help: [commonmark.org/help](https://commonmark.org/help/)",
+            "mode": "markdown"
+          },
+          "pluginVersion": "8.5.13",
+          "title": "Solar Config",
+          "type": "text"
+        }
+      ],
       "title": "About configuration",
       "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "gridPos": {
-        "h": 22,
-        "w": 24,
-        "x": 0,
-        "y": 1
-      },
-      "id": 38,
-      "options": {
-        "content": "# MPP_Solar\nThis Dashboard takes avantage of using prom output from mpp_solar with command output from QPGS and QPIGS.\nThis output can be directed to a text file while building the file, then moved to node_exporter folder as a prom file.\n\nDesigned for Rich Solar 6548 and should work for MPP LV6548 and the like. Should also work with other inverters though thresholds should be adjusted for each case based on the models abilities.\n\nAdjust your serial ports as needed. \n\n`Example configurations:`\n```\n# cat /etc/mppsolar/mpp_qpgs.conf\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPGS2\ntag=QPGS2\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPGS1\ntag=QPGS1\noutputs=prom\ndev=SCC1\n```\n\n\n```\n # cat /etc/mppsolar/mpp_qpigs.conf\n # This output required for Inverter heatsink temp, and PV1 charge wattage.\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPIGS\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPIGS\noutputs=prom\ndev=SCC1\n```\n```\n# cat /etc/mppsolar/mpp_qpigs2.conf\n### This config for inverters with more than one PV input, to retrive PV2 Charge Wattage output.\n### Thoogh not a requirement with this dashboard.\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPIGS2\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPIGS2\noutputs=prom\ndev=SCC1\n```\nExecutable in /usr/local/bin/\n```\n# cat /usr/local/bin/mpp-get-data.sh\n#!/bin/ash\ndataFile=\"mppsolar\"\ndataDir=\"/var/lib/node-exporter/mppsolar/\"\n\ncheckpath -d \"$dataDir\" -m 755 -o node_exporter:node_exporter\n\nwhile : ; do\n\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpgs.conf > ${dataDir}${dataFile}.$$` && \\\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpigs.conf >> ${dataDir}${dataFile}.$$` && \\\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpigs2.conf >> ${dataDir}${dataFile}.$$` && \\\n        mv ${dataDir}${dataFile}.$$ ${dataDir}${dataFile}.prom\n        sleep 5\ndone\n```\n\nCreate a SysV or systemd startup for the executable.\n\nFor markdown syntax help: [commonmark.org/help](https://commonmark.org/help/)",
-        "mode": "markdown"
-      },
-      "pluginVersion": "8.5.13",
-      "title": "Solar Config",
-      "type": "text"
     },
     {
       "collapsed": false,
@@ -2542,7 +2543,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 1
       },
       "id": 50,
       "panels": [],
@@ -2587,7 +2588,7 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 24
+        "y": 2
       },
       "id": 8,
       "libraryPanel": {
@@ -2754,7 +2755,7 @@
         "h": 4,
         "w": 3,
         "x": 4,
-        "y": 24
+        "y": 2
       },
       "id": 4,
       "libraryPanel": {
@@ -2892,7 +2893,7 @@
         "h": 4,
         "w": 4,
         "x": 7,
-        "y": 24
+        "y": 2
       },
       "id": 2,
       "libraryPanel": {
@@ -3022,7 +3023,7 @@
         "h": 4,
         "w": 4,
         "x": 11,
-        "y": 24
+        "y": 2
       },
       "id": 6,
       "libraryPanel": {
@@ -3128,7 +3129,7 @@
         "h": 4,
         "w": 4,
         "x": 15,
-        "y": 24
+        "y": 2
       },
       "id": 14,
       "libraryPanel": {
@@ -3226,7 +3227,7 @@
         "h": 4,
         "w": 5,
         "x": 19,
-        "y": 24
+        "y": 2
       },
       "id": 12,
       "libraryPanel": {
@@ -3343,7 +3344,7 @@
         "h": 5,
         "w": 3,
         "x": 0,
-        "y": 28
+        "y": 6
       },
       "id": 10,
       "libraryPanel": {
@@ -3446,7 +3447,7 @@
         "h": 5,
         "w": 3,
         "x": 3,
-        "y": 28
+        "y": 6
       },
       "id": 16,
       "libraryPanel": {
@@ -3553,7 +3554,7 @@
         "h": 5,
         "w": 3,
         "x": 6,
-        "y": 28
+        "y": 6
       },
       "id": 18,
       "libraryPanel": {
@@ -3656,7 +3657,7 @@
         "h": 5,
         "w": 3,
         "x": 9,
-        "y": 28
+        "y": 6
       },
       "id": 20,
       "libraryPanel": {
@@ -3759,7 +3760,7 @@
         "h": 5,
         "w": 6,
         "x": 12,
-        "y": 28
+        "y": 6
       },
       "id": 60,
       "options": {
@@ -3881,7 +3882,7 @@
         "h": 11,
         "w": 6,
         "x": 18,
-        "y": 28
+        "y": 6
       },
       "id": 40,
       "libraryPanel": {
@@ -3991,7 +3992,7 @@
         "h": 6,
         "w": 5,
         "x": 0,
-        "y": 33
+        "y": 11
       },
       "id": 36,
       "libraryPanel": {
@@ -4102,7 +4103,7 @@
         "h": 6,
         "w": 4,
         "x": 5,
-        "y": 33
+        "y": 11
       },
       "id": 48,
       "libraryPanel": {
@@ -4201,7 +4202,7 @@
         "h": 6,
         "w": 3,
         "x": 9,
-        "y": 33
+        "y": 11
       },
       "id": 42,
       "libraryPanel": {
@@ -4305,7 +4306,7 @@
         "h": 6,
         "w": 3,
         "x": 12,
-        "y": 33
+        "y": 11
       },
       "id": 24,
       "libraryPanel": {
@@ -4403,7 +4404,7 @@
         "h": 6,
         "w": 3,
         "x": 15,
-        "y": 33
+        "y": 11
       },
       "id": 22,
       "libraryPanel": {
@@ -4467,7 +4468,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 39
+        "y": 17
       },
       "id": 47,
       "panels": [],
@@ -4496,7 +4497,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 40
+        "y": 18
       },
       "hiddenSeries": false,
       "id": 56,
@@ -4641,7 +4642,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 40
+        "y": 18
       },
       "hiddenSeries": false,
       "id": 54,
@@ -4783,7 +4784,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 50
+        "y": 28
       },
       "hiddenSeries": false,
       "id": 32,
@@ -4923,7 +4924,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 50
+        "y": 28
       },
       "hiddenSeries": false,
       "id": 30,
@@ -5050,7 +5051,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 60
+        "y": 38
       },
       "hiddenSeries": false,
       "id": 28,
@@ -5235,7 +5236,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 60
+        "y": 38
       },
       "hiddenSeries": false,
       "id": 26,
@@ -5365,12 +5366,106 @@
       }
     },
     {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Shows charging or discharging current",
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 15,
+        "w": 24,
+        "x": 0,
+        "y": 48
+      },
+      "hiddenSeries": false,
+      "id": 61,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.5.13",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "mpp_solar_battery_charging_current{cmd=~\"QPGS1|QPGS2\"} - mpp_solar_battery_discharge_current{cmd=~\"QPGS1|QPGS2\"}",
+          "legendFormat": "{{inverter}} Charge",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Battery current status",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:166",
+          "format": "amp",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:167",
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 70
+        "y": 63
       },
       "id": 52,
       "panels": [],
@@ -5399,7 +5494,7 @@
         "h": 13,
         "w": 12,
         "x": 0,
-        "y": 71
+        "y": 64
       },
       "hiddenSeries": false,
       "id": 58,
@@ -5519,7 +5614,7 @@
         "h": 13,
         "w": 12,
         "x": 12,
-        "y": 71
+        "y": 64
       },
       "hiddenSeries": false,
       "id": 59,
@@ -5639,7 +5734,7 @@
         "h": 17,
         "w": 24,
         "x": 0,
-        "y": 84
+        "y": 77
       },
       "hiddenSeries": false,
       "id": 43,
@@ -5803,7 +5898,7 @@
         "h": 15,
         "w": 24,
         "x": 0,
-        "y": 101
+        "y": 94
       },
       "hiddenSeries": false,
       "id": 34,
@@ -5929,6 +6024,6 @@
   "timezone": "browser",
   "title": "mpp_solar",
   "uid": "EOSZe9jVz",
-  "version": 65,
+  "version": 66,
   "weekStart": ""
 }
