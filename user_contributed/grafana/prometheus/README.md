@@ -3,8 +3,9 @@
 You can also find these instructions on the top row within the dashboard.
 This Dashboard takes avantage of using prom output from mpp_solar with command output from QPGS and QPIGS.
 This output can be directed to a text file while building the file, then moved to node_exporter folder as a prom file.
+This works with all *nix.
 
-Requires a working instalation of Prometheus node_exporter with collection from folder enabled. Here is an example though I use an rc busybox based OS and your init system is likelly Systemd. The important part is to add a folder for node_exporter to read the prometheus formated files and enable node_exporter to do so ` --collector.textfile.directory=/var/lib/node-exporter/mppsolar` and your needs of where to add this switch will depend on your choice of distribution.
+Requires a working instalation of Prometheus_node_exporter on the same system with collection from folder enabled for node_exporter. Here is an example though I use an rc busybox based OS and your init system is likelly Systemd. The important part is to add a folder for node_exporter to read the prometheus formated files and enable node_exporter to do so ` --collector.textfile.directory=/var/lib/node-exporter/mppsolar` and your needs of where to add this switch will depend on your choice of distribution.
 
 ```
 # cat /etc/init.d/node-exporter-mpp
