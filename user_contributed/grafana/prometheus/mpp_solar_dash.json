@@ -52,7 +52,7 @@
           "h": 4,
           "w": 4,
           "x": 0,
-          "y": 2
+          "y": 24
         },
         "id": 8,
         "options": {
@@ -200,7 +200,7 @@
           "h": 4,
           "w": 3,
           "x": 4,
-          "y": 2
+          "y": 24
         },
         "id": 4,
         "links": [],
@@ -319,7 +319,7 @@
           "h": 4,
           "w": 4,
           "x": 7,
-          "y": 2
+          "y": 24
         },
         "id": 2,
         "links": [],
@@ -430,7 +430,7 @@
           "h": 4,
           "w": 4,
           "x": 11,
-          "y": 2
+          "y": 24
         },
         "id": 6,
         "links": [],
@@ -517,7 +517,7 @@
           "h": 4,
           "w": 4,
           "x": 15,
-          "y": 2
+          "y": 24
         },
         "id": 14,
         "options": {
@@ -596,7 +596,7 @@
           "h": 4,
           "w": 5,
           "x": 19,
-          "y": 2
+          "y": 24
         },
         "id": 12,
         "options": {
@@ -694,7 +694,7 @@
           "h": 5,
           "w": 3,
           "x": 0,
-          "y": 6
+          "y": 28
         },
         "id": 10,
         "options": {
@@ -778,7 +778,7 @@
           "h": 5,
           "w": 3,
           "x": 3,
-          "y": 6
+          "y": 28
         },
         "id": 16,
         "options": {
@@ -866,7 +866,7 @@
           "h": 5,
           "w": 3,
           "x": 6,
-          "y": 6
+          "y": 28
         },
         "id": 18,
         "options": {
@@ -950,7 +950,7 @@
           "h": 5,
           "w": 3,
           "x": 9,
-          "y": 6
+          "y": 28
         },
         "id": 20,
         "options": {
@@ -1076,7 +1076,7 @@
           "h": 11,
           "w": 6,
           "x": 18,
-          "y": 6
+          "y": 28
         },
         "id": 40,
         "options": {
@@ -1143,8 +1143,7 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "light-blue",
-                  "value": null
+                  "color": "light-blue"
                 },
                 {
                   "color": "green",
@@ -1168,7 +1167,7 @@
           "h": 6,
           "w": 5,
           "x": 0,
-          "y": 11
+          "y": 33
         },
         "id": 36,
         "options": {
@@ -1204,7 +1203,7 @@
               "uid": "${DS_PROMETHEUS}"
             },
             "editorMode": "builder",
-            "expr": "mpp_solar_pv2_input_current{cmd!=\"QPIGS\"} * mpp_solar_pv2_input_voltage{cmd!=\"QPIGS\"}",
+            "expr": "mpp_solar_pv2_input_current{cmd!~\"QPIGS2\"} * mpp_solar_pv2_input_voltage{cmd!~\"QPIGS2\"}",
             "hide": false,
             "legendFormat": "{{inverter}}  PV2",
             "range": true,
@@ -1262,7 +1261,7 @@
           "h": 6,
           "w": 4,
           "x": 5,
-          "y": 11
+          "y": 33
         },
         "id": 48,
         "options": {
@@ -1342,7 +1341,7 @@
           "h": 6,
           "w": 3,
           "x": 9,
-          "y": 11
+          "y": 33
         },
         "id": 42,
         "options": {
@@ -1427,7 +1426,7 @@
           "h": 6,
           "w": 3,
           "x": 12,
-          "y": 11
+          "y": 33
         },
         "id": 24,
         "options": {
@@ -1506,7 +1505,7 @@
           "h": 6,
           "w": 3,
           "x": 15,
-          "y": 11
+          "y": 33
         },
         "id": 22,
         "options": {
@@ -1567,7 +1566,7 @@
           "h": 10,
           "w": 12,
           "x": 0,
-          "y": 18
+          "y": 40
         },
         "hiddenSeries": false,
         "id": 56,
@@ -1693,7 +1692,7 @@
           "h": 10,
           "w": 12,
           "x": 12,
-          "y": 18
+          "y": 40
         },
         "hiddenSeries": false,
         "id": 54,
@@ -1816,7 +1815,7 @@
           "h": 10,
           "w": 12,
           "x": 0,
-          "y": 28
+          "y": 50
         },
         "hiddenSeries": false,
         "id": 32,
@@ -1937,7 +1936,7 @@
           "h": 10,
           "w": 12,
           "x": 12,
-          "y": 28
+          "y": 50
         },
         "hiddenSeries": false,
         "id": 30,
@@ -2045,7 +2044,7 @@
           "h": 10,
           "w": 12,
           "x": 0,
-          "y": 38
+          "y": 60
         },
         "hiddenSeries": false,
         "id": 28,
@@ -2211,7 +2210,7 @@
           "h": 10,
           "w": 12,
           "x": 12,
-          "y": 38
+          "y": 60
         },
         "hiddenSeries": false,
         "id": 26,
@@ -2343,7 +2342,7 @@
           "h": 15,
           "w": 24,
           "x": 0,
-          "y": 79
+          "y": 101
         },
         "hiddenSeries": false,
         "id": 34,
@@ -2505,7 +2504,7 @@
   "liveNow": false,
   "panels": [
     {
-      "collapsed": true,
+      "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -2513,30 +2512,29 @@
         "y": 0
       },
       "id": 45,
-      "panels": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "gridPos": {
-            "h": 22,
-            "w": 24,
-            "x": 0,
-            "y": 1
-          },
-          "id": 38,
-          "options": {
-            "content": "# MPP_Solar\nThis Dashboard takes avantage of using prom output from mpp_solar with command output from QPGS and QPIGS.\nThis output can be directed to a text file while building the file, then moved to node_exporter folder as a prom file.\n\nDesigned for Rich Solar 6548 and should work for MPP LV6548 and the like. Should also work with other inverters though thresholds should be adjusted for each case based on the models abilities.\n\nAdjust your serial ports as needed. \n\n`Example configurations:`\n```\n# cat /etc/mppsolar/mpp_qpgs.conf\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPGS2\ntag=QPGS2\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPGS1\ntag=QPGS1\noutputs=prom\ndev=SCC1\n```\n\n\n```\n # cat /etc/mppsolar/mpp_qpigs.conf\n # This output required for Inverter heatsink temp, and PV1 charge wattage.\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPIGS\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPIGS\noutputs=prom\ndev=SCC1\n```\n```\n# cat /etc/mppsolar/mpp_qpigs2.conf\n### This config for inverters with more than one PV input, to retrive PV2 Charge Wattage output.\n### Thoogh not a requirement with this dashboard.\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPIGS2\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPIGS2\noutputs=prom\ndev=SCC1\n```\nExecutable in /usr/local/bin/\n```\n# cat /usr/local/bin/mpp-get-data.sh\n#!/bin/ash\ndataFile=\"mppsolar\"\ndataDir=\"/var/lib/node-exporter/mppsolar/\"\n\ncheckpath -d \"$dataDir\" -m 755 -o node_exporter:node_exporter\n\nwhile : ; do\n\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpgs.conf > ${dataDir}${dataFile}.$$` && \\\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpigs.conf >> ${dataDir}${dataFile}.$$` && \\\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpigs2.conf >> ${dataDir}${dataFile}.$$` && \\\n        mv ${dataDir}${dataFile}.$$ ${dataDir}${dataFile}.prom\n        sleep 5\ndone\n```\n\nCreate a SysV or systemd startup for the executable.\n\nFor markdown syntax help: [commonmark.org/help](https://commonmark.org/help/)",
-            "mode": "markdown"
-          },
-          "pluginVersion": "8.5.13",
-          "title": "Solar Config",
-          "type": "text"
-        }
-      ],
+      "panels": [],
       "title": "About configuration",
       "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "h": 22,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 38,
+      "options": {
+        "content": "# MPP_Solar\nThis Dashboard takes avantage of using prom output from mpp_solar with command output from QPGS and QPIGS.\nThis output can be directed to a text file while building the file, then moved to node_exporter folder as a prom file.\n\nDesigned for Rich Solar 6548 and should work for MPP LV6548 and the like. Should also work with other inverters though thresholds should be adjusted for each case based on the models abilities.\n\nAdjust your serial ports as needed. \n\n`Example configurations:`\n```\n# cat /etc/mppsolar/mpp_qpgs.conf\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPGS2\ntag=QPGS2\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPGS1\ntag=QPGS1\noutputs=prom\ndev=SCC1\n```\n\n\n```\n # cat /etc/mppsolar/mpp_qpigs.conf\n # This output required for Inverter heatsink temp, and PV1 charge wattage.\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPIGS\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPIGS\noutputs=prom\ndev=SCC1\n```\n```\n# cat /etc/mppsolar/mpp_qpigs2.conf\n### This config for inverters with more than one PV input, to retrive PV2 Charge Wattage output.\n### Thoogh not a requirement with this dashboard.\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPIGS2\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPIGS2\noutputs=prom\ndev=SCC1\n```\nExecutable in /usr/local/bin/\n```\n# cat /usr/local/bin/mpp-get-data.sh\n#!/bin/ash\ndataFile=\"mppsolar\"\ndataDir=\"/var/lib/node-exporter/mppsolar/\"\n\ncheckpath -d \"$dataDir\" -m 755 -o node_exporter:node_exporter\n\nwhile : ; do\n\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpgs.conf > ${dataDir}${dataFile}.$$` && \\\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpigs.conf >> ${dataDir}${dataFile}.$$` && \\\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpigs2.conf >> ${dataDir}${dataFile}.$$` && \\\n        mv ${dataDir}${dataFile}.$$ ${dataDir}${dataFile}.prom\n        sleep 5\ndone\n```\n\nCreate a SysV or systemd startup for the executable.\n\nFor markdown syntax help: [commonmark.org/help](https://commonmark.org/help/)",
+        "mode": "markdown"
+      },
+      "pluginVersion": "8.5.13",
+      "title": "Solar Config",
+      "type": "text"
     },
     {
       "collapsed": false,
@@ -2544,7 +2542,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 1
+        "y": 23
       },
       "id": 50,
       "panels": [],
@@ -2589,7 +2587,7 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 2
+        "y": 24
       },
       "id": 8,
       "libraryPanel": {
@@ -2756,7 +2754,7 @@
         "h": 4,
         "w": 3,
         "x": 4,
-        "y": 2
+        "y": 24
       },
       "id": 4,
       "libraryPanel": {
@@ -2894,7 +2892,7 @@
         "h": 4,
         "w": 4,
         "x": 7,
-        "y": 2
+        "y": 24
       },
       "id": 2,
       "libraryPanel": {
@@ -3024,7 +3022,7 @@
         "h": 4,
         "w": 4,
         "x": 11,
-        "y": 2
+        "y": 24
       },
       "id": 6,
       "libraryPanel": {
@@ -3130,7 +3128,7 @@
         "h": 4,
         "w": 4,
         "x": 15,
-        "y": 2
+        "y": 24
       },
       "id": 14,
       "libraryPanel": {
@@ -3228,7 +3226,7 @@
         "h": 4,
         "w": 5,
         "x": 19,
-        "y": 2
+        "y": 24
       },
       "id": 12,
       "libraryPanel": {
@@ -3345,7 +3343,7 @@
         "h": 5,
         "w": 3,
         "x": 0,
-        "y": 6
+        "y": 28
       },
       "id": 10,
       "libraryPanel": {
@@ -3448,7 +3446,7 @@
         "h": 5,
         "w": 3,
         "x": 3,
-        "y": 6
+        "y": 28
       },
       "id": 16,
       "libraryPanel": {
@@ -3555,7 +3553,7 @@
         "h": 5,
         "w": 3,
         "x": 6,
-        "y": 6
+        "y": 28
       },
       "id": 18,
       "libraryPanel": {
@@ -3658,7 +3656,7 @@
         "h": 5,
         "w": 3,
         "x": 9,
-        "y": 6
+        "y": 28
       },
       "id": 20,
       "libraryPanel": {
@@ -3761,7 +3759,7 @@
         "h": 5,
         "w": 6,
         "x": 12,
-        "y": 6
+        "y": 28
       },
       "id": 60,
       "options": {
@@ -3785,7 +3783,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "(mpp_solar_pv1_input_current{cmd!~\"QPIGS\"} * mpp_solar_pv1_input_voltage{cmd!~\"QPIGS\"}) + (mpp_solar_pv2_input_voltage{cmd!~\"QPIGS\"} * mpp_solar_pv2_input_current{cmd!~\"QPIGS\"})",
+          "expr": "(mpp_solar_pv1_input_current{cmd!~\"QPIGS\"} * mpp_solar_pv1_input_voltage{cmd!~\"QPIGS\"}) + (mpp_solar_pv2_input_voltage{cmd!~\"QPIGS2\"} * mpp_solar_pv2_input_current{cmd!~\"QPIGS2\"})",
           "instant": true,
           "interval": "",
           "legendFormat": "{{inverter}} Array Wattage",
@@ -3883,7 +3881,7 @@
         "h": 11,
         "w": 6,
         "x": 18,
-        "y": 6
+        "y": 28
       },
       "id": 40,
       "libraryPanel": {
@@ -3969,8 +3967,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-blue",
-                "value": null
+                "color": "light-blue"
               },
               {
                 "color": "green",
@@ -3994,11 +3991,10 @@
         "h": 6,
         "w": 5,
         "x": 0,
-        "y": 11
+        "y": 33
       },
       "id": 36,
       "libraryPanel": {
-        "description": "",
         "meta": {
           "connectedDashboards": 1,
           "created": "2023-07-26T08:36:21Z",
@@ -4007,9 +4003,9 @@
             "id": 1,
             "name": "admin"
           },
-          "folderName": "MPPSOLAR",
-          "folderUid": "lwpa6rCVz",
-          "updated": "2023-07-27T10:08:03Z",
+          "folderName": "",
+          "folderUid": "",
+          "updated": "2023-07-28T16:34:01.60769486Z",
           "updatedBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
             "id": 1,
@@ -4017,9 +4013,8 @@
           }
         },
         "name": "Array Wattage",
-        "type": "bargauge",
         "uid": "SCFytFq4k",
-        "version": 5
+        "version": 6
       },
       "options": {
         "displayMode": "gradient",
@@ -4054,7 +4049,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "builder",
-          "expr": "mpp_solar_pv2_input_current{cmd!=\"QPIGS\"} * mpp_solar_pv2_input_voltage{cmd!=\"QPIGS\"}",
+          "expr": "mpp_solar_pv2_input_current{cmd!~\"QPIGS2\"} * mpp_solar_pv2_input_voltage{cmd!~\"QPIGS2\"}",
           "hide": false,
           "legendFormat": "{{inverter}}  PV2",
           "range": true,
@@ -4107,7 +4102,7 @@
         "h": 6,
         "w": 4,
         "x": 5,
-        "y": 11
+        "y": 33
       },
       "id": 48,
       "libraryPanel": {
@@ -4206,7 +4201,7 @@
         "h": 6,
         "w": 3,
         "x": 9,
-        "y": 11
+        "y": 33
       },
       "id": 42,
       "libraryPanel": {
@@ -4310,7 +4305,7 @@
         "h": 6,
         "w": 3,
         "x": 12,
-        "y": 11
+        "y": 33
       },
       "id": 24,
       "libraryPanel": {
@@ -4408,7 +4403,7 @@
         "h": 6,
         "w": 3,
         "x": 15,
-        "y": 11
+        "y": 33
       },
       "id": 22,
       "libraryPanel": {
@@ -4472,7 +4467,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 17
+        "y": 39
       },
       "id": 47,
       "panels": [],
@@ -4501,7 +4496,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 18
+        "y": 40
       },
       "hiddenSeries": false,
       "id": 56,
@@ -4646,7 +4641,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 18
+        "y": 40
       },
       "hiddenSeries": false,
       "id": 54,
@@ -4661,6 +4656,7 @@
         "values": true
       },
       "libraryPanel": {
+        "description": "Inverter AC Load Percent",
         "meta": {
           "connectedDashboards": 1,
           "created": "2023-07-20T22:18:34Z",
@@ -4669,9 +4665,9 @@
             "id": 1,
             "name": "admin"
           },
-          "folderName": "",
-          "folderUid": "",
-          "updated": "2023-07-28T04:37:05.136215255Z",
+          "folderName": "MPPSOLAR",
+          "folderUid": "lwpa6rCVz",
+          "updated": "2023-07-28T04:37:05Z",
           "updatedBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
             "id": 1,
@@ -4679,6 +4675,7 @@
           }
         },
         "name": "Inverter AC Load %",
+        "type": "graph",
         "uid": "VpachCjVk",
         "version": 7
       },
@@ -4786,7 +4783,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 28
+        "y": 50
       },
       "hiddenSeries": false,
       "id": 32,
@@ -4926,7 +4923,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 28
+        "y": 50
       },
       "hiddenSeries": false,
       "id": 30,
@@ -5053,7 +5050,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 38
+        "y": 60
       },
       "hiddenSeries": false,
       "id": 28,
@@ -5238,7 +5235,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 38
+        "y": 60
       },
       "hiddenSeries": false,
       "id": 26,
@@ -5373,7 +5370,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 48
+        "y": 70
       },
       "id": 52,
       "panels": [],
@@ -5402,7 +5399,7 @@
         "h": 13,
         "w": 12,
         "x": 0,
-        "y": 49
+        "y": 71
       },
       "hiddenSeries": false,
       "id": 58,
@@ -5449,7 +5446,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "mpp_solar_pv2_input_current{cmd!=\"QPIGS\"}",
+          "expr": "mpp_solar_pv2_input_current{cmd!=\"QPIGS2\"}",
           "hide": false,
           "legendFormat": "{{inverter}} PV2",
           "range": true,
@@ -5461,7 +5458,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "mpp_solar_pv3_input_current{cmd!=\"QPIGS\"}",
+          "expr": "mpp_solar_pv3_input_current{cmd!=\"QPIGS2\"}",
           "hide": false,
           "legendFormat": "{{inverter}} PV3",
           "range": true,
@@ -5522,7 +5519,7 @@
         "h": 13,
         "w": 12,
         "x": 12,
-        "y": 49
+        "y": 71
       },
       "hiddenSeries": false,
       "id": 59,
@@ -5569,7 +5566,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "mpp_solar_pv2_input_voltage{cmd!=\"QPIGS\"}",
+          "expr": "mpp_solar_pv2_input_voltage{cmd!=\"QPIGS2\"}",
           "hide": false,
           "legendFormat": "{{inverter}} PV2",
           "range": true,
@@ -5581,7 +5578,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "mpp_solar_pv3_input_voltage{cmd!=\"QPIGS\"}",
+          "expr": "mpp_solar_pv3_input_voltage{cmd!=\"QPIGS2\"}",
           "hide": false,
           "legendFormat": "{{inverter}} PV3",
           "range": true,
@@ -5642,7 +5639,7 @@
         "h": 17,
         "w": 24,
         "x": 0,
-        "y": 62
+        "y": 84
       },
       "hiddenSeries": false,
       "id": 43,
@@ -5686,7 +5683,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "mpp_solar_pv1_input_current{cmd!=\"QPIGS\"} * mpp_solar_pv1_input_voltage{cmd!=\"QPIGS\"}",
+          "expr": "mpp_solar_pv1_input_current{cmd!~\"QPIGS\"} * mpp_solar_pv1_input_voltage{cmd!~\"QPIGS\"}",
           "legendFormat": "{{inverter}} PV1",
           "range": true,
           "refId": "A"
@@ -5697,7 +5694,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "mpp_solar_pv2_input_current{cmd!=\"QPIGS\"} * mpp_solar_pv2_input_voltage{cmd!=\"QPIGS\"}",
+          "expr": "mpp_solar_pv2_input_current{cmd!~\"QPIGS2\"} * mpp_solar_pv2_input_voltage{cmd!~\"QPIGS2\"}",
           "hide": false,
           "legendFormat": "{{inverter}}  PV2",
           "range": true,
@@ -5709,7 +5706,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "mpp_solar_pv3_input_current{cmd!=\"QPIGS\"} * mpp_solar_pv3_input_voltage{cmd!=\"QPIGS\"}",
+          "expr": "mpp_solar_pv3_input_current{cmd!~\"QPIGS2\"} * mpp_solar_pv3_input_voltage{cmd!~\"QPIGS2\"}",
           "hide": false,
           "legendFormat": "{{inverter}}  PV3",
           "range": true,
@@ -5721,7 +5718,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "mpp_solar_pv1_input_current{cmd!=\"QPIGS\"} * mpp_solar_pv1_input_voltage{cmd!=\"QPIGS\"} offset 24h",
+          "expr": "mpp_solar_pv1_input_current{cmd!~\"QPIGS\"} * mpp_solar_pv1_input_voltage{cmd!~\"QPIGS\"} offset 24h",
           "hide": false,
           "legendFormat": "{{inverter}} PV1 Yesterday",
           "range": true,
@@ -5733,7 +5730,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "mpp_solar_pv2_input_current{cmd!=\"QPIGS\"} * mpp_solar_pv2_input_voltage{cmd!=\"QPIGS\"} offset 24h",
+          "expr": "mpp_solar_pv2_input_current{cmd!~\"QPIGS2\"} * mpp_solar_pv2_input_voltage{cmd!~\"QPIGS2\"} offset 24h",
           "hide": false,
           "legendFormat": "{{inverter}}  PV2 Yesterday",
           "range": true,
@@ -5745,7 +5742,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "mpp_solar_pv3_input_current{cmd!=\"QPIGS\"} * mpp_solar_pv3_input_voltage{cmd!=\"QPIGS\"} offset 24h",
+          "expr": "mpp_solar_pv3_input_current{cmd!~\"QPIGS2\"} * mpp_solar_pv3_input_voltage{cmd!~\"QPIGS2\"} offset 24h",
           "hide": false,
           "legendFormat": "{{inverter}}  PV3 Yesterday",
           "range": true,
@@ -5806,7 +5803,7 @@
         "h": 15,
         "w": 24,
         "x": 0,
-        "y": 79
+        "y": 101
       },
       "hiddenSeries": false,
       "id": 34,
@@ -5917,7 +5914,7 @@
       }
     }
   ],
-  "refresh": false,
+  "refresh": "10s",
   "schemaVersion": 36,
   "style": "dark",
   "tags": [],
@@ -5925,13 +5922,13 @@
     "list": []
   },
   "time": {
-    "from": "2023-07-27T07:00:00.000Z",
-    "to": "2023-07-27T22:40:59.000Z"
+    "from": "now-6h",
+    "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "mpp_solar",
   "uid": "EOSZe9jVz",
-  "version": 60,
+  "version": 65,
   "weekStart": ""
 }
