@@ -1,4 +1,3 @@
-# Example alert rules for alert-manager
  - alert: ACInputLostOnSolarController
     expr: mpp_solar_is_line_lost == 1
     for: 1m
@@ -17,3 +16,30 @@
     annotations:
       summary: Solar Batteries below 25 percent capacity (instance {{ $labels.instance }})
       description: "A solar inverters battery capacity is below 25 percent.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+ - alert: InverterHeatsinkHighTemperature
+    expr: min_over_time(mpp_solar_inverter_heat_sink_temperature{}[2m]) > 85
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: Solar Invverter heatsink temperature is over 85C (instance {{ $labels.instance }})
+      description: "A solar inverters heatsink is over 85 degrees centigrade.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+ - alert: InverterHeatsinkHighTemperatureCritical
+    expr: min_over_time(mpp_solar_inverter_heat_sink_temperature{}[2m]) > 85
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: Solar Inverter heatsink temperature is over 90C (instance {{ $labels.instance }})
+      description: "A solar inverters heatsink is over 90 degrees centigrade.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+ - alert: InverterFault
+    expr: min_over_time(mpp_solar_fault_code{myStr!~"No fault"}[1m])
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: Solar Inverter in Fault state (instance {{ $labels.instance }})
+      description: "A solar inverter has a Fault.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
