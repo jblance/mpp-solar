@@ -5420,8 +5420,8 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "editorMode": "code",
-          "expr": "mpp_solar_battery_charging_current{cmd=~\"QPGS1|QPGS2\"} - mpp_solar_battery_discharge_current{cmd=~\"QPGS1|QPGS2\"}",
+          "editorMode": "builder",
+          "expr": "mpp_solar_battery_charging_current{cmd!~\"QPIGS\"} - mpp_solar_battery_discharge_current{cmd!~\"QPIGS\"}",
           "legendFormat": "{{inverter}} Charge",
           "range": true,
           "refId": "A"
@@ -6024,6 +6024,6 @@
   "timezone": "browser",
   "title": "mpp_solar",
   "uid": "EOSZe9jVz",
-  "version": 66,
+  "version": 68,
   "weekStart": ""
 }
