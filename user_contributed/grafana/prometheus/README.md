@@ -4,6 +4,38 @@ You can also find these instructions on the top row within the dashboard.
 This Dashboard takes avantage of using prom output from mpp_solar with command output from QPGS and QPIGS.
 This output can be directed to a text file while building the file, then moved to node_exporter folder as a prom file.
 
+Requires a working instalation of Prometheus node_exporter with collectionn fromm folder enabled here is an example though I use an rc busybox based OS and your init system is likelly Systemd. The important part is to add a folder for node_exporter to read the prometheus formated files ` --collector.textfile.directory=/var/lib/node-exporter/mppsolar` and your needs will depend on your choice of distribution.
+
+```
+# cat /etc/init.d/node-exporter-mpp
+#!/sbin/openrc-run
+supervisor=supervise-daemon
+
+command="/usr/bin/node_exporter"
+command_args="--no-collector.mdadm --collector.textfile.directory=/var/lib/node-exporter/mppsolar $ARGS"
+command_background="yes"
+group="prometheus"
+user="prometheus"
+
+logdir="/var/log/prometheus"
+logfile="$logdir/${SVCNAME}.log"
+datadir="/tmp/mppsolar"
+pidfile="/var/run/${SVCNAME}.pid"
+start_stop_daemon_args="--stderr $logfile --user $user --group $group"
+
+depend() {
+	need net
+	after firewall
+}
+
+start_pre() {
+	checkpath -d -o $user:$group -m755 $logdir
+	checkpath -f -o $user:$group -m644 $logfile
+        checkpath -f -o $user:$group -m755 $datadir
+}
+```
+
+
 Designed for Rich Solar 6548 and should work for MPP LV6548 and the like. Should also work with other inverters though thresholds should be adjusted for each case based on the models abilities.
 
 Adjust your serial ports as needed. 
@@ -80,7 +112,7 @@ Executable in /usr/local/bin/
 dataFile="mppsolar"
 dataDir="/var/lib/node-exporter/mppsolar/"
 
-checkpath -d "$dataDir" -m 755 -o node_exporter:node_exporter
+checkpath -d "$dataDir" -m 755 -o prometheus:prometheus
 
 while : ; do
 
