@@ -36,7 +36,7 @@
       description: "A solar inverters heatsink is over 90 degrees centigrade.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
  - alert: InverterFault
-    expr: min_over_time(mpp_solar_fault_code{myStr!~"No fault"}[1m])
+    expr: min_over_time(mpp_solar_fault_code{myStr!~"No fault"}[1m]) == 1
     for: 1m
     labels:
       severity: critical
