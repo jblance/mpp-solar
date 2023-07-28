@@ -5,17 +5,18 @@ import json
 import logging
 from argparse import ArgumentParser
 from datetime import date, timedelta  # noqa: F401
+from platform import python_version
 
 import yaml
 from pydantic import ValidationError
 
 from mppsolar.version import __version__  # noqa: F401
+from powermon.commands.command import Command
+from powermon.config.configModel import ConfigModel
 from powermon.device import Device
 from powermon.libs.apicoordinator import ApiCoordinator
 from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
-from powermon.commands.command import Command
-from powermon.config.configModel import ConfigModel
 
 # from time import sleep, time
 # from powermon.ports import getPortFromConfig
@@ -55,7 +56,7 @@ def process_command_line_overrides(args):
 
 def main():
     """main entry point for powermon command"""
-    description = f"Power Device Monitoring Utility, version: {__version__}"
+    description = f"Power Device Monitoring Utility, version: {__version__}, python version: {python_version()}"
     parser = ArgumentParser(description=description)
 
     parser.add_argument(

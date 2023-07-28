@@ -1,3 +1,3 @@
-FROM python:3.10-slim
+FROM python:slim
 
-RUN pip install mppsolar==0.16.01
+RUN pip install mppsolar

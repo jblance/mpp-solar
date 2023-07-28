@@ -1,6 +1,7 @@
 # !/usr/bin/python3
 import logging
 from argparse import ArgumentParser
+from platform import python_version
 
 from mppsolar.version import __version__  # noqa: F401
 
@@ -16,7 +17,7 @@ logging.basicConfig(format=FORMAT)
 
 
 def main():
-    description = f"Solar Device Command Utility, version: {__version__}"
+    description = f"Solar Device Command Utility, version: {__version__}, python version: {python_version()}"
     parser = ArgumentParser(description=description)
     parser.add_argument(
         "-n",
