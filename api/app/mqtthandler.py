@@ -7,7 +7,7 @@ from powermon.dto.resultDTO import ResultDTO
 
 class MQTTHandler(object):
     _instance = None
-    _power_monitors = []
+    _devices = []
     _results = []
     _commandDictionary = {
             "mqtt/QPIGS": "QPIGS",
@@ -51,16 +51,17 @@ class MQTTHandler(object):
         device = DeviceDTO.parse_raw(message)
         deviceId = device.identifier 
         print("Device ID: ", deviceId)
-        if(device not in self._power_monitors):
-            self._power_monitors.append(device)
+        if(device not in self._devices):
+            self._devices.append(device)
 
     def get_device_instances(self) -> list[DeviceDTO]:
-        return self._power_monitors
+        return self._devices
     
-    async def get_device_instance(self, powermon_name) -> DeviceDTO:
-        for powermon in self._power_monitors:
-            if(powermon.name == powermon_name):
-                return powermon
+    def get_device_instance(self, device_id) -> DeviceDTO:
+        _device: DeviceDTO
+        for _device in self._devices:
+            if(_device.identifier == device_id):
+                return _device
         return None
     
     async def get_results(self):

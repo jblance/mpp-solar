@@ -112,19 +112,22 @@ async def read_command(command_code: str, handler: MQTTHandler = Depends(get_mqt
 
 
 @app.get("/devices/", response_model=list[DeviceDTO])
-async def read_devices(handler: MQTTHandler = Depends(get_mqtthandler)):
+def read_devices(handler: MQTTHandler = Depends(get_mqtthandler)):
     result = None
 
-    result = await handler.get_device_instances()
+    result = handler.get_device_instances()
 
     return result
 
 
-@app.get("/devices/{powermon_name}", response_model=DeviceDTO)
-async def read_devices(powermon_name: str, handler: MQTTHandler = Depends(get_mqtthandler)):  # noqa: F811
+@app.get("/devices/{device_id}", response_model=DeviceDTO)
+def read_device(device_id: str, handler: MQTTHandler = Depends(get_mqtthandler)):  # noqa: F811
     result = None
 
-    result = await handler.get_devices_instance(powermon_name)
+    result = handler.get_device_instance(device_id)
+
+    if result is None:
+        raise HTTPException(status_code=404, detail="Device not found")
 
     return result
 
