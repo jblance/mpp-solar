@@ -56,3 +56,36 @@ def list_protocols():
         result[name] = (str(_module()), "", "")
     # print(result)
     return result
+
+
+def get_device_id():
+    log.info("get_device_id")
+    pkgpath = __file__
+    pkgpath = pkgpath[: pkgpath.rfind("/")]
+    pkgpath += "/../protocols"
+    # print(pkgpath)
+    result = {}
+    result["_command"] = "get device id"
+    result["_command_description"] = "Attempt to determine device id"
+    for _, name, _ in pkgutil.iter_modules([pkgpath]):
+        # print(name)
+        try:
+            _module_class = importlib.import_module("mppsolar.protocols." + name, ".")
+            _module = getattr(_module_class, name)
+        except ModuleNotFoundError as e:
+            log.debug(f"Error in module {name}: {e}")
+            # result[name] = (str(_module()), "ERROR", "")
+            continue
+        except AttributeError as e:
+            log.debug(f"Error in module {name}: {e}")
+            # result[name] = (name, "ERROR", "")
+            continue
+        pid = _module().PID
+        if pid is None:
+            continue
+        full_command = _module().get_full_command(pid)
+        info = str(full_command)
+        print(info)
+        result[name] = (info, "", "")
+    # print(result)
+    return result

@@ -1,7 +1,7 @@
 # yaml config for powermon
 device:
   name: Test_Inverter
-  serial_id: 123456789
+  id: 123456789
   model: 8048MAX
   manufacturer: MPP-Solar
   port:
@@ -9,12 +9,14 @@ device:
     path: /dev/ttyUSB0
     type: test
     protocol: PI30MAX
-  commands:
-  - command: QED
-    # f_command: f'QED{(date.today()-timedelta(days=1)).strftime("%Y%m%d")}'
-    f_command: f'QED{(date.today()).strftime("%Y%m%d")}'
-    outputs:
-    - name: screen
+commands:
+- command: QED
+  # f_command: f'QED{(date.today()-timedelta(days=1)).strftime("%Y%m%d")}'
+  # f_command: f'QED{(date.today()).strftime("%Y%m%d")}'
+  outputs:
+  - type: screen
+    format:
+      type: simple
       tag: Test_Inverter
       filter: ^pv
 loop: 60

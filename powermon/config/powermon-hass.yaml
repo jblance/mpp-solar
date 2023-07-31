@@ -9,8 +9,9 @@ device:
 commands:
 - command: QPGS0
   outputs:
-  - name: screen
-    format: hass
-    entity_id_prefix: inverter42
-    discovery_prefix: homeassistant
-    filter: ^serial|^work|^charger|^fault
+  - type: screen
+    format: 
+      type: hass
+      entity_id_prefix: inverter42
+      discovery_prefix: homeassistant
+      filter: ^serial|^work|^charger|^fault

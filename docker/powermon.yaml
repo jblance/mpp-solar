@@ -7,16 +7,17 @@ device:
   port:
     baud: 2400
     path: /dev/hidraw0
-    type: USB
+    type: usb
     protocol: PI30
 
 commands:
   - command: QPIGS
     type: basic #default command type is basic
     outputs:
-    - type: mqtt
-      topic: Test_Inverter
-      tag: QPIGS
+      - type: mqtt
+        format: 
+        - type: mqttmessage
+          topic: Test_Inverter
 
 mqttbroker:
   name: localhost

@@ -311,7 +311,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.info(f"Processing response of type {response_type}")
 
         # Process the response by reponse type
-        # QUESTION: should the decode be {"two letter words": {"value": 123, "unit":"count"}, ...}
+        # QUESTION: should the decode be {"parameter name": {"value": 123, "unit":"count"}, ...}
         match response_type:
             case ResponseType.ACK:
                 # Usually for setter type commands
