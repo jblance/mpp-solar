@@ -6,15 +6,15 @@ device:
   manufacturer: MPP-Solar
   port:
     path: /dev/hidraw0
-    type: serial
+    type: usb
     protocol: PI30
 
 commands:
 - command: QPIGS #Must be in the protocol command list
   trigger:
-    every: 60  # every 10 seconds
+    every: 10  # every 10 seconds
   outputs:
-  - type: mqtt
+  - type: api_mqtt
     format: 
       type: htmltable
           
@@ -27,7 +27,7 @@ mqttbroker:
 api:
   announce_topic: powermon/announce
   adhoc_topic: powermon/adhoc
-  refresh_interval: 60
+  refresh_interval: 600
 
 daemon:
   type: systemd

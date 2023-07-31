@@ -3,4 +3,6 @@ from pydantic import BaseModel
 
 # TODO: update
 class ResultDTO(BaseModel):
-    result: list[str]
+    device_identifier: str
+    command: str
+    formatted_data: list[str]

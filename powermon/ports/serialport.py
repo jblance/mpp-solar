@@ -6,7 +6,7 @@ import serial
 from powermon.dto.portDTO import PortDTO
 from powermon.libs.result import Result
 from powermon.ports.abstractport import AbstractPort
-from powermon.protocols import get_protocol
+from powermon.protocols import get_protocol_definition
 
 log = logging.getLogger("SerialPort")
 
@@ -21,16 +21,17 @@ class SerialPort(AbstractPort):
         path = config.get("path", "/dev/ttyUSB0")
         baud = config.get("baud", 2400)
         # get protocol handler, default to PI30 if not supplied
-        protocol = get_protocol(protocol=config.get("protocol", "PI30"))
+        protocol = get_protocol_definition(protocol=config.get("protocol", "PI30"))
         return cls(path=path, baud=baud, protocol=protocol)
 
     def __init__(self, path, baud, protocol) -> None:
+        super().__init__(protocol=protocol)
         self.path = path
         self.baud = baud
-        self.protocol = protocol
 
         self.serialPort = None
         self.error = None
+
 
     def toDTO(self) -> PortDTO:
         dto = PortDTO(type="serial", path=self.path, baud=self.baud, protocol=self.protocol.toDTO())
@@ -51,7 +52,7 @@ class SerialPort(AbstractPort):
             self.serialPort.close()
         return
 
-    def send_and_receive(self, result) -> Result:
+    def send_and_receive(self, result: Result) -> Result:
         full_command = result.command.full_command
         response_line = None
         log.debug(f"port {self.serialPort}")

@@ -5,6 +5,7 @@ from enum import auto
 from strenum import LowercaseStrEnum
 
 from powermon.libs.result import Result
+from powermon.protocols.abstractprotocol import AbstractProtocol
 
 
 log = logging.getLogger("Port")
@@ -24,10 +25,14 @@ class PortType(LowercaseStrEnum):
 
 
 class AbstractPort(ABC):
+
+    def __init__(self, protocol: AbstractProtocol):
+        self.protocol: AbstractProtocol = protocol
+
     @abstractmethod
-    def connect(self) -> None:
+    def connect(self) -> int:
         log.debug("Port connect not implemented")
-        return
+        return 0
 
     @abstractmethod
     def disconnect(self) -> None:
@@ -42,7 +47,7 @@ class AbstractPort(ABC):
     def toDTO(self):
         raise NotImplementedError
     
-    def get_protocol(self):
+    def get_protocol(self) -> AbstractProtocol:
         return self.protocol
 
     def run_command(self, command):
@@ -52,7 +57,7 @@ class AbstractPort(ABC):
         command.touch()
         # update full_command - expand any template / add crc etc
         # updates every run incase something has changed
-        command.full_command = self.protocol.get_full_command(command.name)
+        command.full_command = self.get_protocol().get_full_command(command.name)
         result = Result(command)
         # run the command via the 'send_and_receive port function
         result = self.send_and_receive(result)

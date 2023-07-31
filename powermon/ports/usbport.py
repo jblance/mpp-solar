@@ -5,7 +5,7 @@ import time
 from powermon.dto.portDTO import PortDTO
 from powermon.libs.result import Result
 from powermon.ports.abstractport import AbstractPort
-from powermon.protocols import get_protocol
+from powermon.protocols import get_protocol_definition
 
 log = logging.getLogger("USBPort")
 
@@ -16,19 +16,19 @@ class USBPort(AbstractPort):
         log.debug(f"building usb port. config:{config}")
         path = config.get("path", "/dev/hidraw0")
         # get protocol handler, default to PI30 if not supplied
-        protocol = get_protocol(protocol=config.get("protocol", "PI30"))
+        protocol = get_protocol_definition(protocol=config.get("protocol", "PI30"))
         return cls(path=path, protocol=protocol)
 
     def __init__(self, path, protocol) -> None:
+        super().__init__(protocol=protocol)
         self.path = path
-        self.protocol = protocol
 
     def toDTO(self):
-        dto = PortDTO(type="usb", path=self.path, protocol=self.protocol.toDTO())
+        dto = PortDTO(type="usb", path=self.path, protocol=self.get_protocol().toDTO())
         return dto
 
     def connect(self) -> int:
-        log.debug(f"USBPort connecting. path:{self.path}, protocol: {self.protocol}")
+        log.debug(f"USBPort connecting. path:{self.path}, protocol: {self.get_protocol()}")
         try:
             self.port = os.open(self.path, os.O_RDWR | os.O_NONBLOCK)
             log.debug(f"USBPort port number ${self.port}")
@@ -50,7 +50,7 @@ class USBPort(AbstractPort):
         # Open USB device
         usb0 = None
         try:
-            usb0 = os.open(self._device, os.O_RDWR | os.O_NONBLOCK)
+            usb0 = os.open(self.path, os.O_RDWR | os.O_NONBLOCK)
         except Exception as e:
             log.error("USB open error: {}".format(e))
             result.error = True

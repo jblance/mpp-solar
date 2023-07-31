@@ -17,7 +17,7 @@ class OutputType(LowercaseStrEnum):
     API_MQTT = auto()
 
 
-def getOutputClass(outputType, _format, outputConfig={}, mqtt_broker=None, topic=None, schedule_name=None):
+def getOutputClass(outputType, _format, outputConfig={}, mqtt_broker=None, topic=None):
     output_class = None
     # Only import the required class
     log.debug("outputType %s" % outputType)
@@ -28,7 +28,7 @@ def getOutputClass(outputType, _format, outputConfig={}, mqtt_broker=None, topic
     elif outputType == OutputType.API_MQTT:
         from powermon.outputs.api_mqtt import API_MQTT
 
-        output_class = API_MQTT(outputConfig, topic, schedule_name, mqtt_broker, _format)
+        output_class = API_MQTT(outputConfig, topic, mqtt_broker, _format)
     else:
         from powermon.outputs.screen import Screen
 
