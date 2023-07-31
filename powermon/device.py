@@ -62,11 +62,16 @@ class Device:
         return self.port
 
     def toDTO(self) -> DeviceDTO:
+        commands = []
+        command: Command
+        for command in self.commands:
+            commands.append(command.to_DTO())
         dto = DeviceDTO(
             identifier=self.identifier,
             model=self.model,
             manufacturer=self.manufacturer,
             port=self.port.toDTO(),
+            commands=commands
         )
         return dto
 

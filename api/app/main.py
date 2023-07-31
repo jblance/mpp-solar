@@ -12,8 +12,8 @@ from .db import crud, models, schemas
 from .db.database import SessionLocal, engine
 from .mqtthandler import MQTTHandler
 
-from powermon.dto.powermonDTO import PowermonDTO
 from powermon.dto.resultDTO import ResultDTO
+from powermon.dto.deviceDTO import DeviceDTO
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -83,7 +83,7 @@ templates = Jinja2Templates(directory="api/app/templates")
 @app.get("/")
 def read_root(request: Request):
     handler = MQTTHandler()
-    devices = handler.get_powermon_instances()
+    devices = handler.get_device_instances()
     print(devices)
     return templates.TemplateResponse("home.html.j2", {"request": request, "devices": devices})
 
@@ -103,7 +103,7 @@ def read_message(message_id: int, db: Session = Depends(get_db)):
 
 
 @app.get("/command/{command_code}", response_model=schemas.MQTTMessage)
-async def read_message(command_code: str, handler: MQTTHandler = Depends(get_mqtthandler)):  # noqa: F811
+async def read_command(command_code: str, handler: MQTTHandler = Depends(get_mqtthandler)):  # noqa: F811
     result = None
 
     result = await handler.register_command(command_code)
@@ -111,20 +111,20 @@ async def read_message(command_code: str, handler: MQTTHandler = Depends(get_mqt
     return result
 
 
-@app.get("/powermons/", response_model=list[PowermonDTO])
-async def read_power_monitors(handler: MQTTHandler = Depends(get_mqtthandler)):
+@app.get("/devices/", response_model=list[DeviceDTO])
+async def read_devices(handler: MQTTHandler = Depends(get_mqtthandler)):
     result = None
 
-    result = await handler.get_powermon_instances()
+    result = await handler.get_device_instances()
 
     return result
 
 
-@app.get("/powermons/{powermon_name}", response_model=PowermonDTO)
-async def read_power_monitors(powermon_name: str, handler: MQTTHandler = Depends(get_mqtthandler)):  # noqa: F811
+@app.get("/devices/{powermon_name}", response_model=DeviceDTO)
+async def read_devices(powermon_name: str, handler: MQTTHandler = Depends(get_mqtthandler)):  # noqa: F811
     result = None
 
-    result = await handler.get_powermon_instance(powermon_name)
+    result = await handler.get_devices_instance(powermon_name)
 
     return result
 

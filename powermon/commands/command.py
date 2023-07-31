@@ -2,6 +2,7 @@ import logging
 from time import localtime, strftime, time
 from powermon.commands.trigger import Trigger
 from powermon.outputs import getOutputs
+from powermon.dto.commandDTO import CommandDTO
 
 log = logging.getLogger("Command")
 
@@ -65,3 +66,9 @@ class Command:
         self.last_run = time()
         # update next run time
         self.next_run = self.trigger.nextRun(command=self)
+
+    def to_DTO(self):
+        return CommandDTO(
+            command = self.name,
+            trigger = self.trigger.to_DTO()
+        )

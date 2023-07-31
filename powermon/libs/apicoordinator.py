@@ -2,8 +2,10 @@ import logging
 from time import time
 
 import yaml
+from powermon.device import Device
 
 log = logging.getLogger("APICoordinator")
+
 
 
 class ApiCoordinator:
@@ -29,7 +31,7 @@ class ApiCoordinator:
 
         return cls(adhocTopic=adhocTopic, announceTopic=announceTopic, enabled=enabled, refreshInterval=refreshInterval, device=device, mqtt_broker=mqtt_broker)
 
-    def __init__(self, adhocTopic : str, announceTopic: str, enabled: bool, refreshInterval: int, device=None, mqtt_broker=None):
+    def __init__(self, adhocTopic : str, announceTopic: str, enabled: bool, refreshInterval: int, device: Device, mqtt_broker=None):
         self.device = device
         self.mqtt_broker = mqtt_broker
         self.last_run = None

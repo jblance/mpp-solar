@@ -7,15 +7,21 @@
     <h1>Devices</h1>
     {% if devices is defined%}
         {% for device in devices %}
-            <h2>{{ device.name }}</h2>
+            <h2>Id: {{ device.identifier }}</h2>
             <ul>
                 <li>Model: {{ device.model }}</li>
                 <li>Manufacturer: {{ device.manufacturer }}</li>
                 <li>Port Type: {{ device.port.type }}</li>
+                <li>Device Commands:</li>
+                    <ul>
+                        {% for device_command in device.commands %}
+                        <li>{{ device_command }}</li>
+                        {% endfor %}
+                    </ul>
                 <li>Protocol Id: {{ device.port.protocol.protocol_id }}</li>
                     <ul>
-                        {% for command in device.port.protocol.commands %}
-                        <li>{{ command }}: {{device.port.protocol.commands[command]}}</li>
+                        {% for protocol_command in device.port.protocol.commands %}
+                        <li>{{ protocol_command }}: {{device.port.protocol.commands[protocol_command]}}</li>
                         {% endfor %}
                     </ul>
             </ul>

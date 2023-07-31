@@ -54,10 +54,10 @@ class MQTTHandler(object):
         if(device not in self._power_monitors):
             self._power_monitors.append(device)
 
-    def get_powermon_instances(self) -> list[DeviceDTO]:
+    def get_device_instances(self) -> list[DeviceDTO]:
         return self._power_monitors
     
-    async def get_powermon_instance(self, powermon_name) -> DeviceDTO:
+    async def get_device_instance(self, powermon_name) -> DeviceDTO:
         for powermon in self._power_monitors:
             if(powermon.name == powermon_name):
                 return powermon
