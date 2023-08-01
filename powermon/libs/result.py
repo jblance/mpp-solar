@@ -27,3 +27,6 @@ class Result:
 
     def get_device_id(self) -> str:
         return self.device_id
+    
+    def get_decoded_responses(self) -> dict:
+        return self.decoded_responses

@@ -16,3 +16,6 @@ class AbstractOutput(ABC):
     @abstractmethod
     def process(self, result):
         pass
+
+    def get_topic(self):
+        return ""

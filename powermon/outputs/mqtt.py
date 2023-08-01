@@ -6,13 +6,10 @@ log = logging.getLogger("MQTT")
 
 
 class MQTT(AbstractOutput):
-    def __init__(self, output_config, topic, mqtt_broker, formatter) -> None:
+    def __init__(self, output_config, mqtt_broker, formatter) -> None:
         super().__init__(formatter)
         self.mqtt_broker = mqtt_broker
         self.results_topic = output_config.get("topic_override", None)
-
-        if self.results_topic is None:
-            self.results_topic = topic
 
     def __str__(self):
         return "outputs the results to the supplied mqtt broker: eg powermon/status/total_output_active_power/value 1250"

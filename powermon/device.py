@@ -67,7 +67,7 @@ class Device:
         commands = []
         command: Command
         for command in self.commands:
-            commands.append(command.to_DTO())
+            commands.append(command.to_dto())
         dto = DeviceDTO(
             identifier=self.identifier,
             model=self.model,

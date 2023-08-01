@@ -10,7 +10,7 @@ class simple(AbstractFormat):
         self.name = "simple"
         self.extra_info = formatConfig.get("extra_info", False)
 
-    def format(self, result):
+    def format(self, result) -> list:
         log.info("Using output formatter: %s" % self.name)
 
         _result = []

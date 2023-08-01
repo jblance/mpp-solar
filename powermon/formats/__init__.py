@@ -13,6 +13,7 @@ class FormatterType(LowercaseStrEnum):
     HTMLTABLE = auto()
     RAW = auto()
     SIMPLE = auto()
+    JSON = auto()
     TABLE = auto()
     TOPICS = auto()
 
@@ -20,9 +21,9 @@ class FormatterType(LowercaseStrEnum):
 DEFAULT_FORMAT = FormatterType.SIMPLE
 
 
-def getFormatfromConfig(formatConfig, device, topic) -> AbstractFormat:
+def getFormatfromConfig(formatConfig) -> AbstractFormat:
     # Get values from config
-    log.debug("getFormatfromConfig, formatConfig: %s, device: %s, topic: %s" % (formatConfig, device, topic))
+    log.debug("getFormatfromConfig, formatConfig: %s" % (formatConfig))
 
     # formatConfig can be None, a str (eg 'simple') or a dict
     if formatConfig is None:
@@ -43,10 +44,10 @@ def getFormatfromConfig(formatConfig, device, topic) -> AbstractFormat:
             formatter = htmltable(formatConfig)
         case FormatterType.HASS:
             from powermon.formats.hass import hass
-            formatter = hass(formatConfig, device)
+            formatter = hass(formatConfig, None) #Not passing device to hass formatter, A HASS coordinator should do the device announcement
         case FormatterType.TOPICS:
             from powermon.formats.topics import Topics
-            formatter = Topics(formatConfig, topic)
+            formatter = Topics(formatConfig)
         case FormatterType.SIMPLE:
             from powermon.formats.simple import simple
             formatter = simple(formatConfig)

@@ -16,7 +16,7 @@ commands:
   outputs:
   - type: api_mqtt
     format: 
-      type: htmltable
+      type: simple
           
 mqttbroker:
   name: localhost

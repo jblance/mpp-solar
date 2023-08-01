@@ -3,6 +3,7 @@ from time import localtime, strftime, time
 from powermon.commands.trigger import Trigger
 from powermon.outputs import getOutputs
 from powermon.dto.commandDTO import CommandDTO
+from powermon.outputs.abstractoutput import AbstractOutput
 
 log = logging.getLogger("Command")
 
@@ -41,11 +42,11 @@ class Command:
             log.info("command must be defined")
             raise TypeError("command must be defined")
         commandtype = config.get("type", "basic")
-        outputs = getOutputs(config.get("outputs", ""), mqtt_broker=mqtt_broker, topic=name)
+        outputs = getOutputs(config.get("outputs", ""), name, mqtt_broker=mqtt_broker)
         trigger = Trigger.fromConfig(config=config.get("trigger"))
         return cls(name=name, commandtype=commandtype, outputs=outputs, trigger=trigger)
 
-    def __init__(self, name : str, commandtype: str, outputs: list, trigger : Trigger):
+    def __init__(self, name : str, commandtype: str, outputs: list[AbstractOutput], trigger : Trigger):
 
         self.name = name
         self.type = commandtype
@@ -67,8 +68,9 @@ class Command:
         # update next run time
         self.next_run = self.trigger.nextRun(command=self)
 
-    def to_DTO(self):
+    def to_dto(self):
         return CommandDTO(
             command = self.name,
+            result_topic = self.outputs[0].get_topic(),
             trigger = self.trigger.to_DTO()
         )
