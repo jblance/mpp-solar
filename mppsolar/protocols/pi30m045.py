@@ -148,32 +148,96 @@ QUERY_COMMANDS = {
             b"(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1\x6F\x7E\r",
         ],
     },
-    "QFLAG": {
-        "name": "QFLAG",
-        "description": "Flag Status inquiry",
-        "help": " -- queries the enabled / disabled state of various Inverter settings (e.g. buzzer, overload, interrupt alarm)",
+    "QDI": {
+        "name": "QDI",
+        "description": "Default Settings inquiry",
         "type": "QUERY",
         "response": [
+            ["float", "AC Output Voltage", "V"],
+            ["float", "AC Output Frequency", "Hz"],
+            ["int", "Max AC Charging Current", "A"],
+            ["float", "Battery Under Voltage", "V"],
+            ["float", "Battery Float Charge Voltage", "V"],
+            ["float", "Battery Bulk Charge Voltage", "V"],
+            ["float", "Battery Recharge Voltage", "V"],
+            ["int", "Max Charging Current", "A"],
+            ["option", "Input Voltage Range", ["Appliance", "UPS"]],
             [
-                "enflags",
-                "Device Status",
-                {
-                    "a": {"name": "Buzzer", "state": "disabled"},
-                    "b": {"name": "Overload Bypass", "state": "disabled"},
-                    "d": {"name": "Solar Feed to Grid", "state": "disabled"},
-                    "k": {"name": "LCD Reset to Default", "state": "disabled"},
-                    "u": {"name": "Overload Restart", "state": "disabled"},
-                    "v": {"name": "Over Temperature Restart", "state": "disabled"},
-                    "x": {"name": "LCD Backlight", "state": "disabled"},
-                    "y": {
-                        "name": "Primary Source Interrupt Alarm",
-                        "state": "disabled",
-                    },
-                    "z": {"name": "Record Fault Code", "state": "disabled"},
-                },
-            ]
+                "option",
+                "Output Source Priority",
+                ["Utility first", "Solar first", "SBU first"],
+            ],
+            [
+                "option",
+                "Charger Source Priority",
+                [
+                    "Solar first",
+                    "Solar + Utility",
+                    "Only solar charging permitted",
+                ],
+            ],
+            [
+                "option",
+                "Battery Type",
+                [
+                    "AGM",
+                    "Flooded",
+                    "User",
+                    "TBD",
+                    "Pylontech",
+                    "WECO",
+                    "Soltaro",
+                    "LIb-protocol compatible",
+                    "3rd party Lithium",
+                ],
+            ],
+            ["option", "Buzzer", ["enabled", "disabled"]],
+            ["option", "Power saving", ["disabled", "enabled"]],
+            ["option", "Overload restart", ["disabled", "enabled"]],
+            ["option", "Over temperature restart", ["disabled", "enabled"]],
+            ["option", "LCD Backlight", ["disabled", "enabled"]],
+            ["option", "Primary source interrupt alarm", ["disabled", "enabled"]],
+            ["option", "Record fault code", ["disabled", "enabled"]],
+            ["option", "Overload bypass", ["disabled", "enabled"]],
+            ["option", "LCD reset to default", ["disabled", "enabled"]],
+            [
+                "option",
+                "Output mode",
+                [
+                    "single machine",
+                    "parallel output",
+                    "Phase 1 of 3 phase output",
+                    "Phase 2 of 3 phase output",
+                    "Phase 3 of 3 phase output",
+                    "Phase 1 of 2 phase output",
+                    "Phase 2 of 2 phase output (120°)",
+                    "Phase 2 of 2 phase output (180°)",
+                    "Unknown Output Mode",
+                ],
+            ],
+            ["float", "Battery Redischarge Voltage", "V"],
+            [
+                "option",
+                "PV OK condition",
+                [
+                    "As long as one unit of inverters has connect PV, parallel system will consider PV OK",
+                    "Only All of inverters have connect PV, parallel system will consider PV OK",
+                ],
+            ],
+            [
+                "option",
+                "PV Power Balance",
+                [
+                    "PV input max current will be the max charged current",
+                    "PV input max power will be the sum of the max charged power and loads power",
+                ],
+            ],
+            ["int", "Max Charging Time at CV", "min"],
+            ["int", "Max Discharging current", "A"],
         ],
-        "test_responses": [],
+        "test_responses": [
+            b"(230.0 50.0 0030 44.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 1 0 1 0 54.0 0 1 224\xeb\xbc\r",
+        ],
     },
     "QPGS": {
         "name": "QPGS",
@@ -339,6 +403,32 @@ QUERY_COMMANDS = {
         "regex": "QPGS(\\d+)$",
     },
 }
+SETTER_COMMANDS = {
+    "PCP": {
+        "name": "PCP",
+        "description": "Set Device Charger Priority",
+        "help": " -- examples: PCP00 (set solar first), PCP01 (set solar and utility), PCP02 (set solar only charging)",
+        "type": "SETTER",
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "PCP(0[0123])$",
+    },
+    "PPCP": {
+        "name": "PPCP",
+        "description": "Set Parallel Device Charger Priority",
+        "help": " -- examples: PPCP000 (set unit 1 to 00 - solar first), PPCP101 (set unit 1 to 01 - solar and utility), PPCP202 (set unit 2 to 02 - solar only charging)",
+        "type": "SETTER",
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "PPCP(\\d0[0123])$",
+    },
+}
 
 class pi30m045(pi30max):
     def __str__(self):
@@ -350,5 +440,5 @@ class pi30m045(pi30max):
         # Add pi30m045 specific commands to pi30max commands
         self.COMMANDS.update(QUERY_COMMANDS)
         # Add pi30m045 specific setter commands
-        #self.COMMANDS.update(SETTER_COMMANDS)
+        self.COMMANDS.update(SETTER_COMMANDS)
         log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
