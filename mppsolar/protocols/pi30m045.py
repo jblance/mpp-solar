@@ -291,6 +291,18 @@ SETTER_COMMANDS = {
         ],
         "regex": "PPCP(\\d0[0123])$",
     },
+    "MUCHGC": {
+        "name": "MUCHGC",
+        "description": "Set Utility Max Charging Current",
+        "help": " -- example: MUCHGCuaaa (MUCHGC1030 set unit 1 utility max charging current to 30A)",
+        "type": "SETTER",
+        "response": [["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "MUCHGC(\\d\\d\\d\\d)$",
+    },
 }
 
 class pi30m045(pi30max):
