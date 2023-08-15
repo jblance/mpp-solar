@@ -52,7 +52,7 @@
           "h": 4,
           "w": 4,
           "x": 0,
-          "y": 24
+          "y": 2
         },
         "id": 8,
         "options": {
@@ -139,7 +139,7 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "description": "",
+        "description": "LV6548 - POP\n\nPOP         Set Device Output Source Priority -- examples: POP00 (set utility first), POP01 (set solar first), POP02 (set SBU priority)",
         "fieldConfig": {
           "defaults": {
             "color": {
@@ -200,7 +200,7 @@
           "h": 4,
           "w": 3,
           "x": 4,
-          "y": 24
+          "y": 2
         },
         "id": 4,
         "links": [],
@@ -250,7 +250,7 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "description": "",
+        "description": "LV6548 - PCP/PPCP\n\nPCP         Set Device Charger Priority -- examples: PCP00 (set utility first), PCP01 (set solar first), PCP02 (HS only: set solar and utility), PCP03 (set solar only charging)\nPPCP        Set Parallel Device Charger Priority (for 4000/5000) -- examples: PPCP000 (set unit 1 to 00 - utility first), PPCP101 (set unit 1 to 01 - solar first), PPCP202 (set unit 2 to 02 - solar and utility), PPCP003 (set unit 0 to 03 - solar only charging)",
         "fieldConfig": {
           "defaults": {
             "color": {
@@ -319,7 +319,7 @@
           "h": 4,
           "w": 4,
           "x": 7,
-          "y": 24
+          "y": 2
         },
         "id": 2,
         "links": [],
@@ -403,7 +403,8 @@
                   "pattern": "No fault",
                   "result": {
                     "color": "semi-dark-green",
-                    "index": 2
+                    "index": 2,
+                    "text": "No Fault"
                   }
                 },
                 "type": "regex"
@@ -430,7 +431,7 @@
           "h": 4,
           "w": 4,
           "x": 11,
-          "y": 24
+          "y": 2
         },
         "id": 6,
         "links": [],
@@ -457,7 +458,7 @@
               "uid": "${DS_PROMETHEUS}"
             },
             "editorMode": "builder",
-            "expr": "mpp_solar_fault_code{cmd=~\"QPGS1|QPGS2\"}",
+            "expr": "mpp_solar_fault_code",
             "format": "table",
             "instant": false,
             "interval": "",
@@ -517,7 +518,7 @@
           "h": 4,
           "w": 4,
           "x": 15,
-          "y": 24
+          "y": 2
         },
         "id": 14,
         "options": {
@@ -596,7 +597,7 @@
           "h": 4,
           "w": 5,
           "x": 19,
-          "y": 24
+          "y": 2
         },
         "id": 12,
         "options": {
@@ -694,7 +695,7 @@
           "h": 5,
           "w": 3,
           "x": 0,
-          "y": 28
+          "y": 6
         },
         "id": 10,
         "options": {
@@ -778,7 +779,7 @@
           "h": 5,
           "w": 3,
           "x": 3,
-          "y": 28
+          "y": 6
         },
         "id": 16,
         "options": {
@@ -866,7 +867,7 @@
           "h": 5,
           "w": 3,
           "x": 6,
-          "y": 28
+          "y": 6
         },
         "id": 18,
         "options": {
@@ -950,7 +951,7 @@
           "h": 5,
           "w": 3,
           "x": 9,
-          "y": 28
+          "y": 6
         },
         "id": 20,
         "options": {
@@ -1073,10 +1074,10 @@
           ]
         },
         "gridPos": {
-          "h": 11,
+          "h": 13,
           "w": 6,
           "x": 18,
-          "y": 28
+          "y": 6
         },
         "id": 40,
         "options": {
@@ -1143,7 +1144,8 @@
               "mode": "absolute",
               "steps": [
                 {
-                  "color": "light-blue"
+                  "color": "light-blue",
+                  "value": null
                 },
                 {
                   "color": "green",
@@ -1164,10 +1166,10 @@
           "overrides": []
         },
         "gridPos": {
-          "h": 6,
+          "h": 8,
           "w": 5,
           "x": 0,
-          "y": 33
+          "y": 11
         },
         "id": 36,
         "options": {
@@ -1230,10 +1232,10 @@
               "mode": "thresholds"
             },
             "mappings": [],
-            "max": 101,
+            "max": 100,
             "min": -10,
             "thresholds": {
-              "mode": "absolute",
+              "mode": "percentage",
               "steps": [
                 {
                   "color": "blue",
@@ -1245,7 +1247,7 @@
                 },
                 {
                   "color": "#EAB839",
-                  "value": 75
+                  "value": 70
                 },
                 {
                   "color": "red",
@@ -1258,14 +1260,17 @@
           "overrides": []
         },
         "gridPos": {
-          "h": 6,
+          "h": 8,
           "w": 4,
           "x": 5,
-          "y": 33
+          "y": 11
         },
         "id": 48,
         "options": {
-          "orientation": "auto",
+          "displayMode": "gradient",
+          "minVizHeight": 10,
+          "minVizWidth": 0,
+          "orientation": "horizontal",
           "reduceOptions": {
             "calcs": [
               "lastNotNull"
@@ -1273,8 +1278,7 @@
             "fields": "",
             "values": false
           },
-          "showThresholdLabels": false,
-          "showThresholdMarkers": true
+          "showUnfilled": true
         },
         "pluginVersion": "8.5.13",
         "targets": [
@@ -1291,7 +1295,7 @@
           }
         ],
         "title": "Inverter heat_sink temperature",
-        "type": "gauge"
+        "type": "bargauge"
       }
     },
     {
@@ -1338,10 +1342,10 @@
           "overrides": []
         },
         "gridPos": {
-          "h": 6,
+          "h": 8,
           "w": 3,
           "x": 9,
-          "y": 33
+          "y": 11
         },
         "id": 42,
         "options": {
@@ -1374,6 +1378,86 @@
           }
         ],
         "title": "Grid Voltage",
+        "type": "gauge"
+      }
+    },
+    {
+      "name": "Battery Voltage",
+      "uid": "ZIfYWCC4z",
+      "kind": 1,
+      "model": {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "description": "Battery voltage",
+        "fieldConfig": {
+          "defaults": {
+            "decimals": 1,
+            "mappings": [],
+            "max": 60,
+            "min": 48,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "dark-red",
+                  "value": null
+                },
+                {
+                  "color": "dark-green",
+                  "value": 50
+                },
+                {
+                  "color": "dark-yellow",
+                  "value": 54
+                },
+                {
+                  "color": "red",
+                  "value": 58
+                }
+              ]
+            },
+            "unit": "volt"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 3,
+          "x": 12,
+          "y": 11
+        },
+        "id": 22,
+        "options": {
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true,
+          "text": {}
+        },
+        "pluginVersion": "8.5.13",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${DS_PROMETHEUS}"
+            },
+            "editorMode": "builder",
+            "expr": "mpp_solar_battery_voltage{cmd!=\"QPIGS\"}",
+            "interval": "",
+            "legendFormat": "{{inverter}}",
+            "range": true,
+            "refId": "A"
+          }
+        ],
+        "title": "Battery Voltage ",
         "type": "gauge"
       }
     },
@@ -1423,10 +1507,10 @@
           "overrides": []
         },
         "gridPos": {
-          "h": 6,
+          "h": 8,
           "w": 3,
-          "x": 12,
-          "y": 33
+          "x": 15,
+          "y": 11
         },
         "id": 24,
         "options": {
@@ -1461,86 +1545,6 @@
       }
     },
     {
-      "name": "Battery Voltage",
-      "uid": "ZIfYWCC4z",
-      "kind": 1,
-      "model": {
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
-        },
-        "description": "Battery voltage",
-        "fieldConfig": {
-          "defaults": {
-            "decimals": 1,
-            "mappings": [],
-            "max": 60,
-            "min": 48,
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "dark-red",
-                  "value": null
-                },
-                {
-                  "color": "dark-green",
-                  "value": 50
-                },
-                {
-                  "color": "dark-yellow",
-                  "value": 54
-                },
-                {
-                  "color": "red",
-                  "value": 58
-                }
-              ]
-            },
-            "unit": "volt"
-          },
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 6,
-          "w": 3,
-          "x": 15,
-          "y": 33
-        },
-        "id": 22,
-        "options": {
-          "orientation": "auto",
-          "reduceOptions": {
-            "calcs": [
-              "lastNotNull"
-            ],
-            "fields": "",
-            "values": false
-          },
-          "showThresholdLabels": false,
-          "showThresholdMarkers": true,
-          "text": {}
-        },
-        "pluginVersion": "8.5.13",
-        "targets": [
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "${DS_PROMETHEUS}"
-            },
-            "editorMode": "builder",
-            "expr": "mpp_solar_battery_voltage{cmd!=\"QPIGS\"}",
-            "interval": "",
-            "legendFormat": "{{inverter}}",
-            "range": true,
-            "refId": "A"
-          }
-        ],
-        "title": "Battery Voltage ",
-        "type": "gauge"
-      }
-    },
-    {
       "name": "Inverter AC Watts",
       "uid": "PRG6bFq4k",
       "kind": 1,
@@ -1563,10 +1567,10 @@
         "fill": 1,
         "fillGradient": 4,
         "gridPos": {
-          "h": 10,
+          "h": 11,
           "w": 12,
           "x": 0,
-          "y": 40
+          "y": 20
         },
         "hiddenSeries": false,
         "id": 56,
@@ -1648,7 +1652,7 @@
         "yaxes": [
           {
             "$$hashKey": "object:332",
-            "decimals": 0,
+            "decimals": 1,
             "format": "watt",
             "logBase": 1,
             "show": true
@@ -1689,10 +1693,10 @@
         "fill": 1,
         "fillGradient": 0,
         "gridPos": {
-          "h": 10,
+          "h": 11,
           "w": 12,
           "x": 12,
-          "y": 40
+          "y": 20
         },
         "hiddenSeries": false,
         "id": 54,
@@ -1721,6 +1725,7 @@
           {
             "$$hashKey": "object:115",
             "alias": "/Yesterday/",
+            "dashLength": 1,
             "dashes": true,
             "fill": 0,
             "fillGradient": 0
@@ -1790,235 +1795,6 @@
       }
     },
     {
-      "name": "inverter_heat_sink_temperature",
-      "uid": "N8OnWFqVk",
-      "kind": 1,
-      "model": {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
-        },
-        "description": "Internal heatsink temperature of each inverter depends on QPIGS output.",
-        "fieldConfig": {
-          "defaults": {
-            "unit": "celsius"
-          },
-          "overrides": []
-        },
-        "fill": 1,
-        "fillGradient": 0,
-        "gridPos": {
-          "h": 10,
-          "w": 12,
-          "x": 0,
-          "y": 50
-        },
-        "hiddenSeries": false,
-        "id": 32,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "max": true,
-          "min": true,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "nullPointMode": "null",
-        "options": {
-          "alertThreshold": true
-        },
-        "percentage": false,
-        "pluginVersion": "8.5.13",
-        "pointradius": 2,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [
-          {
-            "$$hashKey": "object:1371",
-            "alias": "/Temp Yesterday/",
-            "dashLength": 1,
-            "dashes": true,
-            "fill": 0
-          }
-        ],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "${DS_PROMETHEUS}"
-            },
-            "editorMode": "code",
-            "expr": "mpp_solar_inverter_heat_sink_temperature{}",
-            "legendFormat": "{{inverter}}",
-            "range": true,
-            "refId": "A"
-          },
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "${DS_PROMETHEUS}"
-            },
-            "editorMode": "code",
-            "expr": "mpp_solar_inverter_heat_sink_temperature{} offset 24h",
-            "hide": false,
-            "legendFormat": "{{inverter}} Temp Yesterday",
-            "range": true,
-            "refId": "B"
-          }
-        ],
-        "thresholds": [],
-        "timeRegions": [],
-        "title": "Inverter heat_sink temperature",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "mode": "time",
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "$$hashKey": "object:1343",
-            "format": "celsius",
-            "logBase": 1,
-            "show": true
-          },
-          {
-            "$$hashKey": "object:1344",
-            "format": "short",
-            "logBase": 1,
-            "show": true
-          }
-        ],
-        "yaxis": {
-          "align": false
-        }
-      }
-    },
-    {
-      "name": "Grid Voltage",
-      "uid": "4Jq52Cj4z",
-      "kind": 1,
-      "model": {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
-        },
-        "description": "As detected by each inverter utilities voltage",
-        "fieldConfig": {
-          "defaults": {
-            "links": []
-          },
-          "overrides": []
-        },
-        "fill": 1,
-        "fillGradient": 4,
-        "gridPos": {
-          "h": 10,
-          "w": 12,
-          "x": 12,
-          "y": 50
-        },
-        "hiddenSeries": false,
-        "id": 30,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "max": true,
-          "min": true,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "nullPointMode": "null",
-        "options": {
-          "alertThreshold": true
-        },
-        "percentage": false,
-        "pluginVersion": "8.5.13",
-        "pointradius": 2,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [
-          {
-            "$$hashKey": "object:500",
-            "alias": "MPP3048_P1"
-          }
-        ],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "${DS_PROMETHEUS}"
-            },
-            "editorMode": "code",
-            "expr": "mpp_solar_grid_voltage",
-            "interval": "",
-            "legendFormat": "{{inverter}} Grid Voltage",
-            "range": true,
-            "refId": "A"
-          }
-        ],
-        "thresholds": [],
-        "timeRegions": [],
-        "title": "Grid Voltage",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "mode": "time",
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "$$hashKey": "object:505",
-            "decimals": 2,
-            "format": "volt",
-            "logBase": 1,
-            "show": true
-          },
-          {
-            "$$hashKey": "object:506",
-            "format": "short",
-            "logBase": 1,
-            "show": true
-          }
-        ],
-        "yaxis": {
-          "align": false
-        }
-      }
-    },
-    {
       "name": "Battery Voltage graph",
       "uid": "VOHd2jjVz",
       "kind": 1,
@@ -2041,10 +1817,10 @@
         "fill": 1,
         "fillGradient": 4,
         "gridPos": {
-          "h": 10,
+          "h": 11,
           "w": 12,
           "x": 0,
-          "y": 60
+          "y": 42
         },
         "hiddenSeries": false,
         "id": 28,
@@ -2126,7 +1902,6 @@
         "yaxes": [
           {
             "$$hashKey": "object:194",
-            "decimals": 2,
             "format": "volt",
             "logBase": 1,
             "show": true
@@ -2134,179 +1909,6 @@
           {
             "$$hashKey": "object:195",
             "format": "short",
-            "logBase": 1,
-            "show": true
-          }
-        ],
-        "yaxis": {
-          "align": false
-        }
-      }
-    },
-    {
-      "name": "Battery SOC graph",
-      "uid": "nRtv2jjVz",
-      "kind": 1,
-      "model": {
-        "alert": {
-          "alertRuleTags": {
-            "A": "A",
-            "B": "B",
-            "C": "C"
-          },
-          "conditions": [
-            {
-              "evaluator": {
-                "params": [
-                  99
-                ],
-                "type": "gt"
-              },
-              "operator": {
-                "type": "and"
-              },
-              "query": {
-                "params": [
-                  "A",
-                  "10s",
-                  "now"
-                ]
-              },
-              "reducer": {
-                "params": [],
-                "type": "avg"
-              },
-              "type": "query"
-            }
-          ],
-          "executionErrorState": "alerting",
-          "for": "1m",
-          "frequency": "10s",
-          "handler": 1,
-          "message": "QC BYD Battery Fully Charged or System ERROR",
-          "name": "Battery SOC alert",
-          "noDataState": "alerting",
-          "notifications": []
-        },
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
-        },
-        "decimals": 0,
-        "description": "SOC",
-        "fieldConfig": {
-          "defaults": {
-            "links": []
-          },
-          "overrides": []
-        },
-        "fill": 1,
-        "fillGradient": 4,
-        "gridPos": {
-          "h": 10,
-          "w": 12,
-          "x": 12,
-          "y": 60
-        },
-        "hiddenSeries": false,
-        "id": 26,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "max": true,
-          "min": true,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "nullPointMode": "null",
-        "options": {
-          "alertThreshold": true
-        },
-        "percentage": false,
-        "pluginVersion": "8.5.13",
-        "pointradius": 2,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [
-          {
-            "$$hashKey": "object:283",
-            "alias": "/SOC Yesterday/",
-            "dashLength": 1,
-            "dashes": true,
-            "fill": 0,
-            "fillGradient": 0
-          }
-        ],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "${DS_PROMETHEUS}"
-            },
-            "editorMode": "code",
-            "expr": "mpp_solar_battery_capacity{cmd!=\"QPIGS\"}",
-            "interval": "",
-            "legendFormat": "{{inverter}} SOC",
-            "range": true,
-            "refId": "A"
-          },
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "${DS_PROMETHEUS}"
-            },
-            "editorMode": "code",
-            "expr": "mpp_solar_battery_capacity{cmd!=\"QPIGS\"} offset 24h",
-            "interval": "",
-            "legendFormat": "{{inverter}} SOC Yesterday",
-            "range": true,
-            "refId": "B"
-          }
-        ],
-        "thresholds": [
-          {
-            "colorMode": "critical",
-            "fill": true,
-            "line": true,
-            "op": "gt",
-            "value": 99,
-            "visible": true
-          }
-        ],
-        "timeRegions": [],
-        "title": "Battery SOC",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "mode": "time",
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "$$hashKey": "object:93",
-            "format": "percent",
-            "logBase": 1,
-            "show": true
-          },
-          {
-            "$$hashKey": "object:94",
-            "format": "percent",
             "logBase": 1,
             "show": true
           }
@@ -2342,7 +1944,7 @@
           "h": 15,
           "w": 24,
           "x": 0,
-          "y": 116
+          "y": 102
         },
         "hiddenSeries": false,
         "id": 34,
@@ -2350,8 +1952,10 @@
           "alignAsTable": true,
           "avg": true,
           "current": true,
+          "hideZero": false,
           "max": true,
           "min": true,
+          "rightSide": false,
           "show": true,
           "total": false,
           "values": true
@@ -2367,7 +1971,17 @@
         "pointradius": 2,
         "points": false,
         "renderer": "flot",
-        "seriesOverrides": [],
+        "seriesOverrides": [
+          {
+            "$$hashKey": "object:125",
+            "alias": "/Yeasterday/",
+            "dashLength": 1,
+            "dashes": true,
+            "fill": 0,
+            "fillGradient": 0,
+            "hiddenSeries": true
+          }
+        ],
         "spaceLength": 10,
         "stack": false,
         "steppedLine": false,
@@ -2377,7 +1991,7 @@
               "type": "prometheus",
               "uid": "${DS_PROMETHEUS}"
             },
-            "editorMode": "builder",
+            "editorMode": "code",
             "expr": "mpp_solar_pv1_charging_power",
             "legendFormat": "{{inverter}} PV1",
             "range": true,
@@ -2394,6 +2008,30 @@
             "legendFormat": "{{inverter}} PV2",
             "range": true,
             "refId": "B"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${DS_PROMETHEUS}"
+            },
+            "editorMode": "code",
+            "expr": "sum(mpp_solar_pv1_charging_power) + sum(mpp_solar_pv2_charging_power)",
+            "hide": false,
+            "legendFormat": "Total",
+            "range": true,
+            "refId": "C"
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${DS_PROMETHEUS}"
+            },
+            "editorMode": "code",
+            "expr": "sum(mpp_solar_pv1_charging_power{} offset 24h) + sum(mpp_solar_pv2_charging_power offset 24h)",
+            "hide": false,
+            "legendFormat": "Total Yeasterday",
+            "range": true,
+            "refId": "D"
           }
         ],
         "thresholds": [],
@@ -2498,13 +2136,13 @@
   },
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
+  "graphTooltip": 1,
   "id": null,
   "links": [],
   "liveNow": false,
   "panels": [
     {
-      "collapsed": false,
+      "collapsed": true,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -2512,29 +2150,30 @@
         "y": 0
       },
       "id": 45,
-      "panels": [],
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "gridPos": {
+            "h": 22,
+            "w": 24,
+            "x": 0,
+            "y": 1
+          },
+          "id": 38,
+          "options": {
+            "content": "# MPP_Solar\nThis Dashboard takes avantage of using prom output from mpp_solar with command output from QPGS and QPIGS.\nThis output can be directed to a text file while building the file, then moved to node_exporter folder as a prom file.\n\nDesigned for Rich Solar 6548 and should work for MPP LV6548 and the like. Should also work with other inverters though thresholds should be adjusted for each case based on the models abilities.\n\nAdjust your serial ports as needed. \n\n`Example configurations:`\n```\n# cat /etc/mppsolar/mpp_qpgs.conf\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPGS2\ntag=QPGS2\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPGS1\ntag=QPGS1\noutputs=prom\ndev=SCC1\n```\n\n\n```\n # cat /etc/mppsolar/mpp_qpigs.conf\n # This output required for Inverter heatsink temp, and PV1 charge wattage.\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPIGS\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPIGS\noutputs=prom\ndev=SCC1\n```\n```\n# cat /etc/mppsolar/mpp_qpigs2.conf\n### This config for inverters with more than one PV input, to retrive PV2 Charge Wattage output.\n### Thoogh not a requirement with this dashboard.\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPIGS2\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPIGS2\noutputs=prom\ndev=SCC1\n```\nExecutable in /usr/local/bin/\n```\n# cat /usr/local/bin/mpp-get-data.sh\n#!/bin/ash\ndataFile=\"mppsolar\"\ndataDir=\"/var/lib/node-exporter/mppsolar/\"\n\ncheckpath -d \"$dataDir\" -m 755 -o node_exporter:node_exporter\n\nwhile : ; do\n\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpgs.conf > ${dataDir}${dataFile}.$$` && \\\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpigs.conf >> ${dataDir}${dataFile}.$$` && \\\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpigs2.conf >> ${dataDir}${dataFile}.$$` && \\\n        mv ${dataDir}${dataFile}.$$ ${dataDir}${dataFile}.prom\n        sleep 5\ndone\n```\n\nCreate a SysV or systemd startup for the executable.\n\nFor markdown syntax help: [commonmark.org/help](https://commonmark.org/help/)",
+            "mode": "markdown"
+          },
+          "pluginVersion": "8.5.13",
+          "title": "Solar Config",
+          "type": "text"
+        }
+      ],
       "title": "About configuration",
       "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "gridPos": {
-        "h": 22,
-        "w": 24,
-        "x": 0,
-        "y": 1
-      },
-      "id": 38,
-      "options": {
-        "content": "# MPP_Solar\nThis Dashboard takes avantage of using prom output from mpp_solar with command output from QPGS and QPIGS.\nThis output can be directed to a text file while building the file, then moved to node_exporter folder as a prom file.\n\nDesigned for Rich Solar 6548 and should work for MPP LV6548 and the like. Should also work with other inverters though thresholds should be adjusted for each case based on the models abilities.\n\nAdjust your serial ports as needed. \n\n`Example configurations:`\n```\n# cat /etc/mppsolar/mpp_qpgs.conf\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPGS2\ntag=QPGS2\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPGS1\ntag=QPGS1\noutputs=prom\ndev=SCC1\n```\n\n\n```\n # cat /etc/mppsolar/mpp_qpigs.conf\n # This output required for Inverter heatsink temp, and PV1 charge wattage.\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPIGS\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPIGS\noutputs=prom\ndev=SCC1\n```\n```\n# cat /etc/mppsolar/mpp_qpigs2.conf\n### This config for inverters with more than one PV input, to retrive PV2 Charge Wattage output.\n### Thoogh not a requirement with this dashboard.\n[SETUP]\npause=5\n\n[Inverter_2]\nport=/dev/ttyUSB2\nprotocol=PI30max\ncommand=QPIGS2\noutputs=prom\ndev=SCC2\n\n[Inverter_1]\nport=/dev/ttyUSB0\nprotocol=PI30max\ncommand=QPIGS2\noutputs=prom\ndev=SCC1\n```\nExecutable in /usr/local/bin/\n```\n# cat /usr/local/bin/mpp-get-data.sh\n#!/bin/ash\ndataFile=\"mppsolar\"\ndataDir=\"/var/lib/node-exporter/mppsolar/\"\n\ncheckpath -d \"$dataDir\" -m 755 -o node_exporter:node_exporter\n\nwhile : ; do\n\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpgs.conf > ${dataDir}${dataFile}.$$` && \\\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpigs.conf >> ${dataDir}${dataFile}.$$` && \\\n        `/usr/bin/mpp-solar -C /etc/mppsolar/mpp_qpigs2.conf >> ${dataDir}${dataFile}.$$` && \\\n        mv ${dataDir}${dataFile}.$$ ${dataDir}${dataFile}.prom\n        sleep 5\ndone\n```\n\nCreate a SysV or systemd startup for the executable.\n\nFor markdown syntax help: [commonmark.org/help](https://commonmark.org/help/)",
-        "mode": "markdown"
-      },
-      "pluginVersion": "8.5.13",
-      "title": "Solar Config",
-      "type": "text"
     },
     {
       "collapsed": false,
@@ -2542,7 +2181,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 1
       },
       "id": 50,
       "panels": [],
@@ -2587,13 +2226,13 @@
         "h": 4,
         "w": 4,
         "x": 0,
-        "y": 24
+        "y": 2
       },
       "id": 8,
       "libraryPanel": {
         "description": "",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-20T18:01:41Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -2693,7 +2332,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "",
+      "description": "LV6548 - POP\n\nPOP         Set Device Output Source Priority -- examples: POP00 (set utility first), POP01 (set solar first), POP02 (set SBU priority)",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2754,13 +2393,13 @@
         "h": 4,
         "w": 3,
         "x": 4,
-        "y": 24
+        "y": 2
       },
       "id": 4,
       "libraryPanel": {
-        "description": "",
+        "description": "LV6548 - POP\n\nPOP         Set Device Output Source Priority -- examples: POP00 (set utility first), POP01 (set solar first), POP02 (set SBU priority)",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-20T18:01:54Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -2769,7 +2408,7 @@
           },
           "folderName": "MPPSOLAR",
           "folderUid": "lwpa6rCVz",
-          "updated": "2023-07-26T08:58:16Z",
+          "updated": "2023-07-31T19:38:46Z",
           "updatedBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
             "id": 1,
@@ -2779,7 +2418,7 @@
         "name": "Work Mode",
         "type": "stat",
         "uid": "BY-PerC4z",
-        "version": 8
+        "version": 11
       },
       "links": [],
       "maxDataPoints": 100,
@@ -2823,7 +2462,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "",
+      "description": "LV6548 - PCP/PPCP\n\nPCP         Set Device Charger Priority -- examples: PCP00 (set utility first), PCP01 (set solar first), PCP02 (HS only: set solar and utility), PCP03 (set solar only charging)\nPPCP        Set Parallel Device Charger Priority (for 4000/5000) -- examples: PPCP000 (set unit 1 to 00 - utility first), PPCP101 (set unit 1 to 01 - solar first), PPCP202 (set unit 2 to 02 - solar and utility), PPCP003 (set unit 0 to 03 - solar only charging)",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2892,13 +2531,13 @@
         "h": 4,
         "w": 4,
         "x": 7,
-        "y": 24
+        "y": 2
       },
       "id": 2,
       "libraryPanel": {
-        "description": "",
+        "description": "LV6548 - PCP/PPCP\n\nPCP         Set Device Charger Priority -- examples: PCP00 (set utility first), PCP01 (set solar first), PCP02 (HS only: set solar and utility), PCP03 (set solar only charging)\nPPCP        Set Parallel Device Charger Priority (for 4000/5000) -- examples: PPCP000 (set unit 1 to 00 - utility first), PPCP101 (set unit 1 to 01 - solar first), PPCP202 (set unit 2 to 02 - solar and utility), PPCP003 (set unit 0 to 03 - solar only charging)",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-26T08:27:43Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -2907,7 +2546,7 @@
           },
           "folderName": "MPPSOLAR",
           "folderUid": "lwpa6rCVz",
-          "updated": "2023-07-26T08:58:02Z",
+          "updated": "2023-07-31T19:23:13Z",
           "updatedBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
             "id": 1,
@@ -2917,7 +2556,7 @@
         "name": "Source Mode",
         "type": "stat",
         "uid": "QKbStFq4z",
-        "version": 4
+        "version": 6
       },
       "links": [],
       "maxDataPoints": 100,
@@ -2995,7 +2634,8 @@
                 "pattern": "No fault",
                 "result": {
                   "color": "semi-dark-green",
-                  "index": 2
+                  "index": 2,
+                  "text": "No Fault"
                 }
               },
               "type": "regex"
@@ -3022,13 +2662,13 @@
         "h": 4,
         "w": 4,
         "x": 11,
-        "y": 24
+        "y": 2
       },
       "id": 6,
       "libraryPanel": {
         "description": "",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-20T18:02:18Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -3037,7 +2677,7 @@
           },
           "folderName": "MPPSOLAR",
           "folderUid": "lwpa6rCVz",
-          "updated": "2023-07-26T07:10:04Z",
+          "updated": "2023-07-28T21:27:37Z",
           "updatedBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
             "id": 1,
@@ -3047,7 +2687,7 @@
         "name": "Fault Mode",
         "type": "stat",
         "uid": "NPFyerCVz",
-        "version": 5
+        "version": 7
       },
       "links": [],
       "maxDataPoints": 100,
@@ -3073,7 +2713,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "builder",
-          "expr": "mpp_solar_fault_code{cmd=~\"QPGS1|QPGS2\"}",
+          "expr": "mpp_solar_fault_code",
           "format": "table",
           "instant": false,
           "interval": "",
@@ -3128,13 +2768,13 @@
         "h": 4,
         "w": 4,
         "x": 15,
-        "y": 24
+        "y": 2
       },
       "id": 14,
       "libraryPanel": {
         "description": "",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-20T18:57:06Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -3226,13 +2866,13 @@
         "h": 4,
         "w": 5,
         "x": 19,
-        "y": 24
+        "y": 2
       },
       "id": 12,
       "libraryPanel": {
         "description": "SOC",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-22T06:18:23Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -3343,13 +2983,13 @@
         "h": 5,
         "w": 3,
         "x": 0,
-        "y": 28
+        "y": 6
       },
       "id": 10,
       "libraryPanel": {
         "description": "",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-20T18:03:07Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -3446,13 +3086,13 @@
         "h": 5,
         "w": 3,
         "x": 3,
-        "y": 28
+        "y": 6
       },
       "id": 16,
       "libraryPanel": {
         "description": "",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-20T19:01:52Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -3553,13 +3193,13 @@
         "h": 5,
         "w": 3,
         "x": 6,
-        "y": 28
+        "y": 6
       },
       "id": 18,
       "libraryPanel": {
         "description": "",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-20T19:04:42Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -3656,13 +3296,13 @@
         "h": 5,
         "w": 3,
         "x": 9,
-        "y": 28
+        "y": 6
       },
       "id": 20,
       "libraryPanel": {
         "description": "",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-20T19:07:07Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -3759,7 +3399,7 @@
         "h": 5,
         "w": 6,
         "x": 12,
-        "y": 28
+        "y": 6
       },
       "id": 60,
       "options": {
@@ -3878,16 +3518,16 @@
         ]
       },
       "gridPos": {
-        "h": 11,
+        "h": 13,
         "w": 6,
         "x": 18,
-        "y": 28
+        "y": 6
       },
       "id": 40,
       "libraryPanel": {
         "description": "AC load wattage on inverters",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-26T09:27:55Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -3967,7 +3607,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "light-blue"
+                "color": "light-blue",
+                "value": null
               },
               {
                 "color": "green",
@@ -3988,24 +3629,25 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 5,
         "x": 0,
-        "y": 33
+        "y": 11
       },
       "id": 36,
       "libraryPanel": {
+        "description": "",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-26T08:36:21Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
             "id": 1,
             "name": "admin"
           },
-          "folderName": "",
-          "folderUid": "",
-          "updated": "2023-07-28T16:34:01.60769486Z",
+          "folderName": "MPPSOLAR",
+          "folderUid": "lwpa6rCVz",
+          "updated": "2023-07-28T16:34:01Z",
           "updatedBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
             "id": 1,
@@ -4013,6 +3655,7 @@
           }
         },
         "name": "Array Wattage",
+        "type": "bargauge",
         "uid": "SCFytFq4k",
         "version": 6
       },
@@ -4071,10 +3714,10 @@
             "mode": "thresholds"
           },
           "mappings": [],
-          "max": 101,
+          "max": 100,
           "min": -10,
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
                 "color": "blue",
@@ -4086,7 +3729,7 @@
               },
               {
                 "color": "#EAB839",
-                "value": 75
+                "value": 70
               },
               {
                 "color": "red",
@@ -4099,16 +3742,16 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 4,
         "x": 5,
-        "y": 33
+        "y": 11
       },
       "id": 48,
       "libraryPanel": {
         "description": "Internal heatsink temperature of each inverter",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-26T09:57:24Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -4117,7 +3760,7 @@
           },
           "folderName": "MPPSOLAR",
           "folderUid": "lwpa6rCVz",
-          "updated": "2023-07-26T09:57:24Z",
+          "updated": "2023-08-07T20:09:08Z",
           "updatedBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
             "id": 1,
@@ -4125,12 +3768,15 @@
           }
         },
         "name": "Inverter heat_sink temperature",
-        "type": "gauge",
+        "type": "bargauge",
         "uid": "22wKxKq4z",
-        "version": 1
+        "version": 2
       },
       "options": {
-        "orientation": "auto",
+        "displayMode": "gradient",
+        "minVizHeight": 10,
+        "minVizWidth": 0,
+        "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -4138,8 +3784,7 @@
           "fields": "",
           "values": false
         },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showUnfilled": true
       },
       "pluginVersion": "8.5.13",
       "targets": [
@@ -4156,7 +3801,7 @@
         }
       ],
       "title": "Inverter heat_sink temperature",
-      "type": "gauge"
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -4198,16 +3843,16 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 3,
         "x": 9,
-        "y": 33
+        "y": 11
       },
       "id": 42,
       "libraryPanel": {
         "description": "As detected by each inverter",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-26T09:35:46Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -4265,108 +3910,6 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": " AC Load %",
-      "fieldConfig": {
-        "defaults": {
-          "decimals": 1,
-          "mappings": [],
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "blue",
-                "value": null
-              },
-              {
-                "color": "dark-green",
-                "value": 25
-              },
-              {
-                "color": "#EAB839",
-                "value": 50
-              },
-              {
-                "color": "dark-orange",
-                "value": 75
-              },
-              {
-                "color": "red",
-                "value": 100
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 3,
-        "x": 12,
-        "y": 33
-      },
-      "id": 24,
-      "libraryPanel": {
-        "description": " AC Load %",
-        "meta": {
-          "connectedDashboards": 1,
-          "created": "2023-07-20T22:05:09Z",
-          "createdBy": {
-            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
-            "id": 1,
-            "name": "admin"
-          },
-          "folderName": "MPPSOLAR",
-          "folderUid": "lwpa6rCVz",
-          "updated": "2023-07-27T09:58:08Z",
-          "updatedBy": {
-            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
-            "id": 1,
-            "name": "admin"
-          }
-        },
-        "name": "AC Power Load %",
-        "type": "gauge",
-        "uid": "opkBtjCVz",
-        "version": 15
-      },
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "8.5.13",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "mpp_solar_load_percentage{}",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "{{inverter}}",
-          "refId": "A"
-        }
-      ],
-      "title": "AC Power Load ",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
       "description": "Battery voltage",
       "fieldConfig": {
         "defaults": {
@@ -4400,16 +3943,16 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 3,
-        "x": 15,
-        "y": 33
+        "x": 12,
+        "y": 11
       },
       "id": 22,
       "libraryPanel": {
         "description": "Battery voltage",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-20T19:11:16Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -4462,12 +4005,114 @@
       "type": "gauge"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": " AC Load %",
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 1,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "dark-green",
+                "value": 25
+              },
+              {
+                "color": "#EAB839",
+                "value": 50
+              },
+              {
+                "color": "dark-orange",
+                "value": 75
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 3,
+        "x": 15,
+        "y": 11
+      },
+      "id": 24,
+      "libraryPanel": {
+        "description": " AC Load %",
+        "meta": {
+          "connectedDashboards": 2,
+          "created": "2023-07-20T22:05:09Z",
+          "createdBy": {
+            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
+            "id": 1,
+            "name": "admin"
+          },
+          "folderName": "MPPSOLAR",
+          "folderUid": "lwpa6rCVz",
+          "updated": "2023-07-27T09:58:08Z",
+          "updatedBy": {
+            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
+            "id": 1,
+            "name": "admin"
+          }
+        },
+        "name": "AC Power Load %",
+        "type": "gauge",
+        "uid": "opkBtjCVz",
+        "version": 15
+      },
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.5.13",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "mpp_solar_load_percentage{}",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{inverter}}",
+          "refId": "A"
+        }
+      ],
+      "title": "AC Power Load ",
+      "type": "gauge"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 39
+        "y": 19
       },
       "id": 47,
       "panels": [],
@@ -4493,10 +4138,10 @@
       "fill": 1,
       "fillGradient": 4,
       "gridPos": {
-        "h": 10,
+        "h": 11,
         "w": 12,
         "x": 0,
-        "y": 40
+        "y": 20
       },
       "hiddenSeries": false,
       "id": 56,
@@ -4513,7 +4158,7 @@
       "libraryPanel": {
         "description": "Inverters AC Wattage output",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-26T10:07:57Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -4522,7 +4167,7 @@
           },
           "folderName": "MPPSOLAR",
           "folderUid": "lwpa6rCVz",
-          "updated": "2023-07-27T07:08:15Z",
+          "updated": "2023-08-06T16:05:54Z",
           "updatedBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
             "id": 1,
@@ -4532,7 +4177,7 @@
         "name": "Inverter AC Watts",
         "type": "graph",
         "uid": "PRG6bFq4k",
-        "version": 10
+        "version": 11
       },
       "lines": true,
       "linewidth": 1,
@@ -4602,7 +4247,7 @@
       "yaxes": [
         {
           "$$hashKey": "object:332",
-          "decimals": 0,
+          "decimals": 1,
           "format": "watt",
           "logBase": 1,
           "show": true
@@ -4638,10 +4283,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 10,
+        "h": 11,
         "w": 12,
         "x": 12,
-        "y": 40
+        "y": 20
       },
       "hiddenSeries": false,
       "id": 54,
@@ -4658,7 +4303,7 @@
       "libraryPanel": {
         "description": "Inverter AC Load Percent",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-20T22:18:34Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -4667,7 +4312,7 @@
           },
           "folderName": "MPPSOLAR",
           "folderUid": "lwpa6rCVz",
-          "updated": "2023-07-28T04:37:05Z",
+          "updated": "2023-08-07T08:29:59Z",
           "updatedBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
             "id": 1,
@@ -4677,7 +4322,7 @@
         "name": "Inverter AC Load %",
         "type": "graph",
         "uid": "VpachCjVk",
-        "version": 7
+        "version": 8
       },
       "lines": true,
       "linewidth": 1,
@@ -4694,6 +4339,7 @@
         {
           "$$hashKey": "object:115",
           "alias": "/Yesterday/",
+          "dashLength": 1,
           "dashes": true,
           "fill": 0,
           "fillGradient": 0
@@ -4762,6 +4408,42 @@
       }
     },
     {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                90
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "10s",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "1m",
+        "frequency": "10s",
+        "handler": 1,
+        "message": "Inverter $(inverter) heatsink temperature is high!",
+        "name": "Inverter heat_sink temperature alert",
+        "noDataState": "keep_state",
+        "notifications": []
+      },
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -4780,10 +4462,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 10,
+        "h": 11,
         "w": 12,
         "x": 0,
-        "y": 50
+        "y": 31
       },
       "hiddenSeries": false,
       "id": 32,
@@ -4796,30 +4478,6 @@
         "show": true,
         "total": false,
         "values": true
-      },
-      "libraryPanel": {
-        "description": "Internal heatsink temperature of each inverter depends on QPIGS output.",
-        "meta": {
-          "connectedDashboards": 1,
-          "created": "2023-07-26T05:31:44Z",
-          "createdBy": {
-            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
-            "id": 1,
-            "name": "admin"
-          },
-          "folderName": "MPPSOLAR",
-          "folderUid": "lwpa6rCVz",
-          "updated": "2023-07-27T01:58:08Z",
-          "updatedBy": {
-            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
-            "id": 1,
-            "name": "admin"
-          }
-        },
-        "name": "inverter_heat_sink_temperature",
-        "type": "graph",
-        "uid": "N8OnWFqVk",
-        "version": 17
       },
       "lines": true,
       "linewidth": 1,
@@ -4869,7 +4527,16 @@
           "refId": "B"
         }
       ],
-      "thresholds": [],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 90,
+          "visible": true
+        }
+      ],
       "timeRegions": [],
       "title": "Inverter heat_sink temperature",
       "tooltip": {
@@ -4902,6 +4569,42 @@
       }
     },
     {
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                95
+              ],
+              "type": "lt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "1m",
+        "frequency": "10s",
+        "handler": 1,
+        "message": "AC Brown out or Utility offline!",
+        "name": "Grid Voltage alert",
+        "noDataState": "keep_state",
+        "notifications": []
+      },
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -4920,10 +4623,10 @@
       "fill": 1,
       "fillGradient": 4,
       "gridPos": {
-        "h": 10,
+        "h": 11,
         "w": 12,
         "x": 12,
-        "y": 50
+        "y": 31
       },
       "hiddenSeries": false,
       "id": 30,
@@ -4937,47 +4640,18 @@
         "total": false,
         "values": true
       },
-      "libraryPanel": {
-        "description": "As detected by each inverter utilities voltage",
-        "meta": {
-          "connectedDashboards": 1,
-          "created": "2023-07-20T22:18:46Z",
-          "createdBy": {
-            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
-            "id": 1,
-            "name": "admin"
-          },
-          "folderName": "General",
-          "folderUid": "",
-          "updated": "2023-07-27T10:01:43Z",
-          "updatedBy": {
-            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
-            "id": 1,
-            "name": "admin"
-          }
-        },
-        "name": "Grid Voltage",
-        "type": "graph",
-        "uid": "4Jq52Cj4z",
-        "version": 5
-      },
       "lines": true,
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
+        "alertThreshold": false
       },
       "percentage": false,
       "pluginVersion": "8.5.13",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [
-        {
-          "$$hashKey": "object:500",
-          "alias": "MPP3048_P1"
-        }
-      ],
+      "seriesOverrides": [],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
@@ -4988,14 +4662,23 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "mpp_solar_grid_voltage",
+          "expr": "mpp_solar_grid_voltage{}",
           "interval": "",
           "legendFormat": "{{inverter}} Grid Voltage",
           "range": true,
           "refId": "A"
         }
       ],
-      "thresholds": [],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": false,
+          "line": false,
+          "op": "lt",
+          "value": 95,
+          "visible": true
+        }
+      ],
       "timeRegions": [],
       "title": "Grid Voltage",
       "tooltip": {
@@ -5012,7 +4695,7 @@
       "yaxes": [
         {
           "$$hashKey": "object:505",
-          "decimals": 2,
+          "decimals": 1,
           "format": "volt",
           "logBase": 1,
           "show": true
@@ -5047,10 +4730,10 @@
       "fill": 1,
       "fillGradient": 4,
       "gridPos": {
-        "h": 10,
+        "h": 11,
         "w": 12,
         "x": 0,
-        "y": 60
+        "y": 42
       },
       "hiddenSeries": false,
       "id": 28,
@@ -5067,7 +4750,7 @@
       "libraryPanel": {
         "description": "volts",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-20T22:17:17Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
@@ -5076,7 +4759,7 @@
           },
           "folderName": "MPPSOLAR",
           "folderUid": "lwpa6rCVz",
-          "updated": "2023-07-27T02:00:46Z",
+          "updated": "2023-08-06T16:23:02Z",
           "updatedBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
             "id": 1,
@@ -5086,7 +4769,7 @@
         "name": "Battery Voltage graph",
         "type": "graph",
         "uid": "VOHd2jjVz",
-        "version": 10
+        "version": 11
       },
       "lines": true,
       "linewidth": 1,
@@ -5156,7 +4839,6 @@
       "yaxes": [
         {
           "$$hashKey": "object:194",
-          "decimals": 2,
           "format": "volt",
           "logBase": 1,
           "show": true
@@ -5175,9 +4857,7 @@
     {
       "alert": {
         "alertRuleTags": {
-          "A": "A",
-          "B": "B",
-          "C": "C"
+          "A": "A"
         },
         "conditions": [
           {
@@ -5204,13 +4884,13 @@
             "type": "query"
           }
         ],
-        "executionErrorState": "alerting",
+        "executionErrorState": "keep_state",
         "for": "1m",
         "frequency": "10s",
         "handler": 1,
-        "message": "QC BYD Battery Fully Charged or System ERROR",
+        "message": "Battery Fully Charged or System ERROR",
         "name": "Battery SOC alert",
-        "noDataState": "alerting",
+        "noDataState": "keep_state",
         "notifications": []
       },
       "aliasColors": {},
@@ -5222,7 +4902,7 @@
         "uid": "${DS_PROMETHEUS}"
       },
       "decimals": 0,
-      "description": "SOC",
+      "description": "Battery State Of Charge",
       "fieldConfig": {
         "defaults": {
           "links": []
@@ -5232,10 +4912,10 @@
       "fill": 1,
       "fillGradient": 4,
       "gridPos": {
-        "h": 10,
+        "h": 11,
         "w": 12,
         "x": 12,
-        "y": 60
+        "y": 42
       },
       "hiddenSeries": false,
       "id": 26,
@@ -5248,30 +4928,6 @@
         "show": true,
         "total": false,
         "values": true
-      },
-      "libraryPanel": {
-        "description": "SOC",
-        "meta": {
-          "connectedDashboards": 1,
-          "created": "2023-07-20T22:16:49Z",
-          "createdBy": {
-            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
-            "id": 1,
-            "name": "admin"
-          },
-          "folderName": "MPPSOLAR",
-          "folderUid": "lwpa6rCVz",
-          "updated": "2023-07-27T02:01:17Z",
-          "updatedBy": {
-            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
-            "id": 1,
-            "name": "admin"
-          }
-        },
-        "name": "Battery SOC graph",
-        "type": "graph",
-        "uid": "nRtv2jjVz",
-        "version": 12
       },
       "lines": true,
       "linewidth": 1,
@@ -5374,17 +5030,13 @@
         "uid": "${DS_PROMETHEUS}"
       },
       "description": "Shows charging or discharging current",
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
         "h": 15,
         "w": 24,
         "x": 0,
-        "y": 70
+        "y": 53
       },
       "hiddenSeries": false,
       "id": 61,
@@ -5464,7 +5116,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 85
+        "y": 68
       },
       "id": 52,
       "panels": [],
@@ -5493,7 +5145,7 @@
         "h": 13,
         "w": 12,
         "x": 0,
-        "y": 86
+        "y": 69
       },
       "hiddenSeries": false,
       "id": 58,
@@ -5613,7 +5265,7 @@
         "h": 13,
         "w": 12,
         "x": 12,
-        "y": 86
+        "y": 69
       },
       "hiddenSeries": false,
       "id": 59,
@@ -5730,10 +5382,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 17,
+        "h": 20,
         "w": 24,
         "x": 0,
-        "y": 99
+        "y": 82
       },
       "hiddenSeries": false,
       "id": 43,
@@ -5762,9 +5414,11 @@
         {
           "$$hashKey": "object:498",
           "alias": "/Yesterday/",
+          "dashLength": 1,
           "dashes": true,
           "fill": 0,
-          "fillGradient": 0
+          "fillGradient": 0,
+          "hiddenSeries": true
         }
       ],
       "spaceLength": 10,
@@ -5897,7 +5551,7 @@
         "h": 15,
         "w": 24,
         "x": 0,
-        "y": 116
+        "y": 102
       },
       "hiddenSeries": false,
       "id": 34,
@@ -5905,24 +5559,27 @@
         "alignAsTable": true,
         "avg": true,
         "current": true,
+        "hideZero": false,
         "max": true,
         "min": true,
+        "rightSide": false,
         "show": true,
         "total": false,
         "values": true
       },
       "libraryPanel": {
+        "description": "Depends on QPIGS (PV1) and QPIGS2 (PV2-PV3) output. After MPPT.",
         "meta": {
-          "connectedDashboards": 1,
+          "connectedDashboards": 2,
           "created": "2023-07-26T09:26:11Z",
           "createdBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
             "id": 1,
             "name": "admin"
           },
-          "folderName": "",
-          "folderUid": "",
-          "updated": "2023-07-28T19:58:47.537128717Z",
+          "folderName": "MPPSOLAR",
+          "folderUid": "lwpa6rCVz",
+          "updated": "2023-08-07T08:31:07Z",
           "updatedBy": {
             "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
             "id": 1,
@@ -5930,8 +5587,9 @@
           }
         },
         "name": "PV Charging Watts",
+        "type": "graph",
         "uid": "ruaxAK3Vk",
-        "version": 8
+        "version": 11
       },
       "lines": true,
       "linewidth": 1,
@@ -5944,7 +5602,17 @@
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [],
+      "seriesOverrides": [
+        {
+          "$$hashKey": "object:125",
+          "alias": "/Yeasterday/",
+          "dashLength": 1,
+          "dashes": true,
+          "fill": 0,
+          "fillGradient": 0,
+          "hiddenSeries": true
+        }
+      ],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
@@ -5954,7 +5622,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "editorMode": "builder",
+          "editorMode": "code",
           "expr": "mpp_solar_pv1_charging_power",
           "legendFormat": "{{inverter}} PV1",
           "range": true,
@@ -5971,6 +5639,30 @@
           "legendFormat": "{{inverter}} PV2",
           "range": true,
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(mpp_solar_pv1_charging_power) + sum(mpp_solar_pv2_charging_power)",
+          "hide": false,
+          "legendFormat": "Total",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(mpp_solar_pv1_charging_power{} offset 24h) + sum(mpp_solar_pv2_charging_power offset 24h)",
+          "hide": false,
+          "legendFormat": "Total Yeasterday",
+          "range": true,
+          "refId": "D"
         }
       ],
       "thresholds": [],
@@ -6014,13 +5706,13 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-12h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "mpp_solar",
   "uid": "EOSZe9jVz",
-  "version": 70,
+  "version": 115,
   "weekStart": ""
 }
