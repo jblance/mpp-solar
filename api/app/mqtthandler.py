@@ -1,5 +1,8 @@
 
 import asyncio
+
+from fastapi_mqtt import FastMQTT, MQTTConfig
+
 from .db.models import MQTTMessage
 from powermon.dto.deviceDTO import DeviceDTO
 from powermon.dto.resultDTO import ResultDTO
@@ -46,13 +49,24 @@ class MQTTHandler(object):
 
         self._results.append(result)
 
-    def recieved_announcement(self, message):
+    def is_command_result_topic(self, topic: str) -> bool:
+        for device in self._devices:
+            for command in device.commands:
+                if(command.result_topic == topic):
+                    return True
+        return False
+
+    def recieved_announcement(self, message) -> DeviceDTO:
         print("Announcement Recieved: ", message)
         device = DeviceDTO.parse_raw(message)
         deviceId = device.identifier 
         print("Device ID: ", deviceId)
         if(device not in self._devices):
             self._devices.append(device)
+        return device
+
+        
+        
 
     def get_device_instances(self) -> list[DeviceDTO]:
         return self._devices

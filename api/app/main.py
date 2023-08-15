@@ -62,8 +62,20 @@ async def listen_to_results(client, topic, payload, qos, properties):
 @mqtt.subscribe("powermon/announce")
 async def listen_to_announcements(client, topic, payload, qos, properties):
     handler = MQTTHandler()
-    handler.recieved_announcement(payload.decode())
-
+    device = handler.recieved_announcement(payload.decode())
+    for command in device.commands:
+        print("Subscribing to command: ", command.result_topic)
+        mqtt.client.subscribe(command.result_topic)
+    
+@mqtt.on_message()
+async def message(client, topic, payload, qos, properties):
+    print("Received message: ", topic, payload.decode(), qos, properties)
+    handler = MQTTHandler()
+    if (handler.is_command_result_topic(topic)):
+        print("Command result")
+        result = ResultDTO.parse_raw(payload.decode())
+        print(f"Result: {result}")
+        handler.recieved_result(result)
 
 @mqtt.on_disconnect()
 def disconnect(client, packet, exc=None):
