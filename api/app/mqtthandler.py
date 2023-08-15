@@ -1,18 +1,18 @@
 
 import asyncio
-import json
 from .db.models import MQTTMessage
 from powermon.dto.deviceDTO import DeviceDTO
 from powermon.dto.resultDTO import ResultDTO
 
 class MQTTHandler(object):
     _instance = None
-    _devices = []
-    _results = []
+    _devices : list[DeviceDTO] = []
+    _results : list[ResultDTO] = []
     _commandDictionary = {
             "mqtt/QPIGS": "QPIGS",
         }
     _commandRequests = {}
+    
     def __new__(class_, *args, **kwargs):
         if not isinstance(class_._instance, class_):
             class_._instance = object.__new__(class_, *args, **kwargs)
