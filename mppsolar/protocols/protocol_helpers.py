@@ -44,13 +44,9 @@ def crcJK232(byteData):
     CRC = 0
     for b in byteData:
         CRC += b
-    CRC = CRC ^ 0xFFFF
-    CRC += 1
-
     crc_low = CRC & 0xFF
     crc_high = (CRC >> 8) & 0xFF
-    return [crc_high, crc_low]
-
+    return [crc_high, crc_low]    
 
 def vedHexChecksum(byteData):
     """
