@@ -21,12 +21,18 @@ class Command:
         self.next_run = self.trigger.nextRun(command=self)
         self.full_command = None
         self.command_defn = None
+        self.device_id = None
         log.debug(self)
     
     def set_outputs(self, outputs):
         self.outputs = outputs
         for output in self.outputs:
             output.set_command(self.name)
+
+    def set_device_id(self, device_id):
+        self.device_id = device_id
+        for output in self.outputs:
+            output.set_device_id(device_id)
 
     def __str__(self):
         if self.name is None:

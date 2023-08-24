@@ -25,4 +25,7 @@ class AbstractOutput(ABC):
     def set_command(self, command_name):
         pass
 
+    def set_device_id(self, device_id):
+        pass
+
     

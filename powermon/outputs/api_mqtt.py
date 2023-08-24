@@ -11,15 +11,14 @@ log = logging.getLogger("API_MQTT")
 class API_MQTT(AbstractOutput):
     def __init__(self, formatter) -> None:
         self.set_formatter(formatter)
-        self.command_name = "not_set"
+        self.command_name : str = "not_set"
+        self.device_id : str = "not_set"
 
-        self.topic_base = "powermon/results/"
+        self.topic_base : str = "powermon/"
+        self.topic_type : str = "results/"
 
     def __str__(self):
         return "outputs the results to the supplied mqtt broker: eg powermon/status/total_output_active_power/value 1250"
-    
-    def get_topic(self):
-        return self.topic_base + self.command_name
     
     def set_formatter(self, formatter):
         self.formatter = formatter
@@ -29,6 +28,14 @@ class API_MQTT(AbstractOutput):
 
     def set_mqtt_broker(self, mqtt_broker: MqttBroker):
         self.mqtt_broker = mqtt_broker
+
+    def set_device_id(self, device_id):
+        self.device_id = device_id
+    
+    def get_topic(self):
+        return self.topic_base + str(self.device_id) + "/" + self.topic_type + self.command_name
+    
+    
 
     def output(self, result: Result):
         log.info("Using output processor: api_mqtt")

@@ -52,13 +52,14 @@ class Device:
         self.port : AbstractPort = port
         self.commands = []
 
-    def add_command(self, command: Command = None) -> None:
+    def add_command(self, command: Command) -> None:
         """ add a command to the device list of commands """
         if command is None:
             return
         # get command definition from protocol
         command.command_defn = self.port.protocol.get_command_defn(command.name)
         self.commands.append(command)
+        command.set_device_id(self.identifier)
 
     def get_port(self) -> AbstractPort:
         return self.port
