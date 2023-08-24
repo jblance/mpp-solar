@@ -21,6 +21,7 @@ class FormatterType(LowercaseStrEnum):
 DEFAULT_FORMAT = FormatterType.SIMPLE
 
 
+
 def getFormatfromConfig(formatConfig) -> AbstractFormat:
     # Get values from config
     log.debug("getFormatfromConfig, formatConfig: %s" % (formatConfig))
@@ -38,6 +39,7 @@ def getFormatfromConfig(formatConfig) -> AbstractFormat:
     log.debug("getFormatfromConfig, formatType: %s" % (formatType))
 
     formatter = None
+    #TODO: should we replace this config processing with from_config methods on each type to remain consistent?
     match formatType:
         case FormatterType.HTMLTABLE:
             from powermon.formats.htmltable import htmltable

@@ -17,26 +17,26 @@ class OutputType(LowercaseStrEnum):
     API_MQTT = auto()
 
 
-def getOutputClass(output_type, formatter, output_config={}, command_name: str="not_set", mqtt_broker=None):
+def getOutputClass(output_type, formatter, output_config={}):
     output_class = None
     # Only import the required class
     log.debug("outputType %s" % output_type)
     if output_type == OutputType.MQTT:
         from powermon.outputs.mqtt import MQTT
-
-        output_class = MQTT(output_config=output_config, mqtt_broker=mqtt_broker, formatter=formatter)
+        #add from config here
+        output_class = MQTT.from_config(output_config)
+        output_class.set_formatter(formatter)
+        #output_class = MQTT(output_config=output_config, mqtt_broker=mqtt_broker, formatter=formatter)
     elif output_type == OutputType.API_MQTT:
         from powermon.outputs.api_mqtt import API_MQTT
-
-        output_class = API_MQTT(mqtt_broker=mqtt_broker, command_name=command_name, formatter=formatter)
+        output_class = API_MQTT(formatter=formatter)
     else:
         from powermon.outputs.screen import Screen
-
-        output_class = Screen(outputConfig=output_config, formatter=formatter)
+        output_class = Screen(formatter=formatter)
     return output_class
 
 
-def getOutputs(outputsConfig, command_name: str, mqtt_broker=None):
+def getOutputs(outputsConfig):
     # outputs can be None,
     # str (eg screen),
     # list (eg [{'type': 'screen', 'format': 'simple'}, {'type': 'screen', 'format': {'type': 'htmltable'}}])
@@ -48,21 +48,21 @@ def getOutputs(outputsConfig, command_name: str, mqtt_broker=None):
         _outputs.append(parseOutputConfig({"type": "screen", "format": "simple"}))
     elif isinstance(outputsConfig, str):
         # eg 'screen'
-        _outputs.append(parseOutputConfig(outputsConfig, command_name=command_name, mqtt_broker=mqtt_broker))
+        _outputs.append(parseOutputConfig(outputsConfig))
     elif isinstance(outputsConfig, list):
         # eg [{'type': 'screen', 'format': 'simple'}, {'type': 'screen', 'format': {'type': 'htmltable'}}]
         for outputConfig in outputsConfig:
-            _outputs.append(parseOutputConfig(outputConfig, command_name=command_name, mqtt_broker=mqtt_broker))
+            _outputs.append(parseOutputConfig(outputConfig))
     elif isinstance(outputsConfig, dict):
         # eg {'format': 'table'}
-        _outputs.append(parseOutputConfig(outputsConfig, command_name=command_name, mqtt_broker=mqtt_broker))
+        _outputs.append(parseOutputConfig(outputsConfig))
     else:
         pass
     return _outputs
 
 
 #TODO: clean up the multiple types of outputconfig, there should only be one type
-def parseOutputConfig(outputConfig, command_name: str, mqtt_broker=None):
+def parseOutputConfig(outputConfig):
     log.debug("parseOutputConfig, config: %s", outputConfig)
     topic_override = None
     # outputConfig can be None, a str (eg 'screen') a dict (eg {'format': 'table'}) or a list (eg [{'type': 'screen', 'format': 'simple'}])
@@ -71,7 +71,7 @@ def parseOutputConfig(outputConfig, command_name: str, mqtt_broker=None):
         outputType = DEFAULT_OUTPUT
         _format = getFormatfromConfig(DEFAULT_FORMAT)
         log.debug("got format: %s", (_format))
-        _output = getOutputClass(outputType, formatter=_format, command_name=command_name, mqtt_broker=mqtt_broker)
+        _output = getOutputClass(outputType, formatter=_format)
         log.debug("got output: %s", (_output))
         return _output
     elif isinstance(outputConfig, str):
@@ -80,7 +80,7 @@ def parseOutputConfig(outputConfig, command_name: str, mqtt_broker=None):
         outputType = outputConfig
         _format = getFormatfromConfig(DEFAULT_FORMAT)
         log.debug("got format: %s", (_format))
-        _output = getOutputClass(outputType, formatter=_format, command_name=command_name, mqtt_broker=mqtt_broker)
+        _output = getOutputClass(outputType, formatter=_format)
         log.debug("got output: %s", (_output))
         return _output
     elif isinstance(outputConfig, dict):
@@ -91,7 +91,7 @@ def parseOutputConfig(outputConfig, command_name: str, mqtt_broker=None):
 
         _format = getFormatfromConfig(formatConfig)
         log.debug("got format: %s", _format)
-        _output = getOutputClass(outputType, formatter=_format, command_name=command_name, mqtt_broker=mqtt_broker)
+        _output = getOutputClass(outputType, formatter=_format)
         log.debug("got output: %s", _output)
         return _output
     elif isinstance(outputConfig, list):

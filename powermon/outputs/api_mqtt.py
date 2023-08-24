@@ -9,18 +9,26 @@ log = logging.getLogger("API_MQTT")
 
 
 class API_MQTT(AbstractOutput):
-    def __init__(self, mqtt_broker: MqttBroker, command_name: str, formatter) -> None:
-        super().__init__(formatter)
-        self.mqtt_broker: MqttBroker = mqtt_broker
+    def __init__(self, formatter) -> None:
+        self.set_formatter(formatter)
+        self.command_name = "not_set"
 
         self.topic_base = "powermon/results/"
-        self.command_name = command_name
 
     def __str__(self):
         return "outputs the results to the supplied mqtt broker: eg powermon/status/total_output_active_power/value 1250"
     
     def get_topic(self):
         return self.topic_base + self.command_name
+    
+    def set_formatter(self, formatter):
+        self.formatter = formatter
+
+    def set_command(self, command_name):
+        self.command_name = command_name
+
+    def set_mqtt_broker(self, mqtt_broker: MqttBroker):
+        self.mqtt_broker = mqtt_broker
 
     def output(self, result: Result):
         log.info("Using output processor: api_mqtt")
@@ -31,7 +39,7 @@ class API_MQTT(AbstractOutput):
         # exit if no broker
         if self.mqtt_broker is None:
             log.error("No mqtt broker supplied")
-            return
+            raise RuntimeError("No mqtt broker supplied")
 
         # build the messages...
         formatted_data = self.formatter.format(result)
