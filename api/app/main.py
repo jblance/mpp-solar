@@ -12,9 +12,8 @@ from .db import crud, models, schemas
 from .db.database import SessionLocal, engine
 from .mqtthandler import MQTTHandler
 
-from powermon.dto.powermonDTO import PowermonDTO
-from powermon.dto.scheduleDTO import ScheduleDTO
 from powermon.dto.resultDTO import ResultDTO
+from powermon.dto.deviceDTO import DeviceDTO
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -63,8 +62,20 @@ async def listen_to_results(client, topic, payload, qos, properties):
 @mqtt.subscribe("powermon/announce")
 async def listen_to_announcements(client, topic, payload, qos, properties):
     handler = MQTTHandler()
-    handler.recieved_announcement(payload.decode())
-
+    device = handler.recieved_announcement(payload.decode())
+    for command in device.commands:
+        print("Subscribing to command: ", command.result_topic)
+        mqtt.client.subscribe(command.result_topic)
+    
+@mqtt.on_message()
+async def message(client, topic, payload, qos, properties):
+    print("Received message: ", topic, payload.decode(), qos, properties)
+    handler = MQTTHandler()
+    if (handler.is_command_result_topic(topic)):
+        print("Command result")
+        result = ResultDTO.parse_raw(payload.decode())
+        print(f"Result: {result}")
+        handler.recieved_result(result)
 
 @mqtt.on_disconnect()
 def disconnect(client, packet, exc=None):
@@ -84,9 +95,9 @@ templates = Jinja2Templates(directory="api/app/templates")
 @app.get("/")
 def read_root(request: Request):
     handler = MQTTHandler()
-    devices = handler.get_powermon_instances()
+    devices = handler.get_device_instances()
     print(devices)
-    return templates.TemplateResponse("home.html.j2", {"request": request, "schedules": devices})
+    return templates.TemplateResponse("home.html.j2", {"request": request, "devices": devices})
 
 
 @app.get("/messages/", response_model=list[schemas.MQTTMessage])
@@ -104,7 +115,7 @@ def read_message(message_id: int, db: Session = Depends(get_db)):
 
 
 @app.get("/command/{command_code}", response_model=schemas.MQTTMessage)
-async def read_message(command_code: str, handler: MQTTHandler = Depends(get_mqtthandler)):  # noqa: F811
+async def read_command(command_code: str, handler: MQTTHandler = Depends(get_mqtthandler)):  # noqa: F811
     result = None
 
     result = await handler.register_command(command_code)
@@ -112,33 +123,26 @@ async def read_message(command_code: str, handler: MQTTHandler = Depends(get_mqt
     return result
 
 
-@app.get("/powermons/", response_model=list[PowermonDTO])
-async def read_power_monitors(handler: MQTTHandler = Depends(get_mqtthandler)):
+@app.get("/devices/", response_model=list[DeviceDTO])
+def read_devices(handler: MQTTHandler = Depends(get_mqtthandler)):
     result = None
 
-    result = await handler.get_powermon_instances()
+    result = handler.get_device_instances()
 
     return result
 
 
-@app.get("/powermons/{powermon_name}", response_model=PowermonDTO)
-async def read_power_monitors(powermon_name: str, handler: MQTTHandler = Depends(get_mqtthandler)):  # noqa: F811
+@app.get("/devices/{device_id}", response_model=DeviceDTO)
+def read_device(device_id: str, handler: MQTTHandler = Depends(get_mqtthandler)):  # noqa: F811
     result = None
 
-    result = await handler.get_powermon_instance(powermon_name)
-
-    return result
-
-
-@app.get("/powermons/{powermon_name}/schedules", response_model=list[ScheduleDTO])
-async def read_schedules(powermon_name: str, handler: MQTTHandler = Depends(get_mqtthandler)):
-    result = None
-
-    result = await handler.get_powermon_instance(powermon_name)
+    result = handler.get_device_instance(device_id)
 
     if result is None:
-        raise HTTPException(status_code=404, detail="Powermon not found")
-    return result.schedulesCommands
+        raise HTTPException(status_code=404, detail="Device not found")
+
+    return result
+
 
 
 @app.get("/results/", response_model=list[ResultDTO])

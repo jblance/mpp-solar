@@ -85,7 +85,7 @@ class EveryTriggerConfig(BaseModel):
 
 
 class OutputConfig(BaseModel):
-    type: Literal['screen'] | Literal['mqtt']
+    type: Literal['screen'] | Literal['mqtt'] | Literal['api_mqtt']
     format: None | str | BaseFormatConfig | HassFormatConfig | MqttFormatConfig
 
     class Config:

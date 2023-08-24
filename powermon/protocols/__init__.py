@@ -13,7 +13,7 @@ class ResponseType(Enum):
     INDEXED = auto()
 
 
-def get_protocol(protocol):
+def get_protocol_definition(protocol):
     """
     Get the protocol based on the protocol name
     """

@@ -17,7 +17,7 @@ commands:
 #     format: raw
 - command: QID
   trigger:
-    every: 5  # every 10 seconds
+    every: 5  # every 5 seconds
   outputs:
   - type: screen
     format:

@@ -2,38 +2,53 @@ import logging
 
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.dto.resultDTO import ResultDTO
+from powermon.libs.result import Result
+from powermon.libs.mqttbroker import MqttBroker
 
 log = logging.getLogger("API_MQTT")
 
 
 class API_MQTT(AbstractOutput):
-    def __init__(self, output_config, topic, schedule_name: str, mqtt_broker, formatter) -> None:
-        super().__init__(formatter)
-        self.mqtt_broker = mqtt_broker
-        self.schedule_name = schedule_name
-        self.results_topic = output_config.get("topic_override", None)
+    def __init__(self, formatter) -> None:
+        self.set_formatter(formatter)
+        self.command_name = "not_set"
 
-        if self.results_topic is None:
-            self.results_topic = topic
+        self.topic_base = "powermon/results/"
 
     def __str__(self):
         return "outputs the results to the supplied mqtt broker: eg powermon/status/total_output_active_power/value 1250"
+    
+    def get_topic(self):
+        return self.topic_base + self.command_name
+    
+    def set_formatter(self, formatter):
+        self.formatter = formatter
 
-    def output(self, data):
+    def set_command(self, command_name):
+        self.command_name = command_name
+
+    def set_mqtt_broker(self, mqtt_broker: MqttBroker):
+        self.mqtt_broker = mqtt_broker
+
+    def output(self, result: Result):
         log.info("Using output processor: api_mqtt")
         # exit if no data
-        if data is None:
+        if result.raw_response is None:
             return
 
         # exit if no broker
         if self.mqtt_broker is None:
             log.error("No mqtt broker supplied")
-            return
+            raise RuntimeError("No mqtt broker supplied")
 
         # build the messages...
-        formattedData = self.formatter.format(data)
-        log.debug(f"mqtt.output msgs {formattedData}")
+        formatted_data = self.formatter.format(result)
+        log.debug("mqtt.output msgs %s",formatted_data)
 
-        result = ResultDTO(schedule_name=self.schedule_name, result=formattedData)
+        result_dto = ResultDTO(device_identifier=result.get_device_id(), command=result.command.name, data=result.get_decoded_responses())
 
-        self.mqtt_broker.publish(self.results_topic, result.json())
+        log.debug("Topic: %s", self.get_topic())
+        self.mqtt_broker.publish(self.get_topic(), result_dto.json())
+
+    def process(self, result: Result):
+        self.output(result)

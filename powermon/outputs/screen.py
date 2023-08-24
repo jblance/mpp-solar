@@ -1,4 +1,5 @@
 import logging
+from powermon.formats.abstractformat import AbstractFormat
 
 from powermon.outputs.abstractoutput import AbstractOutput
 
@@ -6,11 +7,13 @@ log = logging.getLogger("screen")
 
 
 class Screen(AbstractOutput):
-    def __init__(self, outputConfig, formatter):
-        log.debug("outputConfig: %s, formatter: %s" % (outputConfig, formatter))
-        super().__init__(formatter)
+    def __init__(self, formatter):
         self.name = "Screen"
-        # self.formatter = formatter
+        self.set_formatter(formatter)
+        
+
+    def set_formatter(self, formatter: AbstractFormat):
+        self.formatter = formatter
 
     def process(self, result):
         log.info("Using output sender: screen")

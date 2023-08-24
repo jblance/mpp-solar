@@ -2,11 +2,32 @@ import logging
 from time import localtime, strftime, time
 from powermon.commands.trigger import Trigger
 from powermon.outputs import getOutputs
+from powermon.dto.commandDTO import CommandDTO
+from powermon.outputs.abstractoutput import AbstractOutput
 
 log = logging.getLogger("Command")
 
 
 class Command:
+    def __init__(self, name : str, commandtype: str, outputs: list[AbstractOutput], trigger : Trigger):
+
+        self.name = name
+        self.type = commandtype
+        self.set_outputs(outputs)
+        
+        self.trigger = trigger
+
+        self.last_run = None
+        self.next_run = self.trigger.nextRun(command=self)
+        self.full_command = None
+        self.command_defn = None
+        log.debug(self)
+    
+    def set_outputs(self, outputs):
+        self.outputs = outputs
+        for output in self.outputs:
+            output.set_command(self.name)
+
     def __str__(self):
         if self.name is None:
             return "empty command object"
@@ -26,7 +47,7 @@ class Command:
         return f"Command: {self.name=} {self.full_command=}, {self.type=}, [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {self.command_defn=}"
 
     @classmethod
-    def fromConfig(cls, config=None):
+    def from_config(cls, config=None) -> "Command":
         # need to have a config defined
         # minimum is
         # - command: QPI
@@ -43,19 +64,10 @@ class Command:
         outputs = getOutputs(config.get("outputs", ""))
         trigger = Trigger.fromConfig(config=config.get("trigger"))
         return cls(name=name, commandtype=commandtype, outputs=outputs, trigger=trigger)
-
-    def __init__(self, name : str, commandtype: str, outputs: list, trigger : Trigger):
-
-        self.name = name
-        self.type = commandtype
-        self.outputs = outputs
-        self.trigger = trigger
-
-        self.last_run = None
-        self.next_run = self.trigger.nextRun(command=self)
-        self.full_command = None
-        self.command_defn = None
-        log.debug(self)
+    
+    def set_mqtt_broker(self, mqtt_broker):
+        for output in self.outputs:
+            output.set_mqtt_broker(mqtt_broker)
 
     def dueToRun(self):
         return self.trigger.isDue(command=self)
@@ -65,3 +77,10 @@ class Command:
         self.last_run = time()
         # update next run time
         self.next_run = self.trigger.nextRun(command=self)
+
+    def to_dto(self):
+        return CommandDTO(
+            command = self.name,
+            result_topic = self.outputs[0].get_topic(),
+            trigger = self.trigger.to_DTO()
+        )

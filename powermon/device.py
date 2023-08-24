@@ -4,7 +4,9 @@ import logging
 from powermon.dto.deviceDTO import DeviceDTO
 from powermon.ports import getPortFromConfig
 from powermon.ports.abstractport import AbstractPort
+from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.commands.command import Command
+from powermon.libs.result import Result
 
 # Set-up logger
 log = logging.getLogger("Device")
@@ -47,7 +49,7 @@ class Device:
         self.identifier = identifier
         self.model = model
         self.manufacturer = manufacturer
-        self.port = port
+        self.port : AbstractPort = port
         self.commands = []
 
     def add_command(self, command: Command = None) -> None:
@@ -62,11 +64,16 @@ class Device:
         return self.port
 
     def toDTO(self) -> DeviceDTO:
+        commands = []
+        command: Command
+        for command in self.commands:
+            commands.append(command.to_dto())
         dto = DeviceDTO(
             identifier=self.identifier,
             model=self.model,
             manufacturer=self.manufacturer,
             port=self.port.toDTO(),
+            commands=commands
         )
         return dto
 
@@ -78,7 +85,7 @@ class Device:
         log.info("finalizing device")
         return
 
-    def runLoop(self, force=False):
+    def runLoop(self, force=False) -> bool:
         """
         the loop that checks for commands to run,
         runs them
@@ -90,10 +97,12 @@ class Device:
             for command in self.commands:
                 if force or command.dueToRun():
                     # run command
-                    result = self.port.run_command(command)
+                    result: Result = self.port.run_command(command)
                     # decode result
-                    self.port.protocol.decode(result)
+                    self.port.get_protocol().decode(result)
+                    result.set_device_id(self.identifier)
                     # loop through each output and process result
+                    output: AbstractOutput
                     for output in command.outputs:
                         log.debug(f"Using Output: {output}")
                         output.process(result=result)

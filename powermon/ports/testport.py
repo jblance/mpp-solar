@@ -4,7 +4,7 @@ import random
 from powermon.dto.portDTO import PortDTO
 from powermon.libs.result import Result
 from powermon.ports.abstractport import AbstractPort
-from powermon.protocols import get_protocol
+from powermon.protocols import get_protocol_definition
 
 log = logging.getLogger("test")
 
@@ -15,26 +15,23 @@ class TestPort(AbstractPort):
         log.debug(f"building test port. config:{config}")
         response_number = config.get("response_number", None)
         # get protocol handler, default to PI30 if not supplied
-        protocol = get_protocol(protocol=config.get("protocol", "PI30"))
+        protocol = get_protocol_definition(protocol=config.get("protocol", "PI30"))
         return cls(response_number=response_number, protocol=protocol)
 
     def __init__(self, response_number, protocol):
+        super().__init__(protocol=protocol)
         self.response_number = response_number
-        self.protocol = protocol
 
     def __str__(self):
         return "Test port"
 
     def toDTO(self) -> PortDTO:
-        dto = PortDTO(type="test", protocol=self.protocol.toDTO())
+        dto = PortDTO(type="test", protocol=self.get_protocol().toDTO())
         return dto
 
-    def protocol(self):
-        return super().protocol()
-
-    def connect(self) -> None:
+    def connect(self) -> int:
         log.debug("Test port connected")
-        return
+        return 1
 
     def disconnect(self) -> None:
         log.debug("Test port disconnected")

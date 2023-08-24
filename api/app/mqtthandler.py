@@ -1,18 +1,21 @@
 
 import asyncio
-import json
+
+from fastapi_mqtt import FastMQTT, MQTTConfig
+
 from .db.models import MQTTMessage
-from powermon.dto.powermonDTO import PowermonDTO
+from powermon.dto.deviceDTO import DeviceDTO
 from powermon.dto.resultDTO import ResultDTO
 
 class MQTTHandler(object):
     _instance = None
-    _power_monitors = []
-    _results = []
+    _devices : list[DeviceDTO] = []
+    _results : list[ResultDTO] = []
     _commandDictionary = {
             "mqtt/QPIGS": "QPIGS",
         }
     _commandRequests = {}
+    
     def __new__(class_, *args, **kwargs):
         if not isinstance(class_._instance, class_):
             class_._instance = object.__new__(class_, *args, **kwargs)
@@ -46,21 +49,33 @@ class MQTTHandler(object):
 
         self._results.append(result)
 
-    def recieved_announcement(self, message):
-        print("Announcement Recieved: ", message)
-        schedule = PowermonDTO.parse_raw(message)
-        deviceId = schedule.device.identifier
-        print("Device ID: ", deviceId)
-        if(schedule not in self._power_monitors):
-            self._power_monitors.append(schedule)
+    def is_command_result_topic(self, topic: str) -> bool:
+        for device in self._devices:
+            for command in device.commands:
+                if(command.result_topic == topic):
+                    return True
+        return False
 
-    async def get_powermon_instances(self):
-        return self._power_monitors
+    def recieved_announcement(self, message) -> DeviceDTO:
+        print("Announcement Recieved: ", message)
+        device = DeviceDTO.parse_raw(message)
+        deviceId = device.identifier 
+        print("Device ID: ", deviceId)
+        if(device not in self._devices):
+            self._devices.append(device)
+        return device
+
+        
+        
+
+    def get_device_instances(self) -> list[DeviceDTO]:
+        return self._devices
     
-    async def get_powermon_instance(self, powermon_name) -> PowermonDTO:
-        for powermon in self._power_monitors:
-            if(powermon.name == powermon_name):
-                return powermon
+    def get_device_instance(self, device_id) -> DeviceDTO:
+        _device: DeviceDTO
+        for _device in self._devices:
+            if(_device.identifier == device_id):
+                return _device
         return None
     
     async def get_results(self):

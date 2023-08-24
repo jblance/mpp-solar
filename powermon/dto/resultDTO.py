@@ -1,7 +1,10 @@
+from typing import Iterable
 from pydantic import BaseModel
+
 
 
 # TODO: update
 class ResultDTO(BaseModel):
-    schedule_name: str
-    result: str
+    device_identifier: str
+    command: str
+    data: dict 

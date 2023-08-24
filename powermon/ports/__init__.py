@@ -12,7 +12,6 @@ def getPortFromConfig(port_config):
     log.debug(f"port_config: {port_config}")
 
     portObject = None
-
     if not port_config:
         log.info("no port config supplied, defaulting to test port")
         port_config = {"type": "test", "protocol": "PI30"}

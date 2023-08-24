@@ -5,14 +5,25 @@
 </head>
 <body>
     <h1>Devices</h1>
-    {% if schedules is defined%}
-        {% for schedule in schedules %}
-            <h2>{{ schedule.device.name }}</h2>
+    {% if devices is defined%}
+        {% for device in devices %}
+            <h2>Id: {{ device.identifier }}</h2>
             <ul>
-                <li>Model: {{ schedule.device.model }}</li>
-                <li>Manufacturer: {{ schedule.device.manufacturer }}</li>
-                <li>Port Type: {{ schedule.device.port.type }}</li>
-                <li>Protocol Id: {{ schedule.device.port.protocol.protocol_id }}</li>
+                <li>Model: {{ device.model }}</li>
+                <li>Manufacturer: {{ device.manufacturer }}</li>
+                <li>Port Type: {{ device.port.type }}</li>
+                <li>Device Commands:</li>
+                    <ul>
+                        {% for device_command in device.commands %}
+                        <li>{{ device_command }}</li>
+                        {% endfor %}
+                    </ul>
+                <li>Protocol Id: {{ device.port.protocol.protocol_id }}</li>
+                    <ul>
+                        {% for protocol_command in device.port.protocol.commands %}
+                        <li>{{ protocol_command }}: {{device.port.protocol.commands[protocol_command]}}</li>
+                        {% endfor %}
+                    </ul>
             </ul>
             <p></p>
         {% endfor %}

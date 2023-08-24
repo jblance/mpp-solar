@@ -2,8 +2,10 @@ import logging
 from time import time
 
 import yaml
+from powermon.device import Device
 
 log = logging.getLogger("APICoordinator")
+
 
 
 class ApiCoordinator:
@@ -29,7 +31,7 @@ class ApiCoordinator:
 
         return cls(adhocTopic=adhocTopic, announceTopic=announceTopic, enabled=enabled, refreshInterval=refreshInterval, device=device, mqtt_broker=mqtt_broker)
 
-    def __init__(self, adhocTopic : str, announceTopic: str, enabled: bool, refreshInterval: int, device=None, mqtt_broker=None):
+    def __init__(self, adhocTopic : str, announceTopic: str, enabled: bool, refreshInterval: int, device: Device, mqtt_broker=None):
         self.device = device
         self.mqtt_broker = mqtt_broker
         self.last_run = None
@@ -40,12 +42,14 @@ class ApiCoordinator:
 
         if self.mqtt_broker is None or self.mqtt_broker.disabled:
             # no use having api running if no mqtt broker
+            log.debug(self.mqtt_broker)
             log.debug("No mqttbroker (or it is disabled) so disabling ApiCoordinator")
             self.enabled = False
             return
 
-        # self.announceDevice()
+        self.announce_device()
         mqtt_broker.subscribe(self.adhocTopic, self.adhocCallback)  # QUESTION: why subscribe here?
+
         # mqtt_broker.publish(self.announceTopic, self.schedule.getScheduleConfigAsJSON())
 
     def adhocCallback(self, client, userdata, msg):
@@ -67,8 +71,8 @@ class ApiCoordinator:
         if not self.enabled:
             return
         if not self.last_run or time() - self.last_run > self.refreshInterval:
-            log.info("Starting APICoordinator")
-            self.announceDevice()  # QUESTION: what are we announcing here?
+            log.info("APICoordinator running")
+            self.announce_device()  # QUESTION: what are we announcing here?
             self.last_run = time()
 
     def initialize(self):
@@ -76,11 +80,11 @@ class ApiCoordinator:
             return
         self.announce(self)
 
-    def announceDevice(self):
-        # scheduleDTO = self.schedule.toDTO()
+    def announce_device(self):
+        device_dto = self.device.toDTO()
         if not self.enabled:
             return
-        self.mqtt_broker.publish(self.announceTopic, "{'announceDevice':'todo'}")
+        self.mqtt_broker.publish(self.announceTopic, device_dto.json())
 
     def announce(self, obj):
         if not self.enabled:
