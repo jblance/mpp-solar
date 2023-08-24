@@ -161,7 +161,6 @@ def main():
             device.add_command(command)
     log.info(device)
 
-
     # build the daemon object (optional)
     daemon = Daemon.fromConfig(config=config.get("daemon"))
     log.info(daemon)
