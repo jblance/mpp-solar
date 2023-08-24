@@ -28,7 +28,7 @@ class test_powermon_formats(unittest.TestCase):
         device = Device.fromConfig(config=config.get("device"))
         # print(device)
         hass_formatter = hass({}, device)
-        _result = Result()
+        _result = Result(command=None)
         _result.decoded_responses = {"protocol_id": ["PI30", "", ""]}
         result = hass_formatter.format(_result)
 
@@ -101,11 +101,8 @@ class test_powermon_formats(unittest.TestCase):
     def test_format_table(self):
         try:
             expected = """-----------------------------------------
-Command: QPI - Protocol ID inquiry     
------------------------------------------
-Parameter    Value   Unit           
-protocol_id  PI30                   
-"""
+Command: QPI - Protocol ID inquiry     \n-----------------------------------------
+Parameter    Value   Unit           \nprotocol_id  PI30                   \n"""
             result = subprocess.run(
                 ["powermon", "--once", "--config", '{"device": {"port":{"type":"test"}}, "commands": [{"command":"QPI", "outputs": [{"type": "screen", "format": "table"}]}]} '],
                 check=True,
