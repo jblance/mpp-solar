@@ -16,6 +16,7 @@ tv: tests/*.py
 pypi:
 	rm -rf dist/*
 	#python3 -m build 
+	poetry version patch
 	poetry build
 	ls -l dist/
 
