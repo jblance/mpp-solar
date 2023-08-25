@@ -8,7 +8,7 @@ from .commandDTO import CommandDTO
 
 # TODO: update
 class DeviceDTO(BaseModel):
-    identifier: Optional[str]
+    identifier: str
     model: Optional[str]
     manufacturer: Optional[str]
     port: PortDTO

@@ -47,17 +47,6 @@ def connect(client, flags, rc, properties):
     print("Connected: ", client, flags, rc, properties, topic)
 
 
-@mqtt.subscribe("powermon/testmon/results/#")
-async def listen_to_results(client, topic, payload, qos, properties):
-    print("Received message for DB and long poll: ", topic, payload.decode(), qos, properties)
-    # db = SessionLocal()
-    # mqtt_message = crud.create_mqtt_message(db, schemas.MQTTMessage(id=1,topic=topic, message=payload.decode()))
-
-    result = ResultDTO.parse_raw(payload.decode())
-    print(f"Result: {result}")
-    handler = MQTTHandler()
-    handler.recieved_result(result)
-
 
 @mqtt.subscribe("powermon/announce")
 async def listen_to_announcements(client, topic, payload, qos, properties):

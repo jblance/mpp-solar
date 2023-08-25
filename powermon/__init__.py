@@ -167,7 +167,7 @@ def main():
     log.info(daemon)
 
     # build api coordinator
-    api_coordinator = ApiCoordinator.fromConfig(config=config.get("api"), device=device, mqtt_broker=mqtt_broker)
+    api_coordinator = ApiCoordinator.from_config(config=config.get("api"), device=device, mqtt_broker=mqtt_broker)
     log.info(api_coordinator)
 
     # initialize api coordinator

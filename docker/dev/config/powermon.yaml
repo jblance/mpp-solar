@@ -10,9 +10,9 @@ device:
     protocol: PI30
 
 commands:
-- command: QPIGS #Must be in the protocol command list
+- command: QPIRI #Must be in the protocol command list
   trigger:
-    every: 10  # every 10 seconds
+    every: 100  # seconds
   outputs:
   - type: api_mqtt
     format: 

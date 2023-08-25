@@ -9,7 +9,7 @@ from powermon.dto.resultDTO import ResultDTO
 
 class MQTTHandler(object):
     _instance = None
-    _devices : list[DeviceDTO] = []
+    _devices : dict[str,DeviceDTO] = {}
     _results : list[ResultDTO] = []
     _commandDictionary = {
             "mqtt/QPIGS": "QPIGS",
@@ -50,7 +50,7 @@ class MQTTHandler(object):
         self._results.append(result)
 
     def is_command_result_topic(self, topic: str) -> bool:
-        for device in self._devices:
+        for device in self._devices.values():
             for command in device.commands:
                 if(command.result_topic == topic):
                     return True
@@ -59,24 +59,20 @@ class MQTTHandler(object):
     def recieved_announcement(self, message) -> DeviceDTO:
         print("Announcement Recieved: ", message)
         device = DeviceDTO.parse_raw(message)
-        deviceId = device.identifier 
+        deviceId : str = device.identifier 
         print("Device ID: ", deviceId)
-        if(device not in self._devices):
-            self._devices.append(device)
+        self._devices[deviceId] = device
         return device
 
         
         
 
     def get_device_instances(self) -> list[DeviceDTO]:
-        return self._devices
+        return list(self._devices.values())
     
-    def get_device_instance(self, device_id) -> DeviceDTO:
-        _device: DeviceDTO
-        for _device in self._devices:
-            if(_device.identifier == device_id):
-                return _device
-        return None
+    def get_device_instance(self, device_id) -> DeviceDTO | None:
+        device = self._devices.get(device_id)
+        return device
     
     async def get_results(self):
         return self._results

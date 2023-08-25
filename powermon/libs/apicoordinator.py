@@ -3,6 +3,7 @@ from time import time
 
 import yaml
 from powermon.device import Device
+from powermon.commands.command import Command
 
 log = logging.getLogger("APICoordinator")
 
@@ -12,32 +13,31 @@ class ApiCoordinator:
     def __str__(self):
         if not self.enabled:
             return "ApiCoordinator DISABLED"
-        return f"ApiCoordinator: adhocTopic: {self.adhocTopic}, announceTopic: {self.announceTopic}"
+        return f"ApiCoordinator: adhocTopic: {self.adhoc_topic_format}, announceTopic: {self.announce_topic}"
 
     @classmethod
-    def fromConfig(cls, config=None, device=None, mqtt_broker=None):
+    def from_config(cls, config=None, device=None, mqtt_broker=None):
         log.debug(f"ApiCoordinator config: {config}")
         if not config:
             log.info("No api definition in config")
-            adhocTopic = "powermon/adhoc"
-            announceTopic = "powermon/announce"
-            refreshInterval = 60
+            refresh_interval = 60
             enabled = False
         else:
-            adhocTopic = config.get("adhoc_topic", "powermon/adhoc")
-            announceTopic = config.get("announce_topic", "powermon/announce")
-            refreshInterval = config.get("refresh_interval", 60)
+            refresh_interval = config.get("refresh_interval", 60)
             enabled = config.get("enabled", True)  # default to enabled if not specified
 
-        return cls(adhocTopic=adhocTopic, announceTopic=announceTopic, enabled=enabled, refreshInterval=refreshInterval, device=device, mqtt_broker=mqtt_broker)
+        adhoc_topic_format = "powermon/{device_id}/adhoc"
+        announce_topic = "powermon/announce"
 
-    def __init__(self, adhocTopic : str, announceTopic: str, enabled: bool, refreshInterval: int, device: Device, mqtt_broker=None):
-        self.device = device
+        return cls(adhoc_topic_format=adhoc_topic_format, announce_topic=announce_topic, enabled=enabled, refresh_interval=refresh_interval, device=device, mqtt_broker=mqtt_broker)
+
+    def __init__(self, adhoc_topic_format : str, announce_topic: str, enabled: bool, refresh_interval: int, device: Device, mqtt_broker=None):
+        self.device : Device = device
         self.mqtt_broker = mqtt_broker
         self.last_run = None
-        self.adhocTopic = adhocTopic
-        self.announceTopic = announceTopic
-        self.refreshInterval = refreshInterval
+        self.adhoc_topic_format = adhoc_topic_format
+        self.announce_topic = announce_topic
+        self.refresh_interval = refresh_interval
         self.enabled = enabled
 
         if self.mqtt_broker is None or self.mqtt_broker.disabled:
@@ -48,29 +48,37 @@ class ApiCoordinator:
             return
 
         self.announce_device()
-        mqtt_broker.subscribe(self.adhocTopic, self.adhocCallback)  # QUESTION: why subscribe here?
+        mqtt_broker.subscribe(self.get_adhoc_topic(), self.adhoc_callback)  # QUESTION: why subscribe here?
 
         # mqtt_broker.publish(self.announceTopic, self.schedule.getScheduleConfigAsJSON())
 
-    def adhocCallback(self, client, userdata, msg):
+    def get_adhoc_topic(self):
+        return self.adhoc_topic_format.format(device_id=self.device.identifier)
+
+    def adhoc_callback(self, client, userdata, msg):
         log.info(f"Received `{msg.payload}` on topic `{msg.topic}`")
         yamlString = msg.payload.decode("utf-8")
         log.debug(f"Yaml string: {yamlString}")
         try:
-            _command_config = yaml.safe_load(yamlString)
+            _commands_config = yaml.safe_load(yamlString)
         except yaml.YAMLError as exc:
             log.error(f"Error processing config file: {exc}")
 
-        for command in _command_config["commands"]:
-            log.debug(f"command: {command}")
+        for command_config in _commands_config["commands"]:
+            log.debug(f"command: {command_config}")
             log.debug(f"self: {self}")
-            # self.schedule.addOneTimeCommandFromConfig(command)
+            command = Command.from_config(command_config)
+            command.set_mqtt_broker(self.mqtt_broker)
+            self.device.add_command(command)
+
+        self.announce_device()
+            
 
     def run(self):
         # QUESTION: do we need a run?
         if not self.enabled:
             return
-        if not self.last_run or time() - self.last_run > self.refreshInterval:
+        if not self.last_run or time() - self.last_run > self.refresh_interval:
             log.info("APICoordinator running")
             self.announce_device()  # QUESTION: what are we announcing here?
             self.last_run = time()
@@ -82,11 +90,12 @@ class ApiCoordinator:
 
     def announce_device(self):
         device_dto = self.device.toDTO()
+        log.info(device_dto)
         if not self.enabled:
             return
-        self.mqtt_broker.publish(self.announceTopic, device_dto.json())
+        self.mqtt_broker.publish(self.announce_topic, device_dto.json())
 
     def announce(self, obj):
         if not self.enabled:
             return
-        self.mqtt_broker.publish(self.announceTopic, obj)  # QUESTION: obj or obj.toDTO or obj.????
+        self.mqtt_broker.publish(self.announce_topic, obj)  # QUESTION: obj or obj.toDTO or obj.????

@@ -33,6 +33,7 @@ class API_MQTT(AbstractOutput):
         self.device_id = device_id
     
     def get_topic(self):
+        #TODO: is there a more readable approach? like a format string?
         return self.topic_base + str(self.device_id) + "/" + self.topic_type + self.command_name
     
     
