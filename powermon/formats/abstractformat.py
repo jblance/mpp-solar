@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 import logging
 import re
 
+from powermon.dto.formatDTO import FormatDTO
+
 
 # from time import sleep
 log = logging.getLogger("Formatter")
@@ -30,6 +32,9 @@ class AbstractFormat(ABC):
     def format(self, data):
         pass
 
+    def to_DTO(self):
+        return FormatDTO(type=self.name)
+    
     # Override this if the format sends multiple messages
     def sendsMultipleMessages(self) -> bool:
         return False

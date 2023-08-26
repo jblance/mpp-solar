@@ -8,12 +8,15 @@ from fastapi_mqtt import FastMQTT, MQTTConfig
 
 from sqlalchemy.orm import Session
 
-from .db import crud, models, schemas
-from .db.database import SessionLocal, engine
-from .mqtthandler import MQTTHandler
+from api.app.statehandler import StateHandler
 
 from powermon.dto.resultDTO import ResultDTO
 from powermon.dto.deviceDTO import DeviceDTO
+from powermon.dto.commandDTO import CommandDTO
+
+from .db import crud, models, schemas
+from .db.database import SessionLocal, engine
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -35,8 +38,8 @@ def get_db():
         db.close()
 
 
-def get_mqtthandler():
-    handler = MQTTHandler()
+def get_statehandler():
+    handler = StateHandler()
     return handler
 
 
@@ -50,20 +53,19 @@ def connect(client, flags, rc, properties):
 
 @mqtt.subscribe("powermon/announce")
 async def listen_to_announcements(client, topic, payload, qos, properties):
-    handler = MQTTHandler()
+    handler = StateHandler()
     device = handler.recieved_announcement(payload.decode())
     for command in device.commands:
         print("Subscribing to command: ", command.result_topic)
         mqtt.client.subscribe(command.result_topic)
-    
+
 @mqtt.on_message()
 async def message(client, topic, payload, qos, properties):
     print("Received message: ", topic, payload.decode(), qos, properties)
-    handler = MQTTHandler()
-    if (handler.is_command_result_topic(topic)):
-        print("Command result")
+    handler = StateHandler()
+    if handler.is_command_result_topic(topic):
+        print(F"Command result on topic {topic}")
         result = ResultDTO.parse_raw(payload.decode())
-        print(f"Result: {result}")
         handler.recieved_result(result)
 
 @mqtt.on_disconnect()
@@ -83,7 +85,7 @@ templates = Jinja2Templates(directory="api/app/templates")
 
 @app.get("/")
 def read_root(request: Request):
-    handler = MQTTHandler()
+    handler = StateHandler()
     devices = handler.get_device_instances()
     print(devices)
     return templates.TemplateResponse("home.html.j2", {"request": request, "devices": devices})
@@ -103,17 +105,36 @@ def read_message(message_id: int, db: Session = Depends(get_db)):
     return mqtt_message
 
 
-@app.get("/command/{command_code}", response_model=schemas.MQTTMessage)
-async def read_command(command_code: str, handler: MQTTHandler = Depends(get_mqtthandler)):  # noqa: F811
+@app.get("/devices/{device_id}/runCommandCode/{command_code}", response_model=ResultDTO)
+async def read_command(device_id: str, command_code: str, handler: StateHandler = Depends(get_statehandler)):  # noqa: F811
     result = None
+    
+    command_dto = CommandDTO.run_api_command(command_code=command_code, device_id=device_id)
+    mqtt.client.subscribe(command_dto.result_topic)
+    requsted_command = await add_command(command_dto, handler=handler)
 
-    result = await handler.register_command(command_code)
+    result = await handler.get_next_result(requsted_command.result_topic)
 
     return result
 
+@app.post("/addCommand/", response_model=CommandDTO)
+async def add_command(command_dto: CommandDTO, handler: StateHandler = Depends(get_statehandler)):
+    device = handler.get_device_instance(command_dto.device_id)
+    if device is None:
+        raise HTTPException(status_code=404, detail=f"Device id: {command_dto.device_id} not found")
+
+    if command_dto.command not in device.port.protocol.commands.keys():
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Command: {command_dto.command} not found in protocol: {device.port.protocol.protocol_id}")
+
+    mqtt.client.publish(f"powermon/{command_dto.device_id}/addcommand", command_dto.json())
+
+    return command_dto
+
 
 @app.get("/devices/", response_model=list[DeviceDTO])
-def read_devices(handler: MQTTHandler = Depends(get_mqtthandler)):
+def read_devices(handler: StateHandler = Depends(get_statehandler)):
     result = None
 
     result = handler.get_device_instances()
@@ -122,7 +143,7 @@ def read_devices(handler: MQTTHandler = Depends(get_mqtthandler)):
 
 
 @app.get("/devices/{device_id}", response_model=DeviceDTO)
-def read_device(device_id: str, handler: MQTTHandler = Depends(get_mqtthandler)):  # noqa: F811
+def read_device(device_id: str, handler: StateHandler = Depends(get_statehandler)):  # noqa: F811
     result = None
 
     result = handler.get_device_instance(device_id)
@@ -135,7 +156,7 @@ def read_device(device_id: str, handler: MQTTHandler = Depends(get_mqtthandler))
 
 
 @app.get("/results/", response_model=list[ResultDTO])
-async def read_results(handler: MQTTHandler = Depends(get_mqtthandler)):
+async def read_results(handler: StateHandler = Depends(get_statehandler)):
     result = None
 
     result = await handler.get_results()

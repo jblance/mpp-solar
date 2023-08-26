@@ -1,12 +1,15 @@
 import logging
 
 from powermon.outputs.abstractoutput import AbstractOutput
+from powermon.formats.abstractformat import AbstractFormat
+from powermon.dto.outputDTO import OutputDTO
 
 log = logging.getLogger("MQTT")
 
 
 class MQTT(AbstractOutput):
-    def __init__(self, results_topic) -> None:
+    def __init__(self, formatter: AbstractFormat, results_topic) -> None:
+        super().__init__(formatter)
         self.results_topic = results_topic
 
     def __str__(self):
@@ -17,6 +20,9 @@ class MQTT(AbstractOutput):
 
     def set_formatter(self, formatter):
         self.formatter = formatter
+        
+    def to_DTO(self) -> OutputDTO:
+        return OutputDTO(type="mqtt", format=self.formatter.to_DTO())
 
     def output(self, data):
         #Not sure that formatter and mqtt_broker are set, could use builder pattern to ensure they are set

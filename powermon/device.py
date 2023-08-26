@@ -50,7 +50,7 @@ class Device:
         self.model = model
         self.manufacturer = manufacturer
         self.port : AbstractPort = port
-        self.commands = []
+        self.commands : list[Command] = []
 
     def add_command(self, command: Command) -> None:
         """ add a command to the device list of commands """
@@ -97,6 +97,7 @@ class Device:
         else:
             for command in self.commands:
                 if force or command.dueToRun():
+                    log.debug(f"Running command: {command.name}")
                     # run command
                     result: Result = self.port.run_command(command)
                     # decode result

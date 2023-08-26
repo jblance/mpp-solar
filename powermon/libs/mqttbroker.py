@@ -167,7 +167,7 @@ class MqttBroker:
             if not self._isConnected:
                 log.warn("mqtt broker did not connect")
                 return
-    
+        try:
             infot = self.mqttc.publish(topic, payload)
             infot.wait_for_publish(5)
         except Exception as e:

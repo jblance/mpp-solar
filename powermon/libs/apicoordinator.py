@@ -1,9 +1,12 @@
 import logging
 from time import time
 
-import yaml
 from powermon.device import Device
 from powermon.commands.command import Command
+from powermon.commands.trigger import Trigger
+from powermon.dto.commandDTO import CommandDTO
+from powermon.formats.simple import simple
+from powermon.outputs.api_mqtt import API_MQTT
 
 log = logging.getLogger("APICoordinator")
 
@@ -26,7 +29,7 @@ class ApiCoordinator:
             refresh_interval = config.get("refresh_interval", 60)
             enabled = config.get("enabled", True)  # default to enabled if not specified
 
-        adhoc_topic_format = "powermon/{device_id}/adhoc"
+        adhoc_topic_format = "powermon/{device_id}/addcommand"
         announce_topic = "powermon/announce"
 
         return cls(adhoc_topic_format=adhoc_topic_format, announce_topic=announce_topic, enabled=enabled, refresh_interval=refresh_interval, device=device, mqtt_broker=mqtt_broker)
@@ -48,30 +51,35 @@ class ApiCoordinator:
             return
 
         self.announce_device()
-        mqtt_broker.subscribe(self.get_adhoc_topic(), self.adhoc_callback)  # QUESTION: why subscribe here?
+        mqtt_broker.subscribe(self.get_addcommand_topic(), self.addcommand_callback)  # QUESTION: why subscribe here?
 
         # mqtt_broker.publish(self.announceTopic, self.schedule.getScheduleConfigAsJSON())
 
-    def get_adhoc_topic(self):
+    def get_addcommand_topic(self):
         return self.adhoc_topic_format.format(device_id=self.device.identifier)
 
-    def adhoc_callback(self, client, userdata, msg):
+    def addcommand_callback(self, client, userdata, msg):
         log.info(f"Received `{msg.payload}` on topic `{msg.topic}`")
-        yamlString = msg.payload.decode("utf-8")
-        log.debug(f"Yaml string: {yamlString}")
-        try:
-            _commands_config = yaml.safe_load(yamlString)
-        except yaml.YAMLError as exc:
-            log.error(f"Error processing config file: {exc}")
+        jsonString = msg.payload.decode("utf-8")
+        log.debug(f"Yaml string: {jsonString}")
 
-        for command_config in _commands_config["commands"]:
-            log.debug(f"command: {command_config}")
-            log.debug(f"self: {self}")
-            command = Command.from_config(command_config)
-            command.set_mqtt_broker(self.mqtt_broker)
-            self.device.add_command(command)
+        dto = CommandDTO.parse_raw(jsonString)
+        
+            
+        command = Command(name=dto.command, commandtype="basic", outputs=[], trigger=Trigger(trigger_type=dto.trigger.trigger_type, value=dto.trigger.value))
+        outputs = []
+        
+        output = API_MQTT(formatter=simple({}))
+        outputs.append(output)
+            
+        command.set_outputs(outputs=outputs)
+        command.set_mqtt_broker(self.mqtt_broker)
+        
+        self.device.add_command(command)
 
         self.announce_device()
+        
+        return command
             
 
     def run(self):

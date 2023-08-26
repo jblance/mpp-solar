@@ -1,20 +1,14 @@
 
 import asyncio
 
-from fastapi_mqtt import FastMQTT, MQTTConfig
-
-from .db.models import MQTTMessage
 from powermon.dto.deviceDTO import DeviceDTO
 from powermon.dto.resultDTO import ResultDTO
 
-class MQTTHandler(object):
+class StateHandler(object):
     _instance = None
     _devices : dict[str,DeviceDTO] = {}
     _results : list[ResultDTO] = []
-    _commandDictionary = {
-            "mqtt/QPIGS": "QPIGS",
-        }
-    _commandRequests = {}
+    _topics_waiting_for_result : dict[str, ResultDTO | None] = {}
     
     def __new__(class_, *args, **kwargs):
         if not isinstance(class_._instance, class_):
@@ -22,23 +16,6 @@ class MQTTHandler(object):
         return class_._instance
     
 
-    async def register_command(self, command):
-        print("Registering command: ", command)
-        request = CommandRequest(command)
-        if(command not in self._commandRequests):
-            self._commandRequests[command] = []
-
-        self._commandRequests[command].append(request)
-
-        while True:
-            requests = self._commandRequests[command]
-            for request in requests:
-                if(request.done):
-                    print("Command done: ", command)
-                    result = request.result
-                    self._commandRequests[command].remove(request)
-                    return result
-            await asyncio.sleep(1)
     
     def recieved_result(self, result: ResultDTO):
         # command = self._commandDictionary.get(mqtt_message.topic, None)
@@ -48,6 +25,18 @@ class MQTTHandler(object):
         #     return
 
         self._results.append(result)
+        
+    async def get_next_result(self, topic: str) -> ResultDTO:
+        self._topics_waiting_for_result[topic] = None
+        while True:
+            if topic in self._topics_waiting_for_result:
+                if self._topics_waiting_for_result[topic] is not None:
+                    result = self._topics_waiting_for_result[topic]
+                    del self._topics_waiting_for_result[topic]
+                    return result
+            else:
+                raise RuntimeError("Topic not found in waiting for result list")
+            await asyncio.sleep(0.5)
 
     def is_command_result_topic(self, topic: str) -> bool:
         for device in self._devices.values():

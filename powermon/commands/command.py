@@ -4,7 +4,6 @@ from powermon.commands.trigger import Trigger
 from powermon.outputs import getOutputs
 from powermon.dto.commandDTO import CommandDTO
 from powermon.outputs.abstractoutput import AbstractOutput
-
 log = logging.getLogger("Command")
 
 
@@ -24,7 +23,7 @@ class Command:
         self.device_id = None
         log.debug(self)
     
-    def set_outputs(self, outputs):
+    def set_outputs(self, outputs : list[AbstractOutput]):
         self.outputs = outputs
         for output in self.outputs:
             output.set_command(self.name)
@@ -71,6 +70,7 @@ class Command:
         trigger = Trigger.fromConfig(config=config.get("trigger"))
         return cls(name=name, commandtype=commandtype, outputs=outputs, trigger=trigger)
     
+    
     def set_mqtt_broker(self, mqtt_broker):
         for output in self.outputs:
             output.set_mqtt_broker(mqtt_broker)
@@ -87,6 +87,8 @@ class Command:
     def to_dto(self):
         return CommandDTO(
             command = self.name,
+            device_id=self.device_id,
             result_topic = self.outputs[0].get_topic(),
-            trigger = self.trigger.to_DTO()
+            trigger = self.trigger.to_DTO(),
+            outputs=[output.to_DTO() for output in self.outputs],
         )
