@@ -67,7 +67,7 @@ class ApiCoordinator:
         
         trigger = Trigger.from_DTO(dto.trigger)    
         command = Command.from_DTO(dto)
-        Command(code=dto.command, commandtype="basic", outputs=[], trigger=trigger)
+        Command(code=dto.command_code, commandtype="basic", outputs=[], trigger=trigger)
         outputs = []
         
         

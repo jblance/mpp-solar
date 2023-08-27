@@ -5,15 +5,19 @@ from powermon.dto.resultDTO import ResultDTO
 from powermon.commands.result import Result
 from powermon.libs.mqttbroker import MqttBroker
 from powermon.dto.outputDTO import OutputDTO
+from powermon.dto.commandDTO import CommandDTO
 from powermon.formats.simple import SimpleFormat
 
 log = logging.getLogger("API_MQTT")
 
 
 class API_MQTT(AbstractOutput):
+    
+    
+    
     def __init__(self, formatter) -> None:
         self.set_formatter(formatter)
-        self.command_name : str = "not_set"
+        self.command_code : str = "not_set"
         self.device_id : str = "not_set"
 
         self.topic_base : str = "powermon/"
@@ -26,7 +30,7 @@ class API_MQTT(AbstractOutput):
         self.formatter = formatter
 
     def set_command(self, command_name):
-        self.command_name = command_name
+        self.command_code = command_name
 
     def set_mqtt_broker(self, mqtt_broker: MqttBroker):
         self.mqtt_broker = mqtt_broker
@@ -35,8 +39,7 @@ class API_MQTT(AbstractOutput):
         self.device_id = device_id
 
     def get_topic(self):
-        #TODO: is there a more readable approach? like a format string?
-        return self.topic_base + str(self.device_id) + "/" + self.topic_type + self.command_name
+        return  CommandDTO.get_command_result_topic().format(device_id=self.device_id, command_name=self.command_code)
 
     def to_DTO(self) -> OutputDTO:
         return OutputDTO(type="api_mqtt", format=self.formatter.to_DTO())

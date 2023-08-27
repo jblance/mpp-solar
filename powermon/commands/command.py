@@ -78,7 +78,7 @@ class Command:
     @classmethod
     def from_DTO(cls, command_dto: CommandDTO) -> "Command":
         trigger = Trigger.from_DTO(command_dto.trigger)
-        command = cls(code=command_dto.command, commandtype="basic", outputs=[], trigger=trigger)
+        command = cls(code=command_dto.command_code, commandtype="basic", outputs=[], trigger=trigger)
         outputs = []
         for output_dto in command_dto.outputs:
             if output_dto.type == OutputType.API_MQTT:
@@ -102,7 +102,7 @@ class Command:
 
     def to_dto(self):
         return CommandDTO(
-            command = self.code,
+            command_code = self.code,
             device_id=self.device_id,
             result_topic = self.outputs[0].get_topic(),
             trigger = self.trigger.to_DTO(),

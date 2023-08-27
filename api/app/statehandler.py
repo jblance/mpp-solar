@@ -17,18 +17,19 @@ class StateHandler(object):
     
 
     
-    def recieved_result(self, topic: str, result: ResultDTO):
-        # command = self._commandDictionary.get(mqtt_message.topic, None)
-        # print("Command Recieved: ", command, self._commandRequests)
-        # if(command is None or command not in self._commandRequests):
-        #     print("Command not registered: ", command)
-        #     return
+    def recieved_result(self, topic: str, payload: bytes):
+        
         print(f"Recieved result for {topic}")
-        self._results.append(result)
-        if topic in self._topics_waiting_for_result:
-            self._topics_waiting_for_result[topic] = result
+        if self.is_command_result_topic(topic):
+            result = ResultDTO.parse_raw(payload.decode())
+            
+            self._results.append(result)
+            if topic in self._topics_waiting_for_result:
+                self._topics_waiting_for_result[topic] = result
         
     async def get_next_result(self, topic: str) -> ResultDTO | None:
+        print(f"Waiting for result for {topic}")
+        print(self._topics_waiting_for_result)
         self._topics_waiting_for_result[topic] = None
         while True:
             if topic in self._topics_waiting_for_result:
@@ -38,6 +39,7 @@ class StateHandler(object):
                     return result
             else:
                 raise RuntimeError("Topic not found in waiting for result list")
+            print(f"Still waiting for result on {topic}")
             await asyncio.sleep(0.5)
 
     def is_command_result_topic(self, topic: str) -> bool:

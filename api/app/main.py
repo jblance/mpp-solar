@@ -57,18 +57,16 @@ def connect(client, flags, rc, properties):
 async def listen_to_announcements(client, topic, payload, qos, properties):
     handler = StateHandler()
     device = handler.recieved_announcement(payload.decode())
-    for command in device.commands:
-        mqtt.client.subscribe(command.result_topic)
+    print(f"Recieved announcement for {device.identifier}")
+    mqtt.client.subscribe(f"powermon/{device.identifier}/results/#")
 
 @mqtt.on_message()
 async def message(client, topic, payload, qos, properties):
     #print("Received message: ", topic, payload.decode(), qos, properties)
     handler = StateHandler()
     log.debug(F"Command result on topic {topic}")
-    if handler.is_command_result_topic(topic):
-        log.debug(F"Command result on topic {topic}")
-        result = ResultDTO.parse_raw(payload.decode())
-        handler.recieved_result(topic, result)
+    #if handler.is_command_result_topic(topic):
+    handler.recieved_result(topic, payload)
 
 @mqtt.on_disconnect()
 def disconnect(client, packet, exc=None):
@@ -127,10 +125,10 @@ async def add_command(command_dto: CommandDTO, handler: StateHandler = Depends(g
     if device is None:
         raise HTTPException(status_code=404, detail=f"Device id: {command_dto.device_id} not found")
 
-    if command_dto.command not in device.port.protocol.commands.keys():
+    if command_dto.command_code not in device.port.protocol.commands.keys():
         raise HTTPException(
             status_code=404, 
-            detail=f"Command: {command_dto.command} not found in protocol: {device.port.protocol.protocol_id}")
+            detail=f"Command: {command_dto.command_code} not found in protocol: {device.port.protocol.protocol_id}")
 
     mqtt.client.publish(f"powermon/{command_dto.device_id}/addcommand", command_dto.json())
 
