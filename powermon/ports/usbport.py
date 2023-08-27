@@ -3,7 +3,7 @@ import os
 import time
 
 from powermon.dto.portDTO import PortDTO
-from powermon.libs.result import Result
+from powermon.commands.result import Result
 from powermon.ports.abstractport import AbstractPort
 from powermon.protocols import get_protocol_definition
 from powermon.commands.command import Command

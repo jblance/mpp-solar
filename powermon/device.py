@@ -7,7 +7,7 @@ from powermon.ports import getPortFromConfig
 from powermon.ports.abstractport import AbstractPort
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.commands.command import Command
-from powermon.libs.result import Result
+from powermon.commands.result import Result
 
 # Set-up logger
 log = logging.getLogger("Device")

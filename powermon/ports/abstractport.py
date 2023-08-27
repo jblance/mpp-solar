@@ -4,7 +4,7 @@ from enum import auto
 
 from strenum import LowercaseStrEnum
 
-from powermon.libs.result import Result
+from powermon.commands.result import Result
 from powermon.protocols.abstractprotocol import AbstractProtocol
 from powermon.commands.command import Command
 

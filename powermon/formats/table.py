@@ -2,7 +2,7 @@ import logging
 
 from mppsolar.helpers import getMaxLen, pad
 from powermon.formats.abstractformat import AbstractFormat
-from powermon.libs.result import Result
+from powermon.commands.result import Result
 
 log = logging.getLogger("table")
 

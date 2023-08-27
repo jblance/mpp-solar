@@ -2,7 +2,7 @@ import logging
 
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.dto.resultDTO import ResultDTO
-from powermon.libs.result import Result
+from powermon.commands.result import Result
 from powermon.libs.mqttbroker import MqttBroker
 from powermon.dto.outputDTO import OutputDTO
 from powermon.formats.simple import SimpleFormat

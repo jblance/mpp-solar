@@ -20,7 +20,7 @@ from mppsolar.protocols.protocol_helpers import crcPI as crc
 from mppsolar.protocols.protocol_helpers import get_resp_defn, get_value  # noqa: F401
 from powermon.dto.protocolDTO import ProtocolDTO
 from powermon.protocols import ResponseType
-from powermon.libs.result import Result
+from powermon.commands.result import Result
 from powermon.commands.command import Command
 
 log = logging.getLogger("AbstractProtocol")

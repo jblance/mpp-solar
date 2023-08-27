@@ -7,6 +7,7 @@ from fastapi_mqtt import FastMQTT, MQTTConfig
 # import asyncio
 
 from sqlalchemy.orm import Session
+import logging
 
 from api.app.statehandler import StateHandler
 
@@ -17,6 +18,7 @@ from powermon.dto.commandDTO import CommandDTO
 from .db import crud, models, schemas
 from .db.database import SessionLocal, engine
 
+log = logging.getLogger("main")
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -47,7 +49,7 @@ def get_statehandler():
 def connect(client, flags, rc, properties):
     topic = "powermon/"
     # mqtt.client.subscribe(topic) #subscribing mqtt topic
-    print("Connected: ", client, flags, rc, properties, topic)
+    log.info(f"Connected: {client}, {flags}, {rc}, {properties}, {topic}")
 
 
 
@@ -62,8 +64,9 @@ async def listen_to_announcements(client, topic, payload, qos, properties):
 async def message(client, topic, payload, qos, properties):
     #print("Received message: ", topic, payload.decode(), qos, properties)
     handler = StateHandler()
+    log.debug(F"Command result on topic {topic}")
     if handler.is_command_result_topic(topic):
-        print(F"Command result on topic {topic}")
+        log.debug(F"Command result on topic {topic}")
         result = ResultDTO.parse_raw(payload.decode())
         handler.recieved_result(topic, result)
 
@@ -109,7 +112,7 @@ async def read_command(device_id: str, command_code: str, handler: StateHandler 
     result = None
     
     command_dto = CommandDTO.run_api_command(command_code=command_code, device_id=device_id)
-    print(f"Subcribing to {command_dto.result_topic}")
+    log.debug(f"Subcribing to {command_dto.result_topic}")
     mqtt.client.subscribe(command_dto.result_topic)
     await add_command(command_dto, handler=handler)
 
@@ -119,6 +122,7 @@ async def read_command(device_id: str, command_code: str, handler: StateHandler 
 
 @app.post("/addCommand/", response_model=CommandDTO)
 async def add_command(command_dto: CommandDTO, handler: StateHandler = Depends(get_statehandler)):
+    log.debug("Add command")
     device = handler.get_device_instance(command_dto.device_id)
     if device is None:
         raise HTTPException(status_code=404, detail=f"Device id: {command_dto.device_id} not found")
