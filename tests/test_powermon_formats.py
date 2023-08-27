@@ -4,7 +4,7 @@ import unittest
 import yaml
 from powermon.device import Device
 from powermon.formats.hass import hass
-from powermon.libs.result import Result
+from powermon.commands.result import Result
 
 
 class test_powermon_formats(unittest.TestCase):

@@ -111,5 +111,5 @@ def parseOutputConfig(outputConfig):
         outputType = DEFAULT_OUTPUT
         formatConfig = DEFAULT_FORMAT
 
-    _format = getFormatfromConfig(formatConfig, device, topic)
+    _format = getFormatfromConfig(formatConfig)
     log.debug("got format: %s", (_format))

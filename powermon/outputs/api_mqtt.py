@@ -2,18 +2,26 @@ import logging
 
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.dto.resultDTO import ResultDTO
-from powermon.libs.result import Result
+from powermon.commands.result import Result
 from powermon.libs.mqttbroker import MqttBroker
+from powermon.dto.outputDTO import OutputDTO
+from powermon.dto.commandDTO import CommandDTO
+from powermon.formats.simple import SimpleFormat
 
 log = logging.getLogger("API_MQTT")
 
 
 class API_MQTT(AbstractOutput):
+    
+    
+    
     def __init__(self, formatter) -> None:
         self.set_formatter(formatter)
-        self.command_name = "not_set"
+        self.command_code : str = "not_set"
+        self.device_id : str = "not_set"
 
-        self.topic_base = "powermon/results/"
+        self.topic_base : str = "powermon/"
+        self.topic_type : str = "results/"
 
     def __str__(self):
         return "outputs the results to the supplied mqtt broker: eg powermon/status/total_output_active_power/value 1250"
@@ -24,14 +32,26 @@ class API_MQTT(AbstractOutput):
     def set_formatter(self, formatter):
         self.formatter = formatter
 
+    def set_formatter(self, formatter):
+        self.formatter = formatter
+
     def set_command(self, command_name):
-        self.command_name = command_name
+        self.command_code = command_name
 
     def set_mqtt_broker(self, mqtt_broker: MqttBroker):
         self.mqtt_broker = mqtt_broker
 
+    def set_device_id(self, device_id):
+        self.device_id = device_id
+
+    def get_topic(self):
+        return  CommandDTO.get_command_result_topic().format(device_id=self.device_id, command_name=self.command_code)
+
+    def to_DTO(self) -> OutputDTO:
+        return OutputDTO(type="api_mqtt", format=self.formatter.to_DTO())
+
+
     def output(self, result: Result):
-        log.info("Using output processor: api_mqtt")
         # exit if no data
         if result.raw_response is None:
             return
@@ -42,13 +62,14 @@ class API_MQTT(AbstractOutput):
             raise RuntimeError("No mqtt broker supplied")
 
         # build the messages...
-        formatted_data = self.formatter.format(result)
-        log.debug("mqtt.output msgs %s",formatted_data)
-
-        result_dto = ResultDTO(device_identifier=result.get_device_id(), command=result.command.name, data=result.get_decoded_responses())
-
-        log.debug("Topic: %s", self.get_topic())
+        result_dto = ResultDTO(device_identifier=result.get_device_id(), command_code=result.command_code, data=result.get_decoded_responses())
         self.mqtt_broker.publish(self.get_topic(), result_dto.json())
 
     def process(self, result: Result):
         self.output(result)
+        
+        
+    @classmethod
+    def from_DTO(cls, dto: OutputDTO) -> "API_MQTT":
+        formatter = SimpleFormat.from_DTO(dto.format)
+        return cls(formatter=formatter)

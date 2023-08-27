@@ -51,8 +51,8 @@ def getFormatfromConfig(formatConfig) -> AbstractFormat:
             from powermon.formats.topics import Topics
             formatter = Topics(formatConfig)
         case FormatterType.SIMPLE:
-            from powermon.formats.simple import simple
-            formatter = simple(formatConfig)
+            from powermon.formats.simple import SimpleFormat
+            formatter = SimpleFormat(formatConfig)
         case FormatterType.TABLE:
             from powermon.formats.table import table
             formatter = table(formatConfig)
