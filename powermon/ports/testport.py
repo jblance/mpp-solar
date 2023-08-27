@@ -5,6 +5,7 @@ from powermon.dto.portDTO import PortDTO
 from powermon.libs.result import Result
 from powermon.ports.abstractport import AbstractPort
 from powermon.protocols import get_protocol_definition
+from powermon.commands.command import Command
 
 log = logging.getLogger("test")
 
@@ -37,8 +38,10 @@ class TestPort(AbstractPort):
         log.debug("Test port disconnected")
         return
 
-    def send_and_receive(self, result) -> Result:
-        command_defn = result.command.command_defn
+    def send_and_receive(self, command: Command) -> Result:
+        command_defn = command.command_defn
+        
+        result = Result(command.code)
 
         if command_defn is not None:
             # Have test data defined, so use that

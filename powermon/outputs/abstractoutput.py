@@ -1,13 +1,20 @@
 from abc import ABC, abstractmethod
 import logging
+from strenum import LowercaseStrEnum
+from enum import auto
 
 from powermon.libs.mqttbroker import MqttBroker
 from powermon.formats.abstractformat import AbstractFormat
 from powermon.dto.outputDTO import OutputDTO
 
 
+
 log = logging.getLogger("Output")
 
+class OutputType(LowercaseStrEnum):
+    API_MQTT = auto()
+    MQTT = auto()
+    SCREEN = auto()
 
 class AbstractOutput(ABC):
 

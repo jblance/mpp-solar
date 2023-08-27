@@ -21,6 +21,7 @@ from mppsolar.protocols.protocol_helpers import get_resp_defn, get_value  # noqa
 from powermon.dto.protocolDTO import ProtocolDTO
 from powermon.protocols import ResponseType
 from powermon.libs.result import Result
+from powermon.commands.command import Command
 
 log = logging.getLogger("AbstractProtocol")
 
@@ -69,11 +70,11 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.debug(f"full command: {full_command}")
         return full_command
 
-    def get_response_defn(self, result, index=None, key=None):
-        definitions_count = len(result.command.command_defn["response"])
+    def get_response_defn(self, command: Command, index=None, key=None):
+        definitions_count = len(command.command_defn["response"])
         if index is not None:
             if index < definitions_count:
-                return result.command.command_defn["response"][index]
+                return command.command_defn["response"][index]
             else:
                 return [index, f"Unknown value in response {index}", "bytes.decode", ""]
         elif key is not None:
@@ -132,7 +133,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             # Just ignore these ones
             log.debug(f"Discarding {data_name}:{raw_value}")
             return [(None, raw_value, data_units, extra_info)]
-        log.debug(f"Processing data_type: {data_type}, template: {template} for data_name: {data_name}, raw_value {raw_value}")
+        #log.debug(f"Processing data_type: {data_type}, template: {template} for data_name: {data_name}, raw_value {raw_value}")
         match data_type:
             case "loop":
                 log.warning("loop not implemented...")
@@ -256,7 +257,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     r = f"Invalid key: {key}"
                 return [(data_name, r, "", extra_info)]
         format_string = f"{data_type}(raw_value)"
-        log.debug(f"Processing format string {format_string}")
+        #log.debug(f"Processing format string {format_string}")
         try:
             r = eval(format_string)
         except ValueError as e:
@@ -270,7 +271,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             r = eval(template)
         return [(data_name, r, data_units, extra_info)]
 
-    def decode(self, result: Result):
+    def decode(self, result: Result, command: Command):
         """
         Take the a result object and decode the raw response
         into a ??? dict of name: value, unit entries
@@ -293,21 +294,21 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         # - the value is a list of [value, unit, extra_info(opt)]
 
         # Cant decode without a definition of the command
-        if result.command.command_defn is None:
-            log.debug(f"No definition for command {result.command.name}")
+        if command.command_defn is None:
+            log.debug(f"No definition for command {command.code}")
             result.error = True
-            result.error_messages.append(f"failed to decode responses: no definition for {result.command.name}")
+            result.error_messages.append(f"failed to decode responses: no definition for {command.code}")
             return
 
         # Cant decode without a definition of the expected response to the command
-        if "response" not in result.command.command_defn:
-            log.debug(f"No definition for the response of command {result.command.name}")
+        if "response" not in command.command_defn:
+            log.debug(f"No definition for the response of command {command.code}")
             result.error = True
-            result.error_messages.append(f"failed to decode responses: no definition for the response of {result.command.name}")
+            result.error_messages.append(f"failed to decode responses: no definition for the response of {command.code}")
             return
 
         # Determine the type of response
-        response_type = result.command.command_defn.get("response_type", ResponseType.DEFAULT)
+        response_type = command.command_defn.get("response_type", ResponseType.DEFAULT)
         log.info(f"Processing response of type {response_type}")
 
         # Process the response by reponse type
@@ -318,7 +319,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 # expects a single response, eg b'NAK'
 
                 # get the response definition
-                response_defn = self.get_response_defn(result, index=0)
+                response_defn = self.get_response_defn(command, index=0)
 
                 # decode the response
                 raw_value = result.responses[0].decode()
@@ -335,14 +336,14 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             case ResponseType.MULTIVALUED:
                 # Response that while able to be split, makes more sense as a single response
                 # eg Max Charging Current Options: 010 020 030 040 050 060 070 080 090 100 110 120 A
-                data_name = result.command.command_defn["response"][0][1]
+                data_name = command.command_defn["response"][0][1]
                 value = ""
                 for item in result.responses:
                     value += f"{item.decode()} "
-                data_units = result.command.command_defn["response"][0][3]
+                data_units = command.command_defn["response"][0][3]
                 log.debug(f"{data_name}, {value}, {data_units}")
-                if len(result.command.command_defn["response"][0]) > 4:
-                    extra_info = result.command.command_defn["response"][0][4]
+                if len(command.command_defn["response"][0]) > 4:
+                    extra_info = command.command_defn["response"][0][4]
                     result.decoded_responses = {data_name: [value, data_units, extra_info]}
                 else:
                     result.decoded_responses = {data_name: [value, data_units]}
@@ -360,7 +361,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
                 # check the number of responses and the number of response definitions
                 len_responses = len(result.responses)
-                len_defns = len(result.command.command_defn["response"])
+                len_defns = len(command.command_defn["response"])
                 log.debug("got %s responses, %s response definitions" % (len_responses, len_defns))
 
                 # if there are more definitions than responses, the extras may be calculated fields
@@ -373,7 +374,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 for i, _response in enumerate(result.responses):
                     # get response defn for this response
                     # [1, "AC Input Voltage", "float", "V", {icon: blah}]
-                    response_defn = self.get_response_defn(result, index=i)
+                    response_defn = self.get_response_defn(command, index=i)
 
                     # populate vars from response and response definition
                     raw_value = _response
@@ -400,7 +401,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         log.debug(f"Processing info, {data_type=} for {data_name=}, {data_units=} {_response=}")
                         template = data_type.split(":", 1)[1]
                         # Provide cn as shortcut to the command name for info fields
-                        cn = result.command.name  # noqa: F841
+                        cn = command.code  # noqa: F841
                         value = eval(template)
                         if data_name is not None:
                             result.decoded_responses[data_name] = [value, data_units, extra_info]
@@ -424,9 +425,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 return
 
             case _:
-                log.error(f"bad response type {response_type} for {result.command.name}")
+                log.error(f"bad response type {response_type} for {command.name}")
                 result.error = True
-                result.error_messages.append(f"failed to decode responses: bad response type {response_type} for {result.command.name}")
+                result.error_messages.append(f"failed to decode responses: bad response type {response_type} for {command.code}")
                 return
 
     #

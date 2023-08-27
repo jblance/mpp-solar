@@ -56,17 +56,16 @@ async def listen_to_announcements(client, topic, payload, qos, properties):
     handler = StateHandler()
     device = handler.recieved_announcement(payload.decode())
     for command in device.commands:
-        print("Subscribing to command: ", command.result_topic)
         mqtt.client.subscribe(command.result_topic)
 
 @mqtt.on_message()
 async def message(client, topic, payload, qos, properties):
-    print("Received message: ", topic, payload.decode(), qos, properties)
+    #print("Received message: ", topic, payload.decode(), qos, properties)
     handler = StateHandler()
     if handler.is_command_result_topic(topic):
         print(F"Command result on topic {topic}")
         result = ResultDTO.parse_raw(payload.decode())
-        handler.recieved_result(result)
+        handler.recieved_result(topic, result)
 
 @mqtt.on_disconnect()
 def disconnect(client, packet, exc=None):
@@ -110,10 +109,11 @@ async def read_command(device_id: str, command_code: str, handler: StateHandler 
     result = None
     
     command_dto = CommandDTO.run_api_command(command_code=command_code, device_id=device_id)
+    print(f"Subcribing to {command_dto.result_topic}")
     mqtt.client.subscribe(command_dto.result_topic)
-    requsted_command = await add_command(command_dto, handler=handler)
+    await add_command(command_dto, handler=handler)
 
-    result = await handler.get_next_result(requsted_command.result_topic)
+    result = await handler.get_next_result(command_dto.result_topic)
 
     return result
 

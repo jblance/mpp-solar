@@ -1,5 +1,6 @@
 """device.py"""
 import logging
+import time
 
 from powermon.dto.deviceDTO import DeviceDTO
 from powermon.ports import getPortFromConfig
@@ -57,7 +58,7 @@ class Device:
         if command is None:
             return
         # get command definition from protocol
-        command.command_defn = self.port.protocol.get_command_defn(command.name)
+        command.command_defn = self.port.protocol.get_command_defn(command.code)
         self.commands.append(command)
         command.set_device_id(self.identifier)
 
@@ -91,17 +92,18 @@ class Device:
         the loop that checks for commands to run,
         runs them
         """
+        time.sleep(0.1)
         if self.commands is None:
             log.info("no commands in queue")
             return False
         else:
             for command in self.commands:
                 if force or command.dueToRun():
-                    log.debug(f"Running command: {command.name}")
+                    log.debug(f"Running command: {command.code}")
                     # run command
                     result: Result = self.port.run_command(command)
                     # decode result
-                    self.port.get_protocol().decode(result)
+                    self.port.get_protocol().decode(result=result, command=command)
                     result.set_device_id(self.identifier)
                     # loop through each output and process result
                     output: AbstractOutput

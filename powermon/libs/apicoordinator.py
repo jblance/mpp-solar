@@ -5,7 +5,7 @@ from powermon.device import Device
 from powermon.commands.command import Command
 from powermon.commands.trigger import Trigger
 from powermon.dto.commandDTO import CommandDTO
-from powermon.formats.simple import simple
+from powermon.formats.simple import SimpleFormat
 from powermon.outputs.api_mqtt import API_MQTT
 
 log = logging.getLogger("APICoordinator")
@@ -65,11 +65,13 @@ class ApiCoordinator:
 
         dto = CommandDTO.parse_raw(jsonString)
         
-            
-        command = Command(name=dto.command, commandtype="basic", outputs=[], trigger=Trigger(trigger_type=dto.trigger.trigger_type, value=dto.trigger.value))
+        trigger = Trigger.from_DTO(dto.trigger)    
+        command = Command.from_DTO(dto)
+        Command(code=dto.command, commandtype="basic", outputs=[], trigger=trigger)
         outputs = []
         
-        output = API_MQTT(formatter=simple({}))
+        
+        output = API_MQTT(formatter=SimpleFormat({}))
         outputs.append(output)
             
         command.set_outputs(outputs=outputs)
@@ -77,7 +79,7 @@ class ApiCoordinator:
         
         self.device.add_command(command)
 
-        self.announce_device()
+        #self.announce_device()
         
         return command
             
@@ -98,7 +100,6 @@ class ApiCoordinator:
 
     def announce_device(self):
         device_dto = self.device.toDTO()
-        log.info(device_dto)
         if not self.enabled:
             return
         self.mqtt_broker.publish(self.announce_topic, device_dto.json())

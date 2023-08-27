@@ -6,6 +6,7 @@ from powermon.dto.portDTO import PortDTO
 from powermon.libs.result import Result
 from powermon.ports.abstractport import AbstractPort
 from powermon.protocols import get_protocol_definition
+from powermon.commands.command import Command
 
 log = logging.getLogger("USBPort")
 
@@ -43,9 +44,9 @@ class USBPort(AbstractPort):
             os.close(self.port)
         return
 
-    def send_and_receive(self, result) -> Result:
-        full_command = result.command.full_command
+    def send_and_receive(self, command: Command) -> Result:
         response_line = bytes()
+        result = Result(command_code=command.code)
 
         # Open USB device
         usb0 = None
@@ -58,6 +59,7 @@ class USBPort(AbstractPort):
             return result
 
         # Send the command to the open usb connection
+        full_command = command.get_full_command()
         cmd_len = len(full_command)
         log.debug(f"length of to_send: {cmd_len}")
         # for command of len < 8 it ok just to send

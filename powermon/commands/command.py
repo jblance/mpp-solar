@@ -4,13 +4,15 @@ from powermon.commands.trigger import Trigger
 from powermon.outputs import getOutputs
 from powermon.dto.commandDTO import CommandDTO
 from powermon.outputs.abstractoutput import AbstractOutput
+from powermon.outputs.abstractoutput import OutputType
+from powermon.outputs.api_mqtt import API_MQTT
 log = logging.getLogger("Command")
 
 
 class Command:
-    def __init__(self, name : str, commandtype: str, outputs: list[AbstractOutput], trigger : Trigger):
+    def __init__(self, code : str, commandtype: str, outputs: list[AbstractOutput], trigger : Trigger):
 
-        self.name = name
+        self.code = code
         self.type = commandtype
         self.set_outputs(outputs)
         
@@ -19,14 +21,17 @@ class Command:
         self.last_run = None
         self.next_run = self.trigger.nextRun(command=self)
         self.full_command = None
-        self.command_defn = None
+        self.command_defn : dict[str, list] = {}
         self.device_id = None
         log.debug(self)
+        
+    def get_full_command(self) -> str | None:
+        return self.full_command
     
     def set_outputs(self, outputs : list[AbstractOutput]):
         self.outputs = outputs
         for output in self.outputs:
-            output.set_command(self.name)
+            output.set_command(self.code)
 
     def set_device_id(self, device_id):
         self.device_id = device_id
@@ -34,7 +39,7 @@ class Command:
             output.set_device_id(device_id)
 
     def __str__(self):
-        if self.name is None:
+        if self.code is None:
             return "empty command object"
         if self.last_run is None:
             last_run = "Not yet run"
@@ -49,7 +54,7 @@ class Command:
         for output in self.outputs:
             _outs += str(output)
 
-        return f"Command: {self.name=} {self.full_command=}, {self.type=}, [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {self.command_defn=}"
+        return f"Command: {self.code=} {self.full_command=}, {self.type=}, [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {self.command_defn=}"
 
     @classmethod
     def from_config(cls, config=None) -> "Command":
@@ -61,14 +66,25 @@ class Command:
             raise TypeError("Invalid command config")
             # return None
 
-        name = config.get("command")
-        if name is None:
+        code = config.get("command")
+        if code is None:
             log.info("command must be defined")
             raise TypeError("command must be defined")
         commandtype = config.get("type", "basic")
         outputs = getOutputs(config.get("outputs", ""))
         trigger = Trigger.fromConfig(config=config.get("trigger"))
-        return cls(name=name, commandtype=commandtype, outputs=outputs, trigger=trigger)
+        return cls(code=code, commandtype=commandtype, outputs=outputs, trigger=trigger)
+    
+    @classmethod
+    def from_DTO(cls, command_dto: CommandDTO) -> "Command":
+        trigger = Trigger.from_DTO(command_dto.trigger)
+        command = cls(code=command_dto.command, commandtype="basic", outputs=[], trigger=trigger)
+        outputs = []
+        for output_dto in command_dto.outputs:
+            if output_dto.type == OutputType.API_MQTT:
+                outputs.append(API_MQTT.from_DTO(output_dto))
+        command.set_outputs(outputs=outputs)
+        return command
     
     
     def set_mqtt_broker(self, mqtt_broker):
@@ -86,7 +102,7 @@ class Command:
 
     def to_dto(self):
         return CommandDTO(
-            command = self.name,
+            command = self.code,
             device_id=self.device_id,
             result_topic = self.outputs[0].get_topic(),
             trigger = self.trigger.to_DTO(),

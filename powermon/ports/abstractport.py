@@ -6,6 +6,7 @@ from strenum import LowercaseStrEnum
 
 from powermon.libs.result import Result
 from powermon.protocols.abstractprotocol import AbstractProtocol
+from powermon.commands.command import Command
 
 
 log = logging.getLogger("Port")
@@ -40,7 +41,7 @@ class AbstractPort(ABC):
         return
 
     @abstractmethod
-    def send_and_receive(self, result) -> Result:
+    def send_and_receive(self, command: Command) -> Result:
         raise NotImplementedError
 
     @abstractmethod
@@ -50,17 +51,17 @@ class AbstractPort(ABC):
     def get_protocol(self) -> AbstractProtocol:
         return self.protocol
 
-    def run_command(self, command):
+    def run_command(self, command: Command):
         # takes a command object, runs the command and returns a result object (replaces process_command)
         log.debug(f"Command {command}")
         # update run times
         command.touch()
         # update full_command - expand any template / add crc etc
         # updates every run incase something has changed
-        command.full_command = self.get_protocol().get_full_command(command.name)
-        result = Result(command)
+        command.full_command = self.get_protocol().get_full_command(command.code)
+
         # run the command via the 'send_and_receive port function
-        result = self.send_and_receive(result)
+        result = self.send_and_receive(command)
         log.debug(f"after send_and_receive {result}")
         return result
 

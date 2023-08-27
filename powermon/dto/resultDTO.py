@@ -6,5 +6,5 @@ from pydantic import BaseModel
 # TODO: update
 class ResultDTO(BaseModel):
     device_identifier: str
-    command: str
+    command_code: str
     data: dict 

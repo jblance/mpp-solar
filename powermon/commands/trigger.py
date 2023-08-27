@@ -79,7 +79,7 @@ class Trigger:
                 return True
             return False
         elif self.trigger_type == TriggerType.ONCE:
-            if self.value == 0:
+            if int(self.value) == 0:
                 self.value = 1
                 return True
             else:

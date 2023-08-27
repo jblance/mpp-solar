@@ -7,6 +7,7 @@ from powermon.dto.portDTO import PortDTO
 from powermon.libs.result import Result
 from powermon.ports.abstractport import AbstractPort
 from powermon.protocols import get_protocol_definition
+from powermon.commands.command import Command
 
 log = logging.getLogger("SerialPort")
 
@@ -52,8 +53,9 @@ class SerialPort(AbstractPort):
             self.serialPort.close()
         return
 
-    def send_and_receive(self, result: Result) -> Result:
-        full_command = result.command.full_command
+    def send_and_receive(self, command: Command) -> Result:
+        result = Result(command.code)
+        full_command = command.full_command
         response_line = None
         log.debug(f"port {self.serialPort}")
         if self.serialPort is None:

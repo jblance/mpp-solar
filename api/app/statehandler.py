@@ -17,16 +17,18 @@ class StateHandler(object):
     
 
     
-    def recieved_result(self, result: ResultDTO):
+    def recieved_result(self, topic: str, result: ResultDTO):
         # command = self._commandDictionary.get(mqtt_message.topic, None)
         # print("Command Recieved: ", command, self._commandRequests)
         # if(command is None or command not in self._commandRequests):
         #     print("Command not registered: ", command)
         #     return
-
+        print(f"Recieved result for {topic}")
         self._results.append(result)
+        if topic in self._topics_waiting_for_result:
+            self._topics_waiting_for_result[topic] = result
         
-    async def get_next_result(self, topic: str) -> ResultDTO:
+    async def get_next_result(self, topic: str) -> ResultDTO | None:
         self._topics_waiting_for_result[topic] = None
         while True:
             if topic in self._topics_waiting_for_result:
@@ -39,34 +41,28 @@ class StateHandler(object):
             await asyncio.sleep(0.5)
 
     def is_command_result_topic(self, topic: str) -> bool:
-        for device in self._devices.values():
-            for command in device.commands:
-                if(command.result_topic == topic):
-                    return True
-        return False
+        if "result" in topic:
+            return True
+        return False 
 
     def recieved_announcement(self, message) -> DeviceDTO:
-        print("Announcement Recieved: ", message)
         device = DeviceDTO.parse_raw(message)
         deviceId : str = device.identifier 
-        print("Device ID: ", deviceId)
         self._devices[deviceId] = device
         return device
 
-        
-        
 
     def get_device_instances(self) -> list[DeviceDTO]:
         return list(self._devices.values())
-    
+
     def get_device_instance(self, device_id) -> DeviceDTO | None:
         device = self._devices.get(device_id)
         return device
-    
+
     async def get_results(self):
         return self._results
 
-    
+
 class CommandRequest:
     def __init__(self, command):
         self.command = command
