@@ -49,7 +49,7 @@ class StateHandler(object):
 
     def recieved_announcement(self, message) -> DeviceDTO:
         device = DeviceDTO.parse_raw(message)
-        deviceId : str = device.identifier 
+        deviceId : str = device.device_id 
         self._devices[deviceId] = device
         return device
 

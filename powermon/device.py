@@ -24,7 +24,7 @@ class Device:
     """
 
     def __str__(self):
-        return f"Device: {self.name}, {self.identifier=}, {self.model=}, {self.manufacturer=}, port: {self.port}, commands:{self.commands}"
+        return f"Device: {self.name}, {self.device_id=}, {self.model=}, {self.manufacturer=}, port: {self.port}, commands:{self.commands}"
 
     @classmethod
     def fromConfig(cls, config=None):
@@ -32,7 +32,7 @@ class Device:
             log.warning("No device definition in config. Check configFile argument?")
             return cls(name="unnamed")
         name = config.get("name", "unnamed_device")
-        identifier = config.get("id")
+        device_id = config.get("id", "1") # device_id needs to be unique if there are two devices
         model = config.get("model")
         manufacturer = config.get("manufacturer")
 
@@ -42,12 +42,12 @@ class Device:
             log.error("Invalid port config '%s' found", config)
             raise ConfigError(f"Invalid port config '{config}' found")
 
-        return cls(name=name, identifier=identifier, model=model, manufacturer=manufacturer, port=port)
+        return cls(name=name, device_id=device_id, model=model, manufacturer=manufacturer, port=port)
 
-    def __init__(self, name : str, identifier : str = "", model : str = "", manufacturer : str = "", port : AbstractPort = None):
+    def __init__(self, name : str, device_id : str = "", model : str = "", manufacturer : str = "", port : AbstractPort = None):
 
         self.name = name
-        self.identifier = identifier
+        self.device_id = device_id
         self.model = model
         self.manufacturer = manufacturer
         self.port : AbstractPort = port
@@ -60,7 +60,7 @@ class Device:
         # get command definition from protocol
         command.command_defn = self.port.protocol.get_command_defn(command.code)
         self.commands.append(command)
-        command.set_device_id(self.identifier)
+        command.set_device_id(self.device_id)
 
     def get_port(self) -> AbstractPort:
         return self.port
@@ -71,7 +71,7 @@ class Device:
         for command in self.commands:
             commands.append(command.to_dto())
         dto = DeviceDTO(
-            identifier=self.identifier,
+            device_id=self.device_id,
             model=self.model,
             manufacturer=self.manufacturer,
             port=self.port.toDTO(),
@@ -104,7 +104,7 @@ class Device:
                     result: Result = self.port.run_command(command)
                     # decode result
                     self.port.get_protocol().decode(result=result, command=command)
-                    result.set_device_id(self.identifier)
+                    result.set_device_id(self.device_id)
                     # loop through each output and process result
                     output: AbstractOutput
                     for output in command.outputs:

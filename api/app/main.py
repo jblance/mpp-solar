@@ -57,8 +57,8 @@ def connect(client, flags, rc, properties):
 async def listen_to_announcements(client, topic, payload, qos, properties):
     handler = StateHandler()
     device = handler.recieved_announcement(payload.decode())
-    print(f"Recieved announcement for {device.identifier}")
-    mqtt.client.subscribe(f"powermon/{device.identifier}/results/#")
+    print(f"Recieved announcement for {device.device_id}")
+    mqtt.client.subscribe(f"powermon/{device.device_id}/results/#")
 
 @mqtt.on_message()
 async def message(client, topic, payload, qos, properties):

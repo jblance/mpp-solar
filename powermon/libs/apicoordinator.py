@@ -56,7 +56,7 @@ class ApiCoordinator:
         # mqtt_broker.publish(self.announceTopic, self.schedule.getScheduleConfigAsJSON())
 
     def get_addcommand_topic(self):
-        return self.adhoc_topic_format.format(device_id=self.device.identifier)
+        return self.adhoc_topic_format.format(device_id=self.device.device_id)
 
     def addcommand_callback(self, client, userdata, msg):
         log.info(f"Received `{msg.payload}` on topic `{msg.topic}`")
