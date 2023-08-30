@@ -20,7 +20,7 @@ class hass(AbstractFormat):
             self.device_manufacturer = "MPP Solar"
         else:
             self.device_name = device.name
-            self.device_id = device.identifier
+            self.device_id = device.device_id
             self.device_model = device.model
             self.device_manufacturer = device.manufacturer
 
