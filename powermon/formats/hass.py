@@ -26,6 +26,9 @@ class hass(AbstractFormat):
 
     def sendsMultipleMessages(self) -> bool:
         return True
+    
+    def set_command_description(self, command_description):
+        pass
 
     def format(self, result) -> list:
         log.info("Using output formatter: %s" % self.name)

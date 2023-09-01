@@ -58,7 +58,7 @@ class Device:
         if command is None:
             return
         # get command definition from protocol
-        command.command_defn = self.port.protocol.get_command_defn(command.code)
+        command.set_command_definition(self.port.protocol.get_command_definition(command.code))
         self.commands.append(command)
         command.set_device_id(self.device_id)
 

@@ -110,7 +110,7 @@ Parameter    Value   Unit           \nprotocol_id  PI30                   \n"""
                 text=True,
             )
             # print(result.stdout)
-            #self.assertEqual(result.stdout, expected) #returning 'unknown command', not sure why and this type of test doesn't make it obvious. Will make soeme unittest style tests
+            self.assertEqual(result.stdout, expected) #returning 'unknown command', not sure why and this type of test doesn't make it obvious. Will make soeme unittest style tests
             self.assertEqual(result.returncode, 0)
         except subprocess.CalledProcessError as error:
             print(error.stdout)

@@ -148,7 +148,7 @@ class ved(AbstractProtocol):
         )
         # These need to be set to allow other functions to work`
         self._command = command
-        self._command_defn = self.get_command_defn(command)
+        self._command_defn = self.get_command_definition(command)
         # End of required variables setting
         if self._command_defn is None:
             return None

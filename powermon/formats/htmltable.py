@@ -8,6 +8,9 @@ class htmltable(AbstractFormat):
     def __init__(self, formatConfig):
         super().__init__(formatConfig)
         self.name = "htmltable"
+        
+    def set_command_description(self, command_description):
+        pass
 
     def format(self, result):
         log.info("Using output formatter: %s" % self.name)

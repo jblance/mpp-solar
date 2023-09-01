@@ -6,6 +6,8 @@ from powermon.dto.commandDTO import CommandDTO
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.outputs.abstractoutput import OutputType
 from powermon.outputs.api_mqtt import API_MQTT
+from powermon.commands.commanddefinition import CommandDefinition
+
 log = logging.getLogger("Command")
 
 
@@ -13,6 +15,7 @@ class Command:
     def __init__(self, code : str, commandtype: str, outputs: list[AbstractOutput], trigger : Trigger):
 
         self.code = code
+        self.command_description = 'Not set'
         self.type = commandtype
         self.set_outputs(outputs)
         
@@ -21,12 +24,18 @@ class Command:
         self.last_run = None
         self.next_run = self.trigger.nextRun(command=self)
         self.full_command = None
-        self.command_defn : dict[str, list] = {}
+        self.command_definition : dict[str, list] = {}
         self.device_id = None
         log.debug(self)
         
     def get_full_command(self) -> str | None:
         return self.full_command
+    
+    def set_command_definition(self, command_definition : dict):
+        self.command_definition = command_definition
+        self.command_description = command_definition["description"]
+        for output in self.outputs:
+            output.formatter.set_command_description(self.command_description)
     
     def set_outputs(self, outputs : list[AbstractOutput]):
         self.outputs = outputs
@@ -54,7 +63,7 @@ class Command:
         for output in self.outputs:
             _outs += str(output)
 
-        return f"Command: {self.code=} {self.full_command=}, {self.type=}, [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {self.command_defn=}"
+        return f"Command: {self.code=} {self.full_command=}, {self.type=}, [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {self.command_definition=}"
 
     @classmethod
     def from_config(cls, config=None) -> "Command":

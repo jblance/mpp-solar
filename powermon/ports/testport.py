@@ -39,7 +39,7 @@ class TestPort(AbstractPort):
         return
 
     def send_and_receive(self, command: Command) -> Result:
-        command_defn = command.command_defn
+        command_defn = command.command_definition
         
         result = Result(command.code)
 
