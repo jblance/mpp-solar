@@ -1,17 +1,20 @@
 import logging
 from powermon.formats.abstractformat import AbstractFormat
+from powermon.dto.formatDTO import FormatDTO
 
 log = logging.getLogger("simple")
 
 
-class simple(AbstractFormat):
+class SimpleFormat(AbstractFormat):
     def __init__(self, formatConfig):
         super().__init__(formatConfig)
         self.name = "simple"
         self.extra_info = formatConfig.get("extra_info", False)
+   
+    def set_command_description(self, command_description):
+        pass
 
     def format(self, result) -> list:
-        log.info("Using output formatter: %s" % self.name)
 
         _result = []
 
@@ -28,9 +31,7 @@ class simple(AbstractFormat):
         if data is None:
             return _result
 
-        log.debug(f"data: {data}")
         displayData = self.formatAndFilterData(data)
-        log.debug(f"displayData: {displayData}")
 
         # build data to display
         for key in displayData:
@@ -42,3 +43,7 @@ class simple(AbstractFormat):
             else:
                 _result.append(f"{key}={value}{unit}")
         return _result
+
+    @classmethod
+    def from_DTO(cls, dto: FormatDTO):
+        return cls(formatConfig={})

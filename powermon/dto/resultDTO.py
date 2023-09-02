@@ -1,10 +1,9 @@
-from typing import Iterable
+from typing import Optional
 from pydantic import BaseModel
 
 
 
-# TODO: update
 class ResultDTO(BaseModel):
     device_identifier: str
-    command: str
-    data: dict 
+    command_code: str
+    data: Optional[dict] 

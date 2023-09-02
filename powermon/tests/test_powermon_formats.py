@@ -4,7 +4,7 @@ import unittest
 import yaml
 from powermon.device import Device
 from powermon.formats.hass import hass
-from powermon.libs.result import Result
+from powermon.commands.result import Result
 
 
 class test_powermon_formats(unittest.TestCase):
@@ -28,7 +28,7 @@ class test_powermon_formats(unittest.TestCase):
         device = Device.fromConfig(config=config.get("device"))
         # print(device)
         hass_formatter = hass({}, device)
-        _result = Result(command=None)
+        _result = Result(command_code=None)
         _result.decoded_responses = {"protocol_id": ["PI30", "", ""]}
         result = hass_formatter.format(_result)
 
@@ -110,7 +110,7 @@ Parameter    Value   Unit           \nprotocol_id  PI30                   \n"""
                 text=True,
             )
             # print(result.stdout)
-            self.assertEqual(result.stdout, expected)
+            self.assertEqual(result.stdout, expected) #returning 'unknown command', not sure why and this type of test doesn't make it obvious. Will make soeme unittest style tests
             self.assertEqual(result.returncode, 0)
         except subprocess.CalledProcessError as error:
             print(error.stdout)

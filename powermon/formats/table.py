@@ -2,6 +2,7 @@ import logging
 
 from mppsolar.helpers import getMaxLen, pad
 from powermon.formats.abstractformat import AbstractFormat
+from powermon.commands.result import Result
 
 log = logging.getLogger("table")
 
@@ -15,8 +16,12 @@ class table(AbstractFormat):
         self.name = "table"
         self.extra_info = formatConfig.get("extra_info", False)
         self.drawlines = formatConfig.get("draw_lines", False)
+        self.command_description = "unknown command"
+        
+    def set_command_description(self, command_description):
+        self.command_description = command_description
 
-    def format(self, result):
+    def format(self, result: Result):
         log.info("Using output formatter: %s" % self.name)
 
         _result = []
@@ -24,7 +29,7 @@ class table(AbstractFormat):
         # check for error in result
         if result.error:
             data = {}
-            data["Error"] = [f"Command: {result.command.name} incurred an error or errors during execution or processing", ""]
+            data["Error"] = [f"Command: {result.command_code} incurred an error or errors during execution or processing", ""]
             data["Error Count"] = [len(result.error_messages), ""]
             for i, message in enumerate(result.error_messages):
                 data[f"Error #{i}"] = [message, ""]
@@ -38,11 +43,7 @@ class table(AbstractFormat):
         log.debug(f"displayData: {displayData}")
 
         # build header
-        command = result.command.name
-        if result.command.command_defn and "description" in result.command.command_defn:
-            description = result.command.command_defn['description']
-        else:
-            description = "unknown command"
+        command_code = result.command_code
 
         # Determine column widths
         _pad = 1
@@ -61,7 +62,7 @@ class table(AbstractFormat):
         # Total line length
         line_length = width_p + width_v + width_u + 7
         # Check if command / description line is longer and extend line if needed
-        cmd_str = f"Command: {command} - {description}"
+        cmd_str = f"Command: {command_code} - {self.command_description}"
         width_c = len(cmd_str)
         log.debug(f"{width_c=}, {line_length=}, {width_p=}, {width_v=}, {width_u=}")
         if line_length < (width_c + 7):

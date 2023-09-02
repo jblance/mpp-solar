@@ -155,7 +155,7 @@ class MqttBroker:
         if self.disabled:
             log.debug("Cannot publish msg as mqttbroker disabled")
             return
-        log.debug("Publishing '%s' to '%s'", payload, topic)
+        #log.debug("Publishing '%s' to '%s'", payload, topic)
         if self.name == "screen":
             print(f"mqtt debug output only as broker name is 'screen' - topic: '{topic}', payload: '{payload}'")
             return
@@ -169,7 +169,7 @@ class MqttBroker:
                 return
         try:
             infot = self.mqttc.publish(topic, payload)
-            infot.wait_for_publish()
+            infot.wait_for_publish(5)
         except Exception as e:
             log.warning(str(e))
 

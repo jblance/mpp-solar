@@ -9,6 +9,9 @@ class raw(AbstractFormat):
         super().__init__(formatConfig)
         self.name = "raw"
         self.extra_info = formatConfig.get("extra_info", False)
+        
+    def set_command_description(self, command_description):
+        pass
 
     def format(self, result):
         log.info("Using output formatter: %s" % self.name)

@@ -13,6 +13,7 @@ class TriggerType(LowercaseStrEnum):
     EVERY = auto()
     LOOPS = auto()
     AT = auto()
+    ONCE = auto()
     DISABLED = auto()
 
 
@@ -35,10 +36,17 @@ class Trigger:
         elif TriggerType.AT in config:
             trigger_type = TriggerType.AT
             value = config.get(TriggerType.AT, "12:01")
+        elif TriggerType.ONCE in config:
+            trigger_type = TriggerType.ONCE
+            value = config.get(TriggerType.ONCE, 0)
         else:
             trigger_type = TriggerType.DISABLED
             value = None
         return cls(trigger_type=trigger_type, value=value)
+    
+    @classmethod
+    def from_DTO(cls, dto: TriggerDTO):
+        return cls(trigger_type=dto.trigger_type, value=dto.value)
 
     def __init__(self, trigger_type, value=None):
         self.trigger_type = trigger_type
@@ -70,6 +78,12 @@ class Trigger:
             if command.next_run <= now:
                 return True
             return False
+        elif self.trigger_type == TriggerType.ONCE:
+            if int(self.value) == 0:
+                self.value = 1
+                return True
+            else:
+                return False
         log.warn("no isDue set for %s" % command)
         return False
 

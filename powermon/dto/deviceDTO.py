@@ -6,9 +6,9 @@ from .portDTO import PortDTO
 from .commandDTO import CommandDTO
 
 
-# TODO: update
+
 class DeviceDTO(BaseModel):
-    identifier: Optional[str]
+    device_id: str
     model: Optional[str]
     manufacturer: Optional[str]
     port: PortDTO
