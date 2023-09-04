@@ -12,7 +12,7 @@ from pydantic import ValidationError  # pylint: disable=E0401
 
 from mppsolar.version import __version__  # noqa: F401
 from powermon.commands.command import Command
-from powermon.config.configModel import ConfigModel
+from powermon.config.config_model import ConfigModel
 from powermon.device import Device
 from powermon.libs.apicoordinator import ApiCoordinator
 from powermon.libs.daemon import Daemon
@@ -136,6 +136,7 @@ def main():
             return None
     except ValidationError as exception:
         # if config fails to validate, print reason and exit
+        print("Config validation failed")
         print(f"{config=}")
         print(exception)
         return None
@@ -203,7 +204,8 @@ def main():
 
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
-    except Exception as general_exception:
+    except Exception as general_exception:  #pylint: disable=W0718
+        # TODO: this is just temporary to catch the various exceptions and add specific exception handling
         print(general_exception)
     finally:
         # disconnect device

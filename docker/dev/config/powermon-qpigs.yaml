@@ -8,24 +8,18 @@ device:
     type: test
     protocol: PI30MAX
 
-scheduling:
-  loop: once
-  schedules:
-  - name: QPIGS to screen
-    type: once
-    commands:
-    - command: QPIGS
-      type: basic #so far not neccessary, might remove
-      outputs:
-      - type: screen
-        tag: Test_Inverter
-        # format: hass
-        # format: raw
-        # format: simple
-        # format: table
-        format: 
-          type: htmltable
-          #keep_case: True
-          #remove_spaces: False
-          #extra_info: True
-          filter: ^ac|^pv
+commands:
+- command: QPIGS
+  type: basic #so far not neccessary, might remove
+  outputs:
+  - type: screen
+    # format: hass
+    # format: raw
+    # format: simple
+    # format: table
+    format: 
+      type: htmltable
+      #keep_case: True
+      #remove_spaces: False
+      #extra_info: True
+      filter: ^ac|^pv
