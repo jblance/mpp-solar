@@ -1,17 +1,14 @@
 format: 
 	flake8 setup.py mppsolar tests
 
-test: tests/*.py
-	# python3 -m unittest -v
-	coverage run -m unittest
-	coverage report -m
-	coverage html
-
-t: tests/*.py
-	python3 -m unittest -f
+mppsolar-tests: 
+	python3 -m discover -s powermon/tests unittest -f -v
 	
-tv: tests/*.py
-	python3 -m unittest -f -v
+powermon-tests: 
+	python3 -m unittest discover -s powermon/tests -f -v
+
+tests: powermon-tests mppsolar-tests
+
 
 pypi:
 	rm -rf dist/*

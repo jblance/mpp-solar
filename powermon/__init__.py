@@ -8,7 +8,7 @@ from datetime import date, timedelta  # noqa: F401
 from platform import python_version
 
 import yaml
-from pydantic import ValidationError
+from pydantic import ValidationError  # pylint: disable=E0401
 
 from mppsolar.version import __version__  # noqa: F401
 from powermon.commands.command import Command
@@ -56,7 +56,7 @@ def process_command_line_overrides(args):
 
 def main():
     """main entry point for powermon command"""
-    description = f"Power Device Monitoring Utility, version: {__version__}, python version: {python_version()}"
+    description = f"Power Device Monitoring Utility, version: {__version__}, python version: {python_version()}"  # pylint: disable=C0301
     parser = ArgumentParser(description=description)
 
     parser.add_argument(
@@ -72,7 +72,8 @@ def main():
         "--config",
         type=str,
         default=None,
-        help="""Supply config items on the commandline in json format, eg '{"device": {"port":{"type":"test"}}, "commands": [{"command":"QPI"}]}'""",
+        help="""Supply config items on the commandline in json format, \
+             eg '{"device": {"port":{"type":"test"}}, "commands": [{"command":"QPI"}]}'""",
     )
     parser.add_argument("-V", "--validate", action="store_true", help="Validate the configuration")
     parser.add_argument("-v", "--version", action="store_true", help="Display the version")
@@ -127,16 +128,16 @@ def main():
 
     # validate config
     try:
-        c = ConfigModel(config=config)
-        log.info(f"{c}")
+        config_model = ConfigModel(config=config)
+        log.info(config_model)
         if args.validate:
             # if --validate option set, only do validation
             print("Config validation successful")
             return None
-    except ValidationError as e:
+    except ValidationError as exception:
         # if config fails to validate, print reason and exit
         print(f"{config=}")
-        print(e)
+        print(exception)
         return None
 
     # logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
@@ -166,7 +167,10 @@ def main():
     log.info(daemon)
 
     # build api coordinator
-    api_coordinator = ApiCoordinator.from_config(config=config.get("api"), device=device, mqtt_broker=mqtt_broker)
+    api_coordinator = ApiCoordinator.from_config(
+        config=config.get("api"),
+        device=device,
+        mqtt_broker=mqtt_broker)
     log.info(api_coordinator)
 
     # initialize api coordinator
