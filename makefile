@@ -2,10 +2,10 @@ format:
 	flake8 setup.py mppsolar tests
 
 mppsolar-tests: 
-	python3 -m discover -s powermon/tests unittest -f -v
+	python3 -m unittest discover -s tests/mppsolar -f -v
 	
 powermon-tests: 
-	python3 -m unittest discover -s powermon/tests -f -v
+	python3 -m unittest discover -s tests/powermon -f -v
 
 tests: powermon-tests mppsolar-tests
 
