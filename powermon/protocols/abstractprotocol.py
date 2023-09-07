@@ -22,6 +22,8 @@ from powermon.dto.protocolDTO import ProtocolDTO
 from powermon.protocols import ResponseType
 from powermon.commands.result import Result
 from powermon.commands.command import Command
+from powermon.commands.command_definition import CommandDefinition
+from powermon.dto.command_definition_dto import CommandDefinitionDTO
 
 log = logging.getLogger("AbstractProtocol")
 
@@ -30,7 +32,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
     def __init__(self, *args, **kwargs) -> None:
         self._command = None
         self._command_dict = None
-        self.COMMANDS = {}
+        self.command_definitions : dict[str, CommandDefinition] = {}
         self.STATUS_COMMANDS = None
         self.SETTINGS_COMMANDS = None
         self.DEFAULT_COMMAND = None
@@ -38,30 +40,42 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         self._protocol_id = None
 
     def toDTO(self) -> ProtocolDTO:
-        dto = ProtocolDTO(protocol_id=self._protocol_id, commands=self.list_commands())
+        dto = ProtocolDTO(protocol_id=self._protocol_id, commands=self.get_command_definition_dtos())
         return dto
+    
+    def add_command_definitions(self, command_definitions_config: dict, type):
+        """Add command definitions from the configuration"""
+        for course_definition_key in command_definitions_config.keys():
+            course_definition = CommandDefinition.from_config(command_definitions_config[course_definition_key], type)
+            self.command_definitions[course_definition_key] = course_definition
 
-    def list_commands(self) -> dict:
+    def list_commands(self) -> dict[str, CommandDefinition]:
         # print(f"{'Parameter':<30}\t{'Value':<15} Unit")
         if self._protocol_id is None:
             log.error("Attempted to list commands with no protocol defined")
             return {"ERROR": ["Attempted to list commands with no protocol defined", ""]}
-        result = {}
-        result["_command"] = "command help"
-        result["_command_description"] = f"List available commands for protocol {str(self._protocol_id, 'utf-8')}"
-        for command in sorted(self.COMMANDS):
-            if "help" in self.COMMANDS[command]:
-                info = self.COMMANDS[command]["description"] + self.COMMANDS[command]["help"]
-            else:
-                info = self.COMMANDS[command]["description"]
-            result[command] = [info, ""]
-        return result
+        #result = {}
+        #result["_command"] = "command help"
+        #result["_command_description"] = f"List available commands for protocol {str(self._protocol_id, 'utf-8')}"
+        #for command in sorted(self.COMMANDS):
+        #    if "help" in self.COMMANDS[command]:
+        #        info = self.COMMANDS[command]["description"] + self.COMMANDS[command]["help"]
+        #    else:
+        #        info = self.COMMANDS[command]["description"]
+        #    result[command] = [info, ""]
+        return self.command_definitions
+    
+    def get_command_definition_dtos(self) -> dict[str, CommandDefinitionDTO]:
+        command_dtos: dict[str, CommandDefinitionDTO] = {}
+        for command_tuple in self.command_definitions.items():
+            command_dtos[command_tuple[0]] = command_tuple[1].to_DTO()
+        return command_dtos
 
     def get_protocol_id(self) -> bytes:
         return self._protocol_id
 
     def get_full_command(self, command) -> bytes:
-        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
+        log.info(f"Using protocol {self._protocol_id} with {len(self.command_definitions)} commands")
         byte_cmd = bytes(command, "utf-8")
         # calculate the CRC
         crc_high, crc_low = crc(byte_cmd)
@@ -83,20 +97,20 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         else:
             raise Exception("get_response_defn needs index or key")
 
-    def get_command_definition(self, command) -> dict:
+    def get_command_definition(self, command) -> CommandDefinition:
         log.debug(f"Processing command '{command}'")
-        if command in self.COMMANDS and "regex" not in self.COMMANDS[command]:
+        if command in self.command_definitions and self.command_definitions[command].regex is None:
             log.debug(f"Found command {command} in protocol {self._protocol_id}")
-            return self.COMMANDS[command]
-        for _command in self.COMMANDS:
-            if "regex" in self.COMMANDS[_command] and self.COMMANDS[_command]["regex"]:
-                log.debug(f"Regex commands _command: {_command}")
-                _re = re.compile(self.COMMANDS[_command]["regex"])
+            return self.command_definitions[command]
+        for _command_code in self.command_definitions.keys():
+            if self.command_definitions[_command_code].regex is not None:
+                log.debug(f"Regex commands _command: {_command_code}")
+                _re = re.compile(self.command_definitions[_command_code].regex)
                 match = _re.match(command)
                 if match:
-                    log.debug(f"Matched: {command} to: {self.COMMANDS[_command]['name']} value: {match.group(1)}")
+                    log.debug(f"Matched: {command} to: {self.command_definitions[_command_code].name} value: {match.group(1)}")
                     self._command_value = match.group(1)
-                    return self.COMMANDS[_command]
+                    return self.command_definitions[_command_code]
         log.info(f"No command_defn found for {command}")
         return None
 
@@ -300,15 +314,17 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             result.error_messages.append(f"failed to decode responses: no definition for {command.code}")
             return
 
+        log.debug(f"command.code: {command.code}")
+        
         # Cant decode without a definition of the expected response to the command
-        if "response" not in command.command_definition:
+        if command.command_definition.responses is None:
             log.debug(f"No definition for the response of command {command.code}")
             result.error = True
             result.error_messages.append(f"failed to decode responses: no definition for the response of {command.code}")
             return
 
         # Determine the type of response
-        response_type = command.command_definition.get("response_type", ResponseType.DEFAULT)
+        response_type = command.command_definition.response_type
         log.info(f"Processing response of type {response_type}")
 
         # Process the response by reponse type
@@ -444,10 +460,10 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         # Add metadata
         msgs["_command"] = command
         # Check for a stored command definition
-        command_defn = self.get_command_definition(command)
-        if command_defn is not None:
-            msgs["_command_description"] = command_defn["description"]
-            len_command_defn = len(command_defn["response"])
+        command_definition: CommandDefinition = self.get_command_definition(command)
+        if command_definition is not None:
+            msgs["_command_description"] = command_definition.description
+            len_command_defn = len(command_definition.responses)
 
         # Check response is valid
         valid, _msg = self.check_response_valid(response)
@@ -466,7 +482,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         raw_response = _response.decode("utf-8")
         msgs["raw_response"] = [raw_response, ""]
 
-        if command_defn is None:
+        if command_definition is None:
             # No definition, so just return the data
             len_command_defn = 0
             log.debug(f"No definition for command {command}, (splitted) raw response returned")
@@ -478,8 +494,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             return msgs
 
         # Determine the type of response
-        if "response_type" in command_defn:
-            response_type = command_defn["response_type"]
+        if command_definition.response_type is not None:
+            response_type = command_definition.response_type
         else:
             response_type = "DEFAULT"
         log.info(f"Processing response of type {response_type}")
@@ -504,7 +520,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 if i >= len_command_defn:
                     resp_format = ["string", f"Unknown value in response {i}", ""]
                 else:
-                    resp_format = command_defn["response"][i]
+                    resp_format = command_definition.responses[i]
 
                 # key = "{}".format(resp_format[1]).lower().replace(" ", "_")
                 key = resp_format[1]
@@ -589,9 +605,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                             msgs[item_name] = [item_value, ""]
                         else:
                             print(f"item type {item_type} not defined")
-                elif command_defn["type"] == "SETTER":
+                elif command_definition.get_type() == "SETTER":
                     # _key = "{}".format(command_defn["name"]).lower().replace(" ", "_")
-                    _key = command_defn["name"]
+                    _key = command_definition.code
                     msgs[_key] = [result, ""]
                 else:
                     log.info(f"Processing unknown response format {result}")
@@ -623,7 +639,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         continue
                     lookup_key = response[0]
                     raw_value = response[1]
-                    response_defn = get_resp_defn(lookup_key, command_defn["response"])
+                    response_defn = get_resp_defn(lookup_key, command_definition["response"])
                     if response_defn is None:
                         # No definition for this key, so ignore???
                         log.warn(f"No definition for {response}")
@@ -637,7 +653,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     log.warn("Processing SEQUENTIAL type responses")
                     print("Processing SEQUENTIAL type responses")
                     # check for extra definitions...
-                    extra_responses_needed = len(command_defn["response"]) - len(frame)
+                    extra_responses_needed = len(command_definition["response"]) - len(frame)
                     if extra_responses_needed > 0:
                         for _ in range(extra_responses_needed):
                             frame.append("extra")
@@ -647,7 +663,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     if i >= len_command_defn:
                         response_defn = ["str", f"Unknown value in response {i}", ""]
                     else:
-                        response_defn = command_defn["response"][i]
+                        response_defn = command_definition["response"][i]
                     log.debug(f"Got defn {response_defn}")
                     raw_value = response
                     # spacer = response_defn[0] #0
@@ -659,7 +675,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     log.debug("Processing INDEXED type responses")
                     # [1, "AC Input Voltage", "float", "V", {icon: blah}]
                     # check for extra definitions...
-                    extra_responses_needed = len(command_defn["response"]) - len(frame)
+                    extra_responses_needed = len(command_definition["response"]) - len(frame)
                     if extra_responses_needed > 0:
                         for _ in range(extra_responses_needed):
                             frame.append("extra")
@@ -675,7 +691,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                             "",
                         ]
                     else:
-                        response_defn = command_defn["response"][i]
+                        response_defn = command_definition["response"][i]
                     log.debug(f"Got defn {response_defn}")
                     raw_value = response
                     # data_posi = get_value(response_defn, 0)
@@ -688,7 +704,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 elif response_type in ["POSITIONAL", "MULTIFRAME-POSITIONAL"]:
                     log.debug("Processing POSITIONAL type responses")
                     # check for extra definitions...
-                    extra_responses_needed = len(command_defn["response"]) - len(frame)
+                    extra_responses_needed = len(command_definition["response"]) - len(frame)
                     if extra_responses_needed > 0:
                         for _ in range(extra_responses_needed):
                             frame.append("extra")
@@ -703,7 +719,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     if i >= len_command_defn:
                         response_defn = ["str", 1, f"Unknown value in response {i}", ""]
                     else:
-                        response_defn = command_defn["response"][i]
+                        response_defn = command_definition["response"][i]
                     if response_defn is None:
                         # No definition for this key, so ignore???
                         log.warn(f"No definition for {response}")

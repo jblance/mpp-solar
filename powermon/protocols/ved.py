@@ -130,7 +130,7 @@ class ved(AbstractProtocol):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"VED"
-        self.COMMANDS = COMMANDS
+        super().add_command_definitions(COMMANDS, "QUERY")
         self.STATUS_COMMANDS = [
             "vedtext",
         ]
@@ -144,7 +144,7 @@ class ved(AbstractProtocol):
         Override the default get_full_command as its different for VEDirect
         """
         log.info(
-            f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
+            f"Using protocol {self._protocol_id} with {len(self.command_definitions)} commands"
         )
         # These need to be set to allow other functions to work`
         self._command = command
