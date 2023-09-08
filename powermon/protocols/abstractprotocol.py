@@ -84,11 +84,11 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.debug(f"full command: {full_command}")
         return full_command
 
-    def get_response_defn(self, command: Command, index=None, key=None):
-        definitions_count = len(command.command_definition["response"])
+    def get_response_definition(self, command_definition: CommandDefinition, index=None, key=None):
+        definitions_count = len(command_definition.responses)
         if index is not None:
             if index < definitions_count:
-                return command.command_definition["response"][index]
+                return command_definition.responses[index]
             else:
                 return [index, f"Unknown value in response {index}", "bytes.decode", ""]
         elif key is not None:
@@ -335,7 +335,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 # expects a single response, eg b'NAK'
 
                 # get the response definition
-                response_defn = self.get_response_defn(command, index=0)
+                response_defn = self.get_response_definition(command.command_definition, index=0)
 
                 # decode the response
                 raw_value = result.responses[0].decode()
@@ -352,14 +352,14 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             case ResponseType.MULTIVALUED:
                 # Response that while able to be split, makes more sense as a single response
                 # eg Max Charging Current Options: 010 020 030 040 050 060 070 080 090 100 110 120 A
-                data_name = command.command_definition["response"][0][1]
+                data_name = command.command_definition.responses[0][1]
                 value = ""
                 for item in result.responses:
                     value += f"{item.decode()} "
-                data_units = command.command_definition["response"][0][3]
+                data_units = command.command_definition.responses[0][3]
                 log.debug(f"{data_name}, {value}, {data_units}")
-                if len(command.command_definition["response"][0]) > 4:
-                    extra_info = command.command_definition["response"][0][4]
+                if len(command.command_definition.responses[0]) > 4:
+                    extra_info = command.command_definition.responses[0][4]
                     result.decoded_responses = {data_name: [value, data_units, extra_info]}
                 else:
                     result.decoded_responses = {data_name: [value, data_units]}
@@ -377,7 +377,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
                 # check the number of responses and the number of response definitions
                 len_responses = len(result.responses)
-                len_defns = len(command.command_definition["response"])
+                len_defns = len(command.command_definition.responses)
                 log.debug("got %s responses, %s response definitions" % (len_responses, len_defns))
 
                 # if there are more definitions than responses, the extras may be calculated fields
@@ -390,7 +390,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 for i, _response in enumerate(result.responses):
                     # get response defn for this response
                     # [1, "AC Input Voltage", "float", "V", {icon: blah}]
-                    response_defn = self.get_response_defn(command, index=i)
+                    response_defn = self.get_response_definition(command.command_definition, index=i)
 
                     # populate vars from response and response definition
                     raw_value = _response
@@ -441,7 +441,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 return
 
             case _:
-                log.error(f"bad response type {response_type} for {command.name}")
+                log.error(f"bad response type {response_type} for {command.code}")
                 result.error = True
                 result.error_messages.append(f"failed to decode responses: bad response type {response_type} for {command.code}")
                 return
@@ -639,7 +639,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         continue
                     lookup_key = response[0]
                     raw_value = response[1]
-                    response_defn = get_resp_defn(lookup_key, command_definition["response"])
+                    response_defn = get_resp_defn(lookup_key, command_definition.responses)
                     if response_defn is None:
                         # No definition for this key, so ignore???
                         log.warn(f"No definition for {response}")
@@ -653,7 +653,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     log.warn("Processing SEQUENTIAL type responses")
                     print("Processing SEQUENTIAL type responses")
                     # check for extra definitions...
-                    extra_responses_needed = len(command_definition["response"]) - len(frame)
+                    extra_responses_needed = len(command_definition.responses) - len(frame)
                     if extra_responses_needed > 0:
                         for _ in range(extra_responses_needed):
                             frame.append("extra")
@@ -663,7 +663,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     if i >= len_command_defn:
                         response_defn = ["str", f"Unknown value in response {i}", ""]
                     else:
-                        response_defn = command_definition["response"][i]
+                        response_defn = command_definition.responses[i]
                     log.debug(f"Got defn {response_defn}")
                     raw_value = response
                     # spacer = response_defn[0] #0
@@ -675,7 +675,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     log.debug("Processing INDEXED type responses")
                     # [1, "AC Input Voltage", "float", "V", {icon: blah}]
                     # check for extra definitions...
-                    extra_responses_needed = len(command_definition["response"]) - len(frame)
+                    extra_responses_needed = len(command_definition.responses) - len(frame)
                     if extra_responses_needed > 0:
                         for _ in range(extra_responses_needed):
                             frame.append("extra")
@@ -691,7 +691,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                             "",
                         ]
                     else:
-                        response_defn = command_definition["response"][i]
+                        response_defn = command_definition.responses[i]
                     log.debug(f"Got defn {response_defn}")
                     raw_value = response
                     # data_posi = get_value(response_defn, 0)
@@ -704,7 +704,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 elif response_type in ["POSITIONAL", "MULTIFRAME-POSITIONAL"]:
                     log.debug("Processing POSITIONAL type responses")
                     # check for extra definitions...
-                    extra_responses_needed = len(command_definition["response"]) - len(frame)
+                    extra_responses_needed = len(command_definition.responses) - len(frame)
                     if extra_responses_needed > 0:
                         for _ in range(extra_responses_needed):
                             frame.append("extra")
@@ -719,7 +719,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     if i >= len_command_defn:
                         response_defn = ["str", 1, f"Unknown value in response {i}", ""]
                     else:
-                        response_defn = command_definition["response"][i]
+                        response_defn = command_definition.responses[i]
                     if response_defn is None:
                         # No definition for this key, so ignore???
                         log.warn(f"No definition for {response}")

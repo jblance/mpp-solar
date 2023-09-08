@@ -104,6 +104,7 @@ class Device:
                     result: Result = self.port.run_command(command)
                     # decode result
                     self.port.get_protocol().decode(result=result, command=command)
+                    log.debug("decode complete")
                     result.set_device_id(self.device_id)
                     # loop through each output and process result
                     output: AbstractOutput

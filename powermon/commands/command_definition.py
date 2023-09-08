@@ -35,7 +35,7 @@ class CommandDefinition:
         description = dict.get("description")
         help_text = dict.get("help_text")
         response_type = dict.get("response_type")
-        responses = dict.get("responses")
+        responses = dict.get("response")
         text_response = dict.get("text_response")
         regex = dict.get("regex", None)
         return cls(code=code, description=description, help_text=help_text, response_type=response_type, 
