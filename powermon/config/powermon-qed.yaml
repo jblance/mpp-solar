@@ -25,8 +25,8 @@ mqttbroker:
   port: 1883
   username: null
   password: null
-  adhoc_commands:
-    topic: Test_Inverter/commands
-    outputs:
-    - name: screen
-      tag: Test_Inverter
+  # adhoc_commands:
+  #   topic: Test_Inverter/commands
+  #   outputs:
+  #   - name: screen
+  #     tag: Test_Inverter

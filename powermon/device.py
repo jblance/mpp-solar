@@ -54,13 +54,16 @@ class Device:
         self.commands : list[Command] = []
 
     def add_command(self, command: Command) -> None:
-        """ add a command to the device list of commands """
+        """ add a command to the devices' list of commands """
         if command is None:
             return
         # get command definition from protocol
         command.set_command_definition(self.port.protocol.get_command_definition(command.code))
-        self.commands.append(command)
+        # set the device_id in the command
         command.set_device_id(self.device_id)
+        # append to commands list
+        self.commands.append(command)
+        log.debug("added command (%s), command list length: %i", command, len(self.commands))
 
     def get_port(self) -> AbstractPort:
         return self.port

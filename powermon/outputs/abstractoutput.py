@@ -1,17 +1,12 @@
-from abc import ABC, abstractmethod
 import logging
-from strenum import LowercaseStrEnum
+from abc import ABC, abstractmethod
 from enum import auto
 
-from powermon.libs.mqttbroker import MqttBroker
+from strenum import LowercaseStrEnum
+
+# from powermon.dto.outputDTO import OutputDTO
 from powermon.formats.abstractformat import AbstractFormat
-from powermon.dto.outputDTO import OutputDTO
-
-
 from powermon.libs.mqttbroker import MqttBroker
-from powermon.formats.abstractformat import AbstractFormat
-
-
 
 log = logging.getLogger("Output")
 
@@ -26,7 +21,7 @@ class AbstractOutput(ABC):
         self.formatter = formatter
 
     def set_formatter(self, formatter : AbstractFormat):
-        return NotImplemented
+        self.formatter = formatter
 
     @abstractmethod
     def process(self, result):
@@ -40,9 +35,7 @@ class AbstractOutput(ABC):
 
     def set_device_id(self, device_id):
         pass
-    
+
     def to_DTO(self):
         return NotImplemented
-    
-        
     
