@@ -3,13 +3,17 @@ from powermon.dto.command_definition_dto import CommandDefinitionDTO
 
 class CommandDefinition:
     def __init__(self, code, description, help_text: str, response_type : ResponseType, 
-                 responses, text_response: list[bytes], regex: str, type: str):
+                 responses, test_responses: list[bytes], regex: str, type: str):
+        if responses is None:
+            raise ValueError(f"responses cannot be None for command_code: {code}")
+        if test_responses is None:
+            raise ValueError(f"test_responses cannot be None for command_code: {code}")
         self.code = code
         self.description = description
         self.help_text = help_text
         self.response_type : ResponseType = response_type
         self.responses = responses
-        self.text_responses : list[bytes] = text_response
+        self.test_responses : list[bytes] = test_responses
         self.regex : str | None = regex
         self.type : str = type
         
@@ -20,13 +24,18 @@ class CommandDefinition:
             help_text=self.help_text,
             response_type=str(self.response_type),
             responses=self.responses,
-            text_responses=self.text_responses,
+            #test_responses=self.test_responses,
             regex=self.regex
         )
         
     def get_type(self) -> str:
         return self.type
         
+    def get_response_count(self) -> int:
+        if(self.responses is None):
+            return 0
+        else:
+            return len(self.responses)
         
         
     @classmethod
@@ -36,7 +45,7 @@ class CommandDefinition:
         help_text = dict.get("help_text")
         response_type = dict.get("response_type")
         responses = dict.get("response")
-        text_response = dict.get("text_response")
+        test_responses = dict.get("test_responses")
         regex = dict.get("regex", None)
         return cls(code=code, description=description, help_text=help_text, response_type=response_type, 
-                   responses=responses, text_response=text_response, regex=regex, type=type)
+                   responses=responses, test_responses=test_responses, regex=regex, type=type)

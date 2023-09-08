@@ -38,7 +38,7 @@ class API_MQTT(AbstractOutput):
     def set_device_id(self, device_id):
         self.device_id = device_id
 
-    def get_topic(self):
+    def get_topic(self) -> str:
         return  CommandDTO.get_command_result_topic().format(device_id=self.device_id, command_name=self.command_code)
 
     def to_DTO(self) -> OutputDTO:

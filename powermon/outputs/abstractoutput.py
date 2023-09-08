@@ -28,6 +28,9 @@ class AbstractOutput(ABC):
     def set_formatter(self, formatter : AbstractFormat):
         return NotImplemented
 
+    def get_topic(self) -> str:
+        return ""
+
     @abstractmethod
     def process(self, result):
         pass
@@ -40,9 +43,6 @@ class AbstractOutput(ABC):
 
     def set_device_id(self, device_id):
         pass
-    
+
     def to_DTO(self):
         return NotImplemented
-    
-        
-    

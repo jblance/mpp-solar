@@ -585,11 +585,12 @@ QUERY_COMMANDS = {
         "response": [[0, "Protocol ID", "bytes.decode", ""]],
         "test_responses": [b"(PI30\x9a\x0b\r"],
     },
-    "QPIz": {
+    "QPIz": { # Question: is this a typo? Duplicate of QPI?
         "name": "QPIz",
         "description": "Protocol ID inquiry",
         "help": " -- queries the device protocol ID. e.g. PI30 for HS series",
         "response_type": ResponseType.INDEXED,
+        "response": [[0, "Protocol ID", "bytes.decode", ""]],
         "test_responses": [b"(PI30\x9a\x0b\r"],
     },
     "QPIGS": {

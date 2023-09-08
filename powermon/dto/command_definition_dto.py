@@ -9,5 +9,5 @@ class CommandDefinitionDTO(BaseModel):
     help_text: str | None
     response_type: str | None
     responses: list | None
-    text_responses : list[bytes] | None
+    #test_responses : list[bytes] | None
     regex : str | None
