@@ -1,12 +1,18 @@
 import subprocess
 import unittest
 
-FILES = ['powermon/config/min.yaml',
-         'powermon/config/min-api.yaml',
-         'powermon/config/format.yaml',
-         'powermon/config/powermon.yaml',
-         'powermon/config/powermon-hass.yaml',
-         'docker/powermon.yaml']
+FILES = [
+    'docker/powermon.yaml',
+    'docker/dev/config/powermon.yaml',
+    'docker/dev/config/powermon-qpigs.yaml',
+    'powermon/config/min.yaml',
+    'powermon/config/min-api.yaml',
+    'powermon/config/format.yaml',
+    'powermon/config/powermon.yaml',
+    'powermon/config/powermon-hass.yaml',
+    'powermon/config/powermon-qed.yaml',
+    'docker/powermon.yaml'
+    ]
 
 
 def do_test(self, filename):
