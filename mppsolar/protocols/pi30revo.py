@@ -324,6 +324,54 @@ COMMANDS = {
             b"(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1\x6F\x7E\r",
         ],
     },
+    "QLITH0": {
+        "name": "QLITH0",
+        "description": "Read lithium battery information",
+        "help": " -- queries the value of various metrics from the battery",
+        "type": "QUERY",
+        "crctype": "chk",
+        "response": [
+            ["float", "Battery voltage from BMS", "V"],
+            ["float", "Battery charging current from BMS", "A"],
+            ["float", "Battery discharge current from BMS", "A"],
+            ["int", "Battery temperature", "0.1°C"],
+            ["int", "Battery capacity from BMS", "%"],
+            ["int", "Battery wearout", "%"],
+            ["float", "Battery max charging current", "A"],
+            ["float", "Battery max discharge current", "A"],
+            ["float", "Battery max charge voltage", "V"],
+            ["float", "Battery min discharge voltage", "V"],
+            [
+                "keyed",
+                "Fault Code from BMS",
+                {
+                    "0": "No warning",
+                    "1": "Battery overvoltage",
+                    "2": "Low battery",
+                    "3": "Battery over temperature",
+                    "4": "Battery low temperature",
+                    "5": "Battery overcurrent",
+                    "6": "Battery output short circut",
+                },
+            ],
+            [
+                "keyed",
+                "Warning Code fom BMS",
+                {
+                    "0": "No warning",
+                    "1": "Battery overvoltage",
+                    "2": "Low battery",
+                    "3": "Battery over temperature",
+                    "4": "Battery low temperature",
+                    "5": "Battery overcurrent",
+                    "6": "Battery output short circut",
+                },
+            ],
+        ],
+        "test_responses": [
+            b"(048.8 000.0 000.9 250 024 000 052.5 010.0 053.5 004.4 0 2\xFC\n",
+        ],
+    },
 }
 
 
