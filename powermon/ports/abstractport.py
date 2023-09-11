@@ -31,16 +31,6 @@ class AbstractPort(ABC):
         self.protocol: AbstractProtocol = protocol
 
     @abstractmethod
-    def connect(self) -> int:
-        log.debug("Port connect not implemented")
-        return 0
-
-    @abstractmethod
-    def disconnect(self) -> None:
-        log.debug("Port disconnect not implemented")
-        return
-
-    @abstractmethod
     def send_and_receive(self, command: Command) -> Result:
         raise NotImplementedError
 
