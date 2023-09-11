@@ -113,7 +113,6 @@ class Command:
         return CommandDTO(
             command_code = self.code,
             device_id=self.device_id,
-            result_topic = None,
             trigger = self.trigger.to_DTO(),
             outputs=[output.to_DTO() for output in self.outputs],
         )
