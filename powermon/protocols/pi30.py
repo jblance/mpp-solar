@@ -830,8 +830,8 @@ class pi30(AbstractProtocol):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"PI30"
-        super().add_command_definitions(QUERY_COMMANDS, "QUERY")
-        super().add_command_definitions(SETTER_COMMANDS, "SETTER")
+        self.add_command_definitions(QUERY_COMMANDS, "QUERY")
+        self.add_command_definitions(SETTER_COMMANDS, "SETTER")
         self.STATUS_COMMANDS = ["QPIGS", "Q1"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"

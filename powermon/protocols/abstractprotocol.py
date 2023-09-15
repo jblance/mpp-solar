@@ -43,10 +43,10 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         dto = ProtocolDTO(protocol_id=self._protocol_id, commands=self.get_command_definition_dtos())
         return dto
     
-    def add_command_definitions(self, command_definitions_config: dict, type):
+    def add_command_definitions(self, command_definitions_config: dict, command_definition_type):
         """Add command definitions from the configuration"""
         for course_definition_key in command_definitions_config.keys():
-            course_definition = CommandDefinition.from_config(command_definitions_config[course_definition_key], type)
+            course_definition = CommandDefinition.from_config(command_definitions_config[course_definition_key], command_definition_type)
             self.command_definitions[course_definition_key] = course_definition
 
     def list_commands(self) -> dict[str, CommandDefinition]:

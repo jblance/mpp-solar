@@ -44,7 +44,7 @@ class TestPort(AbstractPort):
         
         result = Result(command.code)
 
-        if command_defn is not None and command_defn.test_responses is not None:
+        if command_defn is not None:
             # Have test data defined, so use that
             number_of_test_responses = len(command_defn.test_responses)
             if self.response_number is not None and self.response_number < number_of_test_responses:
