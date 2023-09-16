@@ -101,7 +101,7 @@ class Device:
             return False
         else:
             # open connection on port
-            self.port.connect
+            self.port.connect()
 
             for command in self.commands:
                 if force or command.dueToRun():
@@ -118,5 +118,6 @@ class Device:
                         output.process(result=result)
 
             #close connection on port
-            self.port.disconnect
+            self.port.disconnect()
+            
             return True

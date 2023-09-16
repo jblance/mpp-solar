@@ -39,7 +39,7 @@ class AbstractPort(ABC):
     def disconnect(self) -> None:
         log.debug("Port disconnect not implemented")
         return
-    
+
     @abstractmethod
     def send_and_receive(self, command: Command) -> Result:
         raise NotImplementedError
