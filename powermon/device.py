@@ -100,6 +100,9 @@ class Device:
             log.info("no commands in queue")
             return False
         else:
+            # open connection on port
+            self.port.connect
+
             for command in self.commands:
                 if force or command.dueToRun():
                     log.debug(f"Running command: {command.code}")
@@ -113,4 +116,7 @@ class Device:
                     for output in command.outputs:
                         log.debug(f"Using Output: {output}")
                         output.process(result=result)
+
+            #close connection on port
+            self.port.disconnect
             return True
