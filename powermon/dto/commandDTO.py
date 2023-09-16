@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 from .triggerDTO import TriggerDTO
 from .outputDTO import OutputDTO
@@ -7,7 +8,7 @@ class CommandDTO(BaseModel):
     
     command_code: str
     device_id: str
-    result_topic: str
+    result_topic: Optional(str)
     trigger: TriggerDTO
     outputs: list[OutputDTO]
 
