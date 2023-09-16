@@ -90,4 +90,3 @@ class USBPort(AbstractPort):
         result.raw_response = response_line
 
         return result
-    

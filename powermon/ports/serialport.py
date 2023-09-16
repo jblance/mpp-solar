@@ -84,4 +84,3 @@ class SerialPort(AbstractPort):
         result.error = True
         result.error_messages.append("Serial command execution failed")
         return result
-    

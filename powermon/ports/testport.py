@@ -58,4 +58,3 @@ class TestPort(AbstractPort):
         log.debug(f"Raw response {response}")
         result.raw_response = response
         return result
-    
