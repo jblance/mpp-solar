@@ -96,30 +96,28 @@ class Device:
         runs them
         """
         time.sleep(0.1)
-        if self.commands is None:
+        if self.commands is None or len(self.commands) == 0:
             log.info("no commands in queue")
             return False
         else:
-            #skip if empty commands list
-            if len(self.commands):
-                # open connection on port
-                self.port.connect()
+            # open connection on port
+            self.port.connect()
 
-                for command in self.commands:
-                    if force or command.dueToRun():
-                        log.debug(f"Running command: {command.code}")
-                        # run command
-                        result: Result = self.port.run_command(command)
-                        # decode result
-                        self.port.get_protocol().decode(result=result, command=command)
-                        result.set_device_id(self.device_id)
-                        # loop through each output and process result
-                        output: AbstractOutput
-                        for output in command.outputs:
-                            log.debug(f"Using Output: {output}")
-                            output.process(result=result)
+            for command in self.commands:
+                if force or command.dueToRun():
+                    log.debug(f"Running command: {command.code}")
+                    # run command
+                    result: Result = self.port.run_command(command)
+                    # decode result
+                    self.port.get_protocol().decode(result=result, command=command)
+                    result.set_device_id(self.device_id)
+                    # loop through each output and process result
+                    output: AbstractOutput
+                    for output in command.outputs:
+                        log.debug(f"Using Output: {output}")
+                        output.process(result=result)
 
-                #close connection on port
-                self.port.disconnect()
+            #close connection on port
+            self.port.disconnect()
 
             return True
