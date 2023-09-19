@@ -102,6 +102,7 @@ class ApiCoordinator:
         device_dto = self.device.toDTO()
         if not self.enabled:
             return
+        log.debug(f"Announcing device: {device_dto}")
         self.mqtt_broker.publish(self.announce_topic, device_dto.json())
 
     def announce(self, obj):

@@ -3,6 +3,7 @@ from typing import Tuple
 
 from powermon.protocols import ResponseType
 from powermon.protocols.abstractprotocol import AbstractProtocol
+from powermon.commands.command_definition import CommandDefinition
 from mppsolar.protocols.protocol_helpers  import vedHexChecksum
 
 # from .pi30 import COMMANDS
@@ -130,7 +131,7 @@ class ved(AbstractProtocol):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"VED"
-        self.COMMANDS = COMMANDS
+        super().add_command_definitions(COMMANDS, "QUERY")
         self.STATUS_COMMANDS = [
             "vedtext",
         ]
@@ -144,13 +145,13 @@ class ved(AbstractProtocol):
         Override the default get_full_command as its different for VEDirect
         """
         log.info(
-            f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
+            f"Using protocol {self._protocol_id} with {len(self.command_definitions)} commands"
         )
         # These need to be set to allow other functions to work`
         self._command = command
-        self._command_defn = self.get_command_definition(command)
+        self._command_definition : CommandDefinition = self.get_command_definition(command)
         # End of required variables setting
-        if self._command_defn is None:
+        if self._command_definition is None:
             return None
 
         # VEDHEX
@@ -161,13 +162,13 @@ class ved(AbstractProtocol):
         # 00 cs
         # \n
         # eg b':70010003E\n' = get battery capacity id = 0x1000 = 0010 little endian
-        cmd_type = self._command_defn["type"]
+        cmd_type = self._command_definition.get_type()
         if cmd_type == "VEDTEXT":
             # Just listen - dont need to send a command
             log.debug(f"command is VEDTEXT type so returning {cmd_type}")
             return cmd_type
         elif cmd_type == "VEDGET":
-            ID = self._command_defn["command_code"]
+            ID = self._command_definition.code
             cmd = f"7{ID}00"
             # pad cmd and convert to bytes for checksum
             _r = f"0{cmd}"
@@ -228,11 +229,11 @@ class ved(AbstractProtocol):
             _r = f"0{_r}"
             _r = bytes.fromhex(_r)
             if (
-                self._command_defn is not None
-                and self._command_defn["response_type"] == "POSITIONAL"
+                self._command_definition is not None
+                and self._command_definition.response_type == ResponseType.POSITIONAL
             ):
                 # Have a POSITIONAL type response, so need to break it up...
-                for defn in self._command_defn["response"]:
+                for defn in self._command_definition.responses:
                     size = defn[1]
                     item = _r[:size]
                     responses.append(item)

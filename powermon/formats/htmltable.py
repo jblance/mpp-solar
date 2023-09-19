@@ -1,5 +1,6 @@
 import logging
 from powermon.formats.abstractformat import AbstractFormat
+from powermon.commands.result import Result
 
 log = logging.getLogger("htmltable")
 
@@ -12,7 +13,7 @@ class htmltable(AbstractFormat):
     def set_command_description(self, command_description):
         pass
 
-    def format(self, result):
+    def format(self, result: Result):
         log.info("Using output formatter: %s" % self.name)
 
         _result = []
@@ -20,7 +21,7 @@ class htmltable(AbstractFormat):
         # check for error in result
         if result.error:
             data = {}
-            data["Error"] = [f"Command: {result.command.name} incurred an error or errors during execution or processing", ""]
+            data["Error"] = [f"Command: {result.command_code} incurred an error or errors during execution or processing", ""]
             data["Error Count"] = [len(result.error_messages), ""]
             for i, message in enumerate(result.error_messages):
                 data[f"Error #{i}"] = [message, ""]

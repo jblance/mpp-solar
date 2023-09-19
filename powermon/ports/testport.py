@@ -6,6 +6,7 @@ from powermon.commands.result import Result
 from powermon.ports.abstractport import AbstractPort
 from powermon.protocols import get_protocol_definition
 from powermon.commands.command import Command
+from powermon.commands.command_definition import CommandDefinition
 
 log = logging.getLogger("test")
 
@@ -39,20 +40,21 @@ class TestPort(AbstractPort):
         return
 
     def send_and_receive(self, command: Command) -> Result:
-        command_defn = command.command_definition
+        command_defn : CommandDefinition = command.command_definition
         
         result = Result(command.code)
 
         if command_defn is not None:
             # Have test data defined, so use that
-            number_of_test_responses = len(command_defn["test_responses"])
+            number_of_test_responses = len(command_defn.test_responses)
             if self.response_number is not None and self.response_number < number_of_test_responses:
-                self._test_data = command_defn["test_responses"][self.response_number]
+                self._test_data = command_defn.test_responses[self.response_number]
             else:
-                self._test_data = command_defn["test_responses"][random.randrange(number_of_test_responses)]
+                self._test_data = command_defn.test_responses[random.randrange(number_of_test_responses)]
         else:
             # No test responses defined
             log.warn("Testing a command with no test responses defined")
+            raise 
             self._test_data = None
         response = self._test_data
         log.debug(f"Raw response {response}")

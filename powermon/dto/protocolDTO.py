@@ -1,7 +1,7 @@
 from pydantic import BaseModel
-from typing import Optional
+from .command_definition_dto import CommandDefinitionDTO
 
 
 class ProtocolDTO(BaseModel):
     protocol_id: str
-    commands: dict
+    commands: dict[str, CommandDefinitionDTO]
