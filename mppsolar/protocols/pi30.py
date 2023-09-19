@@ -932,6 +932,56 @@ QUERY_COMMANDS = {
             b"",
         ],
     },
+    "QBMS": {
+        "name": "QBMS",
+        "description": "Read lithium battery information",
+        "help": " -- queries the value of various metrics from the battery",
+        "type": "QUERY",
+        "crctype": "chk",
+        "response": [
+
+            [
+                "keyed",
+                "Battery connect status",
+                {
+                    "0": "Connected",
+                    "1": "Disconnected",
+                },
+            ],
+            ["int", "Battery capacity from BMS", "%"],
+            [
+                "keyed",
+                "Battery force charging",
+                {
+                    "0": "No",
+                    "1": "Yes",
+                },
+            ],
+            [
+                "keyed",
+                "Battery stop discharge flag",
+                {
+                    "0": "Enable discharge",
+                    "1": "Disable discharge",
+                },
+            ],
+            [
+                "keyed",
+                "Battery stop charge flag",
+                {
+                    "0": "Enable charge",
+                    "1": "Disable charge",
+                },
+            ],
+            ["int", "Battery bulk charging voltage from BMS", "0.1 V"],
+            ["int", "Battery float charging voltage from BMS", "0.1 V"],
+            ["int", "Battery cut-off voltage from BMS", "0.1 V"],
+            ["float", "Battery max charging current", "A"],
+            ["float", "Battery max discharge current", "A"]],
+         "test_responses": [
+            b"(0 100 0 0 1 532 532 450 0000 0030\x5E\n",
+        ],
+    },
 }
 
 
