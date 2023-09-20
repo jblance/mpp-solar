@@ -17,9 +17,6 @@ class OutputType(LowercaseStrEnum):
 
 class AbstractOutput(ABC):
 
-    def __init__(self, formatter : AbstractFormat):
-        self.formatter = formatter
-
     def set_formatter(self, formatter : AbstractFormat):
         self.formatter = formatter
 

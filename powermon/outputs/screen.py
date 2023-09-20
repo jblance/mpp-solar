@@ -8,8 +8,7 @@ log = logging.getLogger("screen")
 
 
 class Screen(AbstractOutput):
-    def __init__(self, formatter):
-        super().__init__(formatter)
+    def __init__(self):
         self.name = "Screen"
         
 
@@ -30,3 +29,8 @@ class Screen(AbstractOutput):
 
         for line in formatted_data:
             print(line)
+
+    @classmethod
+    def from_config(cls, output_config) -> "Screen":
+        """If we need to include any config for the Screen output but the processing here"""
+        return cls()

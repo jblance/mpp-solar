@@ -15,8 +15,7 @@ class API_MQTT(AbstractOutput):
     
     
     
-    def __init__(self, formatter) -> None:
-        self.set_formatter(formatter)
+    def __init__(self) -> None:
         self.command_code : str = "not_set"
         self.device_id : str = "not_set"
 
@@ -66,4 +65,9 @@ class API_MQTT(AbstractOutput):
     @classmethod
     def from_DTO(cls, dto: OutputDTO) -> "API_MQTT":
         formatter = SimpleFormat.from_DTO(dto.format)
-        return cls(formatter=formatter)
+        api_mqtt = cls()
+        api_mqtt.set_formatter(formatter)
+    
+    @classmethod
+    def from_config(cls, output_config) -> "API_MQTT":
+        return cls()

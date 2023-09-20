@@ -23,6 +23,7 @@ class TestPort(AbstractPort):
     def __init__(self, response_number, protocol):
         super().__init__(protocol=protocol)
         self.response_number = response_number
+        self.connected = False
 
     def __str__(self):
         return "Test port"
@@ -33,10 +34,12 @@ class TestPort(AbstractPort):
 
     def connect(self) -> int:
         log.debug("Test port connected")
+        self.connected = True
         return 1
 
     def disconnect(self) -> None:
         log.debug("Test port disconnected")
+        self.connected = False
         return
 
     def send_and_receive(self, command: Command) -> Result:

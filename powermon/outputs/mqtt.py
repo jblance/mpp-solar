@@ -13,8 +13,8 @@ log = logging.getLogger("MQTT")
 
 class MQTT(AbstractOutput):
     """ mqtt output class"""
-    def __init__(self, formatter: AbstractFormat, results_topic) -> None:
-        super().__init__(formatter)
+    def __init__(self, results_topic: str):
+        self.formatter = None
         self.mqtt_broker = None
         self.results_topic = results_topic
 
@@ -26,6 +26,9 @@ class MQTT(AbstractOutput):
 
     def set_formatter(self, formatter):
         self.formatter = formatter
+        
+    def get_topic(self) -> str:
+        return self.results_topic
 
     def to_DTO(self) -> OutputDTO:
         return OutputDTO(type="mqtt", format=self.formatter.to_DTO())
@@ -68,4 +71,4 @@ class MQTT(AbstractOutput):
     @classmethod
     def from_config(cls, output_config) -> "MQTT":
         results_topic = output_config.get("topic_override", None)
-        return cls(formatter=None, results_topic=results_topic)  #FIXME: need to sort approach to init or set_formatter
+        return cls(results_topic=results_topic)
