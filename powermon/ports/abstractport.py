@@ -41,6 +41,11 @@ class AbstractPort(ABC):
         return
 
     @abstractmethod
+    def isConnected() -> bool:
+        log.debug("Port isConnected not implemented")
+        return
+
+    @abstractmethod
     def send_and_receive(self, command: Command) -> Result:
         raise NotImplementedError
 

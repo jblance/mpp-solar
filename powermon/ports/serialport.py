@@ -38,6 +38,9 @@ class SerialPort(AbstractPort):
         dto = PortDTO(type="serial", path=self.path, baud=self.baud, protocol=self.protocol.toDTO())
         return dto
 
+    def isConnected(self) -> bool:
+        return self.serialPort is not None
+
     def connect(self) -> None:
         log.debug(f"usbserial port connecting. path:{self.path}, baud:{self.baud}")
         try:

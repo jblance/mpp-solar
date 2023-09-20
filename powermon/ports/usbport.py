@@ -28,6 +28,9 @@ class USBPort(AbstractPort):
         dto = PortDTO(type="usb", path=self.path, protocol=self.get_protocol().toDTO())
         return dto
 
+    def isConnected(self) -> bool:
+        return self.port is not None 
+
     def connect(self) -> int:
         log.debug(f"USBPort connecting. path:{self.path}, protocol: {self.get_protocol()}")
         try:

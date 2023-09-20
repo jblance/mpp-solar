@@ -88,6 +88,9 @@ class Device:
 
     def finalize(self):
         log.info("finalizing device")
+        
+        #close connection on port
+        self.port.disconnect()
         return
 
     def runLoop(self, force=False) -> bool:
@@ -100,11 +103,13 @@ class Device:
             log.info("no commands in queue")
             return False
         else:
-            # open connection on port
-            self.port.connect()
-
             for command in self.commands:
                 if force or command.dueToRun():
+                    #check if port need to be connected
+                    if not self.port.isConnected:
+                        # open connection on port
+                        self.port.connect()
+
                     log.debug(f"Running command: {command.code}")
                     # run command
                     result: Result = self.port.run_command(command)
@@ -116,8 +121,4 @@ class Device:
                     for output in command.outputs:
                         log.debug(f"Using Output: {output}")
                         output.process(result=result)
-
-            #close connection on port
-            self.port.disconnect()
-
             return True
