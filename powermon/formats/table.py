@@ -39,7 +39,7 @@ class table(AbstractFormat):
         if data is None:
             return _result
 
-        displayData = self.formatAndFilterData(data)
+        displayData = self.format_and_filter_data(data)
         log.debug(f"displayData: {displayData}")
 
         # build header

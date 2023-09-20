@@ -7,6 +7,7 @@ import logging
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.formats.abstractformat import AbstractFormat
 from powermon.dto.outputDTO import OutputDTO
+from powermon.commands.result import Result
 
 log = logging.getLogger("MQTT")
 
@@ -33,7 +34,7 @@ class MQTT(AbstractOutput):
     def to_DTO(self) -> OutputDTO:
         return OutputDTO(type="mqtt", format=self.formatter.to_DTO())
 
-    def output(self, data):
+    def process(self, result: Result):
         """ required function for any output class """
         #Not sure that formatter and mqtt_broker are set, could use builder pattern to ensure they are set
         if self.formatter is None:
@@ -46,7 +47,7 @@ class MQTT(AbstractOutput):
 
         log.info("Using output processor: mqtt")
         # exit if no data
-        if data is None:
+        if result is None:
             return
 
         # exit if no broker
@@ -55,7 +56,7 @@ class MQTT(AbstractOutput):
             return
 
         # build the messages...
-        formatted_data = self.formatter.format(data)
+        formatted_data = self.formatter.format(result)
         log.debug("mqtt.output msgs %s", formatted_data)
 
         # publish
@@ -64,9 +65,6 @@ class MQTT(AbstractOutput):
             self.mqtt_broker.publishMultiple(formatted_data)
         else:
             self.mqtt_broker.publish(self.results_topic, formatted_data)
-
-    def process(self, result):
-        self.output(result)  # QUESTION: why this? do we need to pick one? is 'output' used somewhere else?
 
     @classmethod
     def from_config(cls, output_config) -> "MQTT":

@@ -3,6 +3,7 @@ from powermon.formats.abstractformat import AbstractFormat
 
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.dto.outputDTO import OutputDTO
+from powermon.commands.result import Result
 
 log = logging.getLogger("screen")
 
@@ -18,7 +19,7 @@ class Screen(AbstractOutput):
     def to_DTO(self) -> OutputDTO:
         return OutputDTO(type=self.name, format=self.formatter.to_DTO())
 
-    def process(self, result):
+    def process(self, result: Result):
         log.info("Using output sender: screen")
         log.debug("formatter: %s" % self.formatter)
 

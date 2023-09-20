@@ -41,7 +41,7 @@ class hass(AbstractFormat):
         if data is None:
             return _result
         log.debug(f"data: {data}")
-        displayData = self.formatAndFilterData(data)
+        displayData = self.format_and_filter_data(data)
         log.debug(f"displayData: {displayData}")
 
         # build data to display

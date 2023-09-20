@@ -44,7 +44,7 @@ class API_MQTT(AbstractOutput):
         return OutputDTO(type="api_mqtt", format=self.formatter.to_DTO())
 
 
-    def output(self, result: Result):
+    def process(self, result: Result):
         # exit if no data
         if result.raw_response is None:
             return
@@ -58,9 +58,6 @@ class API_MQTT(AbstractOutput):
         result_dto = ResultDTO(device_identifier=result.get_device_id(), command_code=result.command_code, data=result.get_decoded_responses())
         self.mqtt_broker.publish(self.get_topic(), result_dto.json())
 
-    def process(self, result: Result):
-        self.output(result)
-        
         
     @classmethod
     def from_DTO(cls, dto: OutputDTO) -> "API_MQTT":

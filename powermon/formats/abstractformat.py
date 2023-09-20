@@ -3,6 +3,7 @@ import logging
 import re
 
 from powermon.dto.formatDTO import FormatDTO
+from powermon.commands.result import Result
 
 
 # from time import sleep
@@ -33,17 +34,17 @@ class AbstractFormat(ABC):
         pass
 
     @abstractmethod
-    def format(self, data):
+    def format(self, result: Result):
         pass
 
-    def to_DTO(self):
+    def to_DTO(self) -> FormatDTO:
         return FormatDTO(type=self.name)
     
     # Override this if the format sends multiple messages
     def sendsMultipleMessages(self) -> bool:
         return False
 
-    def formatAndFilterData(self, data):
+    def format_and_filter_data(self, data):
         # TODO: should we make data a proper object so it's easy to get the data we want?
         # remove raw response
         if "raw_response" in data:

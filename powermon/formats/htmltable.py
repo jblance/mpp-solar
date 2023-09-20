@@ -32,7 +32,7 @@ class htmltable(AbstractFormat):
             return _result
 
         log.debug(f"data: {data}")
-        displayData = self.formatAndFilterData(data)
+        displayData = self.format_and_filter_data(data)
         log.debug(f"displayData: {displayData}")
 
         _result.append("<table><tr><th>Parameter</th><th>Value</th><th>Unit</th></tr>")

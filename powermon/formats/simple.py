@@ -32,7 +32,7 @@ class SimpleFormat(AbstractFormat):
         if data is None:
             return _result
 
-        displayData = self.formatAndFilterData(data)
+        displayData = self.format_and_filter_data(data)
 
         # build data to display
         for key in displayData:
