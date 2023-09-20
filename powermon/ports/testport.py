@@ -30,7 +30,7 @@ class TestPort(AbstractPort):
         dto = PortDTO(type="test", protocol=self.get_protocol().toDTO())
         return dto
 
-    def isConnected(self) -> bool:
+    def isConnected(self):
         log.debug("Test port is connected")
         return True
 

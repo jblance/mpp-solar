@@ -23,12 +23,13 @@ class USBPort(AbstractPort):
     def __init__(self, path, protocol) -> None:
         super().__init__(protocol=protocol)
         self.path = path
+        self.port = None
 
     def toDTO(self):
         dto = PortDTO(type="usb", path=self.path, protocol=self.get_protocol().toDTO())
         return dto
 
-    def isConnected(self) -> bool:
+    def isConnected(self):
         return self.port is not None 
 
     def connect(self) -> int:

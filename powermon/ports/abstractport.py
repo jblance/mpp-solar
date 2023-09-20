@@ -41,7 +41,7 @@ class AbstractPort(ABC):
         return
 
     @abstractmethod
-    def isConnected() -> bool:
+    def isConnected(self):
         log.debug("Port isConnected not implemented")
         return
 

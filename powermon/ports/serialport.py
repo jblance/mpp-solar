@@ -38,7 +38,7 @@ class SerialPort(AbstractPort):
         dto = PortDTO(type="serial", path=self.path, baud=self.baud, protocol=self.protocol.toDTO())
         return dto
 
-    def isConnected(self) -> bool:
+    def isConnected(self):
         return self.serialPort is not None
 
     def connect(self) -> None:
