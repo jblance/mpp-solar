@@ -57,6 +57,10 @@ class AbstractPort(ABC):
         return self.protocol
 
     def run_command(self, command: Command):
+        #open port if it is closed
+        if not self.isConnected():
+            self.connect()
+
         # takes a command object, runs the command and returns a result object (replaces process_command)
         log.debug(f"Command {command}")
         # update run times

@@ -39,7 +39,7 @@ class SerialPort(AbstractPort):
         return dto
 
     def isConnected(self):
-        return self.serialPort is not None
+        return self.serialPort is not None and self.serialPort.is_open
 
     def connect(self) -> None:
         log.debug(f"usbserial port connecting. path:{self.path}, baud:{self.baud}")
@@ -48,12 +48,15 @@ class SerialPort(AbstractPort):
         except Exception as e:
             log.error(f"Error openning serial port: {e}")
             self.error = str(e)
+            self.serialPort = None
         return
 
     def disconnect(self) -> None:
         log.debug("usbserial port disconnecting")
         if self.serialPort is not None:
             self.serialPort.close()
+
+        self.serialPort = None
         return
 
     def send_and_receive(self, command: Command) -> Result:
@@ -82,6 +85,7 @@ class SerialPort(AbstractPort):
             log.warning(f"Serial read error: {e}")
             result.error = True
             result.error_messages.append(f"Serial read error {e}")
+            self.disconnect()
             return result
         log.info("Command execution failed")
         result.error = True

@@ -46,6 +46,7 @@ class USBPort(AbstractPort):
         log.debug(f"USBPort disconnecting {self.port}")
         if self.port is not None:
             os.close(self.port)
+        self.port = None
         return
 
     def send_and_receive(self, command: Command) -> Result:

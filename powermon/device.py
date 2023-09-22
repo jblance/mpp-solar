@@ -105,25 +105,15 @@ class Device:
         else:
             for command in self.commands:
                 if force or command.dueToRun():
-                    #check if port need to be connected
-                    if not self.port.isConnected():
-                        # open connection on port
-                        self.port.connect()
-
-                    # Run command if port is opened
-                    if self.port.isConnected():
-                        log.debug(f"Running command: {command.code}")
-                        # run command
-                        result: Result = self.port.run_command(command)
-                        # decode result
-                        self.port.get_protocol().decode(result=result, command=command)
-                        result.set_device_id(self.device_id)
-                        # loop through each output and process result
-                        output: AbstractOutput
-                        for output in command.outputs:
-                            log.debug(f"Using Output: {output}")
-                            output.process(result=result)
-                    else:
-                        # Port is closed, something wrong. Stop loop
-                        return False
+                    log.debug(f"Running command: {command.code}")
+                    # run command
+                    result: Result = self.port.run_command(command)
+                    # decode result
+                    self.port.get_protocol().decode(result=result, command=command)
+                    result.set_device_id(self.device_id)
+                    # loop through each output and process result
+                    output: AbstractOutput
+                    for output in command.outputs:
+                        log.debug(f"Using Output: {output}")
+                        output.process(result=result)
             return True

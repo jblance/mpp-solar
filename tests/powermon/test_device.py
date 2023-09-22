@@ -17,51 +17,22 @@ class DeviceTest(TestCase):
         self.port = Mock(spec=SerialPort, protocol = pi30max())
         self.device = Device(name="Test Device", port=self.port)
 
-    def test_if_port_connect_before_run_command(self):
+    def test_if_output_processed_in_success_runLoop(self):
         """
-        Test if connect() method on port is called inside runLoop() before run command
+        Test if output process called in success command run
         """
 
         # Add command into command list with dueToRun=True to emulate running command
+        output = Mock(spec=AbstractOutput)
         self.device.add_command(
             Mock(
                 spec=Command, 
                 code="QPIRI",
-                outputs = [Mock(spec=AbstractOutput)],
+                outputs = [output],
                 dueToRun = Mock(return_value=True)
                 )
             )
-        #Pretend that port is disconnected
-        self.port.isConnected.side_effect = [False, True]
     
         #Run main device loop. Expecting positive result
         self.assertTrue(self.device.runLoop())
-
-        #Check that port connection has been checked
-        self.port.isConnected.assert_called()
-        #Check if port connection been established
-        self.port.connect.assert_called()
-        
-    def test_if_port_is_not_connected(self):
-        """
-        Test if connect() method on port is called inside runLoop() but connection is not established
-        """
-        # Add command into command list with dueToRun=True to emulate running command
-        self.device.add_command(
-            Mock(
-                spec=Command, 
-                code="QPIRI",
-                outputs = [Mock(spec=AbstractOutput)],
-                dueToRun = Mock(return_value=True)
-                )
-            )
-        #Pretend that port is disconnected
-        self.port.isConnected.side_effect = [False, False]
-    
-        #Run main device loop. Expecting negative result due to closed port
-        self.assertFalse(self.device.runLoop())
-
-        #Check that port connection has been checked
-        self.port.isConnected.assert_called()
-        #Check if port connect method has been called
-        self.port.connect.assert_called()
+        output.process.assert_called()
