@@ -585,11 +585,12 @@ QUERY_COMMANDS = {
         "response": [[0, "Protocol ID", "bytes.decode", ""]],
         "test_responses": [b"(PI30\x9a\x0b\r"],
     },
-    "QPIz": {
+    "QPIz": { # Question: is this a typo? Duplicate of QPI?
         "name": "QPIz",
         "description": "Protocol ID inquiry",
         "help": " -- queries the device protocol ID. e.g. PI30 for HS series",
         "response_type": ResponseType.INDEXED,
+        "response": [[0, "Protocol ID", "bytes.decode", ""]],
         "test_responses": [b"(PI30\x9a\x0b\r"],
     },
     "QPIGS": {
@@ -829,8 +830,8 @@ class pi30(AbstractProtocol):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"PI30"
-        self.COMMANDS = QUERY_COMMANDS
-        self.COMMANDS.update(SETTER_COMMANDS)
+        self.add_command_definitions(QUERY_COMMANDS, "QUERY")
+        self.add_command_definitions(SETTER_COMMANDS, "SETTER")
         self.STATUS_COMMANDS = ["QPIGS", "Q1"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"

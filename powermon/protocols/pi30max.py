@@ -979,14 +979,14 @@ class pi30max(pi30):
         super().__init__()
         self._protocol_id = b"PI30MAX"
         # Add pi30max specific commands to pi30 commands
-        self.COMMANDS.update(QUERY_COMMANDS)
+        super().add_command_definitions(QUERY_COMMANDS, "QUERY")
         # Add pi30max specific setter commands
-        self.COMMANDS.update(SETTER_COMMANDS)
+        super().add_command_definitions(SETTER_COMMANDS, "SETTER")
         # remove and unwanted pi30 commands
         for item in COMMANDS_TO_REMOVE:
-            if item in self.COMMANDS:
-                self.COMMANDS.pop(item)
+            if item in self.command_definitions:
+                self.command_definitions.pop(item)
         self.STATUS_COMMANDS = ["QPIGS", "QPIGS2"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
-        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
+        log.info(f"Using protocol {self._protocol_id} with {len(self.command_definitions)} commands")

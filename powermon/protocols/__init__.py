@@ -11,6 +11,7 @@ class ResponseType(Enum):
     ACK = auto()
     MULTIVALUED = auto()
     INDEXED = auto()
+    POSITIONAL = auto()
 
 
 def get_protocol_definition(protocol):

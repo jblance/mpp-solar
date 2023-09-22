@@ -6,7 +6,7 @@ from powermon.dto.commandDTO import CommandDTO
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.outputs.abstractoutput import OutputType
 from powermon.outputs.api_mqtt import API_MQTT
-from powermon.commands.commanddefinition import CommandDefinition
+from powermon.commands.command_definition import CommandDefinition
 
 log = logging.getLogger("Command")
 
@@ -24,16 +24,16 @@ class Command:
         self.last_run = None
         self.next_run = self.trigger.nextRun(command=self)
         self.full_command = None
-        self.command_definition : dict[str, list] = {}
+        self.command_definition : CommandDefinition = None
         self.device_id = None
         log.debug(self)
         
     def get_full_command(self) -> str | None:
         return self.full_command
     
-    def set_command_definition(self, command_definition : dict):
+    def set_command_definition(self, command_definition : CommandDefinition):
         self.command_definition = command_definition
-        self.command_description = command_definition["description"]
+        self.command_description = command_definition.description
         for output in self.outputs:
             output.formatter.set_command_description(self.command_description)
     
