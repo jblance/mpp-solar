@@ -2,6 +2,7 @@ import json as js
 import logging
 from datetime import datetime
 from powermon.formats.abstractformat import AbstractFormat
+from powermon.commands.result import Result
 
 log = logging.getLogger("hass")
 
@@ -30,7 +31,7 @@ class hass(AbstractFormat):
     def set_command_description(self, command_description):
         pass
 
-    def format(self, result) -> list:
+    def format(self, result: Result) -> list:
         log.info("Using output formatter: %s" % self.name)
 
         config_msgs = []

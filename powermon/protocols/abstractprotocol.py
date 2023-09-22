@@ -21,6 +21,7 @@ from mppsolar.protocols.protocol_helpers import get_resp_defn, get_value  # noqa
 from powermon.dto.protocolDTO import ProtocolDTO
 from powermon.protocols import ResponseType
 from powermon.commands.result import Result
+from powermon.commands.response import Response
 from powermon.commands.command import Command
 from powermon.commands.command_definition import CommandDefinition
 from powermon.dto.command_definition_dto import CommandDefinitionDTO

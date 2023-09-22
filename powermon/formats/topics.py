@@ -1,6 +1,7 @@
 # Description: Output format for mqtt as individual topics
 import logging
 from powermon.formats.abstractformat import AbstractFormat
+from powermon.commands.result import Result
 
 log = logging.getLogger("Topics")
 
@@ -14,7 +15,7 @@ class Topics(AbstractFormat):
     def sendsMultipleMessages(self) -> bool:
         return True
 
-    def format(self, result):
+    def format(self, result: Result):
         log.info("Using output formatter: %s" % self.name)
 
         _result = []
