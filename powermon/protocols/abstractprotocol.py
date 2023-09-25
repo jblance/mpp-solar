@@ -89,7 +89,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         definitions_count = command_definition.get_response_count()
         if index is not None:
             if index < definitions_count:
-                return command_definition.responses[index]
+                return command_definition.response_definitions[index]
             else:
                 return [index, f"Unknown value in response {index}", "bytes.decode", ""]
         elif key is not None:
@@ -126,7 +126,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         """
         Simplest validity check, CRC checks should be added to individual protocols
         """
-        if result.raw_response is None:
+        if result.raw_response_blob is None:
             result.is_valid = False
             result.error = True
             result.error_messages.append("failed validity check: response was empty")
@@ -287,12 +287,13 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         return [(data_name, r, data_units, extra_info)]
 
     def decode(self, result: Result, command: Command):
+        #TODO: this should return something instead of modifying result, then it's easy to test
         """
         Take the a result object and decode the raw response
         into a ??? dict of name: value, unit entries
         """
 
-        log.info(f"result.raw_response passed to decode: {result.raw_response}")
+        log.info(f"result.raw_response passed to decode: {result.raw_response_blob}")
 
         # Check response is valid
         self.check_response_valid(result)
@@ -300,7 +301,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             return
 
         # Split the response into individual responses
-        result.responses = self.get_responses(result.raw_response)
+        result.responses = self.get_responses(result.raw_response_blob)
         log.debug(f"trimmed and split responses: {result.responses}")
 
         # Now need to decode each of the responses as per the protocol definition
@@ -333,7 +334,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 response_defn = self.get_response_definition(command.command_definition, index=0)
 
                 # decode the response
-                raw_value = result.responses[0].decode()
+                raw_value = result.raw_responses[0].decode()
 
                 # populate vars from response and response definition
                 data_name = get_value(response_defn, 1)
@@ -342,22 +343,25 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 value = result_dict.get(raw_value)
 
                 # update result object with decoded responses
-                result.decoded_responses = {data_name: [value, "", extra_info]}
+                response = Response(data_name=data_name, data_unit=None, value=value, extra_info=extra_info)
+                result.add_response(response)
                 return
             case ResponseType.MULTIVALUED:
                 # Response that while able to be split, makes more sense as a single response
                 # eg Max Charging Current Options: 010 020 030 040 050 060 070 080 090 100 110 120 A
-                data_name = command.command_definition.responses[0][1]
+                data_name = command.command_definition.response_definitions[0][1]
                 value = ""
                 for item in result.responses:
                     value += f"{item.decode()} "
-                data_units = command.command_definition.responses[0][3]
-                log.debug(f"{data_name}, {value}, {data_units}")
-                if len(command.command_definition.responses[0]) > 4:
-                    extra_info = command.command_definition.responses[0][4]
-                    result.decoded_responses = {data_name: [value, data_units, extra_info]}
-                else:
-                    result.decoded_responses = {data_name: [value, data_units]}
+                _data_unit = command.command_definition.response_definitions[0][3]
+                log.debug(f"{data_name}, {value}, {_data_unit}")
+                extra_info = None
+                if len(command.command_definition.response_definitions[0]) > 4:
+                    extra_info = command.command_definition.response_definitions[0][4]
+                    
+                response = Response(data_name=data_name, data_unit=_data_unit, value=value, extra_info=extra_info)
+                result.add_response(response)
+            
                 return
             case ResponseType.INDEXED:
                 # Most common response, items are defined by their order
@@ -365,10 +369,6 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 # first definition field contains item index in list
                 # [5, "ChargeAverageCurrent", "bytes.decode", ""],
                 # [6, "SCC PWM temperature", "int", "°C", {"device-class": "temperature"}],
-
-                # initialize decoded responses as dict if None
-                if result.decoded_responses is None:
-                    result.decoded_responses = {}
 
                 # check the number of responses and the number of response definitions
                 len_responses = len(result.responses)
@@ -382,7 +382,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         result.responses.append("extra")
 
                 # loop through responses
-                for i, _response in enumerate(result.responses):
+                for i, _response in enumerate(result.raw_responses):
                     # get response defn for this response
                     # [1, "AC Input Voltage", "float", "V", {icon: blah}]
                     response_defn = self.get_response_definition(command.command_definition, index=i)
@@ -392,7 +392,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     # data_posi = get_value(response_defn, 0)
                     data_name = get_value(response_defn, 1)
                     data_type = get_value(response_defn, 2)
-                    data_units = get_value(response_defn, 3)
+                    _data_unit = get_value(response_defn, 3)
                     extra_info = get_value(response_defn, 4)
 
                     #
@@ -409,30 +409,29 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     #     if data_name is not None:
                     #         msgs[data_name] = [value, data_units, extra_info]
                     if data_type.startswith("info"):  # TODO: and/or this should move to process_response
-                        log.debug(f"Processing info, {data_type=} for {data_name=}, {data_units=} {_response=}")
+                        log.debug(f"Processing info, {data_type=} for {data_name=}, {_data_unit=} {_response=}")
                         template = data_type.split(":", 1)[1]
                         # Provide cn as shortcut to the command name for info fields
                         cn = command.code  # noqa: F841
                         value = eval(template)
                         if data_name is not None:
-                            result.decoded_responses[data_name] = [value, data_units, extra_info]
+                            response = Response(data_name=data_name, data_unit=_data_unit, value=value, extra_info=extra_info)
+                            result.add_response(response)
                     else:
                         # Process response  # TODO: this should be collapsed
                         processed_responses = self.process_response(
                             data_name=data_name,
                             raw_value=raw_value,
-                            data_units=data_units,
+                            data_units=_data_unit,
                             data_type=data_type,
                             frame_number=0,
                             extra_info=extra_info,
                         )
                         for item in processed_responses:
-                            data_name, value, data_units, extra_info = item
+                            data_name, value, _data_unit, extra_info = item
                             if data_name is not None:
-                                if extra_info:
-                                    result.decoded_responses[data_name] = [value, data_units, extra_info]
-                                else:
-                                    result.decoded_responses[data_name] = [value, data_units]
+                                response = Response(data_name=data_name, data_unit=_data_unit, value=value, extra_info=extra_info)
+                                result.add_response(response)
                 return
 
             case _:
@@ -515,7 +514,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 if i >= len_command_defn:
                     resp_format = ["string", f"Unknown value in response {i}", ""]
                 else:
-                    resp_format = command_definition.responses[i]
+                    resp_format = command_definition.response_definitions[i]
 
                 # key = "{}".format(resp_format[1]).lower().replace(" ", "_")
                 key = resp_format[1]
@@ -633,7 +632,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         continue
                     lookup_key = response[0]
                     raw_value = response[1]
-                    response_defn = get_resp_defn(lookup_key, command_definition.responses)
+                    response_defn = get_resp_defn(lookup_key, command_definition.response_definitions)
                     if response_defn is None:
                         # No definition for this key, so ignore???
                         log.warn(f"No definition for {response}")
@@ -657,7 +656,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     if i >= len_command_defn:
                         response_defn = ["str", f"Unknown value in response {i}", ""]
                     else:
-                        response_defn = command_definition.responses[i]
+                        response_defn = command_definition.response_definitions[i]
                     log.debug(f"Got defn {response_defn}")
                     raw_value = response
                     # spacer = response_defn[0] #0
@@ -685,7 +684,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                             "",
                         ]
                     else:
-                        response_defn = command_definition.responses[i]
+                        response_defn = command_definition.response_definitions[i]
                     log.debug(f"Got defn {response_defn}")
                     raw_value = response
                     # data_posi = get_value(response_defn, 0)
@@ -713,7 +712,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     if i >= len_command_defn:
                         response_defn = ["str", 1, f"Unknown value in response {i}", ""]
                     else:
-                        response_defn = command_definition.responses[i]
+                        response_defn = command_definition.response_definitions[i]
                     if response_defn is None:
                         # No definition for this key, so ignore???
                         log.warn(f"No definition for {response}")

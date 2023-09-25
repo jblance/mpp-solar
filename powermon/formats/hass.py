@@ -38,18 +38,16 @@ class hass(AbstractFormat):
         value_msgs = []
 
         _result = []
-        data = result.decoded_responses
-        if data is None:
+        if result.responses is None:
             return _result
-        log.debug(f"data: {data}")
-        displayData = self.format_and_filter_data(data)
-        log.debug(f"displayData: {displayData}")
+        display_data = self.format_and_filter_data(result)
+        log.debug(f"displayData: {display_data}")
 
         # build data to display
-        for key in displayData:
+        for key in display_data:
             # Get key data
-            value = displayData[key][0]
-            unit = displayData[key][1]
+            value = display_data[key][0]
+            unit = display_data[key][1]
 
             # Set component type
             if unit == "bool" or value == "enabled" or value == "disabled":
@@ -66,18 +64,18 @@ class hass(AbstractFormat):
 
             # Get icon if present
             icon = None
-            if len(displayData[key]) > 2 and displayData[key][2] and "icon" in displayData[key][2]:
-                icon = displayData[key][2]["icon"]
+            if len(display_data[key]) > 2 and display_data[key][2] and "icon" in display_data[key][2]:
+                icon = display_data[key][2]["icon"]
 
             # Get device_class if present
             device_class = None
-            if len(displayData[key]) > 2 and displayData[key][2] and "device-class" in displayData[key][2]:
-                device_class = displayData[key][2]["device-class"]
+            if len(display_data[key]) > 2 and display_data[key][2] and "device-class" in display_data[key][2]:
+                device_class = display_data[key][2]["device-class"]
 
             # Get state_class if present
             state_class = None
-            if len(displayData[key]) > 2 and displayData[key][2] and "state_class" in displayData[key][2]:
-                state_class = displayData[key][2]["state_class"]
+            if len(display_data[key]) > 2 and display_data[key][2] and "state_class" in display_data[key][2]:
+                state_class = display_data[key][2]["state_class"]
 
             # Object ID
             object_id = f"{self.entity_id_prefix}_{key}".lower()

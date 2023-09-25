@@ -46,7 +46,7 @@ class API_MQTT(AbstractOutput):
 
     def process(self, result: Result):
         # exit if no data
-        if result.raw_response is None:
+        if result.raw_response_blob is None:
             return
 
         # exit if no broker
@@ -55,7 +55,7 @@ class API_MQTT(AbstractOutput):
             raise RuntimeError("No mqtt broker supplied")
 
         # build the messages...
-        result_dto = ResultDTO(device_identifier=result.get_device_id(), command_code=result.command_code, data=result.get_decoded_responses())
+        result_dto = ResultDTO(device_identifier=result.get_device_id(), command_code=result.command_code, data=result.get_responses())
         self.mqtt_broker.publish(self.get_topic(), result_dto.json())
 
         

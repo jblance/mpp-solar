@@ -2,7 +2,7 @@ import logging
 import re
 
 from .baseoutput import baseoutput
-from ..helpers import get_kwargs, key_wanted, pad, getMaxLen
+from ..helpers import get_kwargs, key_wanted, pad, get_max_response_length
 
 log = logging.getLogger("screen")
 
@@ -78,7 +78,7 @@ class screen(baseoutput):
         print("-" * 80)
 
         # print data
-        maxP = getMaxLen(displayData)
+        maxP = get_max_response_length(displayData)
         if maxP < 9:
             maxP = 9
         # maxV = getMaxLen(data.values())

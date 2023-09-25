@@ -5,7 +5,7 @@ mppsolar-tests:
 	python3 -m unittest discover -s tests/mppsolar -f -v
 	
 powermon-tests: 
-	python3 -m unittest discover -s tests/powermon -f -v
+	python3 -m unittest discover -s tests/powermon -v
 
 tests: powermon-tests mppsolar-tests
 

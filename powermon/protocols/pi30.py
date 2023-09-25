@@ -840,31 +840,31 @@ class pi30(AbstractProtocol):
 
     def check_response_valid(self, result):
         # fail if no response
-        if result.raw_response is None:
+        if result.raw_response_blob is None:
             result.is_valid = False
             result.error = True
             result.error_messages.append("failed validity check: response was empty")
             return
         # fail if dict??? not sure what this is for
-        if type(result.raw_response) is dict:
+        if type(result.raw_response_blob) is dict:
             result.is_valid = False
             result.error = True
             result.error_messages.append("failed validity check: incorrect raw_response format (found dict)")
             return
         # fail on short responses
-        if len(result.raw_response) <= 3:
+        if len(result.raw_response_blob) <= 3:
             result.is_valid = False
             result.error = True
             result.error_messages.append(
-                f"failed validity check: response to short len was {len(result.raw_response)}"
+                f"failed validity check: response to short len was {len(result.raw_response_blob)}"
             )
             return
         # check crc matches the calculated one
-        calc_crc_high, calc_crc_low = crc(result.raw_response[:-3])
-        if type(result.raw_response) is str:
-            crc_high, crc_low = ord(result.raw_response[-3]), ord(result.raw_response[-2])
+        calc_crc_high, calc_crc_low = crc(result.raw_response_blob[:-3])
+        if type(result.raw_response_blob) is str:
+            crc_high, crc_low = ord(result.raw_response_blob[-3]), ord(result.raw_response_blob[-2])
         else:
-            crc_high, crc_low = result.raw_response[-3], result.raw_response[-2]
+            crc_high, crc_low = result.raw_response_blob[-3], result.raw_response_blob[-2]
         if [calc_crc_high, calc_crc_low] != [crc_high, crc_low]:
             result.is_valid = False
             result.error = True

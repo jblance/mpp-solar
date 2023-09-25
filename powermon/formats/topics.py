@@ -19,24 +19,25 @@ class Topics(AbstractFormat):
         log.info("Using output formatter: %s" % self.name)
 
         _result = []
-        data = result.decoded_responses
-        if data is None:
+        
+        if len(result.get_responses()) == 0:
             return _result
 
-        displayData = self.format_and_filter_data(data)
-        log.debug(f"displayData: {displayData}")
+        display_data = self.format_and_filter_data(result)
+        log.debug(f"displayData: {display_data}")
 
         # Build array of mqtt messages
         msgs = []
         # Loop through responses build topics and messages
-        for key in data:
-            value = data[key][0]
-            unit = data[key][1]
+        for response in result.get_responses():
+            value = response.data_value
+            unit = response.data_unit
+            name = response.name
             log.debug(f"build_msgs: prefix {self.results_topic}, key {key}, value {value}, unit {unit}")
-            msg = {"topic": f"{self.results_topic}/{key}/value", "payload": value}
+            msg = {"topic": f"{self.results_topic}/{name}/value", "payload": value}
             msgs.append(msg)
             if unit:
-                msg = {"topic": f"{self.results_topic}/{key}/unit", "payload": unit}
+                msg = {"topic": f"{self.results_topic}/{name}/unit", "payload": unit}
                 msgs.append(msg)
         log.debug(f"build_msgs: {msgs}")
         return msgs

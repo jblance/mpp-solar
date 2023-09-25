@@ -1,5 +1,8 @@
 # yaml config for powermon
+debuglevel: debug
+
 device:
+  id: test
   name: 1012LV-MK
   model: 1012LV-MK
   manufacturer: MPP-Solar
@@ -10,12 +13,14 @@ device:
 
 commands:
 - command: QPIRI #Must be in the protocol command list
+  type: basic
   trigger:
     every: 100  # seconds
   outputs:
   - type: api_mqtt
     format: 
       type: simple
+
           
 mqttbroker:
   name: localhost
@@ -24,6 +29,10 @@ mqttbroker:
   password: null
 
 api:
+  host: null
+  port: null
+  enabled: true
+  log_level: null
   announce_topic: powermon/announce
   adhoc_topic: powermon/adhoc
   refresh_interval: 30
@@ -31,3 +40,5 @@ api:
 daemon:
   type: systemd
   keepalive: 100
+
+loop: null

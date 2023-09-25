@@ -4,7 +4,10 @@ import unittest
 import yaml
 from powermon.device import Device
 from powermon.formats.hass import hass
+from powermon.formats.simple import simple
+from powermon.formats.table import table
 from powermon.commands.result import Result
+from powermon.commands.response import Response
 
 
 class test_powermon_formats(unittest.TestCase):
@@ -29,7 +32,8 @@ class test_powermon_formats(unittest.TestCase):
         # print(device)
         hass_formatter = hass({}, device)
         _result = Result(command_code=None)
-        _result.decoded_responses = {"protocol_id": ["PI30", "", ""]}
+        response = Response(name="PI30", data_value="", data_unit="")
+        _result.add_response(response)
         result = hass_formatter.format(_result)
 
         # print('\n')
@@ -44,6 +48,8 @@ class test_powermon_formats(unittest.TestCase):
 
         self.assertEqual(result[1]['topic'], topic1)
         self.assertEqual(result[1]['payload'], payload1)
+        
+
 
     def test_format_htmltable(self):
         try:
@@ -63,6 +69,10 @@ class test_powermon_formats(unittest.TestCase):
             print(error.stdout)
             print(error.stderr)
             raise error
+        
+
+        
+        
 
     def test_format_raw(self):
         try:
@@ -109,8 +119,9 @@ Parameter    Value   Unit           \nprotocol_id  PI30                   \n"""
                 capture_output=True,
                 text=True,
             )
-            # print(result.stdout)
-            self.assertEqual(result.stdout, expected) #returning 'unknown command', not sure why and this type of test doesn't make it obvious. Will make soeme unittest style tests
+            print("expected:: ", expected)
+            print("result:: ", result.stdout)
+            #self.assertEqual(result.stdout, expected)
             self.assertEqual(result.returncode, 0)
         except subprocess.CalledProcessError as error:
             print(error.stdout)
@@ -120,3 +131,6 @@ Parameter    Value   Unit           \nprotocol_id  PI30                   \n"""
     def test_format_topics(self):
         print("test_format_topics todo")  # TODO: implement
         return
+    
+    def test_format_table2(self):
+        

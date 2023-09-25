@@ -233,7 +233,7 @@ class ved(AbstractProtocol):
                 and self._command_definition.response_type == ResponseType.POSITIONAL
             ):
                 # Have a POSITIONAL type response, so need to break it up...
-                for defn in self._command_definition.responses:
+                for defn in self._command_definition.response_definitions:
                     size = defn[1]
                     item = _r[:size]
                     responses.append(item)

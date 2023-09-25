@@ -13,7 +13,6 @@ class Result:
         self.device_id = "default"
         self.raw_response = raw_response
         self.responses = []
-        self.decoded_responses = None
         self.is_valid = False
         self.error = False
         self.error_messages = []
@@ -28,5 +27,3 @@ class Result:
     def get_device_id(self) -> str:
         return self.device_id
 
-    def get_decoded_responses(self) -> dict:
-        return self.decoded_responses

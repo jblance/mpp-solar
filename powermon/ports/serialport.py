@@ -73,7 +73,7 @@ class SerialPort(AbstractPort):
             time.sleep(0.1)  # give serial port time to receive the data
             response_line = self.serialPort.read_until(b"\r")
             log.debug("serial response was: %s", response_line)
-            result.raw_response = response_line
+            result.raw_response_blob = response_line
             return result
         except Exception as e:
             log.warning(f"Serial read error: {e}")

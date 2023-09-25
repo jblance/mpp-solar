@@ -19,20 +19,18 @@ class htmltable(AbstractFormat):
         _result = []
 
         # check for error in result
+        # TODO: have the result output the error
         if result.error:
             data = {}
             data["Error"] = [f"Command: {result.command_code} incurred an error or errors during execution or processing", ""]
             data["Error Count"] = [len(result.error_messages), ""]
             for i, message in enumerate(result.error_messages):
                 data[f"Error #{i}"] = [message, ""]
-        else:
-            data = result.decoded_responses
 
-        if data is None:
+        if len(result.get_responses()) == 0:
             return _result
 
-        log.debug(f"data: {data}")
-        displayData = self.format_and_filter_data(data)
+        displayData = self.format_and_filter_data(result)
         log.debug(f"displayData: {displayData}")
 
         _result.append("<table><tr><th>Parameter</th><th>Value</th><th>Unit</th></tr>")

@@ -61,5 +61,5 @@ class TestPort(AbstractPort):
             self._test_data = None
         response = self._test_data
         log.debug(f"Raw response {response}")
-        result.raw_response = response
+        result.raw_response_blob = response
         return result
