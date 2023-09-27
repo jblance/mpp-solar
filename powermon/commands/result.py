@@ -1,6 +1,7 @@
 import logging
 
 from powermon.commands.response import Response
+from powermon.commands.response_definition import ResponseDefinition
 
 log = logging.getLogger("result")
 
@@ -9,12 +10,13 @@ class Result:
     def __str__(self):
         return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response_blob=}, {self.responses=}"
 
-    def __init__(self, command_code: str, raw_response=None):
+    def __init__(self, command_code: str, response_definitions: list[ResponseDefinition]=None, raw_response=None):
         self.device_id = "default"
         self.command_code = command_code
         self.raw_response_blob = raw_response
         self.raw_responses = []
         self.responses :list[Response] = []
+        self.response_definitions = response_definitions
         self.is_valid = False
         self.error = False
         self.error_messages = []
@@ -35,5 +37,8 @@ class Result:
     def get_responses(self) -> list[Response]:
         return self.responses
     
-    def add_response(self, response: Response):
-        self.responses.append(response)
+    def add_responses(self, responses: list[Response]) -> bool:
+        self.responses.extend(responses)
+        return True
+        
+        

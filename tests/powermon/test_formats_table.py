@@ -17,8 +17,8 @@ class test_formats_table(unittest.TestCase):
         table_formatter.draw_lines = True
         
         _result = Result(command_code=None)
-        response = Response(name="Test", data_value="0.0", data_unit="Check")
-        _result.add_response(response)
+        response = Response(data_name="Test", data_value="0.0", data_unit="Check")
+        _result.add_responses(response)
         
         formatted_data = table_formatter.format(_result)
         print(formatted_data)
@@ -34,8 +34,8 @@ class test_formats_table(unittest.TestCase):
         table_formatter.draw_lines = False
         
         _result = Result(command_code=None)
-        response = Response(name="Test", data_value="0.0", data_unit="Check")
-        _result.add_response(response)
+        response = Response(data_name="Test", data_value="0.0", data_unit="Check")
+        _result.add_responses(response)
         
         formatted_data = table_formatter.format(_result)
         print(formatted_data)
@@ -51,8 +51,8 @@ class test_formats_table(unittest.TestCase):
         table_formatter.draw_lines = False
         
         _result = Result(command_code=None)
-        response = Response(name="Test", data_value="123456789012345678901234567890", data_unit="Check")
-        _result.add_response(response)
+        response = Response(data_name="Test", data_value="123456789012345678901234567890", data_unit="Check")
+        _result.add_responses(response)
         
         formatted_data = table_formatter.format(_result)
         print(formatted_data)

@@ -94,7 +94,7 @@ class table(AbstractFormat):
 
         # print data
         for response in filtered_responses:
-            name = response.name
+            name = response.get_data_name()
             value = response.data_value
             unit = response.data_unit
             if self.draw_lines:

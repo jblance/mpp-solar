@@ -14,7 +14,7 @@ class CommandDefinition:
         self.description = description
         self.help_text = help_text
         self.response_type : ResponseType = response_type
-        self.response_definitions : list[ResponseDefinition] = response_definitions
+        self.response_definitions : dict[int,ResponseDefinition] = response_definitions
         self.test_responses : list[bytes] = test_responses
         self.regex : str | None = regex
         self.command_definition_type : str = command_definition_type
@@ -33,7 +33,7 @@ class CommandDefinition:
     def get_type(self) -> str:
         return self.command_definition_type
         
-    def get_response_count(self) -> int:
+    def get_response_definition_count(self) -> int:
         if(self.response_definitions is None):
             return 0
         else:
@@ -46,7 +46,7 @@ class CommandDefinition:
         description = protocol_dictionary.get("description")
         help_text = protocol_dictionary.get("help_text")
         response_type = protocol_dictionary.get("response_type")
-        response_definitions : list[ResponseDefinition] = ResponseDefinition.multiple_from_config(protocol_dictionary.get("response"))
+        response_definitions : dict[int,ResponseDefinition] = ResponseDefinition.multiple_from_config(protocol_dictionary.get("response"))
         test_responses = protocol_dictionary.get("test_responses")
         regex = protocol_dictionary.get("regex", None)
         return cls(code=code, description=description, help_text=help_text, response_type=response_type, 

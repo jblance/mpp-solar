@@ -32,8 +32,8 @@ class test_powermon_formats(unittest.TestCase):
         # print(device)
         hass_formatter = hass({}, device)
         _result = Result(command_code=None)
-        response = Response(name="PI30", data_value="", data_unit="")
-        _result.add_response(response)
+        response = Response(data_name="PI30", data_value="", data_unit="")
+        _result.add_responses(response)
         result = hass_formatter.format(_result)
 
         # print('\n')

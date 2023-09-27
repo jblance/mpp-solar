@@ -22,6 +22,7 @@ from powermon.dto.protocolDTO import ProtocolDTO
 from powermon.protocols import ResponseType
 from powermon.commands.result import Result
 from powermon.commands.response import Response
+from powermon.commands.response_definition import ResponseDefinition
 from powermon.commands.command import Command
 from powermon.commands.command_definition import CommandDefinition
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
@@ -85,13 +86,14 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.debug(f"full command: {full_command}")
         return full_command
 
-    def get_response_definition(self, command_definition: CommandDefinition, index=None, key=None):
-        definitions_count = command_definition.get_response_count()
+    def get_response_definition(self, command_definition: CommandDefinition, index=None, key=None) -> ResponseDefinition:
+        definitions_count = command_definition.get_response_definition_count()
         if index is not None:
             if index < definitions_count:
                 return command_definition.response_definitions[index]
             else:
-                return [index, f"Unknown value in response {index}", "bytes.decode", ""]
+                #return [index, f"Unknown value in response {index}", "bytes.decode", ""]
+                raise IndexError(f"Index {index} out of range for command {command_definition.code}")
         elif key is not None:
             log.error("key todo abprotocol line 80")  # TODO: add key type get response defn
             raise Exception("get_response_defn needs key logic implemented")
@@ -132,7 +134,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             result.error_messages.append("failed validity check: response was empty")
         else:
             result.is_valid = True
-        return
+        return result
 
     def process_response(self, data_name=None, data_type=None, data_units=None, raw_value=None, frame_number=0, extra_info=None):
         template = None
@@ -188,7 +190,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 return_value = []
                 for i, flag in enumerate(raw_value):
                     if data_units[i]:  # only append value if flag name is present
-                        return_value.append((data_units[i], int(chr(flag)), "bool", None))
+                        return_value.append((data_units[i], int(chr(flag)), "", None))
 
                 # if flag != "" and flag != b'':
                 # msgs[resp_format[2][j]] = [int(flag), "bool"]
@@ -301,7 +303,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             return
 
         # Split the response into individual responses
-        result.responses = self.get_responses(result.raw_response_blob)
+        for i, raw_response in enumerate(self.get_responses(result.raw_response_blob)):
+            responses = command.validate_and_translate_raw_value(raw_response, index=i)
+            result.add_responses(responses)
         log.debug(f"trimmed and split responses: {result.responses}")
 
         # Now need to decode each of the responses as per the protocol definition
@@ -329,38 +333,29 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             case ResponseType.ACK:
                 # Usually for setter type commands
                 # expects a single response, eg b'NAK'
-
-                # get the response definition
-                response_defn = self.get_response_definition(command.command_definition, index=0)
-
+                
                 # decode the response
                 raw_value = result.raw_responses[0].decode()
+                
+                responses : Response = command.validate_and_translate_raw_value(raw_value, 0)
 
-                # populate vars from response and response definition
-                data_name = get_value(response_defn, 1)
-                result_dict = get_value(response_defn, 3)
-                extra_info = get_value(response_defn, 4)
-                value = result_dict.get(raw_value)
-
-                # update result object with decoded responses
-                response = Response(data_name=data_name, data_unit=None, value=value, extra_info=extra_info)
-                result.add_response(response)
+                result.add_responses(responses)
                 return
             case ResponseType.MULTIVALUED:
                 # Response that while able to be split, makes more sense as a single response
                 # eg Max Charging Current Options: 010 020 030 040 050 060 070 080 090 100 110 120 A
-                data_name = command.command_definition.response_definitions[0][1]
+                #data_name = command.command_definition.response_definitions[0][1]
                 value = ""
-                for item in result.responses:
+                for item in result.raw_responses:
                     value += f"{item.decode()} "
-                _data_unit = command.command_definition.response_definitions[0][3]
-                log.debug(f"{data_name}, {value}, {_data_unit}")
-                extra_info = None
-                if len(command.command_definition.response_definitions[0]) > 4:
-                    extra_info = command.command_definition.response_definitions[0][4]
+                #_data_unit = command.command_definition.response_definitions[0][3]
+                #log.debug(f"{data_name}, {value}, {_data_unit}")
+                #extra_info = None
+                #if len(command.command_definition.response_definitions[0]) > 4:
+                #    extra_info = command.command_definition.response_definitions[0][4]
                     
-                response = Response(data_name=data_name, data_unit=_data_unit, value=value, extra_info=extra_info)
-                result.add_response(response)
+                responses = command.validate_and_translate_raw_value(value, 0)
+                result.add_responses(responses)
             
                 return
             case ResponseType.INDEXED:
@@ -372,23 +367,24 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
                 # check the number of responses and the number of response definitions
                 len_responses = len(result.responses)
-                len_defns = command.command_definition.get_response_count()
+                len_defns = command.command_definition.get_response_definition_count()
                 log.debug("got %s responses, %s response definitions" % (len_responses, len_defns))
 
                 # if there are more definitions than responses, the extras may be calculated fields
                 extra_responses_needed = len_defns - len_responses
                 if extra_responses_needed > 0:
-                    for _ in range(extra_responses_needed):
-                        result.responses.append("extra")
+                    for i in range(extra_responses_needed):
+                        pass
+                        #result.responses.append()
 
                 # loop through responses
-                for i, _response in enumerate(result.raw_responses):
+                for i, _raw_response in enumerate(result.raw_responses):
                     # get response defn for this response
                     # [1, "AC Input Voltage", "float", "V", {icon: blah}]
                     response_defn = self.get_response_definition(command.command_definition, index=i)
 
                     # populate vars from response and response definition
-                    raw_value = _response
+                    raw_value = _raw_response
                     # data_posi = get_value(response_defn, 0)
                     data_name = get_value(response_defn, 1)
                     data_type = get_value(response_defn, 2)
@@ -409,14 +405,14 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     #     if data_name is not None:
                     #         msgs[data_name] = [value, data_units, extra_info]
                     if data_type.startswith("info"):  # TODO: and/or this should move to process_response
-                        log.debug(f"Processing info, {data_type=} for {data_name=}, {_data_unit=} {_response=}")
+                        log.debug(f"Processing info, {data_type=} for {data_name=}, {_data_unit=} {_raw_response=}")
                         template = data_type.split(":", 1)[1]
                         # Provide cn as shortcut to the command name for info fields
                         cn = command.code  # noqa: F841
                         value = eval(template)
                         if data_name is not None:
-                            response = Response(data_name=data_name, data_unit=_data_unit, value=value, extra_info=extra_info)
-                            result.add_response(response)
+                            responses = Response(data_name=data_name, data_unit=_data_unit, data_value=value, extra_info=extra_info)
+                            result.add_responses(responses)
                     else:
                         # Process response  # TODO: this should be collapsed
                         processed_responses = self.process_response(
@@ -430,8 +426,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         for item in processed_responses:
                             data_name, value, _data_unit, extra_info = item
                             if data_name is not None:
-                                response = Response(data_name=data_name, data_unit=_data_unit, value=value, extra_info=extra_info)
-                                result.add_response(response)
+                                responses = Response(data_name=data_name, data_unit=_data_unit, data_value=value, extra_info=extra_info)
+                                result.add_responses(responses)
                 return
 
             case _:
@@ -457,13 +453,13 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         command_definition: CommandDefinition = self.get_command_definition(command)
         if command_definition is not None:
             msgs["_command_description"] = command_definition.description
-            len_command_defn = command_definition.get_response_count()
+            len_command_defn = command_definition.get_response_definition_count()
 
         # Check response is valid
-        valid, _msg = self.check_response_valid(response)
-        if not valid:
-            msgs.update(_msg)
-            log.info(f"validity check fail: {_msg}")
+        self.check_response_valid(response)
+        if not response.is_valid:
+            msgs.update(response.error_messages)
+            log.info(f"validity check fail: {response.error_messages}")
             return msgs
 
         # Add Raw response
@@ -553,7 +549,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 elif resp_format[0] == "flags":
                     for j, flag in enumerate(result):
                         # if flag != "" and flag != b'':
-                        msgs[resp_format[2][j]] = [int(flag), "bool"]
+                        msgs[resp_format[2][j]] = [int(flag), ""]
                 # eg. ['stat_flags', 'Warning status', ['Reserved', 'Inver...
                 elif resp_format[0] == "stat_flags":
                     output = ""
@@ -646,7 +642,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     log.warn("Processing SEQUENTIAL type responses")
                     print("Processing SEQUENTIAL type responses")
                     # check for extra definitions...
-                    extra_responses_needed = command_definition.get_response_count() - len(frame)
+                    extra_responses_needed = command_definition.get_response_definition_count() - len(frame)
                     if extra_responses_needed > 0:
                         for _ in range(extra_responses_needed):
                             frame.append("extra")
@@ -668,7 +664,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     log.debug("Processing INDEXED type responses")
                     # [1, "AC Input Voltage", "float", "V", {icon: blah}]
                     # check for extra definitions...
-                    extra_responses_needed = command_definition.get_response_count() - len(frame)
+                    extra_responses_needed = command_definition.get_response_definition_count() - len(frame)
                     if extra_responses_needed > 0:
                         for _ in range(extra_responses_needed):
                             frame.append("extra")
@@ -697,7 +693,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 elif response_type in ["POSITIONAL", "MULTIFRAME-POSITIONAL"]:
                     log.debug("Processing POSITIONAL type responses")
                     # check for extra definitions...
-                    extra_responses_needed = command_definition.get_response_count() - len(frame)
+                    extra_responses_needed = command_definition.get_response_definition_count() - len(frame)
                     if extra_responses_needed > 0:
                         for _ in range(extra_responses_needed):
                             frame.append("extra")

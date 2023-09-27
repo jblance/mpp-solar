@@ -32,7 +32,7 @@ class Topics(AbstractFormat):
         for response in result.get_responses():
             value = response.data_value
             unit = response.data_unit
-            name = response.name
+            name = response.get_data_name()
             log.debug(f"build_msgs: prefix {self.results_topic}, key {key}, value {value}, unit {unit}")
             msg = {"topic": f"{self.results_topic}/{name}/value", "payload": value}
             msgs.append(msg)

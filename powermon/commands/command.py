@@ -7,6 +7,8 @@ from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.outputs.abstractoutput import OutputType
 from powermon.outputs.api_mqtt import API_MQTT
 from powermon.commands.command_definition import CommandDefinition
+from powermon.commands.response import Response
+from powermon.commands.response_definition import ResponseDefinition
 
 log = logging.getLogger("Command")
 
@@ -36,6 +38,9 @@ class Command:
         self.command_description = command_definition.description
         for output in self.outputs:
             output.formatter.set_command_description(self.command_description)
+            
+    def get_response_definitions(self) -> list:
+        return self.command_definition.response_definitions
     
     def set_outputs(self, outputs : list[AbstractOutput]):
         self.outputs = outputs
@@ -46,6 +51,19 @@ class Command:
         self.device_id = device_id
         for output in self.outputs:
             output.set_device_id(device_id)
+            
+    def validate_and_translate_raw_value(self, raw_value : str, index : int) -> list[Response]:
+        response_definition: ResponseDefinition = self.command_definition.response_definitions[index]
+        try:
+            return response_definition.response_from_raw_values(raw_value)
+        except ValueError:
+            error = Response(
+                data_name=response_definition.get_description(),
+                data_value=response_definition.get_invalid_message(raw_value),
+                data_unit=""
+                )
+            error.is_valid = False
+            return [error]
 
     def __str__(self):
         if self.code is None:

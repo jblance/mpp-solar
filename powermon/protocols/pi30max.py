@@ -11,7 +11,8 @@ QUERY_COMMANDS = {
         "description": "Device Serial Number inquiry",
         "help": " -- queries the device serial number (length greater than 14)",
         "response_type": ResponseType.INDEXED,
-        "response": [[0, "Serial Number", "bytes.decode:r[2:int(r[0:2])+2]", "", {"icon": "mdi:identifier"}]],
+        #"response": [[0, "Serial Number", "bytes.decode:r[2:int(r[0:2])+2]", "", {"icon": "mdi:identifier"}]],
+        "response": [[0, "Serial Number", "bytes.decode", "", {"icon": "mdi:identifier"}]],
         "test_responses": [
             b"(1492932105105335005535\x94\x0e\r",
         ],
@@ -280,7 +281,7 @@ QUERY_COMMANDS = {
             [
                 22,
                 "Country",
-                "keyed",
+                "str_keyed",
                 {
                     "00": "India",
                     "01": "Germany",
@@ -325,7 +326,8 @@ QUERY_COMMANDS = {
         "response_type": ResponseType.INDEXED,
         "response": [
             [0, "Parallel instance number", "option", ["Not valid", "valid"]],
-            [1, "Serial number", "bytes:r.decode()", "", {"icon": "mdi:identifier"}],
+            #[1, "Serial number", "bytes:r.decode()", "", {"icon": "mdi:identifier"}],
+            [1, "Serial number", "bytes.decode", "", {"icon": "mdi:identifier"}],
             [
                 2,
                 "Work mode",

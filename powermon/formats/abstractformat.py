@@ -49,7 +49,9 @@ class AbstractFormat(ABC):
 
         display_data = []
         for response in result.get_responses():
-            formatted_key = self.formatKey(response.name)
+            if response is None:
+                raise ValueError("response cannot be None")
+            formatted_key = self.formatKey(response.get_data_name())
             if self.isKeyWanted(formatted_key):
                 display_data.append(response)
         return display_data

@@ -567,8 +567,8 @@ QUERY_COMMANDS = {
             [24, "Max AC charger current", "int", "A"],
             [25, "PV input current", "int", "A"],
             [26, "Battery discharge current", "int", "A"],
-            [27, "Unknown float", ""],
-            [28, "string", "Unknown flags?", ""],
+            [27, "Unknown float", "float", ""],
+            [28, "Unknown flags?", "string", ""],
         ],
         "test_responses": [
             b"(1 92931701100510 B 00 000.0 00.00 230.6 50.00 0275 0141 005 51.4 001 100 083.3 002 00574 00312 003 10100110 1 2 060 120 10 04 000\xcc#\r",
@@ -582,7 +582,7 @@ QUERY_COMMANDS = {
         "description": "Protocol ID inquiry",
         "help": " -- queries the device protocol ID. e.g. PI30 for HS series",
         "response_type": ResponseType.INDEXED,
-        "response": [[0, "Protocol ID", "bytes.decode", ""]],
+        "response": [[0, "protocol_id", "bytes.decode", ""]],
         "test_responses": [b"(PI30\x9a\x0b\r"],
     },
     "QPIz": { # Question: is this a typo? Duplicate of QPI?
