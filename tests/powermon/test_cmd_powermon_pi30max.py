@@ -311,9 +311,9 @@ def do_test(self, command, expected, respno=0):
             capture_output=True,
             text=True,
         )
-        # print(result.stdout)
-        # print(result.stdout)
-        # print(result.stderr)
+        print(result.stdout)
+        print(result.stdout)
+        print(result.stderr)
         self.assertEqual(f"CMD: {command}\n{result.stdout}", f"CMD: {command}\n{expected}")
         self.assertEqual(result.returncode, 0)
         print("OK")

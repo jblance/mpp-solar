@@ -9,6 +9,7 @@ from powermon.outputs.api_mqtt import API_MQTT
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.response import Response
 from powermon.commands.response_definition import ResponseDefinition
+from powermon.commands.response_definition import ResponseDefinitionInfo
 
 log = logging.getLogger("Command")
 
@@ -55,7 +56,11 @@ class Command:
     def validate_and_translate_raw_value(self, raw_value : str, index : int) -> list[Response]:
         response_definition: ResponseDefinition = self.command_definition.response_definitions[index]
         try:
-            return response_definition.response_from_raw_values(raw_value)
+            #The template should be passed in during construction since we will have that information already
+            if isinstance(ResponseDefinition, ResponseDefinitionInfo):
+                return response_definition.response_from_raw_values(self.full_command)
+            else:
+                return response_definition.response_from_raw_values(raw_value)
         except ValueError:
             error = Response(
                 data_name=response_definition.get_description(),

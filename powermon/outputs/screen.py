@@ -30,6 +30,11 @@ class Screen(AbstractOutput):
 
         for line in formatted_data:
             print(line)
+            
+        if result.error:
+            print("Errors occurred during processing")
+            for error in result.error_messages:
+                print(error)
 
     @classmethod
     def from_config(cls, output_config) -> "Screen":

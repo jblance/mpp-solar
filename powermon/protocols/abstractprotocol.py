@@ -347,7 +347,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 #data_name = command.command_definition.response_definitions[0][1]
                 value = ""
                 for item in result.raw_responses:
-                    value += f"{item.decode()} "
+                    value += f"{item} "
                 #_data_unit = command.command_definition.response_definitions[0][3]
                 #log.debug(f"{data_name}, {value}, {_data_unit}")
                 #extra_info = None
@@ -381,53 +381,10 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 for i, _raw_response in enumerate(result.raw_responses):
                     # get response defn for this response
                     # [1, "AC Input Voltage", "float", "V", {icon: blah}]
-                    response_defn = self.get_response_definition(command.command_definition, index=i)
+                    
+                    responses = command.validate_and_translate_raw_value(_raw_response, i)
+                    result.add_responses([responses])
 
-                    # populate vars from response and response definition
-                    raw_value = _raw_response
-                    # data_posi = get_value(response_defn, 0)
-                    data_name = get_value(response_defn, 1)
-                    data_type = get_value(response_defn, 2)
-                    _data_unit = get_value(response_defn, 3)
-                    extra_info = get_value(response_defn, 4)
-
-                    #
-                    # Check for lookup
-                    # if data_type.startswith("lookup"):
-                    #     log.debug("processing lookup...")
-                    #     log.info(f"Processing data_type: '{data_type}' for data_name: '{data_name}', raw_value '{raw_value}'")
-                    #     m = msgs
-                    #     template = data_type.split(":", 1)[1]
-                    #     log.debug(f"Got template {template} for {data_name} {raw_value}")
-                    #     lookup = eval(template)
-                    #     log.debug(f"looking up values for: {lookup}")
-                    #     value, data_units = m[lookup]
-                    #     if data_name is not None:
-                    #         msgs[data_name] = [value, data_units, extra_info]
-                    if data_type.startswith("info"):  # TODO: and/or this should move to process_response
-                        log.debug(f"Processing info, {data_type=} for {data_name=}, {_data_unit=} {_raw_response=}")
-                        template = data_type.split(":", 1)[1]
-                        # Provide cn as shortcut to the command name for info fields
-                        cn = command.code  # noqa: F841
-                        value = eval(template)
-                        if data_name is not None:
-                            responses = Response(data_name=data_name, data_unit=_data_unit, data_value=value, extra_info=extra_info)
-                            result.add_responses([responses])
-                    else:
-                        # Process response  # TODO: this should be collapsed
-                        processed_responses = self.process_response(
-                            data_name=data_name,
-                            raw_value=raw_value,
-                            data_units=_data_unit,
-                            data_type=data_type,
-                            frame_number=0,
-                            extra_info=extra_info,
-                        )
-                        for item in processed_responses:
-                            data_name, value, _data_unit, extra_info = item
-                            if data_name is not None:
-                                responses = Response(data_name=data_name, data_unit=_data_unit, data_value=value, extra_info=extra_info)
-                                result.add_responses([responses])
                 return
 
             case _:

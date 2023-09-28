@@ -15,12 +15,12 @@ class ResponseDefinitionType(LowercaseStrEnum):
     ENFLAGS = auto()
     STRING = auto()
     FLAGS = auto()
+    INFO = auto()
     
 
 class ResponseDefinition(ABC):
     """Create a flat representation to check if a response is valid for the command. It doesn't contain the response value, just the definition of what is valid."""
     
-    @abstractmethod  
     def is_valid_response(self, value) -> bool:
         raise NotImplementedError
     
@@ -115,7 +115,7 @@ class ResponseDefinition(ABC):
             
         elif response_definition_type == ResponseDefinitionType.STRING:
             unit = response_definition_config[3]
-            return ResponseDefinitionBytes(index=response_definition_index,
+            return ResponseDefinitionString(index=response_definition_index,
                                             description=response_definition_description,
                                             unit=unit,
                                             extra_info=response_definition_extra)
@@ -126,6 +126,14 @@ class ResponseDefinition(ABC):
                                             description=response_definition_description,
                                             flags=flags,
                                             extra_info=response_definition_extra)
+            
+        elif ResponseDefinitionType.INFO in response_definition_type:
+            template = response_definition_type.split(":",1)[1]
+            return ResponseDefinitionInfo(index=response_definition_index,
+                                            description=response_definition_description,
+                                            template=template,
+                                            extra_info=response_definition_extra)
+            
             
         else:
             raise ValueError(f"Response description: {response_definition_description} has unknown response definition type: {response_definition_type}")
@@ -246,6 +254,8 @@ class ResponseDefinitionString(ResponseDefinition):
         return isinstance(value, str)
     
     def translate_raw_response(self, raw_value) -> str:
+        if isinstance(raw_value, str):
+            return raw_value
         return str(raw_value.decode())
     
     def response_from_raw_values(self, raw_value) -> list[Response]:
@@ -372,6 +382,26 @@ class ResponseDefinitionFlags(ResponseDefinition):
                                       data_unit="bool",
                                       extra_info=None))
         return responses
+    
+    def get_description(self) -> str:
+        return self.description
+    
+class ResponseDefinitionInfo(ResponseDefinition):
+    def __init__(self, index: int, description: str, template : str, extra_info: str):
+        self.index = index
+        self.description = description
+        self.template = template
+        self.extra_info = extra_info
+    
+    def translate_raw_response(self, cn) -> str:
+        return eval(self.template)
+    
+    def response_from_raw_values(self, raw_value) -> list[Response]:
+        value = self.translate_raw_response(raw_value)
+        return [Response(data_name=self.description,
+                data_value=value,
+                data_unit="",
+                extra_info=None)]
     
     def get_description(self) -> str:
         return self.description
