@@ -369,7 +369,7 @@ class ResponseDefinitionFlags(ResponseDefinition):
         for name, value in values.items():
             responses.append(Response(data_name=name,
                                       data_value=value,
-                                      data_unit="",
+                                      data_unit="bool",
                                       extra_info=None))
         return responses
     

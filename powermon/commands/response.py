@@ -8,6 +8,12 @@ class Response:
         
     def get_data_name(self) -> str:
         return self.data_name.replace(" ", "_").lower()
+    
+    def get_data_unit(self) -> str:
+        return self.data_unit
+    
+    def get_data_value(self) -> str:
+        return self.data_value
         
     @classmethod
     def from_config(cls, response_config: dict) -> "Response":

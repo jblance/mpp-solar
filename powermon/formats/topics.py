@@ -30,8 +30,8 @@ class Topics(AbstractFormat):
         msgs = []
         # Loop through responses build topics and messages
         for response in result.get_responses():
-            value = response.data_value
-            unit = response.data_unit
+            value = response.get_data_value()
+            unit = response.get_data_unit()
             name = response.get_data_name()
             log.debug(f"build_msgs: prefix {self.results_topic}, key {key}, value {value}, unit {unit}")
             msg = {"topic": f"{self.results_topic}/{name}/value", "payload": value}

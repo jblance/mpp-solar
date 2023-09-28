@@ -190,7 +190,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 return_value = []
                 for i, flag in enumerate(raw_value):
                     if data_units[i]:  # only append value if flag name is present
-                        return_value.append((data_units[i], int(chr(flag)), "", None))
+                        return_value.append((data_units[i], int(chr(flag)), "bool", None))
 
                 # if flag != "" and flag != b'':
                 # msgs[resp_format[2][j]] = [int(flag), "bool"]
@@ -549,7 +549,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 elif resp_format[0] == "flags":
                     for j, flag in enumerate(result):
                         # if flag != "" and flag != b'':
-                        msgs[resp_format[2][j]] = [int(flag), ""]
+                        msgs[resp_format[2][j]] = [int(flag), "bool"]
                 # eg. ['stat_flags', 'Warning status', ['Reserved', 'Inver...
                 elif resp_format[0] == "stat_flags":
                     output = ""

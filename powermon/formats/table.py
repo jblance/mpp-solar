@@ -95,8 +95,8 @@ class table(AbstractFormat):
         # print data
         for response in filtered_responses:
             name = response.get_data_name()
-            value = response.data_value
-            unit = response.data_unit
+            value = response.get_data_value()
+            unit = response.get_data_unit()
             if self.draw_lines:
                 _result.append(f"\u2551 {pad(name, width_p)}\u2502 {pad(value, width_v)}\u2502 {pad(unit, width_u)}\u2551")
             else:

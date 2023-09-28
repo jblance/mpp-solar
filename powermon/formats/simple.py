@@ -37,8 +37,8 @@ class SimpleFormat(AbstractFormat):
         # build data to display
         for response in display_data:
             name = response.get_data_name()
-            value = response.data_value
-            unit = response.data_unit
+            value = response.get_data_value()
+            unit = response.get_data_unit()
             if self.extra_info:
                 extra = response.extra_info
                 _result.append(f"{name}={value}{unit} {extra}")
