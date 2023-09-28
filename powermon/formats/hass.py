@@ -3,6 +3,7 @@ import logging
 from datetime import datetime
 from powermon.formats.abstractformat import AbstractFormat
 from powermon.commands.result import Result
+from powermon.commands.response import Response
 
 log = logging.getLogger("hass")
 
@@ -40,14 +41,16 @@ class hass(AbstractFormat):
         _result = []
         if result.responses is None:
             return _result
-        display_data = self.format_and_filter_data(result)
+        display_data : list[Response] = self.format_and_filter_data(result)
         log.debug(f"displayData: {display_data}")
 
         # build data to display
-        for key in display_data:
+        for response in display_data:
             # Get key data
-            value = display_data[key][0]
-            unit = display_data[key][1]
+            data_name = response.get_data_name()
+            value = response.get_data_value()
+            unit = response.get_data_unit()
+            extra_info = response.get_extra_info()
 
             # Set component type
             if unit == "bool" or value == "enabled" or value == "disabled":
@@ -62,25 +65,26 @@ class hass(AbstractFormat):
                 elif value == 1 or value == "1" or value == "enabled":
                     value = "ON"
 
+            #TODO: move all the extra info processing into the response object as methods
             # Get icon if present
             icon = None
-            if len(display_data[key]) > 2 and display_data[key][2] and "icon" in display_data[key][2]:
-                icon = display_data[key][2]["icon"]
+            if extra_info and "icon" in extra_info:
+                icon = extra_info["icon"]
 
             # Get device_class if present
             device_class = None
-            if len(display_data[key]) > 2 and display_data[key][2] and "device-class" in display_data[key][2]:
-                device_class = display_data[key][2]["device-class"]
+            if extra_info and "device-class" in extra_info:
+                device_class = extra_info["device-class"]
 
             # Get state_class if present
             state_class = None
-            if len(display_data[key]) > 2 and display_data[key][2] and "state_class" in display_data[key][2]:
-                state_class = display_data[key][2]["state_class"]
+            if extra_info and "state_class" in extra_info:
+                state_class = extra_info["state_class"]
 
             # Object ID
-            object_id = f"{self.entity_id_prefix}_{key}".lower()
+            object_id = f"{self.entity_id_prefix}_{data_name}".lower()
 
-            name = f"{self.entity_id_prefix} {key}"
+            name = f"{self.entity_id_prefix} {data_name}"
 
             # Home Assistant MQTT Auto Discovery Message
             #

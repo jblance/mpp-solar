@@ -1,5 +1,5 @@
 class Response:
-    def __init__(self, data_name: str, data_value: str, data_unit: str, extra_info: str = None) -> None:
+    def __init__(self, data_name: str, data_value: str, data_unit: str, extra_info: dict = None) -> None:
         self.data_name = data_name
         self.data_value = data_value
         self.data_unit = data_unit
@@ -14,6 +14,9 @@ class Response:
     
     def get_data_value(self) -> str:
         return self.data_value
+    
+    def get_extra_info(self) -> dict:
+        return self.extra_info
         
     @classmethod
     def from_config(cls, response_config: dict) -> "Response":

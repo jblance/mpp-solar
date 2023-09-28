@@ -246,7 +246,7 @@ class ResponseDefinitionString(ResponseDefinition):
         return isinstance(value, str)
     
     def translate_raw_response(self, raw_value) -> str:
-        return str(raw_value)
+        return str(raw_value.decode())
     
     def response_from_raw_values(self, raw_value) -> list[Response]:
         return [Response(data_name=self.description,

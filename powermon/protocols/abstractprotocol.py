@@ -337,7 +337,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 # decode the response
                 raw_value = result.raw_responses[0].decode()
                 
-                responses : Response = command.validate_and_translate_raw_value(raw_value, 0)
+                responses : list[Response] = command.validate_and_translate_raw_value(raw_value, 0)
 
                 result.add_responses(responses)
                 return
@@ -355,7 +355,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 #    extra_info = command.command_definition.response_definitions[0][4]
                     
                 responses = command.validate_and_translate_raw_value(value, 0)
-                result.add_responses(responses)
+                result.add_responses([responses])
             
                 return
             case ResponseType.INDEXED:
@@ -412,7 +412,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         value = eval(template)
                         if data_name is not None:
                             responses = Response(data_name=data_name, data_unit=_data_unit, data_value=value, extra_info=extra_info)
-                            result.add_responses(responses)
+                            result.add_responses([responses])
                     else:
                         # Process response  # TODO: this should be collapsed
                         processed_responses = self.process_response(
@@ -427,7 +427,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                             data_name, value, _data_unit, extra_info = item
                             if data_name is not None:
                                 responses = Response(data_name=data_name, data_unit=_data_unit, data_value=value, extra_info=extra_info)
-                                result.add_responses(responses)
+                                result.add_responses([responses])
                 return
 
             case _:
