@@ -336,7 +336,7 @@ class test_cmd_powermon_pi30max(unittest.TestCase):
 
     def test_powermon_QSID(self):
         try:
-            expected = "serial_number=92932105105335\n"
+            expected = "serial_number=1492932105105335005535\n"
             result = subprocess.run(
                 [
                     "powermon",

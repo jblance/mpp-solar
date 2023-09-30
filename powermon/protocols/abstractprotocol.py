@@ -319,79 +319,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             result.error = True
             result.error_messages.append(f"failed to decode responses: no definition for {command.code}")
             return
-
-        log.debug(f"command.code: {command.code}")
         
+        return
 
-        # Determine the type of response
-        response_type = command.command_definition.response_type
-        log.info(f"Processing response of type {response_type}")
-
-        # Process the response by reponse type
-        # QUESTION: should the decode be {"parameter name": {"value": 123, "unit":"count"}, ...}
-        match response_type:
-            case ResponseType.ACK:
-                # Usually for setter type commands
-                # expects a single response, eg b'NAK'
-                
-                # decode the response
-                raw_value = result.raw_responses[0].decode()
-                
-                responses : list[Response] = command.validate_and_translate_raw_value(raw_value, 0)
-
-                result.add_responses(responses)
-                return
-            case ResponseType.MULTIVALUED:
-                # Response that while able to be split, makes more sense as a single response
-                # eg Max Charging Current Options: 010 020 030 040 050 060 070 080 090 100 110 120 A
-                #data_name = command.command_definition.response_definitions[0][1]
-                value = ""
-                for item in result.raw_responses:
-                    value += f"{item} "
-                #_data_unit = command.command_definition.response_definitions[0][3]
-                #log.debug(f"{data_name}, {value}, {_data_unit}")
-                #extra_info = None
-                #if len(command.command_definition.response_definitions[0]) > 4:
-                #    extra_info = command.command_definition.response_definitions[0][4]
-                    
-                responses = command.validate_and_translate_raw_value(value, 0)
-                result.add_responses([responses])
-            
-                return
-            case ResponseType.INDEXED:
-                # Most common response, items are defined by their order
-                # after splitting responses will be in an ordered list
-                # first definition field contains item index in list
-                # [5, "ChargeAverageCurrent", "bytes.decode", ""],
-                # [6, "SCC PWM temperature", "int", "°C", {"device-class": "temperature"}],
-
-                # check the number of responses and the number of response definitions
-                len_responses = len(result.responses)
-                len_defns = command.command_definition.get_response_definition_count()
-                log.debug("got %s responses, %s response definitions" % (len_responses, len_defns))
-
-                # if there are more definitions than responses, the extras may be calculated fields
-                extra_responses_needed = len_defns - len_responses
-                if extra_responses_needed > 0:
-                    for i in range(extra_responses_needed):
-                        pass
-                        #result.responses.append()
-
-                # loop through responses
-                for i, _raw_response in enumerate(result.raw_responses):
-                    # get response defn for this response
-                    # [1, "AC Input Voltage", "float", "V", {icon: blah}]
-                    
-                    responses = command.validate_and_translate_raw_value(_raw_response, i)
-                    result.add_responses([responses])
-
-                return
-
-            case _:
-                log.error(f"bad response type {response_type} for {command.code}")
-                result.error = True
-                result.error_messages.append(f"failed to decode responses: bad response type {response_type} for {command.code}")
-                return
 
     #
     #

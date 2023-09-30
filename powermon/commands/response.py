@@ -10,6 +10,8 @@ class Response:
         return self.data_name.replace(" ", "_").lower()
     
     def get_data_unit(self) -> str:
+        if self.data_unit is None:
+            return ""
         return self.data_unit
     
     def get_data_value(self) -> str:

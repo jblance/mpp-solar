@@ -97,6 +97,6 @@ class USBPort(AbstractPort):
                 response_line = response_line[: response_line.find(bytes([13])) + 1]
                 break
         log.debug("usb response was: %s", response_line)
-        result.raw_response_blob = response_line
+        result.process_raw_response(response_line)
         os.close(usb0)
         return result

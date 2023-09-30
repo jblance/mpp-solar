@@ -51,7 +51,7 @@ class AbstractPort(ABC):
     def get_protocol(self) -> AbstractProtocol:
         return self.protocol
 
-    def run_command(self, command: Command):
+    def run_command(self, command: Command) -> Result:
         # takes a command object, runs the command and returns a result object (replaces process_command)
         log.debug(f"Command {command}")
         # update run times

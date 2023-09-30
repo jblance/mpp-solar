@@ -40,5 +40,9 @@ class Result:
     def add_responses(self, responses: list[Response]) -> bool:
         self.responses.extend(responses)
         return True
+    
+    def process_raw_response(self, raw_response):
+        self.raw_response_blob = raw_response
+        return
         
         

@@ -56,10 +56,9 @@ class TestPort(AbstractPort):
                 self._test_data = command_defn.test_responses[random.randrange(number_of_test_responses)]
         else:
             # No test responses defined
-            log.warn("Testing a command with no test responses defined")
-            raise 
+            log.warn("Testing a command with no test responses defined") 
             self._test_data = None
         response = self._test_data
         log.debug(f"Raw response {response}")
-        result.raw_response_blob = response
+        result.process_raw_response(response)
         return result
