@@ -15,8 +15,8 @@ COMMANDS = {
         "checksum_required": "True",
         "response_type": "POSITIONAL",
         "response": [
-            ["discard", 11, "discard", ""], # Header
-            ["discard", 1, "discard", ""], # Single battery voltage
+            ["discard", 11, "Packet header", ""],
+            ["discard", 1, "Cells connected", ""],
             ["Hex2Int:r/3", 1, "Cells_connected", ""],
             ["discard", 1, "Voltage_Cell01", ""],
             ["BigHex2Short:r/1000", 2, "Voltage_Cell01", "V"],
@@ -46,6 +46,10 @@ COMMANDS = {
             ["BigHex2Short:r/1000", 2, "Voltage_Cell13", "V"],
             ["discard", 1, "Voltage_Cell14", ""],
             ["BigHex2Short:r/1000", 2, "Voltage_Cell14", "V"],
+            ["discard", 1, "Voltage_Cell15", ""],
+            ["BigHex2Short:r/1000", 2, "Voltage_Cell15", "V"],
+            ["discard", 1, "Voltage_Cell16", ""],
+            ["BigHex2Short:r/1000", 2, "Voltage_Cell16", "V"],
             ["discard", 1, "MOS_Temp", ""],
             ["BigHex2Short", 2, "MOS_Temp", "°C"],
             ["discard", 1, "Battery_T1", ""],
@@ -54,21 +58,33 @@ COMMANDS = {
             ["BigHex2Short", 2, "Battery_T2", "°C"],
             ["discard", 1, "Battery_Voltage", ""],
             ["BigHex2Short:r/100", 2, "Battery_Voltage", "V"],
-            ["discard", 1, "Balance_Current", ""],
-            ["BigHex2Short:r/1000", 2, "Balance_Current", "A"], # Needs other formula
+            ["discard", 1, "Battery_Current", ""],
+            ["BigHex2Short:(r&0x7FFF)/100*(((r&0x8000)>>15)*2-1)", 2, "Battery_Current", "A"],
             ["discard", 1, "Percent_Remain", ""],
             ["Hex2Int", 1, "Percent_Remain", "%"],
             ["discard", 2, "Number of battery sensors", ""],  # useless so dropped
             ["discard", 1, "Cycle_Count", ""],
             ["BigHex2Short", 2, "Cycle_Count", ""],
             ["discard", 1, "Total_capacity", ""],
-            ["Hex2Str", 4, "Total_capacity", ""], # Needs other formula
-            ["discard", 3, "Total number of battery strings", ""],
+            ["BigHex2Float", 4, "Total_capacity", "Ahr"], # Needs other formula
+            ["discard", 3, "Total number of battery strings", ""],  # dropping
             ["discard", 1, "Battery Warning Message", ""],
             ["Hex2Str", 2, "Battery Warning Message", ""],
             ["discard", 1, "Battery status information", ""],
             ["Hex2Str", 2, "Battery status information", ""],
-            ["discard", 880, "settings + header", ""],
+            ["discard", 15 * 3, "settings", ""],
+            ["discard", 1, "Balancer Active", ""],
+            ["Hex2Int", 1, "Balancer Active", ""],
+            ["discard", 7 * 3, "more settings", ""],
+            ["discard", 4 * 3, "temp settings", ""],
+            ["discard", 2, "string count", ""], # dropping
+            ["discard", 1, "Capacity Setting", ""],
+            ["BigHex2Float", 4, "Capacity Setting", "Ahr"],
+            ["discard", 1, "Charge Enabled", ""],
+            ["Hex2Int", 1, "Charge Enabled", ""],
+            ["discard", 1, "Discharge Enabled", ""],
+            ["Hex2Int", 1, "Discharge Enabled", ""],
+            ["discard", 20 + 96, "remaining data", ""]
         ],
         "test_responses": [
             bytes.fromhex(
@@ -99,7 +115,7 @@ class jkserial(AbstractProtocol):
         """
         Override the default get_full_command as its different
         """
-        log.info(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
+        log.debug(f"Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands")
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
