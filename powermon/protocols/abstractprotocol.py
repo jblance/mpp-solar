@@ -168,5 +168,14 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 result.add_responses(responses)
         log.debug(f"trimmed and split responses: {result.responses}")
         
+        #TODO: this is ugly, info types need to be reworked to not have code in the protocol definition
+        #IF there are more response definitions than responses, check if they are INFO and fill them in
+        number_of_responses = len(result.get_responses())
+        if len(command.get_response_definitions()) > number_of_responses:
+            for index in range(number_of_responses, len(command.get_response_definitions())):
+                response_definition = command.get_response_definitions()[index]
+                if response_definition.is_info():
+                    result.add_responses(response_definition.response_from_raw_values(command.code))
+                index += 1
         return
 

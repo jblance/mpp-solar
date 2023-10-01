@@ -3,6 +3,7 @@ from enum import auto
 from abc import ABC, abstractmethod
 from powermon.protocols import ResponseType
 from powermon.commands.response import Response
+import calendar #needed for INFO type evaluating templates
 
 
 class ResponseDefinitionType(LowercaseStrEnum):
@@ -397,7 +398,6 @@ class ResponseDefinitionInfo(ResponseDefinition):
         self.extra_info = extra_info
     
     def translate_raw_response(self, cn) -> str:
-        raise ValueError(f"Template: {self.template}, cn: {cn}")
         return eval(self.template)
     
     def is_info(self) -> bool:

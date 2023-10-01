@@ -40,7 +40,7 @@ class Command:
         for output in self.outputs:
             output.formatter.set_command_description(self.command_description)
             
-    def get_response_definitions(self) -> list:
+    def get_response_definitions(self) -> list[ResponseDefinition]:
         return self.command_definition.response_definitions
     
     def set_outputs(self, outputs : list[AbstractOutput]):
@@ -60,6 +60,7 @@ class Command:
         try:
             #The template should be passed in during construction since we will have that information already
             if response_definition.is_info():
+                raise ValueError("Info response definitions should not be validated")
                 return response_definition.response_from_raw_values(self.code)
             else:
                 return response_definition.response_from_raw_values(raw_value)
