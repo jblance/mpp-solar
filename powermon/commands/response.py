@@ -19,11 +19,3 @@ class Response:
     
     def get_extra_info(self) -> dict:
         return self.extra_info
-        
-    @classmethod
-    def from_config(cls, response_config: dict) -> "Response":
-        name = response_config.get("name")
-        data_value = response_config.get("data_value")
-        data_unit = response_config.get("data_unit")
-        extra_info = response_config.get("extra_info")
-        return cls(data_name=name, data_value=data_value, data_unit=data_unit, extra_info=extra_info)

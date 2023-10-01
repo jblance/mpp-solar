@@ -54,11 +54,13 @@ class Command:
             output.set_device_id(device_id)
             
     def validate_and_translate_raw_value(self, raw_value : str, index : int) -> list[Response]:
+        if(len(self.command_definition.response_definitions) <= index):
+            raise IndexError(f"Index {index} is out of range for command {self.code}")
         response_definition: ResponseDefinition = self.command_definition.response_definitions[index]
         try:
             #The template should be passed in during construction since we will have that information already
-            if isinstance(ResponseDefinition, ResponseDefinitionInfo):
-                return response_definition.response_from_raw_values(self.full_command)
+            if response_definition.is_info():
+                return response_definition.response_from_raw_values(self.code)
             else:
                 return response_definition.response_from_raw_values(raw_value)
         except ValueError:

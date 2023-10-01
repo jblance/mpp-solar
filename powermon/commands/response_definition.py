@@ -35,6 +35,9 @@ class ResponseDefinition(ABC):
     def get_invalid_message(self, raw_value) -> str:
         return f"Invalid response for {self.get_description()}: {raw_value}"
     
+    def is_info(self) -> bool:
+        return False
+    
     @classmethod
     def multiple_from_config(cls, response_definitions_config : list[list]) -> dict[int,"ResponseDefinition"]:
         if response_definitions_config is None:
@@ -159,12 +162,12 @@ class ResponseDefinitionACK(ResponseDefinition):
             return [Response(data_name=self.description,
                             data_value=self.success_description,
                             data_unit=None,
-                            extra_info=None)]
+                            extra_info=self.extra_info)]
         elif value == self.fail_code:
             return [Response(data_name=self.description,
                             data_value=self.fail_description,
                             data_unit=None,
-                            extra_info=None)]
+                            extra_info=self.extra_info)]
         
     def get_description(self) -> str:
         return self.description
@@ -189,7 +192,7 @@ class ResponseDefinitionInt(ResponseDefinition):
         return [Response(data_name=self.description,
                         data_value=str(value),
                         data_unit=self.unit,
-                        extra_info=None)]
+                        extra_info=self.extra_info)]
     
     def get_description(self) -> str:
         return self.description
@@ -213,7 +216,7 @@ class ResponseDefinitionOption(ResponseDefinition):
         return [Response(data_name=self.description,
                         data_value=value,
                         data_unit="",
-                        extra_info=None)]
+                        extra_info=self.extra_info)]
     
     def get_description(self) -> str:
         return self.description
@@ -237,7 +240,7 @@ class ResponseDefinitionBytes(ResponseDefinition):
         return [Response(data_name=self.description,
                         data_value=value,
                         data_unit="",
-                        extra_info=None)]
+                        extra_info=self.extra_info)]
     
     def get_description(self) -> str:
         return self.description
@@ -261,8 +264,8 @@ class ResponseDefinitionString(ResponseDefinition):
     def response_from_raw_values(self, raw_value) -> list[Response]:
         return [Response(data_name=self.description,
                         data_value=self.translate_raw_response(raw_value),
-                        data_unit=None,
-                        extra_info=None)]
+                        data_unit=self.unit,
+                        extra_info=self.extra_info)]
     
     def get_description(self) -> str:
         return self.description
@@ -286,7 +289,7 @@ class ResponseDefinitionFloat(ResponseDefinition):
         return [Response(data_name=self.description,
                         data_value=str(value),
                         data_unit=self.unit,
-                        extra_info=None)]
+                        extra_info=self.extra_info)]
     
     def get_description(self) -> str:
         return self.description
@@ -310,7 +313,7 @@ class ResponseDefinitionStrKeyed(ResponseDefinition):
         return [Response(data_name=self.description,
                         data_value=value,
                         data_unit="",
-                        extra_info=None)]
+                        extra_info=self.extra_info)]
     
     def get_description(self) -> str:
         return self.description
@@ -349,7 +352,7 @@ class ResponseDefinitionENFlags(ResponseDefinition):
             responses.append(Response(data_name=name,
                                       data_value=value,
                                       data_unit="",
-                                      extra_info=None))
+                                      extra_info=self.extra_info))
         
         return responses
     
@@ -380,7 +383,7 @@ class ResponseDefinitionFlags(ResponseDefinition):
             responses.append(Response(data_name=name,
                                       data_value=value,
                                       data_unit="bool",
-                                      extra_info=None))
+                                      extra_info=self.extra_info))
         return responses
     
     def get_description(self) -> str:
@@ -394,14 +397,18 @@ class ResponseDefinitionInfo(ResponseDefinition):
         self.extra_info = extra_info
     
     def translate_raw_response(self, cn) -> str:
+        raise ValueError(f"Template: {self.template}, cn: {cn}")
         return eval(self.template)
+    
+    def is_info(self) -> bool:
+        return True
     
     def response_from_raw_values(self, raw_value) -> list[Response]:
         value = self.translate_raw_response(raw_value)
         return [Response(data_name=self.description,
                 data_value=value,
                 data_unit="",
-                extra_info=None)]
+                extra_info=self.extra_info)]
     
     def get_description(self) -> str:
         return self.description
