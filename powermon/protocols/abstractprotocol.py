@@ -18,7 +18,7 @@ import re
 # )
 from mppsolar.protocols.protocol_helpers import crcPI as crc
 from powermon.dto.protocolDTO import ProtocolDTO
-from powermon.protocols import ResponseType
+from powermon.commands.result import ResultType
 from powermon.commands.result import Result
 from powermon.commands.response_definition import ResponseDefinition
 from powermon.commands.command import Command
@@ -157,7 +157,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             result.error_messages.append(f"failed to decode responses: no definition for {command.code}")
             return
         
-        if command.command_definition.response_type is ResponseType.MULTIVALUED:
+        if command.command_definition.response_type is ResultType.MULTIVALUED:
             response = result.raw_response_blob[1:-3] #this should be moved to the protocol, it should check the CRC then strip them
             responses = command.validate_and_translate_raw_value(response, index=0)
             result.add_responses(responses)

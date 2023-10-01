@@ -1,3 +1,4 @@
+from enum import Enum, auto
 import logging
 
 from powermon.commands.response import Response
@@ -5,6 +6,12 @@ from powermon.commands.response_definition import ResponseDefinition
 
 log = logging.getLogger("result")
 
+class ResultType(Enum):
+    DEFAULT = auto()
+    ACK = auto()
+    MULTIVALUED = auto()
+    INDEXED = auto()
+    POSITIONAL = auto()
 
 class Result:
     def __str__(self):
@@ -44,5 +51,8 @@ class Result:
     def process_raw_response(self, raw_response):
         self.raw_response_blob = raw_response
         return
+
+
+
         
         

@@ -1,6 +1,6 @@
 import logging
 
-from powermon.protocols import ResponseType
+from powermon.commands.result import ResultType
 from powermon.protocols.pi30 import pi30
 
 log = logging.getLogger("pi30max")
@@ -10,7 +10,7 @@ QUERY_COMMANDS = {
         "name": "QSID",
         "description": "Device Serial Number inquiry",
         "help": " -- queries the device serial number (length greater than 14)",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         #"response": [[0, "Serial Number", "bytes.decode:r[2:int(r[0:2])+2]", "", {"icon": "mdi:identifier"}]],
         "response": [[0, "Serial Number", "bytes.decode", "", {"icon": "mdi:identifier"}]],
         "test_responses": [
@@ -20,7 +20,7 @@ QUERY_COMMANDS = {
     "QVFW3": {
         "name": "QVFW3",
         "description": "Remote CPU firmware version inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [[0, "Remote CPU firmware version", "bytes.decode", "", {"icon": "mdi:identifier"}]],
         "test_responses": [
             b"(VERFW:00072.70\x53\xA7\r",
@@ -29,7 +29,7 @@ QUERY_COMMANDS = {
     "VERFW": {
         "name": "VERFW",
         "description": "Bluetooth version inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [[0, "Bluetooth version", "bytes.decode", "", {"icon": "mdi:identifier"}]],
         "test_responses": [
             b"(VERFW:00072.70\x53\xA7\r",
@@ -38,7 +38,7 @@ QUERY_COMMANDS = {
     "QPIRI": {
         "name": "QPIRI",
         "description": "Current Settings inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [
                 0,
@@ -182,7 +182,7 @@ QUERY_COMMANDS = {
         "name": "QFLAG",
         "description": "Flag Status inquiry",
         "help": " -- queries the enabled / disabled state of various Inverter settings (e.g. buzzer, overload, interrupt alarm)",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [
                 0,
@@ -211,7 +211,7 @@ QUERY_COMMANDS = {
     "QPIGS": {
         "name": "QPIGS",
         "description": "General Status Parameters inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [0, "AC Input Voltage", "float", "V", {"icon": "mdi:transmission-tower-export", "device-class": "voltage"}],
             [1, "AC Input Frequency", "float", "Hz", {"icon": "mdi:current-ac", "device-class": "frequency"}],
@@ -303,7 +303,7 @@ QUERY_COMMANDS = {
     "QPIGS2": {
         "name": "QPIGS2",
         "description": "General Status Parameters inquiry 2",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [0, "PV2 Input Current", "float", "A", {"icon": "mdi:solar-power", "device-class": "current"}],
             [1, "PV2 Input Voltage", "float", "V", {"icon": "mdi:solar-power", "device-class": "voltage"}],
@@ -323,7 +323,7 @@ QUERY_COMMANDS = {
         "name": "QPGS",
         "description": "Parallel Information inquiry",
         "help": " -- example: QPGS0 queries the values of various metrics from instance 0 of parallel setup Inverters",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [0, "Parallel instance number", "option", ["Not valid", "valid"]],
             #[1, "Serial number", "bytes:r.decode()", "", {"icon": "mdi:identifier"}],
@@ -485,7 +485,7 @@ QUERY_COMMANDS = {
     "QMOD": {
         "name": "QMOD",
         "description": "Mode inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [
                 0,
@@ -510,7 +510,7 @@ QUERY_COMMANDS = {
     "QPIWS": {
         "name": "QPIWS",
         "description": "Warning status inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [
                 0,
@@ -564,7 +564,7 @@ QUERY_COMMANDS = {
     "QDI": {
         "name": "QDI",
         "description": "Default Settings inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [0, "AC Output Voltage", "float", "V"],
             [1, "AC Output Frequency", "float", "Hz"],
@@ -662,7 +662,7 @@ QUERY_COMMANDS = {
     "QOPPT": {
         "name": "QOPPT",
         "description": "Device Output Source Priority Time Order Inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [[0, "Output Source Priority 00 hours", "option", ["undefined", "Solar first", "Solar + Utility", "Only Solar"]],
                      [1, "Output Source Priority 01 hours", "option", ["undefined", "Solar first", "Solar + Utility", "Only Solar"]],
                      [2, "Output Source Priority 02 hours", "option", ["undefined", "Solar first", "Solar + Utility", "Only Solar"]],
@@ -699,7 +699,7 @@ QUERY_COMMANDS = {
     "QCHPT": {
         "name": "QCHPT",
         "description": "Device Charger Source Priority Time Order Inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [0, "Charger Source Priority 00 hours", "option", ["undefined", "Solar first", "Solar + Utility", "Only Solar"],],
             [1, "Charger Source Priority 01 hours", "option", ["undefined", "Solar first", "Solar + Utility", "Only Solar"],],
@@ -737,7 +737,7 @@ QUERY_COMMANDS = {
     "QT": {
         "name": "QT",
         "description": "Device Time Inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [[0, "Device Time", "bytes.decode", ""]],
         "test_responses": [
             b"(20210726122606JF\r",
@@ -746,7 +746,7 @@ QUERY_COMMANDS = {
     "QBEQI": {
         "name": "QBEQI",
         "description": "Battery Equalization Status Parameters Inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [0, "Equalization Enabled", "option", ["Disabled", "Enabled"]],
             [1, "Equalization Time", "int", "min"],
@@ -766,7 +766,7 @@ QUERY_COMMANDS = {
     "QET": {
         "name": "QET",
         "description": "Total PV Generated Energy Inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [0,
                 "Total PV Generated Energy", "int",
@@ -781,7 +781,7 @@ QUERY_COMMANDS = {
     "QEY": {
         "name": "QEY",
         "description": "Yearly PV Generated Energy Inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [0,
                 "PV Generated Energy for Year", "int", "Wh",
@@ -797,7 +797,7 @@ QUERY_COMMANDS = {
     "QEM": {
         "name": "QEM",
         "description": "Monthly PV Generated Energy Inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [0, "PV Generated Energy for Month", "int", "Wh", {"icon": "mdi:solar-power", "device-class": "energy", "state_class": "total"},],
             [1, "Year", "info:cn[3:7]", ""],
@@ -812,7 +812,7 @@ QUERY_COMMANDS = {
         "name": "QED",
         "description": "Daily PV Generated Energy Inquiry",
         "help": " -- display daily generated energy, format is QEDyyyymmdd",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [0, "PV Generated Energy for Day", "int", "Wh", {"icon": "mdi:solar-power", "device-class": "energy", "state_class": "total"},],
             [1, "Year", "info:cn[3:7]", ""],
@@ -827,7 +827,7 @@ QUERY_COMMANDS = {
     "QLT": {
         "name": "QLT",
         "description": "Total Output Load Energy Inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [0, "Total Output Load Energy", "int", "Wh", {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},]
         ],
@@ -838,7 +838,7 @@ QUERY_COMMANDS = {
     "QLY": {
         "name": "QLY",
         "description": "Yearly Output Load Energy Inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [0, "Output Load Energy for Year", "int", "Wh", {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},],
             [1, "Year", "info:cn[3:]", ""],
@@ -851,7 +851,7 @@ QUERY_COMMANDS = {
     "QLM": {
         "name": "QLM",
         "description": "Monthly Output Load Energy Inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [0, "Output Load Energy for Month", "int", "Wh", {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},],
             [1, "Year", "info:cn[3:7]", ""],
@@ -865,7 +865,7 @@ QUERY_COMMANDS = {
     "QLD": {
         "name": "QLD",
         "description": "Daily Output Load Energy Inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [0, "Output Load Energy for Day", "int", "Wh", {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},],
             [1, "Year", "info:cn[3:7]", ""],
@@ -880,7 +880,7 @@ QUERY_COMMANDS = {
     "QLED": {
         "name": "QLED",
         "description": "LED Status Parameters Inquiry",
-        "response_type": ResponseType.INDEXED,
+        "response_type": ResultType.INDEXED,
         "response": [
             [0, "LED Enabled", "option", ["Disabled", "Enabled"]],
             [1, "LED Speed", "option", ["Low", "Medium", "Fast"]],
@@ -900,7 +900,7 @@ SETTER_COMMANDS = {
         "name": "PLEDE",
         "description": "Enable/disable LED function",
         "help": " -- examples: PLEDE0 (disable LED), PLEDE1 (enable LED)",
-        "response_type": ResponseType.ACK,
+        "response_type": ResultType.ACK,
         "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
@@ -912,7 +912,7 @@ SETTER_COMMANDS = {
         "name": "PLEDS",
         "description": "Set LED speed",
         "help": " -- examples: PLEDS0 (set LED speed low), PLEDS1 (set LED speed medium), PLEDS2 (set LED speed high)",
-        "response_type": ResponseType.ACK,
+        "response_type": ResultType.ACK,
         "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
@@ -924,7 +924,7 @@ SETTER_COMMANDS = {
         "name": "PLEDM",
         "description": "Set LED effect",
         "help": " -- examples: PLEDM0 (set LED effect breathing), PLEDM2 (set LED effect solid), PLEDM3 (set LED right scrolling)",
-        "response_type": ResponseType.ACK,
+        "response_type": ResultType.ACK,
         "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(NAK\x73\x73\r",
@@ -936,7 +936,7 @@ SETTER_COMMANDS = {
         "name": "PLEDB",
         "description": "Set LED brightness",
         "help": " -- examples: PLEDB1 (set LED brightness low), PLEDB5 (set LED brightness normal), PLEDB9 (set LED brightness high)",
-        "response_type": ResponseType.ACK,
+        "response_type": ResultType.ACK,
         "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(ACK\x39\x20\r",
@@ -948,7 +948,7 @@ SETTER_COMMANDS = {
         "name": "PLEDT",
         "description": "Set LED total number of colors",
         "help": " -- examples: PLEDT2 (set 2 LED colors), PLEDT3 (set 3 LED colors)",
-        "response_type": ResponseType.ACK,
+        "response_type": ResultType.ACK,
         "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(ACK\x39\x20\r",
@@ -960,7 +960,7 @@ SETTER_COMMANDS = {
         "name": "PLEDC",
         "description": "Set LED color",
         "help": " -- examples: PLEDCnRRRGGGBBB (n: 1 line mode, 2 AVR mode, 3 battery mode)",
-        "response_type": ResponseType.ACK,
+        "response_type": ResultType.ACK,
         "response": [[0, "Command execution", "ack", {"NAK": "Failed", "ACK": "Successful"}]],
         "test_responses": [
             b"(ACK\x39\x20\r",

@@ -1,7 +1,6 @@
 from strenum import LowercaseStrEnum
 from enum import auto
 from abc import ABC, abstractmethod
-from powermon.protocols import ResponseType
 from powermon.commands.response import Response
 import calendar #needed for INFO type evaluating templates
 

@@ -1,10 +1,10 @@
-from powermon.protocols import ResponseType
+from powermon.commands.result import ResultType
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
 from powermon.commands.response import Response
 from powermon.commands.response_definition import ResponseDefinition
 
 class CommandDefinition:
-    def __init__(self, code, description, help_text: str, response_type : ResponseType, 
+    def __init__(self, code, description, help_text: str, response_type : ResultType, 
                  response_definitions, test_responses: list, regex: str, command_definition_type: str):
         if response_definitions is None or len(response_definitions) == 0:
             raise ValueError(f"response definitions cannot be None for command_code: {code}")
@@ -13,7 +13,7 @@ class CommandDefinition:
         self.code = code
         self.description = description
         self.help_text = help_text
-        self.response_type : ResponseType = response_type
+        self.response_type : ResultType = response_type
         self.response_definitions : dict[int,ResponseDefinition] = response_definitions
         self.test_responses : list[bytes] = test_responses
         self.regex : str | None = regex
