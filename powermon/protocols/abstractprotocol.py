@@ -126,7 +126,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         """
         Simplest validity check, CRC checks should be added to individual protocols
         """
-        if result.raw_response_blob is None:
+        if result.raw_response is None:
             result.is_valid = False
             result.error = True
             result.error_messages.append("failed validity check: response was empty")
@@ -143,7 +143,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         into a ??? dict of name: value, unit entries
         """
 
-        log.info(f"result.raw_response passed to decode: {result.raw_response_blob}")
+        log.info(f"result.raw_response passed to decode: {result.raw_response}")
 
         # Check response is valid
         self.check_response_valid(result)
@@ -158,12 +158,12 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             return
         
         if command.command_definition.response_type is ResultType.MULTIVALUED:
-            response = result.raw_response_blob[1:-3] #this should be moved to the protocol, it should check the CRC then strip them
+            response = result.raw_response[1:-3] #this should be moved to the protocol, it should check the CRC then strip them
             responses = command.validate_and_translate_raw_value(response, index=0)
             result.add_responses(responses)
         else:
             # Split the response into individual responses
-            for i, raw_response in enumerate(self.get_responses(result.raw_response_blob)):
+            for i, raw_response in enumerate(self.get_responses(result.raw_response)):
                 responses = command.validate_and_translate_raw_value(raw_response, index=i)
                 result.add_responses(responses)
         log.debug(f"trimmed and split responses: {result.responses}")

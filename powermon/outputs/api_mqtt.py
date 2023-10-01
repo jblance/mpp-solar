@@ -46,7 +46,7 @@ class API_MQTT(AbstractOutput):
 
     def process(self, result: Result):
         # exit if no data
-        if result.raw_response_blob is None:
+        if result.raw_response is None:
             return
 
         # exit if no broker

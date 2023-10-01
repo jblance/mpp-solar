@@ -17,6 +17,6 @@ class raw(AbstractFormat):
     def format(self, result: Result):
         log.info("Using output formatter: %s" % self.name)
 
-        data = result.raw_response_blob
+        data = result.raw_response
         log.debug(f"data: {data}")
         return [data]
