@@ -88,6 +88,9 @@ class Device:
 
     def finalize(self):
         log.info("finalizing device")
+        
+        #close connection on port
+        self.port.disconnect()
         return
 
     def runLoop(self, force=False) -> bool:
@@ -96,7 +99,7 @@ class Device:
         runs them
         """
         time.sleep(0.1)
-        if self.commands is None:
+        if self.commands is None or len(self.commands) == 0:
             log.info("no commands in queue")
             return False
         else:

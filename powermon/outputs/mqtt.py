@@ -30,6 +30,9 @@ class MQTT(AbstractOutput):
     def to_DTO(self) -> OutputDTO:
         return OutputDTO(type="mqtt", format=self.formatter.to_DTO())
 
+    def get_topic(self):
+        return self.results_topic
+
     def output(self, data):
         """ required function for any output class """
         #Not sure that formatter and mqtt_broker are set, could use builder pattern to ensure they are set
