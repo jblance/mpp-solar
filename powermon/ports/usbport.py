@@ -23,10 +23,14 @@ class USBPort(AbstractPort):
     def __init__(self, path, protocol) -> None:
         super().__init__(protocol=protocol)
         self.path = path
+        self.port = None
 
     def toDTO(self):
         dto = PortDTO(type="usb", path=self.path, protocol=self.get_protocol().toDTO())
         return dto
+
+    def isConnected(self):
+        return self.port is not None 
 
     def connect(self) -> int:
         log.debug(f"USBPort connecting. path:{self.path}, protocol: {self.get_protocol()}")
@@ -42,21 +46,12 @@ class USBPort(AbstractPort):
         log.debug(f"USBPort disconnecting {self.port}")
         if self.port is not None:
             os.close(self.port)
+        self.port = None
         return
 
     def send_and_receive(self, command: Command) -> Result:
         response_line = bytes()
         result = Result(command_code=command.code, response_definitions=command.get_response_definitions())
-
-        # Open USB device
-        usb0 = None
-        try:
-            usb0 = os.open(self.path, os.O_RDWR | os.O_NONBLOCK)
-        except Exception as e:
-            log.error("USB open error: {}".format(e))
-            result.error = True
-            result.error_messages.append("USB open error: {}".format(e))
-            return result
 
         # Send the command to the open usb connection
         full_command = command.get_full_command()
@@ -68,7 +63,7 @@ class USBPort(AbstractPort):
             # Send all at once
             log.debug("sending full_command in on shot")
             time.sleep(0.05)
-            os.write(usb0, full_command)
+            os.write(self.port, full_command)
         else:
             log.debug("multiple chunk send")
             chunks = [full_command[i:i + 8] for i in range(0, cmd_len, 8)]
@@ -79,7 +74,7 @@ class USBPort(AbstractPort):
                     chunk += b'\x00' * padding
                 log.debug("sending chunk: %s" % (chunk))
                 time.sleep(0.05)
-                os.write(usb0, chunk)
+                os.write(self.port, chunk)
         time.sleep(0.25)
         # Read from the usb connection
         # try to a max of 100 times
@@ -87,7 +82,7 @@ class USBPort(AbstractPort):
             # attempt to deal with resource busy and other failures to read
             try:
                 time.sleep(0.15)
-                r = os.read(usb0, 256)
+                r = os.read(self.port, 256)
                 response_line += r
             except Exception as e:
                 log.debug("USB read error: {}".format(e))
@@ -98,5 +93,5 @@ class USBPort(AbstractPort):
                 break
         log.debug("usb response was: %s", response_line)
         result.process_raw_response(response_line)
-        os.close(usb0)
+
         return result

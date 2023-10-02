@@ -7,7 +7,7 @@ class CommandDTO(BaseModel):
     
     command_code: str
     device_id: str
-    result_topic: str
+    result_topic: str = None
     trigger: TriggerDTO
     outputs: list[OutputDTO]
 
