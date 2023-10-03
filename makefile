@@ -4,10 +4,13 @@ format:
 mppsolar-tests: 
 	python3 -m unittest discover -s tests/mppsolar -f -v
 	
-powermon-tests: 
-	python3 -m unittest discover -s tests/powermon -v
+powermon-unit-tests: 
+	python3 -m unittest discover -s tests/powermon/unit -v
 
-tests: powermon-tests mppsolar-tests
+powermon-integration-tests: 
+	python3 -m unittest discover -s tests/powermon/integration -v
+
+tests: powermon-unit-tests powermon-integration-tests mppsolar-tests
 
 
 pypi:

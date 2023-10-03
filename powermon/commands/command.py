@@ -1,5 +1,5 @@
 import logging
-from time import localtime, strftime, time
+from time import localtime, strftime
 from powermon.commands.trigger import Trigger
 from powermon.outputs import getOutputs
 from powermon.dto.commandDTO import CommandDTO
@@ -9,7 +9,6 @@ from powermon.outputs.api_mqtt import API_MQTT
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.response import Response
 from powermon.commands.response_definition import ResponseDefinition
-from powermon.commands.response_definition import ResponseDefinitionInfo
 
 log = logging.getLogger("Command")
 
@@ -22,10 +21,8 @@ class Command:
         self.type = commandtype
         self.set_outputs(outputs)
         
-        self.trigger = trigger
+        self.trigger: Trigger = trigger
 
-        self.last_run = None
-        self.next_run = self.trigger.nextRun(command=self)
         self.full_command = None
         self.command_definition : CommandDefinition = None
         self.device_id = None
@@ -60,7 +57,6 @@ class Command:
         try:
             #The template should be passed in during construction since we will have that information already
             if response_definition.is_info():
-                raise ValueError("Info response definitions should not be validated")
                 return response_definition.response_from_raw_values(self.code)
             else:
                 return response_definition.response_from_raw_values(raw_value)
@@ -76,14 +72,9 @@ class Command:
     def __str__(self):
         if self.code is None:
             return "empty command object"
-        if self.last_run is None:
-            last_run = "Not yet run"
-        else:
-            last_run = strftime("%d %b %Y %H:%M:%S", localtime(self.last_run))
-        if self.next_run is None:
-            next_run = "unknown"
-        else:
-            next_run = strftime("%d %b %Y %H:%M:%S", localtime(self.next_run))
+
+        last_run = self.trigger.get_last_run()
+        next_run = self.trigger.get_next_run()
 
         _outs = ""
         for output in self.outputs:
@@ -127,13 +118,10 @@ class Command:
             output.set_mqtt_broker(mqtt_broker)
 
     def dueToRun(self):
-        return self.trigger.isDue(command=self)
+        return self.trigger.is_due()
 
     def touch(self):
-        # store run time (as secs since epoch)
-        self.last_run = time()
-        # update next run time
-        self.next_run = self.trigger.nextRun(command=self)
+        self.trigger.touch()
 
     def to_dto(self):
         return CommandDTO(
