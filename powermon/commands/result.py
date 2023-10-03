@@ -3,6 +3,7 @@ import logging
 
 from powermon.commands.response import Response
 from powermon.commands.response_definition import ResponseDefinition
+from powermon.dto.resultDTO import ResultDTO
 
 log = logging.getLogger("result")
 
@@ -28,8 +29,11 @@ class Result:
         self.error_messages = []
         log.debug("Result: %s" % (self))
 
-    def to_DTO(self):
-        return None
+    def to_DTO(self) -> ResultDTO:
+        response_dtos = []
+        for response in self.responses:
+            response_dtos.append(response.to_DTO())
+        return ResultDTO(device_identifier=self.get_device_id(), command_code=self.command_code, data=response_dtos)
     
     def get_command_code(self) -> str:
         return self.command_code

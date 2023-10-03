@@ -166,7 +166,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             for i, raw_response in enumerate(self.get_responses(result.raw_response)):
                 responses = command.validate_and_translate_raw_value(raw_response, index=i)
                 result.add_responses(responses)
-        log.debug(f"trimmed and split responses: {result.responses}")
+        log.debug(f"trimmed and split responses: {result.get_responses()}")
         
         #TODO: this is ugly, info types need to be reworked to not have code in the protocol definition
         #IF there are more response definitions than responses, check if they are INFO and fill them in
