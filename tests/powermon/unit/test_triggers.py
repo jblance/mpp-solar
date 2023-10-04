@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 import datetime
 import time
 from powermon.commands.trigger import Trigger, TriggerType
@@ -27,7 +28,7 @@ class test_triggers(unittest.TestCase):
         self.assertEqual(trigger.get_next_run(), next_str)
         
         #Check the trigger comes due when the next run time is reached
-        time.sleep(x)
+        time.sleep(x) #replace with a mock
         self.assertEqual(trigger.is_due(), True)
         
     def test_triggertype_loops(self):
@@ -68,7 +69,7 @@ class test_triggers(unittest.TestCase):
         self.assertEqual(trigger.is_due(), False)
         
         #check that the trigger comes due when the correct time is reached
-        time.sleep(x)
+        time.sleep(x) #replace with a mock
         self.assertEqual(trigger.is_due(), True)
         
         #check that the state after first run is correct and the next run is the next day

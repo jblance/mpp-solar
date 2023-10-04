@@ -32,6 +32,10 @@ class Command:
         return self.full_command
     
     def set_command_definition(self, command_definition : CommandDefinition):
+        if command_definition is None:
+            raise ValueError("CommandDefinition cannot be None")
+        if command_definition.is_command_code_valid(self.code) == False:
+            raise ValueError(f"Command code {self.code} is not valid for command definition regex {command_definition.regex}")
         self.command_definition = command_definition
         self.command_description = command_definition.description
         for output in self.outputs:
@@ -49,6 +53,9 @@ class Command:
         self.device_id = device_id
         for output in self.outputs:
             output.set_device_id(device_id)
+            
+    def set_full_command(self, full_command):
+        self.full_command = full_command
             
     def validate_and_translate_raw_value(self, raw_value : str, index : int) -> list[Response]:
         if(len(self.command_definition.response_definitions) <= index):

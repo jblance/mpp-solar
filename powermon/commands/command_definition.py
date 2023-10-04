@@ -1,3 +1,5 @@
+import re
+
 from powermon.commands.result import ResultType
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
 from powermon.commands.response import Response
@@ -29,6 +31,11 @@ class CommandDefinition:
             #test_responses=self.test_responses,
             regex=self.regex
         )
+        
+    def is_command_code_valid(self, command_code : str) -> bool:
+        if self.regex is None:
+            return self.code == command_code
+        return re.match(self.regex, command_code) is not None
         
     def get_type(self) -> str:
         return self.command_definition_type
