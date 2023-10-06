@@ -5,7 +5,7 @@ from powermon.commands.response import Response
 import calendar #needed for INFO type evaluating templates
 
 
-class ResponseDefinitionType(LowercaseStrEnum):
+class ResponseType(LowercaseStrEnum):
     ACK = auto()
     INT = auto()
     OPTION = auto()
@@ -59,7 +59,7 @@ class ResponseDefinition(ABC):
         if len(response_definition_config) > 4:
             response_definition_extra = response_definition_config[4]
         
-        if response_definition_type == ResponseDefinitionType.ACK:
+        if response_definition_type == ResponseType.ACK:
             ack_values : dict[str, str] = response_definition_config[3]
             ack_codes = list(ack_values.keys())
             fail_code = ack_codes[0]
@@ -74,63 +74,63 @@ class ResponseDefinition(ABC):
                                          fail_description=fail_description,
                                          extra_info=response_definition_extra)
         
-        elif response_definition_type == ResponseDefinitionType.INT:
+        elif response_definition_type == ResponseType.INT:
             unit = response_definition_config[3]
             return ResponseDefinitionInt(index=response_definition_index,
                                          description=response_definition_description,
                                          unit=unit,
                                          extra_info=response_definition_extra)
             
-        elif response_definition_type == ResponseDefinitionType.OPTION:
+        elif response_definition_type == ResponseType.OPTION:
             options : list[str] = response_definition_config[3]
             return ResponseDefinitionOption(index=response_definition_index,
                                             description=response_definition_description,
                                             options=options,
                                             extra_info=response_definition_extra)
         
-        elif response_definition_type == ResponseDefinitionType.BYTES:
+        elif response_definition_type == ResponseType.BYTES:
             unit = response_definition_config[3]
             return ResponseDefinitionBytes(index=response_definition_index,
                                             description=response_definition_description,
                                             unit=unit,
                                             extra_info=response_definition_extra)
         
-        elif response_definition_type == ResponseDefinitionType.FLOAT:
+        elif response_definition_type == ResponseType.FLOAT:
             unit = response_definition_config[3]
             return ResponseDefinitionFloat(index=response_definition_index,
                                             description=response_definition_description,
                                             unit=unit,
                                             extra_info=response_definition_extra)
             
-        elif response_definition_type == ResponseDefinitionType.STR_KEYED:
+        elif response_definition_type == ResponseType.STR_KEYED:
             options : dict[str, str] = response_definition_config[3]
             return ResponseDefinitionStrKeyed(index=response_definition_index,
                                             description=response_definition_description,
                                             options=options,
                                             extra_info=response_definition_extra)
             
-        elif response_definition_type == ResponseDefinitionType.ENFLAGS:
+        elif response_definition_type == ResponseType.ENFLAGS:
             flags : dict[str, dict[str, str]] = response_definition_config[3]
             return ResponseDefinitionENFlags(index=response_definition_index,
                                             description=response_definition_description,
                                             enflags=flags,
                                             extra_info=response_definition_extra)
             
-        elif response_definition_type == ResponseDefinitionType.STRING:
+        elif response_definition_type == ResponseType.STRING:
             unit = response_definition_config[3]
             return ResponseDefinitionString(index=response_definition_index,
                                             description=response_definition_description,
                                             unit=unit,
                                             extra_info=response_definition_extra)
             
-        elif response_definition_type == ResponseDefinitionType.FLAGS:
+        elif response_definition_type == ResponseType.FLAGS:
             flags : list[str] = response_definition_config[3]
             return ResponseDefinitionFlags(index=response_definition_index,
                                             description=response_definition_description,
                                             flags=flags,
                                             extra_info=response_definition_extra)
             
-        elif ResponseDefinitionType.INFO in response_definition_type:
+        elif ResponseType.INFO in response_definition_type:
             template = response_definition_type.split(":",1)[1]
             return ResponseDefinitionInfo(index=response_definition_index,
                                             description=response_definition_description,
