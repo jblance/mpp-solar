@@ -59,8 +59,13 @@ class ResponseDefinition(ABC):
         device_class = None
         state_class = None
         icon = None
+        
+        #parse out the extra values
         if len(response_definition_config) > 4:
             response_definition_extra = response_definition_config[4]
+            device_class = response_definition_extra.get("device-class", None)
+            state_class = response_definition_extra.get("state-class", None)
+            icon = response_definition_extra.get("icon", None)
         
         if response_definition_type == ResponseType.ACK:
             ack_values : dict[str, str] = response_definition_config[3]

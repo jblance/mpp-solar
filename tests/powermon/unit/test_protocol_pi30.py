@@ -22,3 +22,13 @@ class test_protocol_pi30(unittest.TestCase):
         self.assertEqual(test_definition.code, "TEST")
         self.assertEqual(test_definition.response_type, ResultType.INDEXED)
         self.assertEqual(test_definition.get_type(), "QUERY")
+        
+    def test_icon_and_deviceclass_from_response(self):
+        protocol = pi30()
+        command_definition = protocol.get_command_definition("Q1")
+        
+        self.assertEqual(command_definition.response_definitions[13].get_description(), "SCC charge power")
+        self.assertEqual(command_definition.response_definitions[13].icon, "mdi:solar-power")
+        self.assertEqual(command_definition.response_definitions[13].device_class, "power") 
+        
+        
