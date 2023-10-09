@@ -352,7 +352,7 @@ device_mode=Standby\n"""
 
     def test_run_powermon_QMCHGCR(self):
         try:
-            expected = """max_charging_current_options=010 020 030 040 050 060 070 080 090 100 110 120 A\n"""
+            expected = """max_charging_current_options=010 020 030 040 050 060 070 080 090 100 110 120A\n"""
             result = subprocess.run(
                 [
                     "powermon",
@@ -440,7 +440,7 @@ device_mode=Standby\n"""
 
     def test_run_powermon_QMUCHGCR(self):
         try:
-            expected = "max_utility_charging_current=002 010 020 030 040 050 060 070 080 090 100 110 120 A\n"
+            expected = "max_utility_charging_current=002 010 020 030 040 050 060 070 080 090 100 110 120A\n"
             result = subprocess.run(
                 [
                     "powermon",

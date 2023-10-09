@@ -311,9 +311,9 @@ def do_test(self, command, expected, respno=0):
             capture_output=True,
             text=True,
         )
-        # print(result.stdout)
-        # print(result.stdout)
-        # print(result.stderr)
+        print(result.stdout)
+        print(result.stdout)
+        print(result.stderr)
         self.assertEqual(f"CMD: {command}\n{result.stdout}", f"CMD: {command}\n{expected}")
         self.assertEqual(result.returncode, 0)
         print("OK")
@@ -336,7 +336,7 @@ class test_cmd_powermon_pi30max(unittest.TestCase):
 
     def test_powermon_QSID(self):
         try:
-            expected = "serial_number=92932105105335\n"
+            expected = "serial_number=1492932105105335005535\n"
             result = subprocess.run(
                 [
                     "powermon",

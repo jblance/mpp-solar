@@ -1,5 +1,6 @@
 import logging
 from powermon.formats.abstractformat import AbstractFormat
+from powermon.commands.result import Result
 
 log = logging.getLogger("raw")
 
@@ -13,7 +14,7 @@ class raw(AbstractFormat):
     def set_command_description(self, command_description):
         pass
 
-    def format(self, result):
+    def format(self, result: Result):
         log.info("Using output formatter: %s" % self.name)
 
         data = result.raw_response

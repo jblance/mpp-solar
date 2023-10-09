@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 #from powermon.dto.response_definition_dto import ResponseDefinitionDTO
 
 
@@ -8,6 +8,6 @@ class CommandDefinitionDTO(BaseModel):
     description: str
     help_text: str | None
     response_type: str | None
-    responses: list | None
+    #responses: list | None
     #test_responses : list[bytes] | None
     regex : str | None

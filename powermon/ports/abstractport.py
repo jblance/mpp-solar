@@ -56,7 +56,7 @@ class AbstractPort(ABC):
     def get_protocol(self) -> AbstractProtocol:
         return self.protocol
 
-    def run_command(self, command: Command):
+    def run_command(self, command: Command) -> Result:
         #open port if it is closed
         if not self.isConnected():
             self.connect()
@@ -67,7 +67,7 @@ class AbstractPort(ABC):
         command.touch()
         # update full_command - expand any template / add crc etc
         # updates every run incase something has changed
-        command.full_command = self.get_protocol().get_full_command(command.code)
+        command.set_full_command(self.get_protocol().get_full_command(command.code))
 
         # run the command via the 'send_and_receive port function
         result = self.send_and_receive(command)

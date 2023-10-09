@@ -109,7 +109,14 @@ class Device:
                     # run command
                     result: Result = self.port.run_command(command)
                     # decode result
-                    self.port.get_protocol().decode(result=result, command=command)
+                    try:
+                        self.port.get_protocol().decode(result=result, command=command)
+                    except Exception as e:
+                        log.error(f"Error decoding result: {e}")
+                        result.error = True
+                        result.error_messages.append(f"Error decoding result: {e}")
+                        result.error_messages.append(f"Exception Type: {e.__class__.__name__}")
+                        result.error_messages.append(f"Exception args: {e.args}")
                     result.set_device_id(self.device_id)
                     # loop through each output and process result
                     output: AbstractOutput

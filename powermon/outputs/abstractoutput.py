@@ -7,6 +7,7 @@ from strenum import LowercaseStrEnum
 # from powermon.dto.outputDTO import OutputDTO
 from powermon.formats.abstractformat import AbstractFormat
 from powermon.libs.mqttbroker import MqttBroker
+from powermon.commands.result import Result
 
 log = logging.getLogger("Output")
 
@@ -17,9 +18,6 @@ class OutputType(LowercaseStrEnum):
 
 class AbstractOutput(ABC):
 
-    def __init__(self, formatter : AbstractFormat):
-        self.formatter = formatter
-
     def set_formatter(self, formatter : AbstractFormat):
         self.formatter = formatter
 
@@ -27,7 +25,7 @@ class AbstractOutput(ABC):
         return ""
 
     @abstractmethod
-    def process(self, result):
+    def process(self, result: Result):
         pass
 
     def set_mqtt_broker(self, mqtt_broker: MqttBroker):

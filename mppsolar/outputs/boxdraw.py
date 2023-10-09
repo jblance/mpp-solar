@@ -2,7 +2,7 @@ import logging
 import re
 
 from .baseoutput import baseoutput
-from ..helpers import get_kwargs, key_wanted, pad, getMaxLen
+from ..helpers import get_kwargs, key_wanted, pad, get_max_response_length
 
 log = logging.getLogger("boxdraw")
 
@@ -76,15 +76,15 @@ class boxdraw(baseoutput):
         # Determine column widths
         _pad = 1
         # Width of parameter column
-        width_p = getMaxLen(displayData) + _pad
+        width_p = get_max_response_length(displayData) + _pad
         if width_p < 9 + _pad:
             width_p = 9 + _pad
         # Width of value column
-        width_v = getMaxLen(data.values()) + _pad
+        width_v = get_max_response_length(data.values()) + _pad
         if width_v < 6 + _pad:
             width_v = 6 + _pad
         # Width of units column
-        width_u = getMaxLen(data.values(), 1) + _pad
+        width_u = get_max_response_length(data.values(), 1) + _pad
         if width_u < 5 + _pad:
             width_u = 5 + _pad
         # Total line length

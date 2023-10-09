@@ -15,8 +15,7 @@ class API_MQTT(AbstractOutput):
     
     
     
-    def __init__(self, formatter) -> None:
-        self.set_formatter(formatter)
+    def __init__(self) -> None:
         self.command_code : str = "not_set"
         self.device_id : str = "not_set"
 
@@ -45,7 +44,7 @@ class API_MQTT(AbstractOutput):
         return OutputDTO(type="api_mqtt", format=self.formatter.to_DTO())
 
 
-    def output(self, result: Result):
+    def process(self, result: Result):
         # exit if no data
         if result.raw_response is None:
             return
@@ -56,14 +55,17 @@ class API_MQTT(AbstractOutput):
             raise RuntimeError("No mqtt broker supplied")
 
         # build the messages...
-        result_dto = ResultDTO(device_identifier=result.get_device_id(), command_code=result.command_code, data=result.get_decoded_responses())
+        #TODO: responses need to be DTOS
+        result_dto = result.to_DTO()
         self.mqtt_broker.publish(self.get_topic(), result_dto.json())
 
-    def process(self, result: Result):
-        self.output(result)
-        
         
     @classmethod
     def from_DTO(cls, dto: OutputDTO) -> "API_MQTT":
         formatter = SimpleFormat.from_DTO(dto.format)
-        return cls(formatter=formatter)
+        api_mqtt = cls()
+        api_mqtt.set_formatter(formatter)
+    
+    @classmethod
+    def from_config(cls, output_config) -> "API_MQTT":
+        return cls()

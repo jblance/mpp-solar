@@ -7,14 +7,15 @@ import logging
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.formats.abstractformat import AbstractFormat
 from powermon.dto.outputDTO import OutputDTO
+from powermon.commands.result import Result
 
 log = logging.getLogger("MQTT")
 
 
 class MQTT(AbstractOutput):
     """ mqtt output class"""
-    def __init__(self, formatter: AbstractFormat, results_topic) -> None:
-        super().__init__(formatter)
+    def __init__(self, results_topic: str):
+        self.formatter = None
         self.mqtt_broker = None
         self.results_topic = results_topic
 
@@ -26,6 +27,9 @@ class MQTT(AbstractOutput):
 
     def set_formatter(self, formatter):
         self.formatter = formatter
+        
+    def get_topic(self) -> str:
+        return self.results_topic
 
     def to_DTO(self) -> OutputDTO:
         return OutputDTO(type="mqtt", format=self.formatter.to_DTO())
@@ -33,7 +37,7 @@ class MQTT(AbstractOutput):
     def get_topic(self):
         return self.results_topic
 
-    def output(self, data):
+    def process(self, result: Result):
         """ required function for any output class """
         #Not sure that formatter and mqtt_broker are set, could use builder pattern to ensure they are set
         if self.formatter is None:
@@ -46,7 +50,7 @@ class MQTT(AbstractOutput):
 
         log.info("Using output processor: mqtt")
         # exit if no data
-        if data is None:
+        if result is None:
             return
 
         # exit if no broker
@@ -55,7 +59,7 @@ class MQTT(AbstractOutput):
             return
 
         # build the messages...
-        formatted_data = self.formatter.format(data)
+        formatted_data = self.formatter.format(result)
         log.debug("mqtt.output msgs %s", formatted_data)
 
         # publish
@@ -65,10 +69,7 @@ class MQTT(AbstractOutput):
         else:
             self.mqtt_broker.publish(self.results_topic, formatted_data)
 
-    def process(self, result):
-        self.output(result)  # QUESTION: why this? do we need to pick one? is 'output' used somewhere else?
-
     @classmethod
     def from_config(cls, output_config) -> "MQTT":
         results_topic = output_config.get("topic_override", None)
-        return cls(formatter=None, results_topic=results_topic)  #FIXME: need to sort approach to init or set_formatter
+        return cls(results_topic=results_topic)

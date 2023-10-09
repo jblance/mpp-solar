@@ -2,6 +2,7 @@ import logging
 from powermon.formats.abstractformat import AbstractFormat
 from powermon.dto.formatDTO import FormatDTO
 from powermon.commands.result import Result
+from powermon.commands.response import Response
 
 log = logging.getLogger("simple")
 
@@ -20,29 +21,37 @@ class SimpleFormat(AbstractFormat):
         _result = []
 
         # check for error in result
-        if result.error:
-            data = {}
-            data["Error"] = [f"Command: {result.command_code} incurred an error or errors during execution or processing", ""]
-            data["Error Count"] = [len(result.error_messages), ""]
-            for i, message in enumerate(result.error_messages):
-                data[f"Error #{i}"] = [message, ""]
-        else:
-            data = result.decoded_responses
+        #if result.error:
+        #    data = {}
+        #    data["Error"] = [f"Command: {result.command_code} incurred an error or errors during execution or processing", ""]
+        #    data["Error Count"] = [len(result.error_messages), ""]
+        #    for i, message in enumerate(result.error_messages):
+        #        data[f"Error #{i}"] = [message, ""]
 
-        if data is None:
+
+        if len(result.get_responses()) == 0:
             return _result
 
-        displayData = self.formatAndFilterData(data)
+        display_data : list[Response] = self.format_and_filter_data(result)
 
         # build data to display
-        for key in displayData:
-            value = displayData[key][0]
-            unit = displayData[key][1]
-            if len(displayData[key]) > 2 and displayData[key][2] and self.extra_info:
-                extra = displayData[key][2]
-                _result.append(f"{key}={value}{unit} {extra}")
+        for response in display_data:
+            name = response.get_data_name()
+            value = response.get_data_value()
+            unit = response.get_data_unit()
+            if self.extra_info:
+                extra = ""
+                if response.get_device_class() is not None:
+                    extra = " " + response.get_device_class()
+                if response.get_icon() is not None:
+                    extra += " " + response.get_icon()
+                if response.get_state_class() is not None:
+                    extra += " " + response.get_state_class()
+                
+                
+                _result.append(f"{name}={value}{unit}{extra}")
             else:
-                _result.append(f"{key}={value}{unit}")
+                _result.append(f"{name}={value}{unit}")
         return _result
 
     @classmethod

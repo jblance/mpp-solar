@@ -60,7 +60,7 @@ class SerialPort(AbstractPort):
         return
 
     def send_and_receive(self, command: Command) -> Result:
-        result = Result(command.code)
+        result = Result(command.code, response_definitions=command.get_response_definitions())
         full_command = command.full_command
         response_line = None
         log.debug(f"port {self.serialPort}")
@@ -79,7 +79,7 @@ class SerialPort(AbstractPort):
             time.sleep(0.1)  # give serial port time to receive the data
             response_line = self.serialPort.read_until(b"\r")
             log.debug("serial response was: %s", response_line)
-            result.raw_response = response_line
+            result.process_raw_response(response_line)
             return result
         except Exception as e:
             log.warning(f"Serial read error: {e}")

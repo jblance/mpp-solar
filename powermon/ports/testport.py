@@ -23,6 +23,7 @@ class TestPort(AbstractPort):
     def __init__(self, response_number, protocol):
         super().__init__(protocol=protocol)
         self.response_number = response_number
+        self.connected = False
 
     def __str__(self):
         return "Test port"
@@ -37,16 +38,18 @@ class TestPort(AbstractPort):
 
     def connect(self) -> int:
         log.debug("Test port connected")
+        self.connected = True
         return 1
 
     def disconnect(self) -> None:
         log.debug("Test port disconnected")
+        self.connected = False
         return
 
     def send_and_receive(self, command: Command) -> Result:
         command_defn : CommandDefinition = command.command_definition
         
-        result = Result(command.code)
+        result = Result(command.code, response_definitions=command.get_response_definitions())
 
         if command_defn is not None:
             # Have test data defined, so use that
@@ -57,10 +60,9 @@ class TestPort(AbstractPort):
                 self._test_data = command_defn.test_responses[random.randrange(number_of_test_responses)]
         else:
             # No test responses defined
-            log.warn("Testing a command with no test responses defined")
-            raise 
+            log.warn("Testing a command with no test responses defined") 
             self._test_data = None
         response = self._test_data
         log.debug(f"Raw response {response}")
-        result.raw_response = response
+        result.process_raw_response(response)
         return result

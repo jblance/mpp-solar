@@ -3,6 +3,8 @@ import logging
 import re
 
 from powermon.dto.formatDTO import FormatDTO
+from powermon.commands.result import Result
+from powermon.commands.response import Response
 
 
 # from time import sleep
@@ -33,34 +35,26 @@ class AbstractFormat(ABC):
         pass
 
     @abstractmethod
-    def format(self, data):
+    def format(self, result: Result) -> list:
         pass
 
-    def to_DTO(self):
+    def to_DTO(self) -> FormatDTO:
         return FormatDTO(type=self.name)
     
     # Override this if the format sends multiple messages
     def sendsMultipleMessages(self) -> bool:
         return False
 
-    def formatAndFilterData(self, data):
-        # TODO: should we make data a proper object so it's easy to get the data we want?
-        # remove raw response
-        if "raw_response" in data:
-            data.pop("raw_response")
-        # remove command details
-        if "_command" in data:
-            data.pop("_command")
-        if "_command_description" in data:
-            data.pop("_command_description")
+    def format_and_filter_data(self, result: Result) -> list[Response]:
 
-        displayData = {}
-        for key in data:
-            _values = data[key]
-            formattedKey = self.formatKey(key)
-            if self.isKeyWanted(formattedKey):
-                displayData[formattedKey] = _values
-        return displayData
+        display_data = []
+        for response in result.get_responses():
+            if response is None:
+                raise ValueError("response cannot be None")
+            formatted_key = self.formatKey(response.get_data_name())
+            if self.isKeyWanted(formatted_key):
+                display_data.append(response)
+        return display_data
 
     def formatKey(self, key) -> str:
         if self.remove_spaces:

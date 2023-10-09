@@ -1,17 +1,8 @@
 import importlib
 import logging
 import pkgutil
-from enum import Enum, auto
 
 log = logging.getLogger("protocols")
-
-
-class ResponseType(Enum):
-    DEFAULT = auto()
-    ACK = auto()
-    MULTIVALUED = auto()
-    INDEXED = auto()
-    POSITIONAL = auto()
 
 
 def get_protocol_definition(protocol):

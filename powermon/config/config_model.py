@@ -3,7 +3,7 @@ config_model.py - pydantic definitions for the powermon config model
 """
 
 from typing import Literal, List
-from pydantic import BaseModel, Extra  # pylint: disable=E0401
+from pydantic import BaseModel, Extra, Field  # pylint: disable=E0401
 
 
 class NoExtraBaseModel(BaseModel):
@@ -15,7 +15,7 @@ class NoExtraBaseModel(BaseModel):
 class DaemonConfig(NoExtraBaseModel):
     """ model/allowed elements for daemon section of config """
     type: None | str
-    keepalive: None | str
+    keepalive: None | int
 
 
 class MQTTConfig(NoExtraBaseModel):
@@ -30,7 +30,7 @@ class APIConfig(NoExtraBaseModel):
     """ model/allowed elements for api section of config """
     host: None | str
     port: None | int
-    enabled: None | bool
+    enabled: None | bool = Field(default=False)
     log_level: None | str
     announce_topic: None | str
     adhoc_topic: None | str
@@ -40,13 +40,13 @@ class APIConfig(NoExtraBaseModel):
 class BaseFormatConfig(NoExtraBaseModel):
     """ model/allowed elements for base format config """
     type: str
-    tag: None | str
-    draw_lines: None | bool
-    keep_case: None | bool
-    remove_spaces: None | bool
-    extra_info: None | bool
-    excl_filter: None | str
-    filter: None | str
+    tag: None | str = Field(default=None)
+    draw_lines: None | bool = Field(default=None)
+    keep_case: None | bool = Field(default=None)
+    remove_spaces: None | bool = Field(default=None)
+    extra_info: None | bool = Field(default=None)
+    excl_filter: None | str = Field(default=None)
+    filter: None | str = Field(default=None)
 
 
 class HassFormatConfig(BaseFormatConfig):
@@ -86,7 +86,7 @@ class CommandConfig(NoExtraBaseModel):
     command: str
     type: None | Literal["basic"] | Literal["poll"]
     trigger: None | LoopsTriggerConfig | AtTriggerConfig | EveryTriggerConfig
-    outputs: None | str | List[OutputConfig]
+    outputs: None | List[OutputConfig] | str
 
 
 class SerialPortConfig(BaseModel):
@@ -107,8 +107,8 @@ class UsbPortConfig(BaseModel):
 class TestPortConfig(BaseModel):
     """ model/allowed elements for test port config """
     type: Literal["test"]
-    response_number: None | int
-    protocol: None | str
+    response_number: None | int = Field(default=None)
+    protocol: None | str = Field(default=None)
 
 
 class DeviceConfig(NoExtraBaseModel):
@@ -117,7 +117,7 @@ class DeviceConfig(NoExtraBaseModel):
     id: None | str
     model: None | str
     manufacturer: None | str
-    port: SerialPortConfig | UsbPortConfig | TestPortConfig
+    port: TestPortConfig | SerialPortConfig | UsbPortConfig
 
 
 class BaseConfig(NoExtraBaseModel):
@@ -127,7 +127,7 @@ class BaseConfig(NoExtraBaseModel):
     mqttbroker: None | MQTTConfig
     api: None | APIConfig
     daemon: None | DaemonConfig
-    debuglevel: None | str
+    debuglevel: None | int | str #If you put "debug" it translates to 10 then fails to load the config
     loop: None | int | Literal["once"]
 
 

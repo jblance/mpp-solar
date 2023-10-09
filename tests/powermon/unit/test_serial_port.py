@@ -49,7 +49,8 @@ class test_serial_port(TestCase):
                         spec=Command, 
                         code="QPIRI",
                         outputs = [Mock()],
-                        dueToRun = Mock(return_value=True)
+                        dueToRun = Mock(return_value=True),
+                        full_command = "QPIRI"
                     )
         #When: 
         #   isConnected() == False
@@ -69,7 +70,8 @@ class test_serial_port(TestCase):
                         spec=Command, 
                         code="QPIRI",
                         outputs = [Mock()],
-                        dueToRun = Mock(return_value=True)
+                        dueToRun = Mock(return_value=True),
+                        full_command = "QPIRI"
                     )
         #When: 
         #   isConnected() == True

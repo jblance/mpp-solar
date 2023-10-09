@@ -3,13 +3,13 @@ from powermon.formats.abstractformat import AbstractFormat
 
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.dto.outputDTO import OutputDTO
+from powermon.commands.result import Result
 
 log = logging.getLogger("screen")
 
 
 class Screen(AbstractOutput):
-    def __init__(self, formatter):
-        super().__init__(formatter)
+    def __init__(self):
         self.name = "Screen"
         
 
@@ -19,7 +19,7 @@ class Screen(AbstractOutput):
     def to_DTO(self) -> OutputDTO:
         return OutputDTO(type=self.name, format=self.formatter.to_DTO())
 
-    def process(self, result):
+    def process(self, result: Result):
         log.info("Using output sender: screen")
         log.debug("formatter: %s" % self.formatter)
 
@@ -30,3 +30,13 @@ class Screen(AbstractOutput):
 
         for line in formatted_data:
             print(line)
+            
+        if result.error:
+            print("Errors occurred during processing")
+            for error in result.error_messages:
+                print(error)
+
+    @classmethod
+    def from_config(cls, output_config) -> "Screen":
+        """If we need to include any config for the Screen output but the processing here"""
+        return cls()

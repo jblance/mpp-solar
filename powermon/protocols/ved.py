@@ -1,7 +1,7 @@
 import logging
 from typing import Tuple
 
-from powermon.protocols import ResponseType
+from powermon.commands.result import ResultType
 from powermon.protocols.abstractprotocol import AbstractProtocol
 from powermon.commands.command_definition import CommandDefinition
 from mppsolar.protocols.protocol_helpers  import vedHexChecksum
@@ -230,10 +230,10 @@ class ved(AbstractProtocol):
             _r = bytes.fromhex(_r)
             if (
                 self._command_definition is not None
-                and self._command_definition.response_type == ResponseType.POSITIONAL
+                and self._command_definition.response_type == ResultType.POSITIONAL
             ):
                 # Have a POSITIONAL type response, so need to break it up...
-                for defn in self._command_definition.responses:
+                for defn in self._command_definition.response_definitions:
                     size = defn[1]
                     item = _r[:size]
                     responses.append(item)
