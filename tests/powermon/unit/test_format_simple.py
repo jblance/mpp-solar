@@ -19,12 +19,36 @@ class test_formats_simple(unittest.TestCase):
         self.assertEqual(formatted_data, expected)
 
     
-    def test_simple_format_with_extra(self):
+    def test_simple_format_with_device_class(self):
         expected = ["test=0.0Check Extra"]
         simple_formatter = SimpleFormat({"extra_info": True})
         
         _result = Result(command_code=None)
-        _response = Response(data_name="test", data_value="0.0", data_unit="Check", extra_info="Extra")
+        _response = Response(data_name="test", data_value="0.0", data_unit="Check", device_class="Extra")
+        _result.add_responses([_response])
+        
+        formatted_data = simple_formatter.format(_result)
+        
+        self.assertEqual(formatted_data, expected)
+        
+    def test_simple_format_with_icon(self):
+        expected = ["test=0.0Check Extra"]
+        simple_formatter = SimpleFormat({"extra_info": True})
+        
+        _result = Result(command_code=None)
+        _response = Response(data_name="test", data_value="0.0", data_unit="Check", icon="Extra")
+        _result.add_responses([_response])
+        
+        formatted_data = simple_formatter.format(_result)
+        
+        self.assertEqual(formatted_data, expected)
+        
+    def test_simple_format_with_all_extra(self):
+        expected = ["test=0.0Check test-device icon state"]
+        simple_formatter = SimpleFormat({"extra_info": True})
+        
+        _result = Result(command_code=None)
+        _response = Response(data_name="test", data_value="0.0", data_unit="Check", device_class="test-device", icon="icon", state_class="state")
         _result.add_responses([_response])
         
         formatted_data = simple_formatter.format(_result)

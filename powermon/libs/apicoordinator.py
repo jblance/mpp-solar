@@ -23,10 +23,10 @@ class ApiCoordinator:
         log.debug(f"ApiCoordinator config: {config}")
         if not config:
             log.info("No api definition in config")
-            refresh_interval = 60
+            refresh_interval = 300
             enabled = False
         else:
-            refresh_interval = config.get("refresh_interval", 60)
+            refresh_interval = config.get("refresh_interval", 300)
             enabled = config.get("enabled", True)  # default to enabled if not specified
 
         adhoc_topic_format = "powermon/{device_id}/addcommand"

@@ -107,8 +107,8 @@ class UsbPortConfig(BaseModel):
 class TestPortConfig(BaseModel):
     """ model/allowed elements for test port config """
     type: Literal["test"]
-    response_number: None | int
-    protocol: None | str
+    response_number: None | int = Field(default=None)
+    protocol: None | str = Field(default=None)
 
 
 class DeviceConfig(NoExtraBaseModel):
@@ -117,7 +117,7 @@ class DeviceConfig(NoExtraBaseModel):
     id: None | str
     model: None | str
     manufacturer: None | str
-    port: SerialPortConfig | UsbPortConfig | TestPortConfig
+    port: TestPortConfig | SerialPortConfig | UsbPortConfig
 
 
 class BaseConfig(NoExtraBaseModel):

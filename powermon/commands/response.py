@@ -1,18 +1,25 @@
 from powermon.dto.response_dto import ResponseDTO
 
 class Response:
-    def __init__(self, data_name: str, data_value: str, data_unit: str, extra_info: dict = None) -> None:
+    def __init__(self, data_name: str,
+                 data_value: str,
+                 data_unit: str,
+                 device_class: str = None,
+                 state_class: str = None,
+                 icon: str = None) -> None:
         self.data_name = data_name
         self.data_value = data_value
         self.data_unit = data_unit
-        self.extra_info = extra_info
+        self.device_class = device_class
+        self.icon = icon
+        self.state_class = state_class
         self.is_valid = True
         
     def to_DTO(self) -> ResponseDTO:
-        return ResponseDTO(data_name=self.get_data_name(), data_value=self.get_data_value(), data_unit=self.get_data_unit(), extra_info=self.get_extra_info())
+        return ResponseDTO(data_name=self.get_data_name(), data_value=self.get_data_value(), data_unit=self.get_data_unit())
     
     def __str__(self):
-        return f"Response: {self.data_name=}, {self.data_value=}, {self.data_unit=}, {self.extra_info=}"
+        return f"Response: {self.data_name=}, {self.data_value=}, {self.data_unit=}"
         
     def get_data_name(self) -> str:
         return self.data_name.replace(" ", "_").lower()
@@ -25,7 +32,11 @@ class Response:
     def get_data_value(self) -> str:
         return self.data_value
     
-    def get_extra_info(self) -> dict:
-        if self.extra_info is None:
-            return {}
-        return self.extra_info
+    def get_icon(self) -> str | None:
+        return self.icon
+    
+    def get_device_class(self) -> str | None:
+        return self.device_class
+    
+    def get_state_class(self) -> str | None:
+        return self.state_class

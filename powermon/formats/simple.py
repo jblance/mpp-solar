@@ -40,8 +40,16 @@ class SimpleFormat(AbstractFormat):
             value = response.get_data_value()
             unit = response.get_data_unit()
             if self.extra_info:
-                extra = response.extra_info
-                _result.append(f"{name}={value}{unit} {extra}")
+                extra = ""
+                if response.get_device_class() is not None:
+                    extra = " " + response.get_device_class()
+                if response.get_icon() is not None:
+                    extra += " " + response.get_icon()
+                if response.get_state_class() is not None:
+                    extra += " " + response.get_state_class()
+                
+                
+                _result.append(f"{name}={value}{unit}{extra}")
             else:
                 _result.append(f"{name}={value}{unit}")
         return _result

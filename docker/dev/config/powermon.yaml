@@ -17,9 +17,9 @@ commands:
   trigger:
     every: 100  # seconds
   outputs:
-  - type: api_mqtt
+  - type: screen
     format: 
-      type: simple
+      type: hass
 
           
 mqttbroker:

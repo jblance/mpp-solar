@@ -4,7 +4,7 @@ from powermon.formats.table import table
 from powermon.commands.result import Result
 from powermon.commands.response import Response
 
-class test_formats_table(unittest.TestCase):
+class test_format_table(unittest.TestCase):
     def test_format_table_draw_lines_true(self):
         expected = ['╔════════════════════════════════════╗',
                     '║ Command: None - unknown command    ║',

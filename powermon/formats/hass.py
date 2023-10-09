@@ -50,7 +50,9 @@ class hass(AbstractFormat):
             data_name = response.get_data_name()
             value = response.get_data_value()
             unit = response.get_data_unit()
-            extra_info = response.get_extra_info()
+            icon = response.get_icon()
+            device_class = response.get_device_class()
+            state_class = response.get_state_class()
 
             # Set component type
             if unit == "bool" or value == "enabled" or value == "disabled":
@@ -65,21 +67,6 @@ class hass(AbstractFormat):
                 elif value == 1 or value == "1" or value == "enabled":
                     value = "ON"
 
-            #TODO: move all the extra info processing into the response object as methods
-            # Get icon if present
-            icon = None
-            if extra_info and "icon" in extra_info:
-                icon = extra_info["icon"]
-
-            # Get device_class if present
-            device_class = None
-            if extra_info and "device-class" in extra_info:
-                device_class = extra_info["device-class"]
-
-            # Get state_class if present
-            state_class = None
-            if extra_info and "state_class" in extra_info:
-                state_class = extra_info["state_class"]
 
             # Object ID
             object_id = f"{self.entity_id_prefix}_{data_name}".lower()

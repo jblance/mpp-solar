@@ -4,8 +4,8 @@ from powermon.formats.htmltable import htmltable
 from powermon.commands.result import Result
 from powermon.commands.response import Response
 
-class test_formats_htmltable(unittest.TestCase):
-    def test_format_htmltable_draw_lines_true(self):
+class test_format_htmltable(unittest.TestCase):
+    def test_format_htmltable(self):
         expected = ["<table><tr><th>Parameter</th><th>Value</th><th>Unit</th></tr>",
                     "<tr><td>test</td><td>0.0</td><td>Check</td></tr>",
                     "</table>"]

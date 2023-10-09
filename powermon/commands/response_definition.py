@@ -56,6 +56,9 @@ class ResponseDefinition(ABC):
         response_definition_type = response_definition_config[2]
         
         response_definition_extra = None
+        device_class = None
+        state_class = None
+        icon = None
         if len(response_definition_config) > 4:
             response_definition_extra = response_definition_config[4]
         
@@ -72,70 +75,90 @@ class ResponseDefinition(ABC):
                                          success_description=success_description,
                                          fail_code=fail_code,
                                          fail_description=fail_description,
-                                         extra_info=response_definition_extra)
+                                         device_class=device_class,
+                                         state_class=state_class,
+                                         icon=icon)
         
         elif response_definition_type == ResponseType.INT:
             unit = response_definition_config[3]
             return ResponseDefinitionInt(index=response_definition_index,
                                          description=response_definition_description,
                                          unit=unit,
-                                         extra_info=response_definition_extra)
+                                         device_class=device_class,
+                                         state_class=state_class,
+                                         icon=icon)
             
         elif response_definition_type == ResponseType.OPTION:
             options : list[str] = response_definition_config[3]
             return ResponseDefinitionOption(index=response_definition_index,
                                             description=response_definition_description,
                                             options=options,
-                                            extra_info=response_definition_extra)
+                                            device_class=device_class,
+                                            state_class=state_class,
+                                            icon=icon)
         
         elif response_definition_type == ResponseType.BYTES:
             unit = response_definition_config[3]
             return ResponseDefinitionBytes(index=response_definition_index,
                                             description=response_definition_description,
                                             unit=unit,
-                                            extra_info=response_definition_extra)
+                                            device_class=device_class,
+                                            state_class=state_class,
+                                            icon=icon)
         
         elif response_definition_type == ResponseType.FLOAT:
             unit = response_definition_config[3]
             return ResponseDefinitionFloat(index=response_definition_index,
                                             description=response_definition_description,
                                             unit=unit,
-                                            extra_info=response_definition_extra)
+                                            device_class=device_class,
+                                            state_class=state_class,
+                                            icon=icon)
             
         elif response_definition_type == ResponseType.STR_KEYED:
             options : dict[str, str] = response_definition_config[3]
             return ResponseDefinitionStrKeyed(index=response_definition_index,
                                             description=response_definition_description,
                                             options=options,
-                                            extra_info=response_definition_extra)
+                                            device_class=device_class,
+                                            state_class=state_class,
+                                            icon=icon)
             
         elif response_definition_type == ResponseType.ENFLAGS:
             flags : dict[str, dict[str, str]] = response_definition_config[3]
             return ResponseDefinitionENFlags(index=response_definition_index,
                                             description=response_definition_description,
                                             enflags=flags,
-                                            extra_info=response_definition_extra)
+                                            device_class=device_class,
+                                            state_class=state_class,
+                                            icon=icon)
             
         elif response_definition_type == ResponseType.STRING:
             unit = response_definition_config[3]
             return ResponseDefinitionString(index=response_definition_index,
                                             description=response_definition_description,
                                             unit=unit,
-                                            extra_info=response_definition_extra)
+                                            device_class=device_class,
+                                            state_class=state_class,
+                                            icon=icon)
             
         elif response_definition_type == ResponseType.FLAGS:
             flags : list[str] = response_definition_config[3]
             return ResponseDefinitionFlags(index=response_definition_index,
                                             description=response_definition_description,
                                             flags=flags,
-                                            extra_info=response_definition_extra)
+                                            device_class=device_class,
+                                            state_class=state_class,
+                                            icon=icon)
             
         elif ResponseType.INFO in response_definition_type:
             template = response_definition_type.split(":",1)[1]
             return ResponseDefinitionInfo(index=response_definition_index,
                                             description=response_definition_description,
                                             template=template,
-                                            extra_info=response_definition_extra)
+                                            device_class=device_class,
+                                            state_class=state_class,
+                                            icon=icon)
             
             
         else:
@@ -144,14 +167,19 @@ class ResponseDefinition(ABC):
         
     
 class ResponseDefinitionACK(ResponseDefinition):
-    def __init__(self, index: int, description: str, success_code: str, success_description: str, fail_code: str, fail_description: str, extra_info: str):
+    def __init__(self, index: int, description: str, success_code: str, success_description: str, fail_code: str, fail_description: str, 
+                 device_class: str = None,
+                 state_class: str = None,
+                 icon: str = None):
         self.index = index
         self.description = description
         self.success_code = success_code
         self.success_description = success_description
         self.fail_code = fail_code
         self.fail_description = fail_description
-        self.extra_info = extra_info
+        self.device_class = device_class
+        self.state_class = state_class
+        self.icon = icon
     
     def is_valid_response(self, value) -> bool:
         return value == self.success_code or value == self.fail_code
@@ -162,22 +190,31 @@ class ResponseDefinitionACK(ResponseDefinition):
             return [Response(data_name=self.description,
                             data_value=self.success_description,
                             data_unit=None,
-                            extra_info=self.extra_info)]
+                            device_class=self.device_class,
+                            state_class=self.state_class,
+                            icon=self.icon)]
         elif value == self.fail_code:
             return [Response(data_name=self.description,
                             data_value=self.fail_description,
                             data_unit=None,
-                            extra_info=self.extra_info)]
+                            device_class=self.device_class,
+                            state_class=self.state_class,
+                            icon=self.icon)]
         
     def get_description(self) -> str:
         return self.description
     
 class ResponseDefinitionInt(ResponseDefinition):
-    def __init__(self, index: int, description: str, unit : str, extra_info: str):
+    def __init__(self, index: int, description: str, unit : str,
+                 device_class: str = None,
+                 state_class: str = None,
+                 icon: str = None):
         self.index = index
         self.description = description
         self.unit = unit
-        self.extra_info = extra_info
+        self.device_class = device_class
+        self.state_class = state_class
+        self.icon = icon
     
     def is_valid_response(self, value) -> bool:
         #Do we need to check if it's negative? Should we have max and min bounds?
@@ -192,17 +229,24 @@ class ResponseDefinitionInt(ResponseDefinition):
         return [Response(data_name=self.description,
                         data_value=str(value),
                         data_unit=self.unit,
-                        extra_info=self.extra_info)]
+                        device_class=self.device_class,
+                        state_class=self.state_class,
+                        icon=self.icon)]
     
     def get_description(self) -> str:
         return self.description
     
 class ResponseDefinitionOption(ResponseDefinition):
-    def __init__(self, index: int, description: str, options : list[str], extra_info: str):
+    def __init__(self, index: int, description: str, options : list[str],
+                 device_class: str = None,
+                 state_class: str = None,
+                 icon: str = None):
         self.index = index
         self.description = description
         self.options = options
-        self.extra_info = extra_info
+        self.device_class = device_class
+        self.state_class = state_class
+        self.icon = icon
     
     def is_valid_response(self, value) -> bool:
         return value in self.options
@@ -216,18 +260,25 @@ class ResponseDefinitionOption(ResponseDefinition):
         return [Response(data_name=self.description,
                         data_value=value,
                         data_unit="",
-                        extra_info=self.extra_info)]
+                        device_class=self.device_class,
+                        state_class=self.state_class,
+                        icon=self.icon)]
     
     def get_description(self) -> str:
         return self.description
     
 class ResponseDefinitionBytes(ResponseDefinition):
     #Seems to be a catch-all for responses that are not properly implemented
-    def __init__(self, index: int, description: str, unit : str, extra_info: str):
+    def __init__(self, index: int, description: str, unit : str,
+                 device_class: str = None,
+                 state_class: str = None,
+                 icon: str = None):
         self.index = index
         self.description = description
         self.unit = unit
-        self.extra_info = extra_info
+        self.device_class = device_class
+        self.state_class = state_class
+        self.icon = icon
     
     def is_valid_response(self, value) -> bool:
         return True
@@ -240,18 +291,25 @@ class ResponseDefinitionBytes(ResponseDefinition):
         return [Response(data_name=self.description,
                         data_value=value,
                         data_unit="",
-                        extra_info=self.extra_info)]
+                        device_class=self.device_class,
+                        state_class=self.state_class,
+                        icon=self.icon)]
     
     def get_description(self) -> str:
         return self.description
     
 class ResponseDefinitionString(ResponseDefinition):
     #Seems to be a catch-all for responses that are not properly implemented
-    def __init__(self, index: int, description: str, unit : str, extra_info: str):
+    def __init__(self, index: int, description: str, unit : str,
+                 device_class: str = None,
+                 state_class: str = None,
+                 icon: str = None):
         self.index = index
         self.description = description
         self.unit = unit
-        self.extra_info = extra_info
+        self.device_class = device_class
+        self.state_class = state_class
+        self.icon = icon
     
     def is_valid_response(self, value) -> bool:
         return isinstance(value, str)
@@ -265,17 +323,24 @@ class ResponseDefinitionString(ResponseDefinition):
         return [Response(data_name=self.description,
                         data_value=self.translate_raw_response(raw_value),
                         data_unit=self.unit,
-                        extra_info=self.extra_info)]
+                        device_class=self.device_class,
+                        state_class=self.state_class,
+                        icon=self.icon)]
     
     def get_description(self) -> str:
         return self.description
     
 class ResponseDefinitionFloat(ResponseDefinition):
-    def __init__(self, index: int, description: str, unit : str, extra_info: str):
+    def __init__(self, index: int, description: str, unit : str,
+                 device_class: str = None,
+                 state_class: str = None,
+                 icon: str = None):
         self.index = index
         self.description = description
         self.unit = unit
-        self.extra_info = extra_info
+        self.device_class = device_class
+        self.state_class = state_class
+        self.icon = icon
     
     def is_valid_response(self, value) -> bool:
         #Do we need to check if it's negative? Should we have max and min bounds?
@@ -289,17 +354,24 @@ class ResponseDefinitionFloat(ResponseDefinition):
         return [Response(data_name=self.description,
                         data_value=str(value),
                         data_unit=self.unit,
-                        extra_info=self.extra_info)]
+                        device_class=self.device_class,
+                        state_class=self.state_class,
+                        icon=self.icon)]
     
     def get_description(self) -> str:
         return self.description
     
 class ResponseDefinitionStrKeyed(ResponseDefinition):
-    def __init__(self, index: int, description: str, options : dict[str, str], extra_info: str):
+    def __init__(self, index: int, description: str, options : dict[str, str],
+                 device_class: str = None,
+                 state_class: str = None,
+                 icon: str = None):
         self.index = index
         self.description = description
         self.options = options
-        self.extra_info = extra_info
+        self.device_class = device_class
+        self.state_class = state_class
+        self.icon = icon
             
     def is_valid_response(self, value) -> bool:
         return value in self.options
@@ -313,17 +385,24 @@ class ResponseDefinitionStrKeyed(ResponseDefinition):
         return [Response(data_name=self.description,
                         data_value=value,
                         data_unit="",
-                        extra_info=self.extra_info)]
+                        device_class=self.device_class,
+                        state_class=self.state_class,
+                        icon=self.icon)]
     
     def get_description(self) -> str:
         return self.description
     
 class ResponseDefinitionENFlags(ResponseDefinition):
-    def __init__(self, index: int, description: str, enflags : dict[str, dict[str, str]], extra_info: str):
+    def __init__(self, index: int, description: str, enflags : dict[str, dict[str, str]],
+                 device_class: str = None,
+                 state_class: str = None,
+                 icon: str = None):
         self.index = index
         self.description = description
         self.enflags = enflags #what does enflags mean?
-        self.extra_info = extra_info
+        self.device_class = device_class
+        self.state_class = state_class
+        self.icon = icon
             
     def is_valid_response(self, value) -> bool:
         return True
@@ -352,7 +431,9 @@ class ResponseDefinitionENFlags(ResponseDefinition):
             responses.append(Response(data_name=name,
                                       data_value=value,
                                       data_unit="",
-                                      extra_info=self.extra_info))
+                                      device_class=self.device_class,
+                                      state_class=self.state_class,
+                                      icon=self.icon))
         
         return responses
     
@@ -360,11 +441,16 @@ class ResponseDefinitionENFlags(ResponseDefinition):
         return self.description
 
 class ResponseDefinitionFlags(ResponseDefinition):
-    def __init__(self, index: int, description: str, flags : list[str], extra_info: str):
+    def __init__(self, index: int, description: str, flags : list[str],
+                 device_class: str = None,
+                 state_class: str = None,
+                 icon: str = None):
         self.index = index
         self.description = description
         self.flags = flags
-        self.extra_info = extra_info
+        self.device_class = device_class
+        self.state_class = state_class
+        self.icon = icon
         
     def is_valid_response(self, value) -> bool:
         return value in self.flags
@@ -383,18 +469,25 @@ class ResponseDefinitionFlags(ResponseDefinition):
             responses.append(Response(data_name=name,
                                       data_value=value,
                                       data_unit="bool",
-                                      extra_info=self.extra_info))
+                                      device_class=self.device_class,
+                                      state_class=self.state_class,
+                                      icon=self.icon))
         return responses
     
     def get_description(self) -> str:
         return self.description
     
 class ResponseDefinitionInfo(ResponseDefinition):
-    def __init__(self, index: int, description: str, template : str, extra_info: str):
+    def __init__(self, index: int, description: str, template : str,
+                 device_class: str = None,
+                 state_class: str = None,
+                 icon: str = None):
         self.index = index
         self.description = description
         self.template = template
-        self.extra_info = extra_info
+        self.device_class = device_class
+        self.state_class = state_class
+        self.icon = icon
     
     def translate_raw_response(self, cn) -> str:
         return eval(self.template)
@@ -407,7 +500,9 @@ class ResponseDefinitionInfo(ResponseDefinition):
         return [Response(data_name=self.description,
                 data_value=value,
                 data_unit="",
-                extra_info=self.extra_info)]
+                device_class=self.device_class,
+                state_class=self.state_class,
+                icon=self.icon)]
     
     def get_description(self) -> str:
         return self.description
