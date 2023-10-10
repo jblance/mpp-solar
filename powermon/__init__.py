@@ -129,7 +129,8 @@ def main():
     # validate config
     try:
         config_model = ConfigModel(config=config)
-        log.info(config_model)
+        log.debug(config_model)
+        log.info("Config validation successful")
         if args.validate:
             # if --validate option set, only do validation
             print("Config validation successful")
@@ -168,10 +169,9 @@ def main():
     log.info(daemon)
 
     # build api coordinator
-    api_coordinator = ApiCoordinator.from_config(
-        config=config.get("api"),
-        device=device,
-        mqtt_broker=mqtt_broker)
+    api_coordinator = ApiCoordinator.from_config(config=config.get("api"))
+    api_coordinator.set_device(device)
+    api_coordinator.set_mqtt_broker(mqtt_broker)
     log.info(api_coordinator)
 
     # initialize api coordinator

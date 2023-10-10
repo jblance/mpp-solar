@@ -3,7 +3,7 @@ config_model.py - pydantic definitions for the powermon config model
 """
 
 from typing import Literal, List
-from pydantic import BaseModel, Extra, Field  # pylint: disable=E0401
+from pydantic import BaseModel, Extra, Field
 
 
 class NoExtraBaseModel(BaseModel):
