@@ -21,7 +21,7 @@ class test_format_table(unittest.TestCase):
         _result.add_responses([response])
         
         formatted_data = table_formatter.format(_result)
-        print(formatted_data)
+        # print(formatted_data)
         self.assertEqual(formatted_data, expected)
         
     def test_format_table_draw_lines_false(self):
@@ -38,7 +38,7 @@ class test_format_table(unittest.TestCase):
         _result.add_responses([response])
         
         formatted_data = table_formatter.format(_result)
-        print(formatted_data)
+        # print(formatted_data)
         self.assertEqual(formatted_data, expected)
         
     def test_format_table_large_value(self):
@@ -55,7 +55,7 @@ class test_format_table(unittest.TestCase):
         _result.add_responses([response])
         
         formatted_data = table_formatter.format(_result)
-        print(formatted_data)
+        # print(formatted_data)
         self.assertEqual(formatted_data, expected)
         
     def test_format_table_no_responses(self):
@@ -66,5 +66,5 @@ class test_format_table(unittest.TestCase):
         _result = Result(command_code=None)
         
         formatted_data = table_formatter.format(_result)
-        print(formatted_data)
+        # print(formatted_data)
         self.assertEqual(formatted_data, expected)

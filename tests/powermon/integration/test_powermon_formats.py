@@ -118,8 +118,8 @@ Parameter    Value   Unit           \nprotocol_id  PI30                   \n"""
                 capture_output=True,
                 text=True,
             )
-            print("expected:: ", expected)
-            print("result:: ", result.stdout)
+            # print("expected:: ", expected)
+            # print("result:: ", result.stdout)
             #self.assertEqual(result.stdout, expected)
             self.assertEqual(result.returncode, 0)
         except subprocess.CalledProcessError as error:

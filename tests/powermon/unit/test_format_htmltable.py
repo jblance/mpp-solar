@@ -16,6 +16,6 @@ class test_format_htmltable(unittest.TestCase):
         _result.add_responses([response])
         
         formatted_data = table_formatter.format(_result)
-        print(formatted_data)
+        # print(formatted_data)
         self.assertEqual(formatted_data, expected)
         

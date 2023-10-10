@@ -5,10 +5,10 @@ mppsolar-tests:
 	python3 -m unittest discover -s tests/mppsolar -f -v
 	
 powermon-unit-tests: 
-	python3 -m unittest discover -s tests/powermon/unit -v
+	python3 -m unittest discover -s tests/powermon/unit -f -v
 
 powermon-integration-tests: 
-	python3 -m unittest discover -s tests/powermon/integration -v
+	python3 -m unittest discover -s tests/powermon/integration -f -v
 
 tests: powermon-unit-tests powermon-integration-tests mppsolar-tests
 

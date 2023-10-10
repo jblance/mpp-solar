@@ -15,6 +15,6 @@ class test_format_hass(unittest.TestCase):
         _result.add_responses([response])
         
         formatted_data = hass_formatter.format(_result)
-        print(formatted_data)
+        # print(formatted_data)
         self.assertEqual(formatted_data[0]["topic"], "homeassistant/sensor/mpp_test/config") #TODO: add some more asserts. Lots of info in the hass format
         
