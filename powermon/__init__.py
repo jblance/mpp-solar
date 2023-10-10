@@ -4,11 +4,11 @@
 import json
 import logging
 from argparse import ArgumentParser
-from datetime import date, timedelta  # noqa: F401
+from datetime import date, timedelta
 from platform import python_version
 
 import yaml
-from pydantic import ValidationError  # pylint: disable=E0401
+from pydantic import ValidationError
 
 from mppsolar.version import __version__  # noqa: F401
 from powermon.commands.command import Command
@@ -149,7 +149,7 @@ def main():
 
     # build mqtt broker object (optional)
     # QUESTION: should mqtt_broker be part of device...
-    mqtt_broker = MqttBroker.fromConfig(config=config.get("mqttbroker"))
+    mqtt_broker = MqttBroker.from_config(config=config.get("mqttbroker"))
     log.info(mqtt_broker)
 
     # build device object (required)

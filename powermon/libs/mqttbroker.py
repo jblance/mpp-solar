@@ -1,3 +1,4 @@
+"""mqttbroker.py"""
 import logging
 from time import sleep
 
@@ -8,6 +9,9 @@ log = logging.getLogger("mqttbroker")
 
 
 class MqttBroker:
+    """
+    Wrapper for mqtt broker connectivity and message proccessing
+    """
     def __str__(self):
         if self.disabled:
             return "MqttBroker DISABLED"
@@ -15,8 +19,8 @@ class MqttBroker:
             return f"MqttBroker name: {self.name}, port: {self.port}, user: {self.username}"
 
     @classmethod
-    def fromConfig(cls, config={}):
-        log.debug(f"mqttbroker config: {config}")
+    def from_config(cls, config={}):
+        log.debug("mqttbroker config: %s", config)
 
         if config:
             name = config.get("name")

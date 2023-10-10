@@ -1,2 +1,4 @@
 [MASTER]
 extension-pkg-whitelist=pydantic
+ignored-modules=pydantic,paho
+max-line-length=140
