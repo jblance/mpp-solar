@@ -164,7 +164,7 @@ def main():
     log.info(device)
 
     # build the daemon object (optional)
-    daemon = Daemon.fromConfig(config=config.get("daemon"))
+    daemon = Daemon.from_config(config=config.get("daemon"))
     log.info(daemon)
 
     # build api coordinator

@@ -1,3 +1,4 @@
+""" daemon.py """
 import logging
 from enum import Enum, auto
 from time import time
@@ -21,13 +22,15 @@ class DaemonType(LowercaseStrEnum):
 
 
 class Daemon:
+    """ abstraction to support different daemon approaches / solutions """
     def __str__(self):
         if not self.enabled:
             return "Daemon DISABLED"
         return f"Daemon name: {self.type}"
 
     @classmethod
-    def fromConfig(cls, config={}):
+    def from_config(cls, config=None):
+        """ build the object from a config dict """
         log.debug(f"daemon config: {config}")
 
         if config is None:
@@ -52,6 +55,7 @@ class Daemon:
 
         match self.type:
             case DaemonType.SYSTEMD:
+                # TODO: this should probably be separate classes / objects
                 try:
                     from cysystemd import journal
                     from cysystemd.daemon import Notification, notify
@@ -59,9 +63,9 @@ class Daemon:
                     self._notify = notify
                     self._journal = journal.write
                     self._Notification = Notification
-                except ModuleNotFoundError as e:
+                except ModuleNotFoundError as exception:
                     print(
-                        f"error: {e}, try 'pip install cysystemd' (which may need 'apt install build-essential libsystemd-dev'), see https://pypi.org/project/cysystemd/ for further info"
+                        f"error: {exception}, try 'pip install cysystemd' (which may need 'apt install build-essential libsystemd-dev'), see https://pypi.org/project/cysystemd/ for further info"
                     )
                     exit(1)
             case _:
@@ -71,6 +75,7 @@ class Daemon:
         self.notify(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
 
     def initialize(self, *args, **kwargs):
+        """ Daemon initialization activities """
         if self.enabled:
             # Send READY=1
             self._notify(self._Notification.READY)
