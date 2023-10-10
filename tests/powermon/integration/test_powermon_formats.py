@@ -27,7 +27,7 @@ class test_powermon_formats(unittest.TestCase):
         payload0 = '{"name": "mpp protocol_id", "state_topic": "homeassistant/sensor/mpp_protocol_id/state", "unique_id": "mpp_protocol_id", "force_update": "true", "last_reset": "2023-05-30 03:41:31.850677", "device": {"name": "Test_Inverter", "identifiers": [123456789], "model": "8048MAX", "manufacturer": "MPP-Solar"}}'
         topic1 = "homeassistant/sensor/mpp_protocol_id/state"
         payload1 = "PI30"
-        device = Device.fromConfig(config=config.get("device"))
+        device = Device.from_config(config=config.get("device"))
         # print(device)
         hass_formatter = hass({}, device)
         _result = Result(command_code=None)

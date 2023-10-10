@@ -153,7 +153,7 @@ def main():
     log.info(mqtt_broker)
 
     # build device object (required)
-    device = Device.fromConfig(config=config.get("device"))
+    device = Device.from_config(config=config.get("device"))
     log.debug(device)
     # add commands to device command list
     for command_config in config.get("commands"):
@@ -192,8 +192,8 @@ def main():
             # tell the daemon we're still working
             daemon.watchdog()
 
-            # run schedule loop
-            keep_looping = device.runLoop(args.force)
+            # run device loop (ie run any needed commands)
+            keep_looping = device.run(args.force)
 
             # run api coordinator ...
             api_coordinator.run()

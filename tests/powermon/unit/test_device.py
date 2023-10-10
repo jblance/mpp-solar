@@ -34,5 +34,5 @@ class DeviceTest(TestCase):
             )
     
         #Run main device loop. Expecting positive result
-        self.assertTrue(self.device.runLoop())
+        self.assertTrue(self.device.run())
         output.process.assert_called()

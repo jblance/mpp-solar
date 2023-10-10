@@ -27,7 +27,8 @@ class Device:
         return f"Device: {self.name}, {self.device_id=}, {self.model=}, {self.manufacturer=}, port: {self.port}, commands:{self.commands}"
 
     @classmethod
-    def fromConfig(cls, config=None):
+    def from_config(cls, config=None):
+        """ build the object from a config dict """
         if not config:
             log.warning("No device definition in config. Check configFile argument?")
             return cls(name="unnamed")
@@ -66,9 +67,11 @@ class Device:
         log.debug("added command (%s), command list length: %i", command, len(self.commands))
 
     def get_port(self) -> AbstractPort:
+        """ return the port associated with this device """
         return self.port
 
     def toDTO(self) -> DeviceDTO:
+        """ convert the Device to a Data Transfer Object """
         commands = []
         command: Command
         for command in self.commands:
@@ -83,44 +86,40 @@ class Device:
         return dto
 
     def initialize(self):
+        """ Device initialization activities """
         log.info("initializing device")
-        return
 
     def finalize(self):
+        """ Device finalization activities """
         log.info("finalizing device")
-        
         #close connection on port
         self.port.disconnect()
-        return
 
-    def runLoop(self, force=False) -> bool:
-        """
-        the loop that checks for commands to run,
-        runs them
-        """
+    def run(self, force=False) -> bool:
+        """ checks for commands to run and runs them """
         time.sleep(0.1)
         if self.commands is None or len(self.commands) == 0:
             log.info("no commands in queue")
             return False
-        else:
-            for command in self.commands:
-                if force or command.dueToRun():
-                    log.debug(f"Running command: {command.code}")
-                    # run command
-                    result: Result = self.port.run_command(command)
-                    # decode result
-                    try:
-                        self.port.get_protocol().decode(result=result, command=command)
-                    except Exception as e:
-                        log.error(f"Error decoding result: {e}")
-                        result.error = True
-                        result.error_messages.append(f"Error decoding result: {e}")
-                        result.error_messages.append(f"Exception Type: {e.__class__.__name__}")
-                        result.error_messages.append(f"Exception args: {e.args}")
-                    result.set_device_id(self.device_id)
-                    # loop through each output and process result
-                    output: AbstractOutput
-                    for output in command.outputs:
-                        log.debug(f"Using Output: {output}")
-                        output.process(result=result)
-            return True
+
+        for command in self.commands:
+            if force or command.dueToRun():
+                log.debug("Running command: %s", command.code)
+                # run command
+                result: Result = self.port.run_command(command)
+                # decode result
+                try:
+                    self.port.get_protocol().decode(result=result, command=command)
+                except Exception as exception:
+                    log.error("Error decoding result: %s", exception)
+                    result.error = True
+                    result.error_messages.append(f"Error decoding result: {exception}")
+                    result.error_messages.append(f"Exception Type: {exception.__class__.__name__}")
+                    result.error_messages.append(f"Exception args: {exception.args}")
+                result.set_device_id(self.device_id)
+                # loop through each output and process result
+                output: AbstractOutput
+                for output in command.outputs:
+                    log.debug("Using Output: %s", output)
+                    output.process(result=result)
+        return True
