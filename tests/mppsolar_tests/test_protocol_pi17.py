@@ -133,7 +133,7 @@ battery_discharge_to_feed_grid_when_solar_input_loss=disabled\n"""),
 
 def do_test(self, command, expected, respno=0):
     try:
-        print(command, end=" ")
+        # print(command, end=" ")
         result = subprocess.run(
             [
                 "mppsolar",
@@ -156,7 +156,7 @@ def do_test(self, command, expected, respno=0):
         # print(".")
         self.assertEqual(f"CMD: {command}\n{result.stdout}", f"CMD: {command}\n{expected}")
         self.assertEqual(result.returncode, 0)
-        print("OK")
+        # print("OK")
     except subprocess.CalledProcessError as error:
         print(error.stdout)
         print(error.stderr)

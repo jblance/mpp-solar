@@ -17,14 +17,14 @@ FILES = [
 
 def do_test(self, filename):
     try:
-        print(f"testing {filename}", end=' ')
+        # print(f"testing {filename}", end=' ')
         expected = "Config validation successful\n"
         result = subprocess.run(
             ["powermon", "-V", "-C", filename,], check=True, capture_output=True, text=True
         )
         self.assertEqual(result.stdout, expected)
         self.assertEqual(result.returncode, 0)
-        print('OK')
+        # print('OK')
     except subprocess.CalledProcessError as error:
         print(error.stdout)
         print(error.stderr)
