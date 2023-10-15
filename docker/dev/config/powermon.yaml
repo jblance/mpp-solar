@@ -18,10 +18,9 @@ commands:
     every: 100  # seconds
   outputs:
   - type: screen
-    format: 
+    format:
       type: hass
 
-          
 mqttbroker:
   name: localhost
   port: 1883

@@ -8,6 +8,7 @@ import calendar #needed for INFO type evaluating templates
 class ResponseType(LowercaseStrEnum):
     ACK = auto()
     INT = auto()
+    TEN_INT = auto()
     OPTION = auto()
     BYTES = "bytes.decode" #can't use auto() for this value
     FLOAT = auto()
@@ -92,7 +93,16 @@ class ResponseDefinition(ABC):
                                          device_class=device_class,
                                          state_class=state_class,
                                          icon=icon)
-            
+        
+        elif response_definition_type == ResponseType.TEN_INT:
+            unit = response_definition_config[3]
+            return ResponseDefinitionTenInt(index=response_definition_index,
+                                         description=response_definition_description,
+                                         unit=unit,
+                                         device_class=device_class,
+                                         state_class=state_class,
+                                         icon=icon)
+        
         elif response_definition_type == ResponseType.OPTION:
             options : list[str] = response_definition_config[3]
             return ResponseDefinitionOption(index=response_definition_index,
@@ -227,6 +237,39 @@ class ResponseDefinitionInt(ResponseDefinition):
     
     def translate_raw_response(self, raw_value) -> str:
         return int(raw_value.decode())
+    
+    
+    def response_from_raw_values(self, raw_value) -> list[Response]:
+        value = self.translate_raw_response(raw_value)
+        return [Response(data_name=self.description,
+                        data_value=str(value),
+                        data_unit=self.unit,
+                        device_class=self.device_class,
+                        state_class=self.state_class,
+                        icon=self.icon)]
+    
+    def get_description(self) -> str:
+        return self.description
+      
+# Same INT but base 10
+class ResponseDefinitionTenInt(ResponseDefinition):
+    def __init__(self, index: int, description: str, unit : str,
+                 device_class: str = None,
+                 state_class: str = None,
+                 icon: str = None):
+        self.index = index
+        self.description = description
+        self.unit = unit
+        self.device_class = device_class
+        self.state_class = state_class
+        self.icon = icon
+    
+    def is_valid_response(self, value) -> bool:
+        #Do we need to check if it's negative? Should we have max and min bounds?
+        return isinstance(value, int) / 10
+    
+    def translate_raw_response(self, raw_value) -> str:
+        return int(raw_value.decode()) / 10
     
     
     def response_from_raw_values(self, raw_value) -> list[Response]:

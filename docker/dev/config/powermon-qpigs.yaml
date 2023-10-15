@@ -17,7 +17,7 @@ commands:
     # format: raw
     # format: simple
     # format: table
-    format: 
+    format:
       type: htmltable
       #keep_case: True
       #remove_spaces: False

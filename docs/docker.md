@@ -53,3 +53,15 @@ services:
    devices:
      - /dev/ttyUSB0:/dev/ttyUSB0
 ```
+
+Build Dev Container
+change to Git Directory 
+```
+docker build -t YOUR_TAG -f docker/dev/Dockerfile .
+```
+
+Stop mpp-sor container and Run Powermon one time
+```
+docker compose -f /etc/docker/docker-compose.yaml stop; sleep 3; docker run --rm --volume=/etc/mpp-solar:/etc/mpp-solar --device=/dev/hidraw0 pi18_powermon powermon -C /etc/mpp-solar/powermon.conf -1; docker compose -f /etc/docker/docker-compose.yaml start;
+
+```
