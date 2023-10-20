@@ -48,7 +48,7 @@ class json_mqtt(mqtt):
         output = to_json(data, keep_case, excl_filter, filter)
         payload = js.dumps(output)
         msg = {
-            "topic": topic,
+             "topic": f"{tag}/{topic}",
             "payload": payload,
         }
         msgs.append(msg)
