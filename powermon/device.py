@@ -99,7 +99,7 @@ class Device:
             return
 
         for command in self.commands:
-            if force or command.dueToRun():
+            if force or command.is_due():
                 log.debug("Running command: %s", command.code)
                 # run command
                 result: Result = self.port.run_command(command)
