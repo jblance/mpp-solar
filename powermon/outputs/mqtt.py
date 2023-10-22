@@ -20,7 +20,7 @@ class MQTT(AbstractOutput):
         self.results_topic = results_topic
 
     def __str__(self):
-        return "outputs the results to the supplied mqtt broker as per the formatter supplied"
+        return "outputs.MQTT: outputs the results to the supplied mqtt broker as per the formatter supplied"
 
     def set_mqtt_broker(self, mqtt_broker):
         self.mqtt_broker = mqtt_broker

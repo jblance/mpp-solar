@@ -11,6 +11,9 @@ log = logging.getLogger("screen")
 class Screen(AbstractOutput):
     def __init__(self):
         self.name = "Screen"
+
+    def __str__(self):
+        return "outputs.Screen: outputs the results to the screen as per the formatter supplied"
         
 
     def set_formatter(self, formatter: AbstractFormat):
