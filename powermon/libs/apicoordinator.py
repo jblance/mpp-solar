@@ -107,7 +107,7 @@ class ApiCoordinator:
         self.announce(self)
 
     def announce_device(self):
-        device_dto = self.device.toDTO()
+        device_dto = self.device.to_dto()
         if not self.enabled:
             return
         log.debug(f"Announcing device: {device_dto}")
