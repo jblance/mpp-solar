@@ -1,6 +1,5 @@
 """device.py"""
 import logging
-import time
 
 from powermon.dto.deviceDTO import DeviceDTO
 from powermon.ports import getPortFromConfig
@@ -28,34 +27,34 @@ class Device:
 
     @classmethod
     def from_config(cls, config=None):
-        """ build the object from a config dict """
+        """build the object from a config dict"""
         if not config:
             log.warning("No device definition in config. Check configFile argument?")
             return cls(name="unnamed")
         name = config.get("name", "unnamed_device")
-        device_id = config.get("id", "1") # device_id needs to be unique if there are two devices
+        device_id = config.get("id", "1")  # device_id needs to be unique if there are two devices
         model = config.get("model")
         manufacturer = config.get("manufacturer")
 
         port = getPortFromConfig(config.get("port"))
-        # error out if unable to configure port
+
+        # raise error if unable to configure port
         if not port:
             log.error("Invalid port config '%s' found", config)
             raise ConfigError(f"Invalid port config '{config}' found")
 
         return cls(name=name, device_id=device_id, model=model, manufacturer=manufacturer, port=port)
 
-    def __init__(self, name : str, device_id : str = "", model : str = "", manufacturer : str = "", port : AbstractPort = None):
-
+    def __init__(self, name: str, device_id: str = "", model: str = "", manufacturer: str = "", port: AbstractPort = None):
         self.name = name
         self.device_id = device_id
         self.model = model
         self.manufacturer = manufacturer
-        self.port : AbstractPort = port
-        self.commands : list[Command] = []
+        self.port: AbstractPort = port
+        self.commands: list[Command] = []
 
     def add_command(self, command: Command) -> None:
-        """ add a command to the devices' list of commands """
+        """add a command to the devices' list of commands"""
         if command is None:
             return
         # get command definition from protocol
@@ -67,40 +66,37 @@ class Device:
         log.debug("added command (%s), command list length: %i", command, len(self.commands))
 
     def get_port(self) -> AbstractPort:
-        """ return the port associated with this device """
+        """return the port associated with this device"""
         return self.port
 
-    def toDTO(self) -> DeviceDTO:
-        """ convert the Device to a Data Transfer Object """
+    def to_dto(self) -> DeviceDTO:
+        """convert the Device to a Data Transfer Object"""
         commands = []
         command: Command
         for command in self.commands:
             commands.append(command.to_dto())
-        dto = DeviceDTO(
-            device_id=self.device_id,
-            model=self.model,
-            manufacturer=self.manufacturer,
-            port=self.port.toDTO(),
-            commands=commands
-        )
+        dto = DeviceDTO(device_id=self.device_id,
+                        model=self.model,
+                        manufacturer=self.manufacturer,
+                        port=self.port.toDTO(),
+                        commands=commands)
         return dto
 
     def initialize(self):
-        """ Device initialization activities """
+        """Device initialization activities"""
         log.info("initializing device")
 
     def finalize(self):
-        """ Device finalization activities """
+        """Device finalization activities"""
         log.info("finalizing device")
-        #close connection on port
+        # close connection on port
         self.port.disconnect()
 
-    def run(self, force=False) -> bool:
-        """ checks for commands to run and runs them """
-        time.sleep(0.1)
+    def run(self, force=False):
+        """checks for commands to run and runs them"""
         if self.commands is None or len(self.commands) == 0:
             log.info("no commands in queue")
-            return False
+            return
 
         for command in self.commands:
             if force or command.dueToRun():
@@ -122,4 +118,3 @@ class Device:
                 for output in command.outputs:
                     log.debug("Using Output: %s", output)
                     output.process(result=result)
-        return True

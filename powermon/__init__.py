@@ -3,6 +3,7 @@
 
 import json
 import logging
+import time
 from argparse import ArgumentParser
 from datetime import date, timedelta
 from platform import python_version
@@ -186,21 +187,23 @@ def main():
     api_coordinator.announce(device)
 
     # Main working loop
-    keep_looping = True
     try:
-        while keep_looping:
+        while True:
             # tell the daemon we're still working
             daemon.watchdog()
 
             # run device loop (ie run any needed commands)
-            keep_looping = device.run(args.force)
+            device.run(args.force)
 
             # run api coordinator ...
             api_coordinator.run()
 
             # only run loop once if required
             if args.once:
-                keep_looping = False
+                break
+
+            # add small delay in loop
+            time.sleep(0.1)
 
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
