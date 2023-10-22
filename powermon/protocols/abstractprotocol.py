@@ -2,6 +2,7 @@ import abc
 import calendar  # noqa: F401
 import logging
 import re
+
 # from typing import Tuple
 
 # from mppsolar.protocols.protocol_helpers import uptime  # noqa: F401
@@ -32,7 +33,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
     def __init__(self, *args, **kwargs) -> None:
         self._command = None
         self._command_dict = None
-        self.command_definitions : dict[str, CommandDefinition] = {}
+        self.command_definitions: dict[str, CommandDefinition] = {}
         self.STATUS_COMMANDS = None
         self.SETTINGS_COMMANDS = None
         self.DEFAULT_COMMAND = None
@@ -42,7 +43,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
     def toDTO(self) -> ProtocolDTO:
         dto = ProtocolDTO(protocol_id=self._protocol_id, commands=self.get_command_definition_dtos())
         return dto
-    
+
     def add_command_definitions(self, command_definitions_config: dict, command_definition_type):
         """Add command definitions from the configuration"""
         for course_definition_key in command_definitions_config.keys():
@@ -54,17 +55,17 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         if self._protocol_id is None:
             log.error("Attempted to list commands with no protocol defined")
             return {"ERROR": ["Attempted to list commands with no protocol defined", ""]}
-        #result = {}
-        #result["_command"] = "command help"
-        #result["_command_description"] = f"List available commands for protocol {str(self._protocol_id, 'utf-8')}"
-        #for command in sorted(self.COMMANDS):
+        # result = {}
+        # result["_command"] = "command help"
+        # result["_command_description"] = f"List available commands for protocol {str(self._protocol_id, 'utf-8')}"
+        # for command in sorted(self.COMMANDS):
         #    if "help" in self.COMMANDS[command]:
         #        info = self.COMMANDS[command]["description"] + self.COMMANDS[command]["help"]
         #    else:
         #        info = self.COMMANDS[command]["description"]
         #    result[command] = [info, ""]
         return self.command_definitions
-    
+
     def get_command_definition_dtos(self) -> dict[str, CommandDefinitionDTO]:
         command_dtos: dict[str, CommandDefinitionDTO] = {}
         for command_tuple in self.command_definitions.items():
@@ -90,7 +91,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             if index < definitions_count:
                 return command_definition.response_definitions[index]
             else:
-                #return [index, f"Unknown value in response {index}", "bytes.decode", ""]
+                # return [index, f"Unknown value in response {index}", "bytes.decode", ""]
                 raise IndexError(f"Index {index} out of range for command {command_definition.code}")
         elif key is not None:
             log.error("key todo abprotocol line 80")  # TODO: add key type get response defn
@@ -134,10 +135,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             result.is_valid = True
         return result
 
-
     def decode(self, result: Result, command: Command):
-        #TODO: this should return something instead of modifying result, then it's easy to test
-        #TODO: should be moved into a Result class
+        # TODO: this should return something instead of modifying result, then it's easy to test
+        # TODO: should be moved into a Result class
         """
         Take the a result object and decode the raw response
         into a ??? dict of name: value, unit entries
@@ -149,16 +149,16 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         self.check_response_valid(result)
         if result.error:
             return
-        
+
         # Cant decode without a definition of the command
         if command.command_definition is None:
             log.debug(f"No definition for command {command.code}")
             result.error = True
             result.error_messages.append(f"failed to decode responses: no definition for {command.code}")
             return
-        
+
         if command.command_definition.response_type is ResultType.MULTIVALUED:
-            response = result.raw_response[1:-3] #this should be moved to the protocol, it should check the CRC then strip them
+            response = result.raw_response[1:-3]  # TODO: this should be moved to the protocol, it should check the CRC then strip them
             responses = command.validate_and_translate_raw_value(response, index=0)
             result.add_responses(responses)
         else:
@@ -167,9 +167,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 responses = command.validate_and_translate_raw_value(raw_response, index=i)
                 result.add_responses(responses)
         log.debug(f"trimmed and split responses: {result.get_responses()}")
-        
-        #TODO: this is ugly, info types need to be reworked to not have code in the protocol definition
-        #IF there are more response definitions than responses, check if they are INFO and fill them in
+
+        # TODO: this is ugly, info types need to be reworked to not have code in the protocol definition
+        # IF there are more response definitions than responses, check if they are INFO and fill them in
         number_of_responses = len(result.get_responses())
         if len(command.get_response_definitions()) > number_of_responses:
             for index in range(number_of_responses, len(command.get_response_definitions())):
@@ -178,4 +178,3 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     result.add_responses(response_definition.response_from_raw_values(command.code))
                 index += 1
         return
-
