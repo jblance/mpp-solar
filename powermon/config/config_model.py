@@ -77,14 +77,14 @@ class EveryTriggerConfig(NoExtraBaseModel):
 
 class OutputConfig(NoExtraBaseModel):
     """ model/allowed elements for output config """
-    type: Literal['screen'] | Literal['mqtt'] | Literal['api_mqtt']
-    format: None | str | BaseFormatConfig | HassFormatConfig | MqttFormatConfig
+    type: Literal['screen'] | Literal['mqtt'] | Literal['api_mqtt'] | Literal['table']
+    format: None | str | BaseFormatConfig | HassFormatConfig | MqttFormatConfig = Field(default=None)
 
 
 class CommandConfig(NoExtraBaseModel):
     """ model/allowed elements for command section of config """
     command: str
-    type: None | Literal["basic"] | Literal["poll"]
+    type: None | Literal["basic"] | Literal["poll"] = Field(default="basic")
     trigger: None | LoopsTriggerConfig | AtTriggerConfig | EveryTriggerConfig
     outputs: None | List[OutputConfig] | str
 
@@ -114,7 +114,7 @@ class TestPortConfig(BaseModel):
 class DeviceConfig(NoExtraBaseModel):
     """ model/allowed elements for device section of config """
     name: None | str
-    id: None | str
+    id: None | str | int
     model: None | str
     manufacturer: None | str
     port: TestPortConfig | SerialPortConfig | UsbPortConfig
@@ -124,11 +124,11 @@ class BaseConfig(NoExtraBaseModel):
     """ model/allowed elements for first level of config """
     device: DeviceConfig
     commands: List[CommandConfig]
-    mqttbroker: None | MQTTConfig
-    api: None | APIConfig
-    daemon: None | DaemonConfig
-    debuglevel: None | int | str #If you put "debug" it translates to 10 then fails to load the config
-    loop: None | int | Literal["once"]
+    mqttbroker: None | MQTTConfig = Field(default=None)
+    api: None | APIConfig = Field(default=None)
+    daemon: None | DaemonConfig = Field(default=None)
+    debuglevel: None | int | str = Field(default=None) #If you put "debug" it translates to 10 then fails to load the config
+    loop: None | int | Literal["once"] = Field(default=None)
 
 
 class ConfigModel(NoExtraBaseModel):
