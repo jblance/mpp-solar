@@ -118,12 +118,11 @@ def main():
         return None
 
     # Do enquiry commands
-    # List Protocols
+    # - List Protocols
     if args.listProtocols:
         from powermon.protocols import list_protocols
         list_protocols()
         return None
-
 
     # Build configuration from config file and command line overrides
     log.info("Using config file: %s", args.configFile)

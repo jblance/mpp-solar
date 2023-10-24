@@ -1,3 +1,4 @@
+""" apicoordinator.py """
 import logging
 from time import time
 
@@ -12,6 +13,7 @@ log = logging.getLogger("APICoordinator")
 
 
 class ApiCoordinator:
+    """ apicoordinator coordinates the api / mqtt interface """
     def __str__(self):
         if not self.enabled:
             return "ApiCoordinator DISABLED"
