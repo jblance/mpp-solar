@@ -1,8 +1,17 @@
+""" protocol __init__.py """
 import importlib
 import logging
-import pkgutil
+from enum import auto
+
+from strenum import LowercaseStrEnum
 
 log = logging.getLogger("protocols")
+
+
+class Protocol(LowercaseStrEnum):
+    """ enumerate available protocols """
+    PI30 = auto()
+    PI30MAX = auto()
 
 
 def get_protocol_definition(protocol):
@@ -10,49 +19,31 @@ def get_protocol_definition(protocol):
     Get the protocol based on the protocol name
     """
 
-    log.debug(f"Protocol {protocol}")
-    if protocol is None:
-        return None
+    log.debug("Protocol: %s", protocol)
+
     protocol_id = protocol.lower()
-    # Try to import the protocol module with the supplied name (may not exist)
-    try:
-        proto_module = importlib.import_module("powermon.protocols." + protocol_id, ".")
-    except ModuleNotFoundError:
-        log.error(f"No module found for protocol {protocol_id}")
-        return None
-    # Find the protocol class - classname must be the same as the protocol_id
-    try:
-        protocol_class = getattr(proto_module, protocol_id)
-    except AttributeError:
-        log.error(f"Module {proto_module} has no attribute {protocol_id}")
-        return None
-    # Return the instantiated class
-    return protocol_class()
+
+    match protocol_id:
+        case Protocol.PI30:
+            from powermon.protocols.pi30 import pi30
+            return pi30()
+        case Protocol.PI30MAX:
+            from powermon.protocols.pi30max import pi30max
+            return pi30max()
+    return None
 
 
 def list_protocols():
-    # print("outputs list protocols")
-    pkgpath = __file__
-    pkgpath = pkgpath[: pkgpath.rfind("/")]
-    pkgpath += "/../protocols"
-    # print(pkgpath)
-    result = {}
-    result["_command"] = "protocols help"
-    result["_command_description"] = "List available protocol modules"
-    for _, name, _ in pkgutil.iter_modules([pkgpath]):
-        # print(name)
+    """ helper function to display a list of supported protocols """
+    print("Supported protocols")
+    for name in Protocol:
         try:
             _module_class = importlib.import_module("powermon.protocols." + name, ".")
             _module = getattr(_module_class, name)
-        except ModuleNotFoundError as e:
-            log.info(f"Error in module {name}: {e}")
-            # result[name] = (str(_module()), "ERROR", "")
+        except ModuleNotFoundError as exc:
+            log.info("Error in module %s: %s", name, exc)
             continue
-        except AttributeError as e:
-            log.info(f"Error in module {name}: {e}")
-            # result[name] = (name, "ERROR", "")
+        except AttributeError as exc:
+            log.info("Error in module %s: %s", name, exc)
             continue
-        # print(_module())
-        result[name] = (str(_module()), "", "")
-    # print(result)
-    return result
+        print(f"{name}: {_module()}")
