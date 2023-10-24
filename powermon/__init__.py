@@ -75,6 +75,7 @@ def main():
     )
     parser.add_argument("-V", "--validate", action="store_true", help="Validate the configuration")
     parser.add_argument("-v", "--version", action="store_true", help="Display the version")
+    parser.add_argument("--listProtocols", action="store_true", help="Display the currently supported protocols")
     parser.add_argument(
         "-1",
         "--once",
@@ -115,6 +116,14 @@ def main():
     if args.version:
         print(description)
         return None
+
+    # Do enquiry commands
+    # List Protocols
+    if args.listProtocols:
+        from powermon.protocols import list_protocols
+        list_protocols()
+        return None
+
 
     # Build configuration from config file and command line overrides
     log.info("Using config file: %s", args.configFile)
@@ -204,7 +213,7 @@ def main():
 
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
-    except Exception as general_exception:  #pylint: disable=W0718
+    except Exception as general_exception:  # pylint: disable=W0718
         # TODO: this is just temporary to catch the various exceptions and add specific exception handling
         print(general_exception)
     finally:
