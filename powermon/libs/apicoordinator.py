@@ -11,7 +11,6 @@ from powermon.outputs.api_mqtt import API_MQTT
 log = logging.getLogger("APICoordinator")
 
 
-
 class ApiCoordinator:
     def __str__(self):
         if not self.enabled:
@@ -33,10 +32,9 @@ class ApiCoordinator:
             announce_topic = config.get("announce_topic", "powermon/announce")
             adhoc_topic_format = config.get("adhoc_topic_format", "powermon/{device_id}/addcommand")
 
-
         return cls(adhoc_topic_format=adhoc_topic_format, announce_topic=announce_topic, enabled=enabled, refresh_interval=refresh_interval)
 
-    def __init__(self, adhoc_topic_format : str, announce_topic: str, enabled: bool, refresh_interval: int):
+    def __init__(self, adhoc_topic_format: str, announce_topic: str, enabled: bool, refresh_interval: int):
         self.device = None
         self.mqtt_broker = None
         self.last_run = None
@@ -47,6 +45,7 @@ class ApiCoordinator:
 
     def set_device(self, device: Device):
         self.device = device
+        self.announce(self.device)
 
     def set_mqtt_broker(self, mqtt_broker):
         self.mqtt_broker = mqtt_broker
@@ -58,9 +57,7 @@ class ApiCoordinator:
             self.enabled = False
             return
 
-        self.announce_device()
-        mqtt_broker.subscribe(self.get_addcommand_topic(), self.addcommand_callback)  # QUESTION: why subscribe here?
-
+        mqtt_broker.subscribe(self.get_addcommand_topic(), self.addcommand_callback)
         # mqtt_broker.publish(self.announceTopic, self.schedule.getScheduleConfigAsJSON())
 
     def get_addcommand_topic(self):
@@ -73,11 +70,10 @@ class ApiCoordinator:
 
         dto = CommandDTO.parse_raw(jsonString)
 
-        trigger = Trigger.from_DTO(dto.trigger)    
+        trigger = Trigger.from_DTO(dto.trigger)
         command = Command.from_DTO(dto)
         Command(code=dto.command_code, commandtype="basic", outputs=[], trigger=trigger)
         outputs = []
-
 
         output = API_MQTT(formatter=SimpleFormat({}))
         outputs.append(output)
@@ -87,33 +83,28 @@ class ApiCoordinator:
 
         self.device.add_command(command)
 
-        #self.announce_device()
-
         return command
 
-
     def run(self):
-        # QUESTION: do we need a run?
+        """ regular processing function, ensures that the announce isnt too frequent """
         if not self.enabled:
             return
         if not self.last_run or time() - self.last_run > self.refresh_interval:
             log.info("APICoordinator running")
-            self.announce_device()  # QUESTION: what are we announcing here?
+            self.announce(self.device)
             self.last_run = time()
 
     def initialize(self):
+        """ initialize the apicoordinator """
         if not self.enabled:
             return
         self.announce(self)
 
-    def announce_device(self):
-        device_dto = self.device.to_dto()
-        if not self.enabled:
-            return
-        log.debug(f"Announcing device: {device_dto}")
-        self.mqtt_broker.publish(self.announce_topic, device_dto.json())
-
     def announce(self, obj):
+        """ Announce jsonised obj dto to api """
+        obj_dto = obj.to_dto()
         if not self.enabled:
+            log.debug("Not announcing obj: %s as api DISABLED", obj_dto)
             return
-        self.mqtt_broker.publish(self.announce_topic, obj)  # QUESTION: obj or obj.toDTO or obj.????
+        log.debug("Announcing obj: %s to api", obj_dto)
+        self.mqtt_broker.publish(self.announce_topic, obj_dto.json())
