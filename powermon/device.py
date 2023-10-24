@@ -103,16 +103,18 @@ class Device:
                 log.debug("Running command: %s", command.code)
                 # run command
                 result: Result = self.port.run_command(command)
+
                 # decode result
                 try:
                     self.port.get_protocol().decode(result=result, command=command)
-                except Exception as exception:
+                except Exception as exception:  # pylint: disable=W0718
                     log.error("Error decoding result: %s", exception)
                     result.error = True
                     result.error_messages.append(f"Error decoding result: {exception}")
                     result.error_messages.append(f"Exception Type: {exception.__class__.__name__}")
                     result.error_messages.append(f"Exception args: {exception.args}")
                 result.set_device_id(self.device_id)
+
                 # loop through each output and process result
                 output: AbstractOutput
                 for output in command.outputs:

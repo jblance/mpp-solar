@@ -211,10 +211,7 @@ def main():
             time.sleep(0.1)
 
     except KeyboardInterrupt:
-        print("KeyboardInterrupt")
-    except Exception as general_exception:  # pylint: disable=W0718
-        # TODO: this is just temporary to catch the various exceptions and add specific exception handling
-        print(general_exception)
+        print("KeyboardInterrupt - stopping")
     finally:
         # disconnect device
         device.finalize()

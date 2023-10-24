@@ -1,11 +1,10 @@
 """ pi30.py """
 import logging
 
-from powermon.commands.result import ResultType
-from powermon.protocols.abstractprotocol import AbstractProtocol
 from mppsolar.protocols.protocol_helpers import crcPI as crc
-from powermon.commands.result import Result
 from powermon.commands.response_definition import ResponseType
+from powermon.commands.result import Result, ResultType
+from powermon.protocols.abstractprotocol import AbstractProtocol
 
 log = logging.getLogger("pi30")
 
