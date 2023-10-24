@@ -31,8 +31,8 @@ class MQTT(AbstractOutput):
     def get_topic(self) -> str:
         return self.results_topic
 
-    def to_DTO(self) -> OutputDTO:
-        return OutputDTO(type="mqtt", format=self.formatter.to_DTO())
+    def to_dto(self) -> OutputDTO:
+        return OutputDTO(type="mqtt", format=self.formatter.to_dto())
 
     def process(self, result: Result):
         """ required function for any output class """

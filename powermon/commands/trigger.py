@@ -18,16 +18,16 @@ class TriggerType(LowercaseStrEnum):
 
 
 class Trigger:
-    
+
     DATE_FORMAT = "%d %b %Y %H:%M:%S"
-    
+
     def __init__(self, trigger_type, value=None):
         self.trigger_type = trigger_type
         self.value = value
         self.togo = 0
         self.last_run : float | None = None
         self.next_run : float = self.determine_next_run()
-    
+
     def __str__(self):
         return f"trigger: {self.trigger_type} {self.value} loops togo: {self.togo}"
 
@@ -53,23 +53,23 @@ class Trigger:
             trigger_type = TriggerType.DISABLED
             value = None
         return cls(trigger_type=trigger_type, value=value)
-    
+
     @classmethod
     def from_DTO(cls, dto: TriggerDTO) -> "Trigger":
         return cls(trigger_type=dto.trigger_type, value=dto.value)    
-    
+
     def touch(self):
         # store run time (as secs since epoch)
         self.last_run = time.time()
         # update next run time
         self.next_run = self.determine_next_run()
-        
+
     def get_last_run(self) -> str:
         last_run_str = "Not yet run"
         if self.last_run is not None:
             last_run_str = time.strftime(Trigger.DATE_FORMAT, time.localtime(self.last_run))
         return last_run_str
-    
+
     def get_next_run(self) -> str:
         next_run_str = "unknown"
         if self.next_run is not None:
@@ -134,8 +134,8 @@ class Trigger:
             self.next_run = None
         return self.next_run
 
-    def to_DTO(self):
+    def to_dto(self):
         return TriggerDTO(
-            trigger_type = self.trigger_type,
-            value = self.value
+            trigger_type=self.trigger_type,
+            value=self.value
         )

@@ -149,6 +149,6 @@ class Command:
             command_code=self.code,
             device_id=self.device_id,
             result_topic=self.outputs[0].get_topic(),
-            trigger=self.trigger.to_DTO(),
-            outputs=[output.to_DTO() for output in self.outputs],
+            trigger=self.trigger.to_dto(),
+            outputs=[output.to_dto() for output in self.outputs],
         )

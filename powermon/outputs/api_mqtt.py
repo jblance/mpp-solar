@@ -40,8 +40,8 @@ class API_MQTT(AbstractOutput):
     def get_topic(self) -> str:
         return  CommandDTO.get_command_result_topic().format(device_id=self.device_id, command_name=self.command_code)
 
-    def to_DTO(self) -> OutputDTO:
-        return OutputDTO(type="api_mqtt", format=self.formatter.to_DTO())
+    def to_dto(self) -> OutputDTO:
+        return OutputDTO(type="api_mqtt", format=self.formatter.to_dto())
 
 
     def process(self, result: Result):

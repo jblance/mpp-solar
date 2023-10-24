@@ -27,35 +27,30 @@ class Result:
         self.is_valid = False
         self.error = False
         self.error_messages = []
-        log.debug("Result: %s" % (self))
+        log.debug("Result: %s", self)
 
-    def to_DTO(self) -> ResultDTO:
+    def to_dto(self) -> ResultDTO:
         response_dtos = []
         for response in self.responses:
-            response_dtos.append(response.to_DTO())
+            response_dtos.append(response.to_dto())
         return ResultDTO(device_identifier=self.get_device_id(), command_code=self.command_code, data=response_dtos)
-    
+
     def get_command_code(self) -> str:
         return self.command_code
-    
+
     def set_device_id(self, device_id):
         self.device_id = device_id
 
     def get_device_id(self) -> str:
         return self.device_id
-    
+
     def get_responses(self) -> list[Response]:
         return self.responses
-    
+
     def add_responses(self, responses: list[Response]) -> bool:
         self.responses.extend(responses)
         return True
-    
+
     def process_raw_response(self, raw_response):
         self.raw_response = raw_response
         return
-
-
-
-        
-        
