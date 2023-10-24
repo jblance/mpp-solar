@@ -31,20 +31,31 @@ class Command:
 
         self.full_command = None
         self.command_definition: CommandDefinition = None
-        self.device_id = None
+        self.device_id = None  # TODO: shouldnt need this
         log.debug(self)
+
+    def set_full_command(self, full_command):
+        """store the full command"""
+        self.full_command = full_command
 
     def get_full_command(self) -> str | None:
         """return the full command, including CRC and/or headers"""
         return self.full_command
 
     def set_command_definition(self, command_definition: CommandDefinition):
+        """store the definition of the command"""
+        # QUESTION: is this true, why cant we store a None definition?
         if command_definition is None:
             raise ValueError("CommandDefinition cannot be None")
-        if command_definition.is_command_code_valid(self.code) == False:
+
+        # Check if the definition is valid for the command
+        if command_definition.is_command_code_valid(self.code) is False:
             raise ValueError(f"Command code {self.code} is not valid for command definition regex {command_definition.regex}")
         self.command_definition = command_definition
         self.command_description = command_definition.description
+
+        # set command description in each of the outputs
+        # QUESTION: why, cant we just pass the command object?
         for output in self.outputs:
             output.formatter.set_command_description(self.command_description)
 
@@ -54,15 +65,12 @@ class Command:
     def set_outputs(self, outputs: list[AbstractOutput]):
         self.outputs = outputs
         for output in self.outputs:
-            output.set_command(self.code)
+            output.set_command(self.code)  # TODO: shouldnt need this
 
-    def set_device_id(self, device_id):
+    def set_device_id(self, device_id):  # TODO: shouldnt need this
         self.device_id = device_id
         for output in self.outputs:
             output.set_device_id(device_id)
-
-    def set_full_command(self, full_command):
-        self.full_command = full_command
 
     def validate_and_translate_raw_value(self, raw_value: str, index: int) -> list[Response]:
         if len(self.command_definition.response_definitions) <= index:
@@ -96,6 +104,7 @@ class Command:
 
     @classmethod
     def from_config(cls, config=None) -> "Command":
+        """build object from config dict"""
         # need to have a config defined
         # minimum is
         # - command: QPI
@@ -129,6 +138,7 @@ class Command:
             output.set_mqtt_broker(mqtt_broker)
 
     def is_due(self):
+        """is this command due to run?"""
         return self.trigger.is_due()
 
     def touch(self):

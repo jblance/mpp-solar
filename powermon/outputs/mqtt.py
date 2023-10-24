@@ -68,5 +68,6 @@ class MQTT(AbstractOutput):
 
     @classmethod
     def from_config(cls, output_config) -> "MQTT":
+        """build object from config dict"""
         results_topic = output_config.get("topic_override", None)
         return cls(results_topic=results_topic)
