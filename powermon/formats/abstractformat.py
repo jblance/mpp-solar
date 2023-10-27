@@ -4,7 +4,7 @@ import re
 
 from powermon.dto.formatDTO import FormatDTO
 from powermon.commands.result import Result
-from powermon.commands.response import Response
+from powermon.commands.reading import Reading
 
 
 # from time import sleep
@@ -45,7 +45,7 @@ class AbstractFormat(ABC):
     def sendsMultipleMessages(self) -> bool:
         return False
 
-    def format_and_filter_data(self, result: Result) -> list[Response]:
+    def format_and_filter_data(self, result: Result) -> list[Reading]:
 
         display_data = []
         for response in result.get_responses():

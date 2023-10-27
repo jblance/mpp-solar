@@ -2,7 +2,7 @@ import unittest
 
 from powermon.formats.table import table
 from powermon.commands.result import Result
-from powermon.commands.response import Response
+from powermon.commands.reading import Reading
 
 class test_format_table(unittest.TestCase):
     def test_format_table_draw_lines_true(self):
@@ -17,7 +17,7 @@ class test_format_table(unittest.TestCase):
         table_formatter.draw_lines = True
         
         _result = Result(command_code=None)
-        response = Response(data_name="Test", data_value="0.0", data_unit="Check")
+        response = Reading(data_name="Test", data_value="0.0", data_unit="Check")
         _result.add_responses([response])
         
         formatted_data = table_formatter.format(_result)
@@ -34,7 +34,7 @@ class test_format_table(unittest.TestCase):
         table_formatter.draw_lines = False
         
         _result = Result(command_code=None)
-        response = Response(data_name="Test", data_value="0.0", data_unit="Check")
+        response = Reading(data_name="Test", data_value="0.0", data_unit="Check")
         _result.add_responses([response])
         
         formatted_data = table_formatter.format(_result)
@@ -51,7 +51,7 @@ class test_format_table(unittest.TestCase):
         table_formatter.draw_lines = False
         
         _result = Result(command_code=None)
-        response = Response(data_name="Test", data_value="123456789012345678901234567890", data_unit="Check")
+        response = Reading(data_name="Test", data_value="123456789012345678901234567890", data_unit="Check")
         _result.add_responses([response])
         
         formatted_data = table_formatter.format(_result)

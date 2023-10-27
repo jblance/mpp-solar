@@ -1,7 +1,7 @@
 from strenum import LowercaseStrEnum
 from enum import auto
 from abc import ABC, abstractmethod
-from powermon.commands.response import Response
+from powermon.commands.reading import Reading
 import calendar  # needed for INFO type evaluating templates
 
 
@@ -16,23 +16,36 @@ class ResponseType(LowercaseStrEnum):
     STRING = auto()
     FLAGS = auto()
     INFO = auto()
+    
+class ReadingType(LowercaseStrEnum):
+    ACK = auto()
+    WATT_HOURS = auto()
 
 
-class ResponseDefinition(ABC):
+class ReadingDefinition(ABC):
     """
     Create a flat representation to check if a response is valid for the command.
     It doesn't contain the response value, just the definition of what is valid.
     """
+    def __init__(self, index, name, response_type, unit, description, device_class, state_class, icon):
+        self.index = index
+        self.name = name
+        self.response_type = response_type
+        self.unit = unit
+        self.description = description
+        self.device_class = device_class
+        self.state_class = state_class
+        self.icon = icon
 
     def is_valid_response(self, value) -> bool:
         raise NotImplementedError
 
-    @abstractmethod
+
     def get_description(self) -> str:
-        raise NotImplementedError
+        return self.description
 
     @abstractmethod
-    def response_from_raw_values(self, raw_value) -> list[Response]:
+    def reading_from_raw_response(self, raw_value) -> list[Reading]:
         raise NotImplementedError
 
     def get_invalid_message(self, raw_value) -> str:
@@ -42,146 +55,134 @@ class ResponseDefinition(ABC):
         return False
 
     @classmethod
-    def multiple_from_config(cls, response_definitions_config: list[list]) -> dict[int, "ResponseDefinition"]:
-        if response_definitions_config is None:
+    def multiple_from_config(cls, reading_definitions_config: list[dict]) -> dict[int, "ReadingDefinition"]:
+        if reading_definitions_config is None:
             return {}
         else:
-            response_definitions: dict[int, "ResponseDefinition"] = {}
-            for response_definition_config in response_definitions_config:
-                response_definition = cls.from_config(response_definition_config)
-                response_definitions[response_definition.index] = response_definition
-            return response_definitions
+            reading_definitions: dict[int, "ReadingDefinition"] = {}
+            for reading_definition_config in reading_definitions_config:
+                reading_definition = cls.from_config(reading_definition_config)
+                print(reading_definition)
+                reading_definitions[reading_definition.index] = reading_definition
+            return reading_definitions
 
     @classmethod
-    def from_config(cls, response_definition_config: list) -> "ResponseDefinition":
-        response_definition_index = response_definition_config[0]
-        response_definition_description = response_definition_config[1]
-        response_definition_type = response_definition_config[2]
+    def from_config(cls, reading_definition_config: dict) -> "ReadingDefinition":
+        index = reading_definition_config.get("index")
+        name = reading_definition_config.get("name")
+        description = reading_definition_config.get("description")
+        response_type = reading_definition_config.get("response_type")
+        reading_type = reading_definition_config.get("reading_type")
+        device_class = reading_definition_config.get("device-class", None)
+        state_class = reading_definition_config.get("state-class", None)
+        icon = reading_definition_config.get("icon", None)
 
-        response_definition_extra = None
-        device_class = None
-        state_class = None
-        icon = None
+        if reading_type == ReadingType.ACK:
+            return ReadingDefinitionACK(
+                index=index,
+                name=name,
+                response_type=response_type,
+                description=description,
+                device_class=device_class,
+                state_class=state_class,
+                icon=icon,
+            )
+            
+        
 
-        # parse out the extra values
-        if len(response_definition_config) > 4:
-            response_definition_extra = response_definition_config[4]
-            device_class = response_definition_extra.get("device-class", None)
-            state_class = response_definition_extra.get("state-class", None)
-            icon = response_definition_extra.get("icon", None)
-
-        if response_definition_type == ResponseType.ACK:
-            ack_values: dict[str, str] = response_definition_config[3]
-            ack_codes = list(ack_values.keys())
-            fail_code = ack_codes[0]
-            fail_description = ack_values.get(fail_code)
-            success_code = ack_codes[1]
-            success_description = ack_values.get(success_code)
-            return ResponseDefinitionACK(
-                index=response_definition_index,
-                description=response_definition_description,
-                success_code=success_code,
-                success_description=success_description,
-                fail_code=fail_code,
-                fail_description=fail_description,
+        elif reading_type == ReadingType.WATT_HOURS:
+            return ReadingDefinitionWattHours(
+                index=index,
+                name=name,
+                response_type=response_type,
+                description=description,
                 device_class=device_class,
                 state_class=state_class,
                 icon=icon,
             )
 
-        elif response_definition_type == ResponseType.INT:
-            unit = response_definition_config[3]
-            return ResponseDefinitionInt(
-                index=response_definition_index,
-                description=response_definition_description,
-                unit=unit,
-                device_class=device_class,
-                state_class=state_class,
-                icon=icon,
-            )
-
-        elif response_definition_type == ResponseType.OPTION:
-            options: list[str] = response_definition_config[3]
+        elif reading_type == ResponseType.OPTION:
+            options: list[str] = reading_definition_config[3]
             return ResponseDefinitionOption(
-                index=response_definition_index,
-                description=response_definition_description,
+                index=index,
+                description=description,
                 options=options,
                 device_class=device_class,
                 state_class=state_class,
                 icon=icon,
             )
 
-        elif response_definition_type == ResponseType.BYTES:
-            unit = response_definition_config[3]
+        elif reading_type == ResponseType.BYTES:
+            unit = reading_definition_config[3]
             return ResponseDefinitionBytes(
-                index=response_definition_index,
-                description=response_definition_description,
+                index=index,
+                description=description,
                 unit=unit,
                 device_class=device_class,
                 state_class=state_class,
                 icon=icon,
             )
 
-        elif response_definition_type == ResponseType.FLOAT:
-            unit = response_definition_config[3]
+        elif reading_type == ResponseType.FLOAT:
+            unit = reading_definition_config[3]
             return ResponseDefinitionFloat(
-                index=response_definition_index,
-                description=response_definition_description,
+                index=index,
+                description=description,
                 unit=unit,
                 device_class=device_class,
                 state_class=state_class,
                 icon=icon,
             )
 
-        elif response_definition_type == ResponseType.STR_KEYED:
-            options: dict[str, str] = response_definition_config[3]
+        elif reading_type == ResponseType.STR_KEYED:
+            options: dict[str, str] = reading_definition_config[3]
             return ResponseDefinitionStrKeyed(
-                index=response_definition_index,
-                description=response_definition_description,
+                index=index,
+                description=description,
                 options=options,
                 device_class=device_class,
                 state_class=state_class,
                 icon=icon,
             )
 
-        elif response_definition_type == ResponseType.ENFLAGS:
-            flags: dict[str, dict[str, str]] = response_definition_config[3]
+        elif reading_type == ResponseType.ENFLAGS:
+            flags: dict[str, dict[str, str]] = reading_definition_config[3]
             return ResponseDefinitionENFlags(
-                index=response_definition_index,
-                description=response_definition_description,
+                index=index,
+                description=description,
                 enflags=flags,
                 device_class=device_class,
                 state_class=state_class,
                 icon=icon,
             )
 
-        elif response_definition_type == ResponseType.STRING:
-            unit = response_definition_config[3]
+        elif reading_type == ResponseType.STRING:
+            unit = reading_definition_config[3]
             return ResponseDefinitionString(
-                index=response_definition_index,
-                description=response_definition_description,
+                index=index,
+                description=description,
                 unit=unit,
                 device_class=device_class,
                 state_class=state_class,
                 icon=icon,
             )
 
-        elif response_definition_type == ResponseType.FLAGS:
-            flags: list[str] = response_definition_config[3]
+        elif reading_type == ResponseType.FLAGS:
+            flags: list[str] = reading_definition_config[3]
             return ResponseDefinitionFlags(
-                index=response_definition_index,
-                description=response_definition_description,
+                index=index,
+                description=description,
                 flags=flags,
                 device_class=device_class,
                 state_class=state_class,
                 icon=icon,
             )
 
-        elif ResponseType.INFO in response_definition_type:
-            template = response_definition_type.split(":", 1)[1]
+        elif ResponseType.INFO in reading_type:
+            template = reading_type.split(":", 1)[1]
             return ResponseDefinitionInfo(
-                index=response_definition_index,
-                description=response_definition_description,
+                index=index,
+                description=description,
                 template=template,
                 device_class=device_class,
                 state_class=state_class,
@@ -190,41 +191,36 @@ class ResponseDefinition(ABC):
 
         else:
             raise ValueError(
-                f"Response description: {response_definition_description} has unknown response definition type: {response_definition_type}"
+                f"Response description: {description} has unknown response definition type: {reading_type}"
             )
 
 
-class ResponseDefinitionACK(ResponseDefinition):
+class ReadingDefinitionACK(ReadingDefinition):
     def __init__(
         self,
         index: int,
+        name: str,
+        response_type: str,
         description: str,
-        success_code: str,
-        success_description: str,
-        fail_code: str,
-        fail_description: str,
         device_class: str = None,
         state_class: str = None,
         icon: str = None,
     ):
-        self.index = index
-        self.description = description
-        self.success_code = success_code
-        self.success_description = success_description
-        self.fail_code = fail_code
-        self.fail_description = fail_description
-        self.device_class = device_class
-        self.state_class = state_class
-        self.icon = icon
+        super().__init__(index, name, response_type, "", description, device_class, state_class, icon)
+ 
+        self.fail_code = "NAK"
+        self.fail_description = "Failed"
+        self.success_code = "ACK"
+        self.success_description = "Successful"
 
     def is_valid_response(self, value) -> bool:
         return value == self.success_code or value == self.fail_code
 
-    def response_from_raw_values(self, raw_value) -> list[Response]:
+    def reading_from_raw_response(self, raw_value) -> list[Reading]:
         value = raw_value.decode()
         if value == self.success_code:
             return [
-                Response(
+                Reading(
                     data_name=self.description,
                     data_value=self.success_description,
                     data_unit=None,
@@ -235,7 +231,7 @@ class ResponseDefinitionACK(ResponseDefinition):
             ]
         elif value == self.fail_code:
             return [
-                Response(
+                Reading(
                     data_name=self.description,
                     data_value=self.fail_description,
                     data_unit=None,
@@ -247,9 +243,42 @@ class ResponseDefinitionACK(ResponseDefinition):
 
     def get_description(self) -> str:
         return self.description
+    
+class ReadingDefinitionWattHours(ReadingDefinition):
+    def __init__(
+        self,
+        index: int,
+        name: str,
+        response_type: str,
+        description: str,
+        device_class: str = None,
+        state_class: str = None,
+        icon: str = None
+    ):
+        super().__init__(index, name, response_type, "Wh", description, device_class, state_class, icon)
+        
+    def is_valid_response(self, value) -> bool:
+        # Do we need to check if it's negative? Should we have max and min bounds?
+        return isinstance(value, int)
+
+    def translate_raw_response(self, raw_value) -> str:
+        return int(raw_value.decode())
+
+    def reading_from_raw_response(self, raw_value) -> list[Reading]:
+        value = self.translate_raw_response(raw_value)
+        return [
+            Reading(
+                data_name=self.description,
+                data_value=str(value),
+                data_unit=self.unit,
+                device_class=self.device_class,
+                state_class=self.state_class,
+                icon=self.icon,
+            )
+        ]
 
 
-class ResponseDefinitionInt(ResponseDefinition):
+class ResponseDefinitionInt(ReadingDefinition):
     def __init__(self, index: int, description: str, unit: str, device_class: str = None, state_class: str = None, icon: str = None):
         self.index = index
         self.description = description
@@ -265,10 +294,10 @@ class ResponseDefinitionInt(ResponseDefinition):
     def translate_raw_response(self, raw_value) -> str:
         return int(raw_value.decode())
 
-    def response_from_raw_values(self, raw_value) -> list[Response]:
+    def reading_from_raw_response(self, raw_value) -> list[Reading]:
         value = self.translate_raw_response(raw_value)
         return [
-            Response(
+            Reading(
                 data_name=self.description,
                 data_value=str(value),
                 data_unit=self.unit,
@@ -282,7 +311,7 @@ class ResponseDefinitionInt(ResponseDefinition):
         return self.description
 
 
-class ResponseDefinitionOption(ResponseDefinition):
+class ResponseDefinitionOption(ReadingDefinition):
     def __init__(self, index: int, description: str, options: list[str], device_class: str = None, state_class: str = None, icon: str = None):
         self.index = index
         self.description = description
@@ -298,10 +327,10 @@ class ResponseDefinitionOption(ResponseDefinition):
         value = int(raw_value.decode())
         return self.options[value]
 
-    def response_from_raw_values(self, raw_value) -> list[Response]:
+    def reading_from_raw_response(self, raw_value) -> list[Reading]:
         value = self.translate_raw_response(raw_value)
         return [
-            Response(
+            Reading(
                 data_name=self.description,
                 data_value=value,
                 data_unit="",
@@ -315,7 +344,7 @@ class ResponseDefinitionOption(ResponseDefinition):
         return self.description
 
 
-class ResponseDefinitionBytes(ResponseDefinition):
+class ResponseDefinitionBytes(ReadingDefinition):
     # Seems to be a catch-all for responses that are not properly implemented
     def __init__(self, index: int, description: str, unit: str, device_class: str = None, state_class: str = None, icon: str = None):
         self.index = index
@@ -331,10 +360,10 @@ class ResponseDefinitionBytes(ResponseDefinition):
     def translate_raw_response(self, raw_value) -> str:
         return raw_value.decode()
 
-    def response_from_raw_values(self, raw_value) -> list[Response]:
+    def reading_from_raw_response(self, raw_value) -> list[Reading]:
         value = self.translate_raw_response(raw_value)
         return [
-            Response(
+            Reading(
                 data_name=self.description,
                 data_value=value,
                 data_unit="",
@@ -348,7 +377,7 @@ class ResponseDefinitionBytes(ResponseDefinition):
         return self.description
 
 
-class ResponseDefinitionString(ResponseDefinition):
+class ResponseDefinitionString(ReadingDefinition):
     # Seems to be a catch-all for responses that are not properly implemented
     def __init__(self, index: int, description: str, unit: str, device_class: str = None, state_class: str = None, icon: str = None):
         self.index = index
@@ -366,9 +395,9 @@ class ResponseDefinitionString(ResponseDefinition):
             return raw_value
         return str(raw_value.decode())
 
-    def response_from_raw_values(self, raw_value) -> list[Response]:
+    def reading_from_raw_response(self, raw_value) -> list[Reading]:
         return [
-            Response(
+            Reading(
                 data_name=self.description,
                 data_value=self.translate_raw_response(raw_value),
                 data_unit=self.unit,
@@ -382,7 +411,7 @@ class ResponseDefinitionString(ResponseDefinition):
         return self.description
 
 
-class ResponseDefinitionFloat(ResponseDefinition):
+class ResponseDefinitionFloat(ReadingDefinition):
     def __init__(self, index: int, description: str, unit: str, device_class: str = None, state_class: str = None, icon: str = None):
         self.index = index
         self.description = description
@@ -398,10 +427,10 @@ class ResponseDefinitionFloat(ResponseDefinition):
     def translate_raw_response(self, raw_value) -> float:
         return float(raw_value.decode())
 
-    def response_from_raw_values(self, raw_value) -> list[Response]:
+    def reading_from_raw_response(self, raw_value) -> list[Reading]:
         value = self.translate_raw_response(raw_value)
         return [
-            Response(
+            Reading(
                 data_name=self.description,
                 data_value=str(value),
                 data_unit=self.unit,
@@ -415,7 +444,7 @@ class ResponseDefinitionFloat(ResponseDefinition):
         return self.description
 
 
-class ResponseDefinitionStrKeyed(ResponseDefinition):
+class ResponseDefinitionStrKeyed(ReadingDefinition):
     def __init__(self, index: int, description: str, options: dict[str, str], device_class: str = None, state_class: str = None, icon: str = None):
         self.index = index
         self.description = description
@@ -431,10 +460,10 @@ class ResponseDefinitionStrKeyed(ResponseDefinition):
         value = raw_value.decode()
         return self.options[value]
 
-    def response_from_raw_values(self, raw_value) -> list[Response]:
+    def reading_from_raw_response(self, raw_value) -> list[Reading]:
         value = self.translate_raw_response(raw_value)
         return [
-            Response(
+            Reading(
                 data_name=self.description,
                 data_value=value,
                 data_unit="",
@@ -448,7 +477,7 @@ class ResponseDefinitionStrKeyed(ResponseDefinition):
         return self.description
 
 
-class ResponseDefinitionENFlags(ResponseDefinition):
+class ResponseDefinitionENFlags(ReadingDefinition):
     def __init__(
         self, index: int, description: str, enflags: dict[str, dict[str, str]], device_class: str = None, state_class: str = None, icon: str = None
     ):
@@ -479,12 +508,12 @@ class ResponseDefinitionENFlags(ResponseDefinition):
                 return_values[_key] = status
         return return_values
 
-    def response_from_raw_values(self, raw_value) -> list[Response]:
+    def reading_from_raw_response(self, raw_value) -> list[Reading]:
         values: dict[str, str] = self.translate_raw_response(raw_value)
         responses = []
         for name, value in values.items():
             responses.append(
-                Response(
+                Reading(
                     data_name=name, data_value=value, data_unit="", device_class=self.device_class, state_class=self.state_class, icon=self.icon
                 )
             )
@@ -495,7 +524,7 @@ class ResponseDefinitionENFlags(ResponseDefinition):
         return self.description
 
 
-class ResponseDefinitionFlags(ResponseDefinition):
+class ResponseDefinitionFlags(ReadingDefinition):
     def __init__(self, index: int, description: str, flags: list[str], device_class: str = None, state_class: str = None, icon: str = None):
         self.index = index
         self.description = description
@@ -514,12 +543,12 @@ class ResponseDefinitionFlags(ResponseDefinition):
                 return_value[self.flags[i]] = int(chr(flag))
         return return_value
 
-    def response_from_raw_values(self, raw_value) -> list[Response]:
+    def reading_from_raw_response(self, raw_value) -> list[Reading]:
         values: dict[str, int] = self.translate_raw_response(raw_value)
         responses = []
         for name, value in values.items():
             responses.append(
-                Response(
+                Reading(
                     data_name=name, data_value=value, data_unit="bool", device_class=self.device_class, state_class=self.state_class, icon=self.icon
                 )
             )
@@ -529,7 +558,7 @@ class ResponseDefinitionFlags(ResponseDefinition):
         return self.description
 
 
-class ResponseDefinitionInfo(ResponseDefinition):
+class ResponseDefinitionInfo(ReadingDefinition):
     def __init__(self, index: int, description: str, template: str, device_class: str = None, state_class: str = None, icon: str = None):
         self.index = index
         self.description = description
@@ -544,10 +573,10 @@ class ResponseDefinitionInfo(ResponseDefinition):
     def is_info(self) -> bool:
         return True
 
-    def response_from_raw_values(self, raw_value) -> list[Response]:
+    def reading_from_raw_response(self, raw_value) -> list[Reading]:
         value = self.translate_raw_response(raw_value)
         return [
-            Response(
+            Reading(
                 data_name=self.description,
                 data_value=value,
                 data_unit="",

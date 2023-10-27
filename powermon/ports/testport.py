@@ -49,7 +49,7 @@ class TestPort(AbstractPort):
     def send_and_receive(self, command: Command) -> Result:
         command_defn : CommandDefinition = command.command_definition
         
-        result = Result(command.code, response_definitions=command.get_response_definitions())
+        result = Result(command.code, reading_definitions=command.get_response_definitions())
 
         if command_defn is not None:
             # Have test data defined, so use that

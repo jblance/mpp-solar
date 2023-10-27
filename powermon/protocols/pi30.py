@@ -4,7 +4,7 @@ from powermon.commands.result import ResultType
 from powermon.protocols.abstractprotocol import AbstractProtocol
 from mppsolar.protocols.protocol_helpers import crcPI as crc
 from powermon.commands.result import Result
-from powermon.commands.response_definition import ResponseType
+from powermon.commands.reading_definition import ResponseType
 
 log = logging.getLogger("pi30")
 
@@ -829,7 +829,7 @@ class pi30(AbstractProtocol):
     def __str__(self):
         return "PI30 protocol handler"
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self) -> None:
         super().__init__()
         self._protocol_id = b"PI30"
         self.add_command_definitions(QUERY_COMMANDS, "QUERY")

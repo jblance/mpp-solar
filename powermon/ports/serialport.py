@@ -60,7 +60,7 @@ class SerialPort(AbstractPort):
         return
 
     def send_and_receive(self, command: Command) -> Result:
-        result = Result(command.code, response_definitions=command.get_response_definitions())
+        result = Result(command.code, reading_definitions=command.get_response_definitions())
         full_command = command.full_command
         response_line = None
         log.debug(f"port {self.serialPort}")

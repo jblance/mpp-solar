@@ -2,7 +2,7 @@ import logging
 
 from powermon.commands.result import ResultType
 from powermon.protocols.pi30 import pi30
-from powermon.commands.response_definition import ResponseType
+from powermon.commands.reading_definition import ResponseType
 
 log = logging.getLogger("pi30max")
 

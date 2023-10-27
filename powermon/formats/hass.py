@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 from powermon.formats.abstractformat import AbstractFormat
 from powermon.commands.result import Result
-from powermon.commands.response import Response
+from powermon.commands.reading import Reading
 
 log = logging.getLogger("hass")
 
@@ -39,9 +39,9 @@ class hass(AbstractFormat):
         value_msgs = []
 
         _result = []
-        if result.responses is None:
+        if result.readings is None:
             return _result
-        display_data : list[Response] = self.format_and_filter_data(result)
+        display_data : list[Reading] = self.format_and_filter_data(result)
         log.debug(f"displayData: {display_data}")
 
         # build data to display

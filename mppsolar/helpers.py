@@ -2,7 +2,7 @@
 import logging
 import importlib
 
-from powermon.commands.response import Response
+from powermon.commands.reading import Reading
 
 log = logging.getLogger("helpers")
 
@@ -94,7 +94,7 @@ def getMaxLen(data, index=0):
             _maxLen = len(item)
     return _maxLen
 
-def get_max_response_length(responses: list[Response]):
+def get_max_response_length(responses: list[Reading]):
     _max_length = 0
     for response in responses:
         if len(response.get_data_value()) > _max_length:

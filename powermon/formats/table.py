@@ -3,7 +3,7 @@ import logging
 from mppsolar.helpers import get_max_response_length, pad
 from powermon.formats.abstractformat import AbstractFormat
 from powermon.commands.result import Result
-from powermon.commands.response import Response
+from powermon.commands.reading import Reading
 
 log = logging.getLogger("table")
 
@@ -38,7 +38,7 @@ class table(AbstractFormat):
         if len(result.get_responses()) == 0:
             return _result
 
-        filtered_responses: list[Response] = self.format_and_filter_data(result)
+        filtered_responses: list[Reading] = self.format_and_filter_data(result)
         log.debug(f"displayData: {filtered_responses}")
 
         # build header

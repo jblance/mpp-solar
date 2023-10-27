@@ -1,7 +1,9 @@
-from powermon.dto.response_dto import ResponseDTO
+from strenum import LowercaseStrEnum
+from enum import auto
+from powermon.dto.reading_dto import ReadingDTO
 
 
-class Response:
+class Reading:
     def __init__(self, data_name: str,
                  data_value: str,
                  data_unit: str,
@@ -16,8 +18,8 @@ class Response:
         self.state_class = state_class
         self.is_valid = True
 
-    def to_DTO(self) -> ResponseDTO:
-        return ResponseDTO(data_name=self.get_data_name(), data_value=self.get_data_value(), data_unit=self.get_data_unit())
+    def to_DTO(self) -> ReadingDTO:
+        return ReadingDTO(data_name=self.get_data_name(), data_value=self.get_data_value(), data_unit=self.get_data_unit())
 
     def __str__(self):
         return f"Response: {self.data_name=}, {self.data_value=}, {self.data_unit=}"
