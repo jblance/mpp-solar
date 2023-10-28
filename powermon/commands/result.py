@@ -29,10 +29,10 @@ class Result:
         self.error_messages = []
         log.debug("Result: %s", self)
 
-    def to_DTO(self) -> ResultDTO:
+    def to_dto(self) -> ResultDTO:
         reading_dtos = []
         for reading in self.readings:
-            reading_dtos.append(reading.to_DTO())
+            reading_dtos.append(reading.to_dto())
         return ResultDTO(device_identifier=self.get_device_id(), command_code=self.command_code, data=reading_dtos)
     
     def get_command_code(self) -> str:

@@ -18,7 +18,7 @@ class Reading:
         self.state_class = state_class
         self.is_valid = True
 
-    def to_DTO(self) -> ReadingDTO:
+    def to_dto(self) -> ReadingDTO:
         return ReadingDTO(data_name=self.get_data_name(), data_value=self.get_data_value(), data_unit=self.get_data_unit())
 
     def __str__(self):

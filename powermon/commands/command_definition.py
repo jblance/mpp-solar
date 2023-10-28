@@ -23,7 +23,7 @@ class CommandDefinition:
         self.regex : str | None = regex
         self.command_definition_type : str = command_definition_type
         
-    def to_DTO(self) -> CommandDefinitionDTO:
+    def to_dto(self) -> CommandDefinitionDTO:
         return CommandDefinitionDTO(
             command_code=self.code,
             description=self.description,

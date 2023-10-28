@@ -69,7 +69,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
     def get_command_definition_dtos(self) -> dict[str, CommandDefinitionDTO]:
         command_dtos: dict[str, CommandDefinitionDTO] = {}
         for command_tuple in self.command_definitions.items():
-            command_dtos[command_tuple[0]] = command_tuple[1].to_DTO()
+            command_dtos[command_tuple[0]] = command_tuple[1].to_dto()
         return command_dtos
 
     def get_protocol_id(self) -> bytes:
