@@ -1,7 +1,6 @@
+""" pi30.py """
 import logging
 
-from powermon.commands.result import ResultType
-from powermon.protocols.abstractprotocol import AbstractProtocol
 from mppsolar.protocols.protocol_helpers import crcPI as crc
 from powermon.commands.result import Result
 from powermon.commands.reading_definition import ResponseType
@@ -826,6 +825,7 @@ QUERY_COMMANDS = {
 
 
 class pi30(AbstractProtocol):
+    """ pi30 protocol handler """
     def __str__(self):
         return "PI30 protocol handler"
 
@@ -838,6 +838,7 @@ class pi30(AbstractProtocol):
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
         self.ID_COMMANDS = ["QPI", "QGMN", "QMN"]
+        log.info(f"Using protocol {self._protocol_id} with {len(self.command_definitions)} commands")
         # log.info(f'Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands')
 
     def check_response_valid(self, result: Result):
@@ -847,7 +848,7 @@ class pi30(AbstractProtocol):
             result.error = True
             result.error_messages.append("failed validity check: response was empty")
             return
-        # fail if dict??? not sure what this is for
+        # FIXME: fail if dict??? not sure what this is for
         if type(result.raw_response) is dict:
             result.is_valid = False
             result.error = True

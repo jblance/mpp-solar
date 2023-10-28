@@ -38,6 +38,6 @@ class AbstractOutput(ABC):
         pass
 
 
-    def to_DTO(self):
+    def to_dto(self):
         return NotImplemented
     

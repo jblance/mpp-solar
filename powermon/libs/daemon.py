@@ -3,6 +3,7 @@ import logging
 from enum import Enum, auto
 from time import time
 
+from pydantic import BaseModel
 from strenum import LowercaseStrEnum
 
 # Set-up logger
@@ -17,8 +18,16 @@ class dummyNotification(Enum):
 
 
 class DaemonType(LowercaseStrEnum):
+    """ Daemon types implemented """
     DISABLED = auto()
     SYSTEMD = auto()
+
+
+class DaemonDTO(BaseModel):
+    """ data transfer ojbect model """
+    daemon_type: DaemonType
+    enabled: bool
+    keepalive: int
 
 
 class Daemon:
@@ -74,14 +83,14 @@ class Daemon:
                 self._Notification = dummyNotification
         self.notify(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
 
-    def initialize(self, *args, **kwargs):
+    def initialize(self):
         """ Daemon initialization activities """
         if self.enabled:
             # Send READY=1
             self._notify(self._Notification.READY)
             self._lastNotify = time()
 
-    def watchdog(self, *args, **kwargs):
+    def watchdog(self):
         if self.enabled:
             elapsed = time() - self._lastNotify
             if (elapsed) > self.keepalive:
@@ -89,29 +98,33 @@ class Daemon:
                 self._lastNotify = time()
                 self._journal(f"Daemon notify at {self._lastNotify}")
 
-    def notify(self, *args, **kwargs):
+    def notify(self, status="OK"):
         if not self.enabled:
             return
         # Send status
-        if args:
-            status = args[0]
-        else:
-            status = "OK"
         self._notify(self._Notification.STATUS, status)
 
-    def stop(self, *args, **kwargs):
+    def stop(self):
         if self.enabled:
             # Send stopping
             self._notify(self._Notification.STOPPING)
 
-    def log(self, *args, **kwargs):
+    def log(self, message=None):
         if self.enabled:
             # Print log message
-            if args:
-                self._journal(args[0])
+            if message is not None:
+                self._journal(message)
 
     def _dummyNotify(self, *args, **kwargs):
         # Print log message
         # if args:
         #     print(args[0])
         return
+
+    def to_dto(self):
+        """ return the data transfer object version of this object """
+        return DaemonDTO(
+            daemon_type=self.type,
+            enabled=self.enabled,
+            keepalive=self.keepalive,
+        )

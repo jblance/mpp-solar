@@ -31,8 +31,8 @@ class MQTT(AbstractOutput):
     def get_topic(self) -> str:
         return self.results_topic
 
-    def to_DTO(self) -> OutputDTO:
-        return OutputDTO(type="mqtt", format=self.formatter.to_DTO())
+    def to_dto(self) -> OutputDTO:
+        return OutputDTO(type="mqtt", format=self.formatter.to_dto())
 
     def process(self, result: Result):
         """ required function for any output class """
@@ -68,5 +68,6 @@ class MQTT(AbstractOutput):
 
     @classmethod
     def from_config(cls, output_config) -> "MQTT":
+        """build object from config dict"""
         results_topic = output_config.get("topic_override", None)
         return cls(results_topic=results_topic)

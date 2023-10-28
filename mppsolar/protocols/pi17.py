@@ -131,9 +131,9 @@ QUERY_COMMANDS = {
         "help": "",
         "type": "QUERY",
         "response": [
-            ["int", "Input current R", "0.1V"],
-            ["int", "Input current S", "0.1V"],
-            ["int", "Input current T", "0.1V"],
+            ["int", "Input current R", "0.1A"],
+            ["int", "Input current S", "0.1A"],
+            ["int", "Input current T", "0.1A"],
             ["int", "Output current R", "0.1V"],
             ["int", "Output current S", "0.1V"],
             ["int", "Output current T", "0.1V"],
@@ -464,7 +464,7 @@ QUERY_COMMANDS = {
         "help": " -- queries generated energy for the year YYYY from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated energy", "kWh"],
+            ["int", "Generated energy", "Wh"],
         ],
         "test_responses": [
             b"^D01100006591\xba\x10\r",
@@ -478,7 +478,7 @@ QUERY_COMMANDS = {
         "help": " -- queries generated energy for the month YYYYMM from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated energy", "kWh"],
+            ["int", "Generated energy", "Wh"],
         ],
         "test_responses": [
             b"^D01000006591\xba\x10\r",
@@ -492,7 +492,7 @@ QUERY_COMMANDS = {
         "help": " -- queries generated energy for the day YYYYMMDD from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated energy", "kWh"],
+            ["int", "Generated energy", "Wh"],
         ],
         "test_responses": [
             b"^D009000091\xba\x10\r",
@@ -506,7 +506,7 @@ QUERY_COMMANDS = {
         "help": " -- queries generated energy for the hour YYYYMMDDHH from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated energy", "kWh"],
+            ["int", "Generated energy", "Wh"],
         ],
         "test_responses": [
             b"^D008000001\xba\x10\r",
@@ -766,7 +766,7 @@ SETTER_COMMANDS = {
             b"^1\x0b\xc2\r",
             b"^0\x1b\xe3\r",
         ],
-        "regex": "MCHGV(05\\d\\d,05\\d\\d)$",
+        "regex": "MCHGV(0[45]\\d\\d,0[45]\\d\\d)$",
     },
     "ACCT": {
         "name": "ACCT",
@@ -796,9 +796,23 @@ SETTER_COMMANDS = {
         ],
         "regex": "ACCB([01],0[456]\\d\\d)$",
     },
+    "MCHGC": {
+        "name": "MCHGC",
+        "description": "Set battery maximum charge current",
+        "help": " -- examples: MCHGC1200 (Current in mA xxxx)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "MCHGC([012]\\d\\d\\d)$",
+    },
     "MUCHGC": {
         "name": "MUCHGC",
-        "description": "Set battery charge current",
+        "description": "Set maximum charge current from AC",
         "help": " -- examples: MUCHGC0600 (Current in mA xxxx)",
         "type": "SETTER",
         "response": [
@@ -837,6 +851,20 @@ SETTER_COMMANDS = {
             b"^0\x1b\xe3\r",
         ],
         "regex": "BDCM(0[1-2]\\d\\d)$",
+    },
+    "BATDV": {
+        "name": "BATDV",
+        "description": "Battery discharge voltage limits",
+        "help": " -- examples: (BATDV0420,0440,0430,0450, 0.1V)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "BATDV(0[45]\\d\\d,0[45]\\d\\d,0[45]\\d\\d,0[45]\\d\\d)$",
     },
 }
 

@@ -38,7 +38,7 @@ class AbstractFormat(ABC):
     def format(self, result: Result) -> list:
         pass
 
-    def to_DTO(self) -> FormatDTO:
+    def to_dto(self) -> FormatDTO:
         return FormatDTO(type=self.name)
     
     # Override this if the format sends multiple messages

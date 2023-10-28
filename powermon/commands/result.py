@@ -27,7 +27,7 @@ class Result:
         self.is_valid = False
         self.error = False
         self.error_messages = []
-        log.debug("Result: %s" % (self))
+        log.debug("Result: %s", self)
 
     def to_DTO(self) -> ResultDTO:
         reading_dtos = []
@@ -37,7 +37,7 @@ class Result:
     
     def get_command_code(self) -> str:
         return self.command_code
-    
+
     def set_device_id(self, device_id):
         self.device_id = device_id
 
@@ -50,12 +50,7 @@ class Result:
     def add_responses(self, responses: list[Reading]) -> bool:
         self.readings.extend(responses)
         return True
-    
+
     def process_raw_response(self, raw_response):
         self.raw_response = raw_response
         return
-
-
-
-        
-        

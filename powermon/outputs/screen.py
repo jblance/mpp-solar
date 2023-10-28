@@ -19,8 +19,8 @@ class Screen(AbstractOutput):
     def set_formatter(self, formatter: AbstractFormat):
         self.formatter = formatter
         
-    def to_DTO(self) -> OutputDTO:
-        return OutputDTO(type=self.name, format=self.formatter.to_DTO())
+    def to_dto(self) -> OutputDTO:
+        return OutputDTO(type=self.name, format=self.formatter.to_dto())
 
     def process(self, result: Result):
         log.info("Using output sender: screen")
