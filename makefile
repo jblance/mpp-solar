@@ -12,13 +12,16 @@ test:
 
 tests: powermon-unit-tests powermon-integration-tests mppsolar-tests
 
-
 pypi:
 	rm -rf dist/*
 	#python3 -m build 
 	poetry version patch
+	./make_version.sh
 	poetry build
+	./make_version_dev.sh
 	ls -l dist/
+	cat mppsolar/version.py
+	cat powermon/version.py
 
 pypi-upload:
 	twine upload dist/*
