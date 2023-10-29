@@ -11,14 +11,14 @@ from platform import python_version
 import yaml
 from pydantic import ValidationError
 
-from mppsolar.version import __version__  # noqa: F401
+from powermon.version import __version__  # noqa: F401
 from powermon.commands.command import Command
 from powermon.config.config_model import ConfigModel
 from powermon.device import Device
 from powermon.libs.apicoordinator import ApiCoordinator
 from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
-
+from powermon.protocols import list_protocols
 
 # Set-up logger
 log = logging.getLogger("")
@@ -120,7 +120,6 @@ def main():
     # Do enquiry commands
     # - List Protocols
     if args.listProtocols:
-        from powermon.protocols import list_protocols
         list_protocols()
         return None
 
@@ -165,7 +164,7 @@ def main():
     # add commands to device command list
     for command_config in config.get("commands"):
         command = Command.from_config(command_config)
-        command.set_mqtt_broker(mqtt_broker)
+        command.set_mqtt_broker(mqtt_broker)  # QUESTION: what command needs mqtt broker
         if command is not None:
             device.add_command(command)
     log.info(device)

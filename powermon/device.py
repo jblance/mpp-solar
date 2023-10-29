@@ -113,10 +113,10 @@ class Device:
                     result.error_messages.append(f"Error decoding result: {exception}")
                     result.error_messages.append(f"Exception Type: {exception.__class__.__name__}")
                     result.error_messages.append(f"Exception args: {exception.args}")
-                result.set_device_id(self.device_id)
+                result.set_device_id(self.device_id)  # FIXME: think this is limiting, should pass device and mqtt_broker to output
 
                 # loop through each output and process result
                 output: AbstractOutput
                 for output in command.outputs:
                     log.debug("Using Output: %s", output)
-                    output.process(result=result)
+                    output.process(result=result)  # FIXME: should also have device, mqtt_broker
