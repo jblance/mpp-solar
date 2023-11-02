@@ -12,7 +12,7 @@ class test_format_hass(unittest.TestCase):
         
         _result = Result(command_code=None)
         response = Reading(data_name="Test", data_value="0.0", data_unit="Check")
-        _result.add_responses([response])
+        _result.add_readings([response])
         
         formatted_data = hass_formatter.format(_result)
         # print(formatted_data)

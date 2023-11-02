@@ -3,6 +3,9 @@ import logging
 from powermon.commands.result import ResultType
 from powermon.protocols.pi30 import pi30
 from powermon.commands.reading_definition import ResponseType
+from powermon.commands.reading_definition import ReadingType
+from powermon.commands.parameter import ParameterType
+from powermon.commands.parameter import ParameterFormat
 
 log = logging.getLogger("pi30max")
 
@@ -813,17 +816,17 @@ QUERY_COMMANDS = {
         "name": "QED",
         "description": "Daily PV Generated Energy Inquiry",
         "help": " -- display daily generated energy, format is QEDyyyymmdd",
-        "response_type": ResultType.INDEXED,
-        "response": [
-            [0, "PV Generated Energy for Day", ResponseType.INT, "Wh", {"icon": "mdi:solar-power", "device-class": "energy", "state_class": "total"},],
-            [1, "Year", ResponseType.INFO+":cn[3:7]", ""],
-            [2, "Month", ResponseType.INFO+":calendar.month_name[int(cn[7:9])]", ""],
-            [3, "Day", ResponseType.INFO+":cn[9:]", ""],
+        "result_type": ResultType.INDEXED,
+        "reading_definitions": [
+            {"index":0, "description":"PV Generated Energy for Day", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device-class": "energy", "state_class": "total"},
+        ],
+        "parameters": [
+            {"name":"date", "description":"Date for query", "parameter_type":ParameterType.DATE, "parameter_format":ParameterFormat.YYYYMMDD}
         ],
         "test_responses": [
             b"(00238800!J\r",
         ],
-        "regex": "QED(\\d\\d\\d\\d\\d\\d\\d\\d)$",
+        "regex": "QED(\\d\\d\\d\\d\\d\\d\\d\\d)$", 
     },
     "QLT": {
         "name": "QLT",

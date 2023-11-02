@@ -180,7 +180,7 @@ class ved(AbstractProtocol):
         log.warn("unable to generate full command - is the definition wrong?")
         return None
 
-    def check_response_valid(self, response) -> Tuple[bool, dict]:
+    def check_response_and_trim(self, response) -> Tuple[bool, dict]:
         """
         VED HEX protocol - sum of bytes should be 0x55
         VED Text protocol - no validity check

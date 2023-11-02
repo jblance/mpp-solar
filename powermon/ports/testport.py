@@ -48,8 +48,6 @@ class TestPort(AbstractPort):
 
     def send_and_receive(self, command: Command) -> Result:
         command_defn : CommandDefinition = command.command_definition
-        
-        result = Result(command.code, reading_definitions=command.get_response_definitions())
 
         if command_defn is not None:
             # Have test data defined, so use that
@@ -62,7 +60,8 @@ class TestPort(AbstractPort):
             # No test responses defined
             log.warn("Testing a command with no test responses defined") 
             self._test_data = None
-        response = self._test_data
-        log.debug(f"Raw response {response}")
-        result.process_raw_response(response)
+        response_line = self._test_data
+        log.debug(f"Raw response {response_line}")
+        response = self.get_protocol().check_response_and_trim(response_line)
+        result = command.build_result(raw_response=response)
         return result

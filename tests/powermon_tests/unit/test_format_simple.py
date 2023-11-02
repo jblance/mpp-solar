@@ -12,7 +12,7 @@ class test_formats_simple(unittest.TestCase):
         
         _result = Result(command_code=None)
         _response = Reading(data_name="test", data_value="0.0", data_unit="Check")
-        _result.add_responses([_response])
+        _result.add_readings([_response])
         
         formatted_data = simple_formatter.format(_result)
         
@@ -25,7 +25,7 @@ class test_formats_simple(unittest.TestCase):
         
         _result = Result(command_code=None)
         _response = Reading(data_name="test", data_value="0.0", data_unit="Check", device_class="Extra")
-        _result.add_responses([_response])
+        _result.add_readings([_response])
         
         formatted_data = simple_formatter.format(_result)
         
@@ -37,7 +37,7 @@ class test_formats_simple(unittest.TestCase):
         
         _result = Result(command_code=None)
         _response = Reading(data_name="test", data_value="0.0", data_unit="Check", icon="Extra")
-        _result.add_responses([_response])
+        _result.add_readings([_response])
         
         formatted_data = simple_formatter.format(_result)
         
@@ -49,7 +49,7 @@ class test_formats_simple(unittest.TestCase):
         
         _result = Result(command_code=None)
         _response = Reading(data_name="test", data_value="0.0", data_unit="Check", device_class="test-device", icon="icon", state_class="state")
-        _result.add_responses([_response])
+        _result.add_readings([_response])
         
         formatted_data = simple_formatter.format(_result)
         
@@ -63,7 +63,7 @@ class test_formats_simple(unittest.TestCase):
         _result = Result(command_code=None)
         _response = Reading(data_name="test", data_value="0.0", data_unit="Check")
         _response2 = Reading(data_name="test2", data_value="2.0", data_unit="Check")
-        _result.add_responses([_response, _response2])
+        _result.add_readings([_response, _response2])
         
         formatted_data = simple_formatter.format(_result)
         

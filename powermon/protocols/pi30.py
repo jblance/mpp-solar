@@ -3,7 +3,9 @@ import logging
 
 from mppsolar.protocols.protocol_helpers import crcPI as crc
 from powermon.commands.result import Result
+from powermon.commands.result import ResultType
 from powermon.commands.reading_definition import ResponseType
+from powermon.protocols.abstractprotocol import AbstractProtocol
 
 log = logging.getLogger("pi30")
 
@@ -841,7 +843,7 @@ class pi30(AbstractProtocol):
         log.info(f"Using protocol {self._protocol_id} with {len(self.command_definitions)} commands")
         # log.info(f'Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands')
 
-    def check_response_valid(self, result: Result):
+    def check_response_and_trim(self, result: Result):
         # fail if no response
         if result.raw_response is None:
             result.is_valid = False

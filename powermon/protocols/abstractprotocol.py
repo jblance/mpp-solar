@@ -123,65 +123,16 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.info("No command_defn found for %s", command)
         return None
 
-    def get_responses(self, response) -> list:
-        """
-        Default implementation of split and trim
-        """
-        # Trim leading '(' + trailing CRC and \r of response, then split
-        return response[1:-3].split(None)
 
-    def check_response_valid(self, result: Result) -> Result:
+
+    def check_response_and_trim(self, response: str) -> str:
         """
         Simplest validity check, CRC checks should be added to individual protocols
         """
-        if result.raw_response is None:
-            result.is_valid = False
-            result.error = True
-            result.error_messages.append("failed validity check: response was empty")
+        if response is None:
+            raise ValueError("Response is None")
         else:
-            result.is_valid = True
-        return result
+            response = response[1:-3]
+        return response
 
-    def decode(self, result: Result, command: Command):
-        # TODO: this should return something instead of modifying result, then it's easy to test
-        # TODO: should be moved into a Result class
-        """
-        Take the a result object and decode the raw response
-        into a ??? dict of name: value, unit entries
-        """
-
-        log.info(f"result.raw_response passed to decode: {result.raw_response}")
-
-        # Check response is valid
-        self.check_response_valid(result)
-        if result.error:
-            return
-
-        # Cant decode without a definition of the command
-        if command.command_definition is None:
-            log.debug(f"No definition for command {command.code}")
-            result.error = True
-            result.error_messages.append(f"failed to decode responses: no definition for {command.code}")
-            return
-
-        if command.command_definition.result_type is ResultType.MULTIVALUED:
-            response = result.raw_response[1:-3]  # TODO: this should be moved to the protocol, it should check the CRC then strip them
-            responses = command.validate_and_translate_raw_value(response, index=0)
-            result.add_responses(responses)
-        else:
-            # Split the response into individual responses
-            for i, raw_response in enumerate(self.get_responses(result.raw_response)):
-                responses = command.validate_and_translate_raw_value(raw_response, index=i)
-                result.add_responses(responses)
-        log.debug(f"trimmed and split responses: {result.get_responses()}")
-
-        # TODO: this is ugly, info types need to be reworked to not have code in the protocol definition
-        # IF there are more response definitions than responses, check if they are INFO and fill them in
-        number_of_responses = len(result.get_responses())
-        if len(command.get_response_definitions()) > number_of_responses:
-            for index in range(number_of_responses, len(command.get_response_definitions())):
-                response_definition = command.get_response_definitions()[index]
-                if response_definition.is_info():
-                    result.add_responses(response_definition.reading_from_raw_response(command.code))
-                index += 1
-        return
+    

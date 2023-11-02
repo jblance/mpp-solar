@@ -32,7 +32,7 @@ class test_powermon_formats(unittest.TestCase):
         hass_formatter = hass({}, device)
         _result = Result(command_code=None)
         response = Reading(data_name="protocol_id", data_value="PI30", data_unit="")
-        _result.add_responses([response])
+        _result.add_readings([response])
         result = hass_formatter.format(_result)
 
         # print('\n')
