@@ -12,6 +12,7 @@ class NoExtraBaseModel(BaseModel):
         """pydantic BaseModel config"""
         extra = Extra.forbid
 
+
 class DaemonConfig(NoExtraBaseModel):
     """ model/allowed elements for daemon section of config """
     type: None | str
@@ -21,20 +22,20 @@ class DaemonConfig(NoExtraBaseModel):
 class MQTTConfig(NoExtraBaseModel):
     """ model/allowed elements for mqtt broker section of config """
     name: str
-    port: None | int
-    username: None | str
-    password: None | str
+    port: None | int = Field(default=None)
+    username: None | str = Field(default=None)
+    password: None | str = Field(default=None)
 
 
 class APIConfig(NoExtraBaseModel):
     """ model/allowed elements for api section of config """
-    host: None | str
-    port: None | int
+    host: None | str = Field(default=None)
+    port: None | int = Field(default=None)
     enabled: None | bool = Field(default=False)
-    log_level: None | str
-    announce_topic: None | str
-    adhoc_topic: None | str
-    refresh_interval: None | int
+    log_level: None | str = Field(default=None)
+    announce_topic: None | str = Field(default=None)
+    adhoc_topic: None | str = Field(default=None)
+    refresh_interval: None | int = Field(default=None)
 
 
 class BaseFormatConfig(NoExtraBaseModel):
@@ -85,8 +86,8 @@ class CommandConfig(NoExtraBaseModel):
     """ model/allowed elements for command section of config """
     command: str
     type: None | Literal["basic"] | Literal["poll"] = Field(default="basic")
-    trigger: None | LoopsTriggerConfig | AtTriggerConfig | EveryTriggerConfig
-    outputs: None | List[OutputConfig] | str
+    trigger: None | LoopsTriggerConfig | AtTriggerConfig | EveryTriggerConfig = Field(default=None)
+    outputs: None | List[OutputConfig] | str = Field(default=None)
 
 
 class SerialPortConfig(BaseModel):
@@ -113,10 +114,10 @@ class TestPortConfig(BaseModel):
 
 class DeviceConfig(NoExtraBaseModel):
     """ model/allowed elements for device section of config """
-    name: None | str
-    id: None | str | int
-    model: None | str
-    manufacturer: None | str
+    name: None | str = Field(default=None)
+    id: None | str | int = Field(default=None)
+    model: None | str = Field(default=None)
+    manufacturer: None | str = Field(default=None)
     port: TestPortConfig | SerialPortConfig | UsbPortConfig
 
 
@@ -127,7 +128,7 @@ class BaseConfig(NoExtraBaseModel):
     mqttbroker: None | MQTTConfig = Field(default=None)
     api: None | APIConfig = Field(default=None)
     daemon: None | DaemonConfig = Field(default=None)
-    debuglevel: None | int | str = Field(default=None) #If you put "debug" it translates to 10 then fails to load the config
+    debuglevel: None | int | str = Field(default=None)  # If you put "debug" it translates to 10 then fails to load the config
     loop: None | int | Literal["once"] = Field(default=None)
 
 
