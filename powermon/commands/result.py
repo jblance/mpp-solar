@@ -11,8 +11,10 @@ log = logging.getLogger("result")
 class ResultType(Enum):
     DEFAULT = auto()
     ACK = auto()
+    COMMAND = auto()
     MULTIVALUED = auto()
     INDEXED = auto()
+    SINGLE = auto()
     POSITIONAL = auto()
 
 class Result:

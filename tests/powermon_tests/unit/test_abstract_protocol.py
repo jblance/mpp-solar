@@ -16,7 +16,7 @@ class test_protocol_pi30(unittest.TestCase):
                 "name": "PBT",
                 "description": "Set Battery Type",
                 "help": " -- examples: PBT00 (set battery as AGM), PBT01 (set battery as FLOODED), PBT02 (set battery as USER)",
-                "result_type": ResultType.ACK,
+                "result_type": ResultType.COMMAND,
                 "reading_definitions": [{"index":0, "decription":"Command execution", "reading_type":ReadingType.ACK, "response_type":ResponseType.ACK}],
                 "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
                 "regex": "PBT(0[012])$",
@@ -44,7 +44,7 @@ class test_protocol_pi30(unittest.TestCase):
                 "name": "QED",
                 "description": "Daily PV Generated Energy Inquiry",
                 "help": " -- display daily generated energy, format is QEDyyyymmdd",
-                "result_type": ResultType.INDEXED,
+                "result_type": ResultType.SINGLE,
                 "reading_definitions": [
                     {"index":0, "description":"PV Generated Energy for Day", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device-class": "energy", "state_class": "total"},
                 ],

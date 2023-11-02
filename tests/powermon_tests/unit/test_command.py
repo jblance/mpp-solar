@@ -36,7 +36,7 @@ class test_command(unittest.TestCase):
                 "name": "QED",
                 "description": "Daily PV Generated Energy Inquiry",
                 "help": " -- display daily generated energy, format is QEDyyyymmdd",
-                "result_type": ResultType.INDEXED,
+                "result_type": ResultType.SINGLE,
                 "reading_definitions": [
                     {"index":0, "description":"PV Generated Energy for Day", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device-class": "energy", "state_class": "total"},
                 ],
@@ -54,5 +54,9 @@ class test_command(unittest.TestCase):
         command = Command(code="QED20210901", commandtype="GETTER", outputs=[], trigger=None)
         command.set_command_definition(qed_command_definition)
         result = command.build_result(b"00238800")
-        print(result.readings[0])
+        reading = result.readings[0]
+        self.assertEqual(reading.data_unit, "Wh")
+        self.assertEqual(reading.data_value, "238800")
+        self.assertEqual(reading.data_name, "PV Generated Energy for Day")
+        
         
