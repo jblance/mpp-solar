@@ -54,9 +54,7 @@ class API_MQTT(AbstractOutput):
             log.error("No mqtt broker supplied")
             raise RuntimeError("No mqtt broker supplied")
 
-        # build the messages...
-        #TODO: responses need to be DTOS
-        result_dto = result.to_DTO()
+        result_dto = result.to_dto()
         self.mqtt_broker.publish(self.get_topic(), result_dto.json())
 
         

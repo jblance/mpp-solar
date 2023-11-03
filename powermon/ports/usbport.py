@@ -52,7 +52,6 @@ class USBPort(AbstractPort):
 
     def send_and_receive(self, command: Command) -> Result:
         response_line = bytes()
-        result = Result(command_code=command.code, response_definitions=command.get_response_definitions())
 
         # Send the command to the open usb connection
         full_command = command.get_full_command()
@@ -93,6 +92,7 @@ class USBPort(AbstractPort):
                 response_line = response_line[: response_line.find(bytes([13])) + 1]
                 break
         log.debug("usb response was: %s", response_line)
-        result.process_raw_response(response_line)
+        response = self.get_protocol().check_response_and_trim(response_line)
+        result = command.build_result(raw_response=response)
 
         return result

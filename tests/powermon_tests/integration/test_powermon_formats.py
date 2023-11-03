@@ -6,7 +6,7 @@ from powermon.device import Device
 from powermon.formats.hass import hass
 from powermon.formats.table import table
 from powermon.commands.result import Result
-from powermon.commands.response import Response
+from powermon.commands.reading import Reading
 
 
 class test_powermon_formats(unittest.TestCase):
@@ -31,8 +31,8 @@ class test_powermon_formats(unittest.TestCase):
         # print(device)
         hass_formatter = hass({}, device)
         _result = Result(command_code=None)
-        response = Response(data_name="protocol_id", data_value="PI30", data_unit="")
-        _result.add_responses([response])
+        response = Reading(data_name="protocol_id", data_value="PI30", data_unit="")
+        _result.add_readings([response])
         result = hass_formatter.format(_result)
 
         # print('\n')

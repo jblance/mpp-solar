@@ -2,7 +2,7 @@ import logging
 from powermon.formats.abstractformat import AbstractFormat
 from powermon.dto.formatDTO import FormatDTO
 from powermon.commands.result import Result
-from powermon.commands.response import Response
+from powermon.commands.reading import Reading
 
 log = logging.getLogger("simple")
 
@@ -32,7 +32,7 @@ class SimpleFormat(AbstractFormat):
         if len(result.get_responses()) == 0:
             return _result
 
-        display_data : list[Response] = self.format_and_filter_data(result)
+        display_data : list[Reading] = self.format_and_filter_data(result)
 
         # build data to display
         for response in display_data:

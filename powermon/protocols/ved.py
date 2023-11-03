@@ -150,7 +150,7 @@ class VictronEnergyDirect(AbstractProtocol):
 
         # These need to be set to allow other functions to work`
         self._command = command
-        self._command_definition : CommandDefinition = self.get_command_definition(command)
+        self._command_definition : CommandDefinition = self.get_command_with_command_string(command)
         # End of required variables setting
         if self._command_definition is None:
             return None
@@ -181,7 +181,7 @@ class VictronEnergyDirect(AbstractProtocol):
         log.warning("unable to generate full command - is the definition wrong?")
         return None
 
-    def check_response_valid(self, response) -> Tuple[bool, dict]:
+    def check_response_and_trim(self, response) -> Tuple[bool, dict]:
         """
         VED HEX protocol - sum of bytes should be 0x55
         VED Text protocol - no validity check
@@ -229,10 +229,10 @@ class VictronEnergyDirect(AbstractProtocol):
             _r = bytes.fromhex(_r)
             if (
                 self._command_definition is not None
-                and self._command_definition.response_type == ResultType.POSITIONAL
+                and self._command_definition.result_type == ResultType.POSITIONAL
             ):
                 # Have a POSITIONAL type response, so need to break it up...
-                for defn in self._command_definition.response_definitions:
+                for defn in self._command_definition.reading_definitions:
                     size = defn[1]
                     item = _r[:size]
                     responses.append(item)

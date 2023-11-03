@@ -1,7 +1,7 @@
 import logging
 from powermon.formats.abstractformat import AbstractFormat
 from powermon.commands.result import Result
-from powermon.commands.response import Response
+from powermon.commands.reading import Reading
 
 log = logging.getLogger("htmltable")
 
@@ -31,7 +31,7 @@ class htmltable(AbstractFormat):
         if len(result.get_responses()) == 0:
             return _result
 
-        displayData : list[Response] = self.format_and_filter_data(result)
+        displayData : list[Reading] = self.format_and_filter_data(result)
         log.debug(f"displayData: {displayData}")
 
         _result.append("<table><tr><th>Parameter</th><th>Value</th><th>Unit</th></tr>")

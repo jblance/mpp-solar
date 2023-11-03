@@ -55,7 +55,7 @@ class Device:
         if command is None:
             return
         # get command definition from protocol
-        command.set_command_definition(self.port.protocol.get_command_definition(command.code))
+        command.set_command_definition(self.port.protocol.get_command_with_command_string(command.code))
         # set the device_id in the command
         command.set_device_id(self.device_id)
         # append to commands list
@@ -98,14 +98,12 @@ class Device:
         for command in self.commands:
             if force or command.is_due():
                 log.debug("Running command: %s", command.code)
-                # run command
-                result: Result = self.port.run_command(command)
-
-                # decode result
                 try:
-                    self.port.get_protocol().decode(result=result, command=command)
+                    # run command
+                    result: Result = self.port.run_command(command)
                 except Exception as exception:  # pylint: disable=W0718
                     log.error("Error decoding result: %s", exception)
+                    result = Result(command_code=command.code)
                     result.error = True
                     result.error_messages.append(f"Error decoding result: {exception}")
                     result.error_messages.append(f"Exception Type: {exception.__class__.__name__}")

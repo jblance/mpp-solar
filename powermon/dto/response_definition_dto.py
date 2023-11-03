@@ -1,7 +1,7 @@
 from pydantic import BaseModel
-from powermon.commands.result import ResultType
+from powermon.commands.reading_definition import ReadingType
 
 
 class ResponseDefinitionDTO(BaseModel):
-    response_type : ResultType
+    response_type : ReadingType
     responses: list
