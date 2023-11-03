@@ -34,7 +34,7 @@ class TestPort(AbstractPort):
         return "Test port"
 
     def to_dto(self) -> PortDTO:
-        dto = PortDTO(type="test", protocol=self.get_protocol().toDTO())
+        dto = PortDTO(type="test", protocol=self.get_protocol().to_dto())
         return dto
 
     def is_connected(self):
@@ -65,7 +65,7 @@ class TestPort(AbstractPort):
             log.warning("Testing a command with no test responses defined")
             self._test_data = None
         response_line = self._test_data
-        log.debug(f"Raw response {response_line}")
-        response = self.get_protocol().check_response_and_trim(response_line)
+        log.debug("Raw response: %s", response_line)
+        response = self.get_protocol().check_response_and_trim(response_line)  # FIXME: Needs a result
         result = command.build_result(raw_response=response)
         return result

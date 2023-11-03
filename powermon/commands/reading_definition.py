@@ -20,6 +20,7 @@ class ResponseType(LowercaseStrEnum):
 class ReadingType(LowercaseStrEnum):
     ACK = auto()
     WATT_HOURS = auto()
+    AMPS = auto()
 
 
 class ReadingDefinition(ABC):
@@ -87,9 +88,6 @@ class ReadingDefinition(ABC):
                 state_class=state_class,
                 icon=icon,
             )
-            
-        
-
         elif reading_type == ReadingType.WATT_HOURS:
             return ReadingDefinitionWattHours(
                 index=index,

@@ -5,6 +5,7 @@ from mppsolar.protocols.protocol_helpers import crcPI as crc
 from powermon.commands.result import Result
 from powermon.commands.result import ResultType
 from powermon.commands.reading_definition import ResponseType
+from powermon.commands.reading_definition import ReadingType
 from powermon.protocols.abstractprotocol import AbstractProtocol
 
 log = logging.getLogger("pi30")
@@ -245,6 +246,16 @@ SETTER_COMMANDS = {
 }
 
 QUERY_COMMANDS = {
+    "QID": {
+        "name": "QID",
+        "description": "Device Serial Number inquiry",
+        "help": " -- queries the device serial number",
+        "result_type": ResultType.INDEXED,
+        "reading_definitions": [{
+            "index": 0, "description": "Serial Number", "reading_type": ReadingType.ACK, "response_type": ResponseType.BYTES
+        }],
+        "test_responses": [b"(9293333010501\xbb\x07\r"],
+    },
     "Q1": {
         "name": "Q1",
         "description": "Q1 query",
@@ -380,20 +391,13 @@ QUERY_COMMANDS = {
         ],
         "test_responses": [b"(EakxyDbjuvz\x2F\x29\r"],
     },
-    "QID": {
-        "name": "QID",
-        "description": "Device Serial Number inquiry",
-        "help": " -- queries the device serial number",
-        "response_type": ResultType.INDEXED,
-        "response": [[0, "Serial Number", ResponseType.BYTES, ""]],
-        "test_responses": [b"(9293333010501\xbb\x07\r"],
-    },
+    
     "QMCHGCR": {
         "name": "QMCHGCR",
         "description": "Max Charging Current Options inquiry",
         "help": " -- queries the maximum charging current setting of the Inverter",
         "response_type": ResultType.MULTIVALUED,
-        "response": [[0, "Max Charging Current Options", ResponseType.STRING, "A"]],
+        "response": [{"index": 0, "description": "Max Charging Current Options", "reading_type": ReadingType.AMPS, "response_type": ResponseType.STRING}],
         "test_responses": [b"(010 020 030 040 050 060 070 080 090 100 110 120\x0c\xcb\r"],
     },
     "QMOD": {
@@ -826,7 +830,7 @@ QUERY_COMMANDS = {
 }
 
 
-class pi30(AbstractProtocol):
+class PI30(AbstractProtocol):
     """ pi30 protocol handler """
     def __str__(self):
         return "PI30 protocol handler"
@@ -840,8 +844,7 @@ class pi30(AbstractProtocol):
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
         self.ID_COMMANDS = ["QPI", "QGMN", "QMN"]
-        log.info(f"Using protocol {self._protocol_id} with {len(self.command_definitions)} commands")
-        # log.info(f'Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands')
+        self.check_definitions_count()
 
     def check_response_and_trim(self, result: Result):
         # fail if no response
@@ -874,7 +877,9 @@ class pi30(AbstractProtocol):
             result.is_valid = False
             result.error = True
             result.error_messages.append(
-                f"failed validity check: response has invalid CRC - got '\\x{crc_high:02x}\\x{crc_low:02x}', calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'"
+                f"failed validity check: response has invalid CRC - \
+                    got '\\x{crc_high:02x}\\x{crc_low:02x}', \
+                    calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'"
             )
             return
             # if result.raw_response[-3:-1] != bytes([calc_crc_high, calc_crc_low]):

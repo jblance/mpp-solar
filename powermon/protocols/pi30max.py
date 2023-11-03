@@ -1,7 +1,7 @@
 import logging
 
 from powermon.commands.result import ResultType
-from powermon.protocols.pi30 import pi30
+from powermon.protocols.pi30 import PI30
 from powermon.commands.reading_definition import ResponseType
 from powermon.commands.reading_definition import ReadingType
 from powermon.commands.parameter import ParameterType
@@ -977,7 +977,7 @@ SETTER_COMMANDS = {
 COMMANDS_TO_REMOVE = ["QVFW2"]
 
 
-class pi30max(pi30):
+class pi30max(PI30):
     def __str__(self):
         return "PI30 protocol handler for LV6048MAX and similar inverters"
 
@@ -995,4 +995,4 @@ class pi30max(pi30):
         self.STATUS_COMMANDS = ["QPIGS", "QPIGS2"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
-        log.info(f"Using protocol {self._protocol_id} with {len(self.command_definitions)} commands")
+        self.check_definitions_count()

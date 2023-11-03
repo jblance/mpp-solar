@@ -1,23 +1,25 @@
-"""command.py"""
+""" commands / command.py """
 import logging
-from time import localtime, strftime
 
 from powermon.commands.command_definition import CommandDefinition
-from powermon.commands.reading import Reading
-from powermon.commands.reading_definition import ReadingDefinition
-from powermon.commands.trigger import Trigger
-from powermon.commands.result import ResultType
+# from powermon.commands.result import ResultType
 from powermon.commands.parameter import Parameter
+# from powermon.commands.reading import Reading
+from powermon.commands.reading_definition import ReadingDefinition
 from powermon.commands.result import Result
+from powermon.commands.trigger import Trigger
 from powermon.dto.commandDTO import CommandDTO
 from powermon.outputs import getOutputs
 from powermon.outputs.abstractoutput import AbstractOutput, OutputType
 from powermon.outputs.api_mqtt import API_MQTT
 
+# from time import localtime, strftime
+
+
 log = logging.getLogger("Command")
 
 
-class Command:
+class Command():
     """
     Command object, holds the details of the command, including:
     - trigger
@@ -36,11 +38,14 @@ class Command:
         self.command_definition: CommandDefinition = None
         self.device_id = None  # TODO: shouldnt need this
         log.debug(self)
-        
-    
-        
+
     def build_result(self, raw_response=None) -> Result:
-        result = Result(self.code, result_type=self.command_definition.result_type, reading_definitions=self.get_response_definitions(), parameters=self.command_definition.parameters, raw_response=raw_response)
+        log.debug("build_result: code:%s, command_definition:%s", self.code, self.command_definition)
+        result = Result(
+            self.code, result_type=self.command_definition.result_type,
+            reading_definitions=self.get_response_definitions(),
+            parameters=self.command_definition.parameters, raw_response=raw_response
+        )
         return result
 
     def set_full_command(self, full_command):
@@ -81,9 +86,8 @@ class Command:
         for output in self.outputs:
             output.set_device_id(device_id)
 
-    def get_parameters(self) -> dict[str,Parameter]:
+    def get_parameters(self) -> dict[str, Parameter]:
         return self.command_definition.parameters
-        
 
     def __str__(self):
         if self.code is None:

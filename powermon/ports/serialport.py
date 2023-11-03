@@ -63,11 +63,10 @@ class SerialPort(AbstractPort):
         self.serial_port = None
 
     def send_and_receive(self, command: Command) -> Result:
-        
         full_command = command.full_command
         response_line = None
-        log.debug(f"port {self.serialPort}")
-        if self.serialPort is None:
+        log.debug("port: %s", self.serial_port)
+        if self.serial_port is None:
             raise RuntimeError("Serial port not open")
         try:
             log.debug("Executing command via usbserial...")
@@ -88,4 +87,3 @@ class SerialPort(AbstractPort):
             result.error_messages.append(f"Serial read error {e}")
             self.disconnect()
             return result
-
