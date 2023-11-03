@@ -78,7 +78,7 @@ class Device:
         dto = DeviceDTO(device_id=self.device_id,
                         model=self.model,
                         manufacturer=self.manufacturer,
-                        port=self.port.toDTO(),
+                        port=self.port.to_dto(),
                         commands=commands)
         return dto
 

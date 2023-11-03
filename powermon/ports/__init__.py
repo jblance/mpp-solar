@@ -48,11 +48,11 @@ def getPortFromConfig(port_config):
     # build port object
     match port_type:
         case PortType.TEST:
-            port_object = TestPort.fromConfig(config=port_config)
+            port_object = TestPort.from_config(config=port_config)
         case PortType.SERIAL:
-            port_object = SerialPort.fromConfig(config=port_config)
+            port_object = SerialPort.from_config(config=port_config)
         case PortType.USB:
-            port_object = USBPort.fromConfig(config=port_config)
+            port_object = USBPort.from_config(config=port_config)
 
         # Pattern for port types that cause problems when imported
         # case PortType.BLE:
