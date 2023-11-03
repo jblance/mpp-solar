@@ -13,6 +13,7 @@ log = logging.getLogger("ports")
 
 
 class PortType(LowercaseStrEnum):
+    """ enumeration of supported / known port types """
     UNKNOWN = auto()
     TEST = auto()
     SERIAL = auto()
@@ -33,7 +34,7 @@ def getPortFromConfig(port_config):
 
     port_object = None
     if not port_config:
-        log.info("no port config supplied, defaulting to test port")
+        log.info("no port config supplied, defaulting to test port")  # QUESTION: does this make sense, maybe should return None
         port_config = {"type": "test", "protocol": "PI30"}
 
     # port type is mandatory
