@@ -5,6 +5,8 @@ from enum import auto
 
 from strenum import LowercaseStrEnum
 
+from powermon.errors import ConfigError
+
 log = logging.getLogger("protocols")
 
 
@@ -12,6 +14,7 @@ class Protocol(LowercaseStrEnum):
     """ enumerate available protocols """
     PI30 = auto()
     PI30MAX = auto()
+    VED = auto()
 
 
 def get_protocol_definition(protocol):
@@ -30,6 +33,11 @@ def get_protocol_definition(protocol):
         case Protocol.PI30MAX:
             from powermon.protocols.pi30max import pi30max
             return pi30max()
+        case Protocol.VED:
+            from powermon.protocols.ved import VictronEnergyDirect
+            return VictronEnergyDirect()
+        case _:
+            raise ConfigError(f"Invalid protocol_id, no protocol found for: '{protocol_id}'") 
     return None
 
 

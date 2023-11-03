@@ -1,3 +1,4 @@
+""" serialport.py """
 import logging
 import time
 
@@ -13,12 +14,14 @@ log = logging.getLogger("SerialPort")
 
 
 class SerialPort(AbstractPort):
+    """ serial port object - normally a usb to serial adapter """
+
     def __str__(self):
-        return f"SerialPort: {self.path=}, {self.baud=}, protocol:{self.protocol}, {self.serialPort=}, {self.error=}"
+        return f"SerialPort: {self.path=}, {self.baud=}, protocol:{self.protocol}, {self.serial_port=}, {self.error=}"
 
     @classmethod
-    def fromConfig(cls, config=None):
-        log.debug(f"building serial port. config:{config}")
+    def from_config(cls, config=None):
+        log.debug("building serial port. config:%s", config)
         path = config.get("path", "/dev/ttyUSB0")
         baud = config.get("baud", 2400)
         # get protocol handler, default to PI30 if not supplied
@@ -29,60 +32,60 @@ class SerialPort(AbstractPort):
         super().__init__(protocol=protocol)
         self.path = path
         self.baud = baud
-
-        self.serialPort = None
+        self.serial_port = None
         self.error = None
 
-
-    def toDTO(self) -> PortDTO:
+    def to_dto(self) -> PortDTO:
         dto = PortDTO(type="serial", path=self.path, baud=self.baud, protocol=self.protocol.toDTO())
         return dto
 
-    def isConnected(self):
-        return self.serialPort is not None and self.serialPort.is_open
+    def is_connected(self):
+        return self.serial_port is not None and self.serial_port.is_open
 
-    def connect(self) -> None:
-        log.debug(f"usbserial port connecting. path:{self.path}, baud:{self.baud}")
+    def connect(self) -> int:
+        log.debug("usbserial port connecting. path:%s, baud:%s", self.path, self.baud)
         try:
-            self.serialPort = serial.Serial(port=self.path, baudrate=self.baud, timeout=1, write_timeout=1)
-        except Exception as e:
-            log.error(f"Error openning serial port: {e}")
+            self.serial_port = serial.Serial(port=self.path, baudrate=self.baud, timeout=1, write_timeout=1)
+        except ValueError as e:
+            log.error("Incorrect configuration for serial port: %s", e)
             self.error = str(e)
-            self.serialPort = None
-        return
+            self.serial_port = None
+        except serial.SerialException as e:
+            log.error("Error opening serial port: %s", e)
+            self.error = str(e)
+            self.serial_port = None
+        return 0
 
     def disconnect(self) -> None:
         log.debug("usbserial port disconnecting")
-        if self.serialPort is not None:
-            self.serialPort.close()
-
-        self.serialPort = None
-        return
+        if self.serial_port is not None:
+            self.serial_port.close()
+        self.serial_port = None
 
     def send_and_receive(self, command: Command) -> Result:
         result = Result(command.code, response_definitions=command.get_response_definitions())
         full_command = command.full_command
         response_line = None
-        log.debug(f"port {self.serialPort}")
-        if self.serialPort is None:
+        log.debug("port: %s", self.serial_port)
+        if self.serial_port is None:
             log.error("Port not available")
             result.error = True
             result.error_messages.append(f"Serial port not available {self.error}")
             return result
         try:
             log.debug("Executing command via usbserial...")
-            self.serialPort.reset_input_buffer()
-            self.serialPort.reset_output_buffer()
-            c = self.serialPort.write(full_command)
-            log.debug(f"Wrote {c} bytes")
-            self.serialPort.flush()
+            self.serial_port.reset_input_buffer()
+            self.serial_port.reset_output_buffer()
+            c = self.serial_port.write(full_command)
+            log.debug("Wrote %i bytes", c)
+            self.serial_port.flush()
             time.sleep(0.1)  # give serial port time to receive the data
-            response_line = self.serialPort.read_until(b"\r")
+            response_line = self.serial_port.read_until(b"\r")
             log.debug("serial response was: %s", response_line)
             result.process_raw_response(response_line)
             return result
         except Exception as e:
-            log.warning(f"Serial read error: {e}")
+            log.warning("Serial read error: %s", e)
             result.error = True
             result.error_messages.append(f"Serial read error {e}")
             self.disconnect()

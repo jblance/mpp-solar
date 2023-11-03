@@ -16,7 +16,7 @@ commands:
     outputs:
       - type: mqtt
         format: 
-        - type: mqttmessage
+          type: mqttmessage
           topic: Test_Inverter
 
 mqttbroker:
