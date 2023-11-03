@@ -7,6 +7,7 @@ from strenum import LowercaseStrEnum
 from powermon.ports.serialport import SerialPort
 from powermon.ports.testport import TestPort
 from powermon.ports.usbport import USBPort
+from powermon.errors import ConfigError
 
 # Set-up logger
 log = logging.getLogger("ports")
@@ -62,5 +63,6 @@ def getPortFromConfig(port_config):
 
         case _:
             log.info("port type object not found for %s", port_type)
+            raise ConfigError(f"Invalid port type: '{port_type}'")
 
     return port_object

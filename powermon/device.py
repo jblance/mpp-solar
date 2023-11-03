@@ -1,19 +1,16 @@
 """device.py"""
 import logging
 
-from powermon.dto.deviceDTO import DeviceDTO
-from powermon.ports import getPortFromConfig
-from powermon.ports.abstractport import AbstractPort
-from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.commands.command import Command
 from powermon.commands.result import Result
+from powermon.dto.deviceDTO import DeviceDTO
+from powermon.errors import ConfigError
+from powermon.outputs.abstractoutput import AbstractOutput
+from powermon.ports import getPortFromConfig
+from powermon.ports.abstractport import AbstractPort
 
 # Set-up logger
 log = logging.getLogger("Device")
-
-
-class ConfigError(Exception):
-    """Exception for invaild configurations"""
 
 
 class Device:
