@@ -1,19 +1,16 @@
 """device.py"""
 import logging
 
-from powermon.dto.deviceDTO import DeviceDTO
-from powermon.ports import getPortFromConfig
-from powermon.ports.abstractport import AbstractPort
-from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.commands.command import Command
 from powermon.commands.result import Result
+from powermon.dto.deviceDTO import DeviceDTO
+from powermon.errors import ConfigError
+from powermon.outputs.abstractoutput import AbstractOutput
+from powermon.ports import getPortFromConfig
+from powermon.ports.abstractport import AbstractPort
 
 # Set-up logger
 log = logging.getLogger("Device")
-
-
-class ConfigError(Exception):
-    """Exception for invaild configurations"""
 
 
 class Device:
@@ -78,7 +75,7 @@ class Device:
         dto = DeviceDTO(device_id=self.device_id,
                         model=self.model,
                         manufacturer=self.manufacturer,
-                        port=self.port.toDTO(),
+                        port=self.port.to_dto(),
                         commands=commands)
         return dto
 
@@ -111,10 +108,10 @@ class Device:
                     result.error_messages.append(f"Error decoding result: {exception}")
                     result.error_messages.append(f"Exception Type: {exception.__class__.__name__}")
                     result.error_messages.append(f"Exception args: {exception.args}")
-                result.set_device_id(self.device_id)
+                result.set_device_id(self.device_id)  # FIXME: think this is limiting, should pass device and mqtt_broker to output
 
                 # loop through each output and process result
                 output: AbstractOutput
                 for output in command.outputs:
                     log.debug("Using Output: %s", output)
-                    output.process(result=result)
+                    output.process(result=result)  # FIXME: should also have device, mqtt_broker

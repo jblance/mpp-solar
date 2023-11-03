@@ -1,3 +1,4 @@
+""" usbport.py """
 import logging
 import os
 import time
@@ -12,9 +13,10 @@ log = logging.getLogger("USBPort")
 
 
 class USBPort(AbstractPort):
+    """ usb port object """
     @classmethod
-    def fromConfig(cls, config=None):
-        log.debug(f"building usb port. config:{config}")
+    def from_config(cls, config=None):
+        log.debug("building usb port. config:%s", config)
         path = config.get("path", "/dev/hidraw0")
         # get protocol handler, default to PI30 if not supplied
         protocol = get_protocol_definition(protocol=config.get("protocol", "PI30"))
@@ -25,12 +27,12 @@ class USBPort(AbstractPort):
         self.path = path
         self.port = None
 
-    def toDTO(self):
+    def to_dto(self):
         dto = PortDTO(type="usb", path=self.path, protocol=self.get_protocol().toDTO())
         return dto
 
-    def isConnected(self):
-        return self.port is not None 
+    def is_connected(self):
+        return self.port is not None
 
     def connect(self) -> int:
         log.debug(f"USBPort connecting. path:{self.path}, protocol: {self.get_protocol()}")
@@ -43,11 +45,10 @@ class USBPort(AbstractPort):
         return self.port
 
     def disconnect(self) -> None:
-        log.debug(f"USBPort disconnecting {self.port}")
+        log.debug("USBPort disconnecting: %i", self.port)
         if self.port is not None:
             os.close(self.port)
         self.port = None
-        return
 
     def send_and_receive(self, command: Command) -> Result:
         response_line = bytes()
@@ -55,7 +56,7 @@ class USBPort(AbstractPort):
         # Send the command to the open usb connection
         full_command = command.get_full_command()
         cmd_len = len(full_command)
-        log.debug(f"length of to_send: {cmd_len}")
+        log.debug("length of to_send: %i", cmd_len)
         # for command of len < 8 it ok just to send
         # otherwise need to pack to a multiple of 8 bytes and send 8 at a time
         if cmd_len <= 8:
@@ -71,7 +72,7 @@ class USBPort(AbstractPort):
                 if len(chunk) < 8:
                     padding = 8 - len(chunk)
                     chunk += b'\x00' * padding
-                log.debug("sending chunk: %s" % (chunk))
+                log.debug("sending chunk: %s", chunk)
                 time.sleep(0.05)
                 os.write(self.port, chunk)
         time.sleep(0.25)
@@ -84,7 +85,7 @@ class USBPort(AbstractPort):
                 r = os.read(self.port, 256)
                 response_line += r
             except Exception as e:
-                log.debug("USB read error: {}".format(e))
+                log.debug("USB read error: %s", e)
             # Finished is \r is in byte_response
             if bytes([13]) in response_line:
                 # remove anything after the \r

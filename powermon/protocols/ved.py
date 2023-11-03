@@ -1,10 +1,11 @@
+""" protocols / ved.py """
 import logging
 from typing import Tuple
 
 from powermon.commands.result import ResultType
 from powermon.protocols.abstractprotocol import AbstractProtocol
 from powermon.commands.command_definition import CommandDefinition
-from mppsolar.protocols.protocol_helpers  import vedHexChecksum
+from mppsolar.protocols.protocol_helpers import vedHexChecksum
 
 # from .pi30 import COMMANDS
 
@@ -120,9 +121,9 @@ COMMANDS = {
 }
 
 
-class ved(AbstractProtocol):
+class VictronEnergyDirect(AbstractProtocol):
     """
-    VED - VEDirect protocol handler
+    VictronEnergyDirect - VEDirect protocol handler
     """
 
     def __str__(self):
@@ -139,14 +140,14 @@ class ved(AbstractProtocol):
             "",
         ]
         self.DEFAULT_COMMAND = "vedtext"
+        self._command_definition = None
 
     def get_full_command(self, command) -> bytes:
         """
         Override the default get_full_command as its different for VEDirect
         """
-        log.info(
-            f"Using protocol {self._protocol_id} with {len(self.command_definitions)} commands"
-        )
+        log.info("Using protocol %s with %i commands", self._protocol_id, len(self.command_definitions))
+
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_definition : CommandDefinition = self.get_command_with_command_string(command)
@@ -165,7 +166,7 @@ class ved(AbstractProtocol):
         cmd_type = self._command_definition.get_type()
         if cmd_type == "VEDTEXT":
             # Just listen - dont need to send a command
-            log.debug(f"command is VEDTEXT type so returning {cmd_type}")
+            log.debug("command is VEDTEXT type so returning %s", cmd_type)
             return cmd_type
         elif cmd_type == "VEDGET":
             ID = self._command_definition.code
@@ -175,9 +176,9 @@ class ved(AbstractProtocol):
             _r = bytes.fromhex(_r)
             checksum = vedHexChecksum(_r)
             cmd = f":{cmd}{checksum:02X}\n"
-            log.debug(f"full command: {cmd}")
+            log.debug("full command: %s", cmd)
             return cmd
-        log.warn("unable to generate full command - is the definition wrong?")
+        log.warning("unable to generate full command - is the definition wrong?")
         return None
 
     def check_response_and_trim(self, response) -> Tuple[bool, dict]:
@@ -189,7 +190,7 @@ class ved(AbstractProtocol):
             return False, {"validity check": ["Error: Response was empty", ""]}
         if b":" in response:
             # HEX protocol response
-            log.debug(f"checking validity of {response}")
+            log.debug("checking validity of '%s'", response)
             _r = response.split(b":")[1][:-1].decode()
             # print(f"trimmed response {_r}")
             _r = f"0{_r}"
@@ -199,9 +200,7 @@ class ved(AbstractProtocol):
             data = _r[:-1]
             checksum = _r[-1:][0]
             if vedHexChecksum(data) == checksum:
-                log.debug(
-                    f"VED Hex Checksum matches in response '{response}' checksum:{checksum}"
-                )
+                log.debug("VED Hex Checksum matches in response '%s' checksum:'%s'", response, checksum)
                 return True, {}
             else:
                 # print("VED Hex Checksum does not match")
@@ -242,8 +241,8 @@ class ved(AbstractProtocol):
             else:
                 return bytearray(response)
                 # convert string hex to bytes
-                _r = bytes.fromhex(_r)
-                return bytearray(_r)
+                # _r = bytes.fromhex(_r)
+                # return bytearray(_r)
         else:
             # for text protocol responses
             _responses = response.split(b"\r")

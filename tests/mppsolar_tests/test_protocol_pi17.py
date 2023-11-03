@@ -17,12 +17,12 @@ norminal_ac_input_voltage=2300(0.1V)
 battery_piece_number=04(ea)
 battery_standard_voltage_per_unit=120(0.1V)\n"""),
     ("DM", """model_code=050\n"""),
-    ("INGS", """input_current_r=20(0.1V)
-input_current_s=19(0.1V)
-input_current_t=21(0.1V)
-output_current_r=2(0.1V)
-output_current_s=4(0.1V)
-output_current_t=5(0.1V)
+    ("INGS", """input_current_r=20(0.1A)
+input_current_s=19(0.1A)
+input_current_t=21(0.1A)
+output_current_r=2(0.1A)
+output_current_s=4(0.1A)
+output_current_t=5(0.1A)
 pbusvolt=3809(0.1V)
 nbusvolt=3809(0.1V)
 pbusavgv=3810(0.1V)
@@ -121,10 +121,10 @@ battery_discharge_to_loads_when_solar_input_normal=disabled
 battery_discharge_to_loads_when_solar_input_loss=disabled
 battery_discharge_to_feed_grid_when_solar_input_normal=disabled
 battery_discharge_to_feed_grid_when_solar_input_loss=disabled\n"""),
-    ("EY2023", """generated_energy=6591(kWh)\n"""),
-    ("EM202301", """generated_energy=6591(kWh)\n"""),
-    ("ED20230213", """generated_energy=91(kWh)\n"""),
-    ("EH2023021323", """generated_energy=1(kWh)\n"""),
+    ("EY2023", """generated_energy=6591(Wh)\n"""),
+    ("EM202301", """generated_energy=6591(Wh)\n"""),
+    ("ED20230213", """generated_energy=91(Wh)\n"""),
+    ("EH2023021323", """generated_energy=1(Wh)\n"""),
 ]
 # ("", """\n"""),
 # ("DI", """\n"""),

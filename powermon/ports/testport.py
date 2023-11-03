@@ -1,3 +1,4 @@
+""" testport.py """
 import logging
 import random
 
@@ -12,9 +13,12 @@ log = logging.getLogger("test")
 
 
 class TestPort(AbstractPort):
+    """ test port object - responds with test data (if configured in the protocol) """
+
     @classmethod
-    def fromConfig(cls, config=None):
-        log.debug(f"building test port. config:{config}")
+    def from_config(cls, config=None):
+        log.debug("building test port. config:%s", config)
+        # allows specification of which of the test responses to use (mainly to allow test cases to be repeatable)
         response_number = config.get("response_number", None)
         # get protocol handler, default to PI30 if not supplied
         protocol = get_protocol_definition(protocol=config.get("protocol", "PI30"))
@@ -24,15 +28,16 @@ class TestPort(AbstractPort):
         super().__init__(protocol=protocol)
         self.response_number = response_number
         self.connected = False
+        self._test_data = None
 
     def __str__(self):
         return "Test port"
 
-    def toDTO(self) -> PortDTO:
+    def to_dto(self) -> PortDTO:
         dto = PortDTO(type="test", protocol=self.get_protocol().toDTO())
         return dto
 
-    def isConnected(self):
+    def is_connected(self):
         log.debug("Test port is connected")
         return True
 
@@ -44,7 +49,6 @@ class TestPort(AbstractPort):
     def disconnect(self) -> None:
         log.debug("Test port disconnected")
         self.connected = False
-        return
 
     def send_and_receive(self, command: Command) -> Result:
         command_defn : CommandDefinition = command.command_definition
@@ -58,7 +62,7 @@ class TestPort(AbstractPort):
                 self._test_data = command_defn.test_responses[random.randrange(number_of_test_responses)]
         else:
             # No test responses defined
-            log.warn("Testing a command with no test responses defined") 
+            log.warning("Testing a command with no test responses defined")
             self._test_data = None
         response_line = self._test_data
         log.debug(f"Raw response {response_line}")

@@ -1,0 +1,25 @@
+# minimal config for powermon
+device:
+  name: Test_Inverter
+  id: 123456789
+  model: 8048MAX
+  manufacturer: MPP-Solar
+  port:
+    type: serialx
+    path: /dev/ttyUSB0
+    baud: 0
+    protocol: invalid
+
+commands:
+# # - command: QMCHGCR
+# #   outputs:
+# #   - type: screen
+# #     format: raw
+- command: QID
+  trigger:
+    every: 5  # every 5 seconds
+#   outputs:
+#   - type: screen
+#     format:
+#       type: table
+#       draw_lines: True
