@@ -13,15 +13,15 @@ async def main(address):
         for service in services:
             print('\nservice', service.handle, service.uuid, service.description)
 
-        characteristics = service.characteristics
+            characteristics = service.characteristics
 
-        for char in characteristics:
-            print('  characteristic', char.handle, char.uuid, char.description, char.properties)
+            for char in characteristics:
+                print('  characteristic', char.handle, char.uuid, char.description, char.properties)
 
-            descriptors = char.descriptors
+                descriptors = char.descriptors
 
-            for desc in descriptors:
-                print('    descriptor', desc)
+                for desc in descriptors:
+                    print('    descriptor', desc)
 
 if __name__ == "__main__":
     address = sys.argv[1]
