@@ -853,9 +853,7 @@ class PI30(AbstractProtocol):
         calc_crc_high, calc_crc_low = crc(response[:-3])
         crc_high, crc_low = response[-3], response[-2]
         if [calc_crc_high, calc_crc_low] != [crc_high, crc_low]:
-            raise ValueError(f"failed validity check: response has invalid CRC - \
-                                got '\\x{crc_high:02x}\\x{crc_low:02x}', \
-                                calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'")
+            raise ValueError(f"failed validity check: response has invalid CRC - got '\\x{crc_high:02x}\\x{crc_low:02x}', calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'")
         log.debug("CRCs match")
 
     # def check_response_and_trim(self, response: str):

@@ -24,7 +24,8 @@ class ResultType(Enum):
 class Result:
     """ object to contain all the info of a result """
     def __str__(self):
-        return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, {' '.join(str(i) for i in self.readings)}"
+        return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, \
+            {' '.join(str(i) for i in self.readings)}"
 
     def __init__(self, command_code: str, result_type: str, reading_definitions: list[ReadingDefinition] = None,
                  parameters: dict[str, Parameter] = None, raw_response=None):
