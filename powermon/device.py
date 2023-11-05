@@ -2,7 +2,7 @@
 import logging
 
 from powermon.commands.command import Command
-from powermon.commands.result import Result
+from powermon.commands.result import Result, ResultType
 from powermon.dto.deviceDTO import DeviceDTO
 from powermon.errors import ConfigError
 from powermon.outputs.abstractoutput import AbstractOutput
@@ -103,7 +103,7 @@ class Device:
                     result: Result = self.port.run_command(command)
                 except Exception as exception:  # pylint: disable=W0718
                     log.error("Error decoding result: %s", exception)
-                    result = Result(command_code=command.code)
+                    result = Result(command_code=command.code, result_type=ResultType.ERROR)
                     result.error = True
                     result.error_messages.append(f"Error decoding result: {exception}")
                     result.error_messages.append(f"Exception Type: {exception.__class__.__name__}")

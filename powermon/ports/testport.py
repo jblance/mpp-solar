@@ -64,8 +64,10 @@ class TestPort(AbstractPort):
             # No test responses defined
             log.warning("Testing a command with no test responses defined")
             self._test_data = None
+        # Get raw response
         response_line = self._test_data
         log.debug("Raw response: %s", response_line)
-        response = self.get_protocol().check_response_and_trim(response_line)  # FIXME: Needs a result
-        result = command.build_result(raw_response=response)
+
+        # response = self.get_protocol().check_response_and_trim(response_line)
+        result = command.build_result(raw_response=response_line, protocol=self.get_protocol())
         return result

@@ -1,3 +1,4 @@
+""" table.py """
 import logging
 
 from mppsolar.helpers import get_max_response_length, pad
@@ -23,7 +24,7 @@ class table(AbstractFormat):
         self.command_description = command_description
 
     def format(self, result: Result) -> list[str]:
-        log.info("Using output formatter: %s" % self.name)
+        log.info("Using output formatter: %s", self.name)
 
         _result = []
 
@@ -39,7 +40,7 @@ class table(AbstractFormat):
             return _result
 
         filtered_responses: list[Reading] = self.format_and_filter_data(result)
-        log.debug(f"displayData: {filtered_responses}")
+        log.debug("displayData: %s", *filtered_responses)
 
         # build header
         command_code = result.command_code

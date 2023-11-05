@@ -1,9 +1,14 @@
-from strenum import LowercaseStrEnum
-from enum import auto
+""" reading.py """
+# from enum import auto
+# from strenum import LowercaseStrEnum
+
 from powermon.dto.reading_dto import ReadingDTO
 
 
 class Reading:
+    def __str__(self):
+        return f"Reading: {self.data_name=}, {self.data_value=}, {self.data_unit=}, {self.is_valid=}"
+
     def __init__(self, data_name: str,
                  data_value: str,
                  data_unit: str,
@@ -20,9 +25,6 @@ class Reading:
 
     def to_dto(self) -> ReadingDTO:
         return ReadingDTO(data_name=self.get_data_name(), data_value=self.get_data_value(), data_unit=self.get_data_unit())
-
-    def __str__(self):
-        return f"Response: {self.data_name=}, {self.data_value=}, {self.data_unit=}"
 
     def get_data_name(self) -> str:
         return self.data_name.replace(" ", "_").lower()

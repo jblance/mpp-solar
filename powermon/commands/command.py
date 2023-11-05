@@ -39,12 +39,13 @@ class Command():
         self.device_id = None  # TODO: shouldnt need this
         log.debug(self)
 
-    def build_result(self, raw_response=None) -> Result:
+    def build_result(self, raw_response=None, protocol=None) -> Result:
         log.debug("build_result: code:%s, command_definition:%s", self.code, self.command_definition)
+        trimmed_response = protocol.check_response_and_trim(raw_response)
         result = Result(
             self.code, result_type=self.command_definition.result_type,
             reading_definitions=self.get_response_definitions(),
-            parameters=self.command_definition.parameters, raw_response=raw_response
+            parameters=self.command_definition.parameters, raw_response=trimmed_response
         )
         return result
 

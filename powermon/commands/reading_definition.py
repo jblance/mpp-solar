@@ -21,6 +21,7 @@ class ReadingType(LowercaseStrEnum):
     ACK = auto()
     WATT_HOURS = auto()
     AMPS = auto()
+    STRING = auto()
 
 
 class ReadingDefinition(ABC):
@@ -90,6 +91,16 @@ class ReadingDefinition(ABC):
             )
         elif reading_type == ReadingType.WATT_HOURS:
             return ReadingDefinitionWattHours(
+                index=index,
+                name=name,
+                response_type=response_type,
+                description=description,
+                device_class=device_class,
+                state_class=state_class,
+                icon=icon,
+            )
+        elif reading_type == ReadingType.STRING:
+            return ReadingDefinitionString(
                 index=index,
                 name=name,
                 response_type=response_type,
@@ -275,6 +286,38 @@ class ReadingDefinitionWattHours(ReadingDefinition):
             )
         ]
 
+
+class ReadingDefinitionString(ReadingDefinition):
+    def __init__(
+        self,
+        index: int,
+        name: str,
+        response_type: str,
+        description: str,
+        device_class: str = None,
+        state_class: str = None,
+        icon: str = None
+    ):
+        super().__init__(index, name, response_type, "", description, device_class, state_class, icon)
+        
+    def is_valid_response(self, value) -> bool:
+        return True
+
+    def translate_raw_response(self, raw_value) -> str:
+        return raw_value.decode('utf-8')
+
+    def reading_from_raw_response(self, raw_value) -> list[Reading]:
+        value = self.translate_raw_response(raw_value)
+        return [
+            Reading(
+                data_name=self.description,
+                data_value=str(value),
+                data_unit=self.unit,
+                device_class=self.device_class,
+                state_class=self.state_class,
+                icon=self.icon,
+            )
+        ]
 
 class ResponseDefinitionInt(ReadingDefinition):
     def __init__(self, index: int, description: str, unit: str, device_class: str = None, state_class: str = None, icon: str = None):

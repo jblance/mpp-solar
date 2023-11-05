@@ -121,13 +121,20 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.info("No command_defn found for %s", command)
         return None
 
+    def check_crc(self, response: str):
+        """ crc check, needs override in protocol """
+        log.debug("check crc for %s", response)
+        return
+
     def check_response_and_trim(self, response: str) -> str:
         """
         Simplest validity check, CRC checks should be added to individual protocols
         """
-        log.debug("response: %s", %s)
+        log.debug("response: %s", response)
         if response is None:
             raise ValueError("Response is None")
-        else:
-            response = response[1:-3]
+        if len(response) <= 3:
+            raise ValueError("Response is too short")
+        self.check_crc(response)
+        response = response[1:-3]
         return response

@@ -252,7 +252,7 @@ QUERY_COMMANDS = {
         "help": " -- queries the device serial number",
         "result_type": ResultType.INDEXED,
         "reading_definitions": [{
-            "index": 0, "description": "Serial Number", "reading_type": ReadingType.ACK, "response_type": ResponseType.BYTES
+            "index": 0, "description": "Serial Number", "reading_type": ReadingType.STRING, "response_type": ResponseType.BYTES
         }],
         "test_responses": [b"(9293333010501\xbb\x07\r"],
     },
@@ -846,42 +846,48 @@ class PI30(AbstractProtocol):
         self.ID_COMMANDS = ["QPI", "QGMN", "QMN"]
         self.check_definitions_count()
 
-    def check_response_and_trim(self, result: Result):
-        # fail if no response
-        if result.raw_response is None:
-            result.is_valid = False
-            result.error = True
-            result.error_messages.append("failed validity check: response was empty")
-            return
-        # FIXME: fail if dict??? not sure what this is for
-        if type(result.raw_response) is dict:
-            result.is_valid = False
-            result.error = True
-            result.error_messages.append("failed validity check: incorrect raw_response format (found dict)")
-            return
-        # fail on short responses
-        if len(result.raw_response) <= 3:
-            result.is_valid = False
-            result.error = True
-            result.error_messages.append(
-                f"failed validity check: response to short len was {len(result.raw_response)}"
-            )
-            return
+    def check_crc(self, response: str):
+        """ crc check, needs override in protocol """
+        log.debug("check crc for %s in pi30", response)
         # check crc matches the calculated one
-        calc_crc_high, calc_crc_low = crc(result.raw_response[:-3])
-        if type(result.raw_response) is str:
-            crc_high, crc_low = ord(result.raw_response[-3]), ord(result.raw_response[-2])
-        else:
-            crc_high, crc_low = result.raw_response[-3], result.raw_response[-2]
+        calc_crc_high, calc_crc_low = crc(response[:-3])
+        crc_high, crc_low = response[-3], response[-2]
         if [calc_crc_high, calc_crc_low] != [crc_high, crc_low]:
-            result.is_valid = False
-            result.error = True
-            result.error_messages.append(
-                f"failed validity check: response has invalid CRC - \
-                    got '\\x{crc_high:02x}\\x{crc_low:02x}', \
-                    calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'"
-            )
-            return
-            # if result.raw_response[-3:-1] != bytes([calc_crc_high, calc_crc_low]):
+            raise ValueError(f"failed validity check: response has invalid CRC - \
+                                got '\\x{crc_high:02x}\\x{crc_low:02x}', \
+                                calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'")
         log.debug("CRCs match")
-        return
+
+    # def check_response_and_trim(self, response: str):
+    #     # fail if no response
+    #     if response is None:
+    #         result.is_valid = False
+    #         result.error = True
+    #         result.error_messages.append("failed validity check: response was empty")
+    #         return
+    #     # fail on short responses
+    #     if len(result.raw_response) <= 3:
+    #         result.is_valid = False
+    #         result.error = True
+    #         result.error_messages.append(
+    #             f"failed validity check: response to short len was {len(result.raw_response)}"
+    #         )
+    #         return
+    #     # check crc matches the calculated one
+    #     calc_crc_high, calc_crc_low = crc(result.raw_response[:-3])
+    #     if type(result.raw_response) is str:
+    #         crc_high, crc_low = ord(result.raw_response[-3]), ord(result.raw_response[-2])
+    #     else:
+    #         crc_high, crc_low = result.raw_response[-3], result.raw_response[-2]
+    #     if [calc_crc_high, calc_crc_low] != [crc_high, crc_low]:
+    #         result.is_valid = False
+    #         result.error = True
+    #         result.error_messages.append(
+    #             f"failed validity check: response has invalid CRC - \
+    #                 got '\\x{crc_high:02x}\\x{crc_low:02x}', \
+    #                 calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'"
+    #         )
+    #         return
+    #         # if result.raw_response[-3:-1] != bytes([calc_crc_high, calc_crc_low]):
+    #     log.debug("CRCs match")
+    #     return
