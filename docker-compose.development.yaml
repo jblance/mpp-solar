@@ -2,6 +2,8 @@ services:
   mosquitto:
     image: eclipse-mosquitto
     network_mode: host
+    ports:
+    - "1883:1883"
     volumes:
       - ./docker/mosquitto/config:/mosquitto/config
       - ./docker/mosquitto/data:/mosquitto/data
@@ -9,8 +11,8 @@ services:
 
   mppsolar:
     network_mode: host
-    devices:
-     - /dev/hidraw0:/dev/hidraw0
+    # devices:
+    #  - /dev/hidraw0:/dev/hidraw0
     volumes:
     #Bind over the configuration
       - type: bind

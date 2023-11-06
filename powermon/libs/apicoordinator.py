@@ -6,6 +6,7 @@ from powermon.commands.command import Command
 from powermon.commands.trigger import Trigger
 from powermon.device import Device
 from powermon.dto.commandDTO import CommandDTO
+from powermon.dto.apicoordinatorDTO import ApicoordinatorDTO
 from powermon.formats.simple import SimpleFormat
 from powermon.outputs.api_mqtt import API_MQTT
 
@@ -18,6 +19,11 @@ class ApiCoordinator:
         if not self.enabled:
             return "ApiCoordinator DISABLED"
         return f"ApiCoordinator: adhocTopic: {self.adhoc_topic_format}, announceTopic: {self.announce_topic}"
+
+    def to_dto(self):
+        """ convert object to data transfer object """
+        dto = ApicoordinatorDTO(name="ApiCoordinator", description="api coordinator to_dto is todo")
+        return dto
 
     @classmethod
     def from_config(cls, config=None):
@@ -47,9 +53,10 @@ class ApiCoordinator:
 
     def set_device(self, device: Device):
         self.device = device
-        self.announce(self.device)
+        # self.announce(self.device)
 
     def set_mqtt_broker(self, mqtt_broker):
+        log.debug("setting mqtt_broker to %s", mqtt_broker)
         self.mqtt_broker = mqtt_broker
 
         if self.mqtt_broker is None or self.mqtt_broker.disabled:
@@ -108,5 +115,5 @@ class ApiCoordinator:
         if not self.enabled:
             log.debug("Not announcing obj: %s as api DISABLED", obj_dto)
             return
-        log.debug("Announcing obj: %s to api", obj_dto)
+        log.debug("Announcing obj: %s to api on topic: %s", obj_dto, self.announce_topic)
         self.mqtt_broker.publish(self.announce_topic, obj_dto.json())

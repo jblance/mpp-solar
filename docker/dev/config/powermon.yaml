@@ -1,5 +1,6 @@
 # yaml config for powermon
-debuglevel: debug
+# logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+debuglevel: INFO
 
 device:
   id: test
@@ -8,18 +9,18 @@ device:
   manufacturer: MPP-Solar
   port:
     path: /dev/hidraw0
-    type: usb
+    type: test
     protocol: PI30
 
 commands:
-- command: QPIRI #Must be in the protocol command list
+- command: QID #Must be in the protocol command list
   type: basic
   trigger:
-    every: 100  # seconds
+    every: 5  # seconds
   outputs:
-  - type: screen
+  - type: api_mqtt
     format: 
-      type: hass
+      type: simple
 
           
 mqttbroker:
@@ -37,8 +38,8 @@ api:
   adhoc_topic: powermon/adhoc
   refresh_interval: 30
 
-daemon:
-  type: systemd
-  keepalive: 100
+# daemon:
+#   type: systemd
+#   keepalive: 100
 
 loop: null

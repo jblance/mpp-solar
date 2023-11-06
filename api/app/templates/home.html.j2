@@ -7,7 +7,7 @@
     <h1>Devices</h1>
     {% if devices is defined%}
         {% for device in devices %}
-            <h2>Id: {{ device.identifier }}</h2>
+            <h2>Id: {{ device.device_id }}</h2>
             <ul>
                 <li>Model: {{ device.model }}</li>
                 <li>Manufacturer: {{ device.manufacturer }}</li>
