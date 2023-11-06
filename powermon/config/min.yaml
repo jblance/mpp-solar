@@ -15,7 +15,7 @@ commands:
 #   outputs:
 #   - type: screen
 #     format: raw
-- command: QID
+- command: F50
   trigger:
     every: 5  # every 5 seconds
   outputs:

@@ -24,8 +24,7 @@ class ResultType(Enum):
 class Result:
     """ object to contain all the info of a result """
     def __str__(self):
-        return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, \
-            {' '.join(str(i) for i in self.readings)}"
+        return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, {' '.join(str(i) for i in self.readings)}"
 
     def __init__(self, command_code: str, result_type: str, reading_definitions: list[ReadingDefinition] = None,
                  parameters: dict[str, Parameter] = None, raw_response=None):
@@ -67,7 +66,7 @@ class Result:
         self.readings.extend(responses)
         return True
 
-    # If we split reults into different types then each type can have its own decode_response
+    # If we split results into different types then each type can have its own decode_response
     def decode_response(self, raw_response) -> list[Reading]:
         """
         Take the raw response and decode into a list of Readings depending on the result type
@@ -77,14 +76,26 @@ class Result:
 
         all_readings : list[Reading] = []
 
-        if self.result_type is ResultType.MULTIVALUED:
-            readings = self.validate_and_translate_raw_value(self.raw_response, index=0)
-            all_readings.extend(readings)
-        else:
-            # Split the response into individual responses
-            for i, raw_response in enumerate(self.split_responses(self.raw_response)):
-                readings = self.validate_and_translate_raw_value(raw_response, index=i)
+        # Process response based on result type
+        match self.result_type:
+            case ResultType.SINGLE:
+                readings = self.validate_and_translate_raw_value(self.raw_response, index=0)
                 all_readings.extend(readings)
+            case ResultType.ACK:
+                readings = self.validate_and_translate_raw_value(self.raw_response, index=0)
+                all_readings.extend(readings)
+            case ResultType.INDEXED:
+                # Response is splitable and order of each item determines decode logic
+                for i, _raw_response in enumerate(self.split_responses(self.raw_response)):
+                    readings = self.validate_and_translate_raw_value(_raw_response, index=i)
+                    all_readings.extend(readings)
+            case ResultType.MULTIVALUED:
+                # while response has multiple values, the all relate to a single result
+                readings = self.validate_and_translate_raw_value(self.raw_response, index=0)
+                all_readings.extend(readings)
+            case _:
+                # unknown result type
+                raise ValueError(f"Unknown result type: {self.result_type}")
 
         return all_readings
 
@@ -98,12 +109,12 @@ class Result:
     def validate_and_translate_raw_value(self, raw_value: str, index: int) -> list[Reading]:
         if len(self.reading_definitions) <= index:
             raise IndexError(f"Index {index} is out of range for command {self.command_code}")
-        response_definition: ReadingDefinition = self.reading_definitions[index]
+        reading_definition: ReadingDefinition = self.reading_definitions[index]
         try:
-            return response_definition.reading_from_raw_response(raw_value)
+            return reading_definition.reading_from_raw_response(raw_value)
         except ValueError:
             error = Reading(
-                data_name=response_definition.get_description(), data_value=response_definition.get_invalid_message(raw_value), data_unit=""
+                data_name=reading_definition.get_description(), data_value=reading_definition.get_invalid_message(raw_value), data_unit=""
             )
             error.is_valid = False
             return [error]
