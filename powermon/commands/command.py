@@ -44,7 +44,7 @@ class Command():
         trimmed_response = protocol.check_response_and_trim(raw_response)
         result = Result(
             self.code, result_type=self.command_definition.result_type,
-            reading_definitions=self.get_response_definitions(),
+            reading_definitions=self.get_reading_definitions(),
             parameters=self.command_definition.parameters, raw_response=trimmed_response
         )
         return result
@@ -74,7 +74,7 @@ class Command():
         for output in self.outputs:
             output.formatter.set_command_description(self.command_description)
 
-    def get_response_definitions(self) -> list[ReadingDefinition]:
+    def get_reading_definitions(self) -> list[ReadingDefinition]:
         return self.command_definition.reading_definitions
 
     def set_outputs(self, outputs: list[AbstractOutput]):

@@ -52,7 +52,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         """ Add command definitions from the configuration """
         for command_definition_key in command_definitions_config.keys():
             try:
-                log.debug("Attempting to add command_definition_key: %s", command_definition_key)
+                log.debug("Attempting to add command_definition_key: %s of type: %s", command_definition_key, command_definition_type)
                 command_definition = CommandDefinition.from_config(command_definitions_config[command_definition_key], command_definition_type)
                 self.command_definitions[command_definition_key] = command_definition
             except ValueError as value_error:
