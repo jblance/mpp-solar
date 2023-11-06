@@ -1,23 +1,25 @@
-"""command.py"""
+""" commands / command.py """
 import logging
-from time import localtime, strftime
 
 from powermon.commands.command_definition import CommandDefinition
-from powermon.commands.reading import Reading
-from powermon.commands.reading_definition import ReadingDefinition
-from powermon.commands.trigger import Trigger
-from powermon.commands.result import ResultType
+# from powermon.commands.result import ResultType
 from powermon.commands.parameter import Parameter
+# from powermon.commands.reading import Reading
+from powermon.commands.reading_definition import ReadingDefinition
 from powermon.commands.result import Result
+from powermon.commands.trigger import Trigger
 from powermon.dto.commandDTO import CommandDTO
 from powermon.outputs import getOutputs
 from powermon.outputs.abstractoutput import AbstractOutput, OutputType
 from powermon.outputs.api_mqtt import API_MQTT
 
+# from time import localtime, strftime
+
+
 log = logging.getLogger("Command")
 
 
-class Command:
+class Command():
     """
     Command object, holds the details of the command, including:
     - trigger
@@ -36,11 +38,15 @@ class Command:
         self.command_definition: CommandDefinition = None
         self.device_id = None  # TODO: shouldnt need this
         log.debug(self)
-        
-    
-        
-    def build_result(self, raw_response=None) -> Result:
-        result = Result(self.code, result_type=self.command_definition.result_type, reading_definitions=self.get_response_definitions(), parameters=self.command_definition.parameters, raw_response=raw_response)
+
+    def build_result(self, raw_response=None, protocol=None) -> Result:
+        log.debug("build_result: code:%s, command_definition:%s", self.code, self.command_definition)
+        trimmed_response = protocol.check_response_and_trim(raw_response)
+        result = Result(
+            self.code, result_type=self.command_definition.result_type,
+            reading_definitions=self.get_reading_definitions(),
+            parameters=self.command_definition.parameters, raw_response=trimmed_response
+        )
         return result
 
     def set_full_command(self, full_command):
@@ -68,7 +74,7 @@ class Command:
         for output in self.outputs:
             output.formatter.set_command_description(self.command_description)
 
-    def get_response_definitions(self) -> list[ReadingDefinition]:
+    def get_reading_definitions(self) -> list[ReadingDefinition]:
         return self.command_definition.reading_definitions
 
     def set_outputs(self, outputs: list[AbstractOutput]):
@@ -81,9 +87,8 @@ class Command:
         for output in self.outputs:
             output.set_device_id(device_id)
 
-    def get_parameters(self) -> dict[str,Parameter]:
+    def get_parameters(self) -> dict[str, Parameter]:
         return self.command_definition.parameters
-        
 
     def __str__(self):
         if self.code is None:

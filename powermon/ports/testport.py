@@ -34,7 +34,7 @@ class TestPort(AbstractPort):
         return "Test port"
 
     def to_dto(self) -> PortDTO:
-        dto = PortDTO(type="test", protocol=self.get_protocol().toDTO())
+        dto = PortDTO(type="test", protocol=self.get_protocol().to_dto())
         return dto
 
     def is_connected(self):
@@ -62,10 +62,11 @@ class TestPort(AbstractPort):
                 self._test_data = command_defn.test_responses[random.randrange(number_of_test_responses)]
         else:
             # No test responses defined
-            log.warning("Testing a command with no test responses defined")
-            self._test_data = None
+            raise ValueError(f"Testing a command '{command.code}' with no test responses defined")
+        # Get raw response
         response_line = self._test_data
-        log.debug(f"Raw response {response_line}")
-        response = self.get_protocol().check_response_and_trim(response_line)
-        result = command.build_result(raw_response=response)
+        log.debug("Raw response: %s", response_line)
+
+        # response = self.get_protocol().check_response_and_trim(response_line)
+        result = command.build_result(raw_response=response_line, protocol=self.get_protocol())
         return result

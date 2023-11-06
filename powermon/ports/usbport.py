@@ -92,7 +92,7 @@ class USBPort(AbstractPort):
                 response_line = response_line[: response_line.find(bytes([13])) + 1]
                 break
         log.debug("usb response was: %s", response_line)
-        response = self.get_protocol().check_response_and_trim(response_line)
-        result = command.build_result(raw_response=response)
+        # response = self.get_protocol().check_response_and_trim(response_line)
+        result = command.build_result(raw_response=response_line, protocol=self.get_protocol())
 
         return result

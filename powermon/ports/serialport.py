@@ -63,11 +63,10 @@ class SerialPort(AbstractPort):
         self.serial_port = None
 
     def send_and_receive(self, command: Command) -> Result:
-        
         full_command = command.full_command
         response_line = None
-        log.debug(f"port {self.serialPort}")
-        if self.serialPort is None:
+        log.debug("port: %s", self.serial_port)
+        if self.serial_port is None:
             raise RuntimeError("Serial port not open")
         try:
             log.debug("Executing command via usbserial...")
@@ -79,8 +78,8 @@ class SerialPort(AbstractPort):
             time.sleep(0.1)  # give serial port time to receive the data
             response_line = self.serial_port.read_until(b"\r")
             log.debug("serial response was: %s", response_line)
-            response = self.get_protocol().check_response_and_trim(response_line)
-            result = command.build_result(raw_response=response)
+            # response = self.get_protocol().check_response_and_trim(response_line)
+            result = command.build_result(raw_response=response_line, protocol=self.get_protocol())
             return result
         except Exception as e:
             log.warning("Serial read error: %s", e)
@@ -88,4 +87,3 @@ class SerialPort(AbstractPort):
             result.error_messages.append(f"Serial read error {e}")
             self.disconnect()
             return result
-

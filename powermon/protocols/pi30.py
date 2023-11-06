@@ -2,9 +2,9 @@
 import logging
 
 from mppsolar.protocols.protocol_helpers import crcPI as crc
-from powermon.commands.result import Result
+from powermon.commands.reading_definition import ReadingType, ResponseType
+# from powermon.commands.result import Result
 from powermon.commands.result import ResultType
-from powermon.commands.reading_definition import ResponseType
 from powermon.protocols.abstractprotocol import AbstractProtocol
 
 log = logging.getLogger("pi30")
@@ -14,8 +14,8 @@ SETTER_COMMANDS = {
         "name": "F",
         "description": "Set Device Output Frequency",
         "help": " -- examples: F50 (set output frequency to 50Hz) or F60 (set output frequency to 60Hz)",
-        "response_type": ResultType.ACK,
-        "response": [[0, "Command execution", ResponseType.ACK, {"NAK": "Failed", "ACK": "Successful"}]],
+        "result_type": ResultType.ACK,
+        "reading_definitions": [{"description": "Command execution", "response_type": ResponseType.ACK, "options": {"NAK": "Failed", "ACK": "Successful"}, "reading_type": ReadingType.ACK}],
         "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
         "regex": "F([56]0)$",
     },
@@ -245,37 +245,46 @@ SETTER_COMMANDS = {
 }
 
 QUERY_COMMANDS = {
-    "Q1": {
-        "name": "Q1",
-        "description": "Q1 query",
-        "response_type": ResultType.INDEXED,
-        "response": [
-            [0, "Time until the end of absorb charging", ResponseType.INT, "sec"],
-            [1, "Time until the end of float charging", ResponseType.INT, "sec"],
-            [2, "SCC Flag", ResponseType.OPTION, ["SCC not communicating?", "SCC is powered and communicating"]],
-            [3, "AllowSccOnFlag", ResponseType.BYTES, ""],
-            [4, "ChargeAverageCurrent", ResponseType.BYTES, ""],
-            [5, "SCC PWM temperature", ResponseType.INT, "\u00b0C", {"device-class": "temperature"}],
-            [6, "Inverter temperature", ResponseType.INT, "\u00b0C", {"device-class": "temperature"}],
-            [7, "Battery temperature", ResponseType.INT, "\u00b0C", {"device-class": "temperature"}],
-            [8, "Transformer temperature", ResponseType.INT, "\u00b0C", {"device-class": "temperature"}],
-            [9, "GPIO13", ResponseType.INT, ""],
-            [10, "Fan lock status", ResponseType.OPTION, ["Not locked", "Locked"]],
-            [11, "Not used", ResponseType.BYTES, ""],
-            [12, "Fan PWM speed", ResponseType.INT, "%"],
-            [13, "SCC charge power", ResponseType.INT, "W", {"icon": "mdi:solar-power", "device-class": "power"}],
-            [14, "Parallel Warning", ResponseType.BYTES, ""],
-            [15, "Sync frequency", ResponseType.FLOAT, ""],
-            [
-                16,
-                "Inverter charge status",
-                ResponseType.STR_KEYED,
-                {"10": "nocharging", "11": "bulk stage", "12": "absorb", "13": "float"},
-                {"icon": "mdi:book-open"},
-            ],
-        ],
-        "test_responses": [b"(00000 00000 01 01 00 059 045 053 068 00 00 000 0040 0580 0000 50.00 139\xb9\r"],
+    "QID": {
+        "name": "QID",
+        "description": "Device Serial Number inquiry",
+        "help": " -- queries the device serial number",
+        "result_type": ResultType.SINGLE,
+        "reading_definitions": [{"description": "Serial Number", "reading_type": ReadingType.STRING, "response_type": ResponseType.STRING}],
+        "test_responses": [b"(9293333010501\xbb\x07\r"],
     },
+    # "Q1": {
+    #     "name": "Q1",
+    #     "description": "Q1 query",
+    #     "result_type": ResultType.INDEXED,
+    #     "reading_definitions": [
+    #         {"index": 0, "description": "Time until the end of absorb charging", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING},
+    #         {"index": 1, "description": "Time until the end of float charging", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING},
+    #         {"index": 2, "description": "SCC Flag", "response_type": ResponseType.OPTION, "options": ["SCC not communicating?", "SCC is powered and communicating"], "reading_type": ReadingType.STRING},
+    #         {"index": 3, "description": "AllowSccOnFlag", "response_type": ResponseType.BYTES, "reading_type": ReadingType.STRING},
+    #         {"index": 4, "description": "ChargeAverageCurrent", "response_type": ResponseType.BYTES, "reading_type": ReadingType.STRING},
+    #         {"index": 5, "description": "SCC PWM temperature", "response_type": ResponseType.INT, "reading_type": ReadingType.TEMP, "device-class": "temperature"},
+    #         {"index": 6, "description": "Inverter temperature", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING, "device-class": "temperature"},
+    #         {"index": 7, "description": "Battery temperature", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING, "device-class": "temperature"},
+    #         {"index": 8, "description": "Transformer temperature", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING, "device-class": "temperature"},
+    #         {"index": 9, "description": "GPIO13", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING},
+    #         {"index": 10, "description": "Fan lock status", "response_type": ResponseType.OPTION, "options": ["Not locked", "Locked"], "reading_type": ReadingType.STRING},
+    #         {"index": 11, "description": "Not used", "response_type": ResponseType.BYTES, "reading_type": ReadingType.STRING},
+    #         {"index": 12, "description": "Fan PWM speed", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING},
+    #         {"index": 13, "description": "SCC charge power", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING, "icon": "mdi:solar-power", "device-class": "power"},
+    #         {"index": 14, "description": "Parallel Warning", "response_type": ResponseType.BYTES, "reading_type": ReadingType.STRING},
+    #         {"index": 15, "description": "Sync frequency", "response_type": ResponseType.FLOAT, "reading_type": ReadingType.STRING},
+    #         {
+    #             "index": 16,
+    #             "description": "Inverter charge status",
+    #             "response_type": ResponseType.STRING,
+    #             "options": {"10": "nocharging", "11": "bulk stage", "12": "absorb", "13": "float"},
+    #             "reading_type": ReadingType.STRING,
+    #             "icon": "mdi:book-open",
+    #         }
+    #     ],
+    #     "test_responses": [b"(00000 00000 01 01 00 059 045 053 068 00 00 000 0040 0580 0000 50.00 139\xb9\r"],
+    # },
     "QBOOT": {
         "name": "QBOOT",
         "description": "DSP Has Bootstrap inquiry",
@@ -380,20 +389,12 @@ QUERY_COMMANDS = {
         ],
         "test_responses": [b"(EakxyDbjuvz\x2F\x29\r"],
     },
-    "QID": {
-        "name": "QID",
-        "description": "Device Serial Number inquiry",
-        "help": " -- queries the device serial number",
-        "response_type": ResultType.INDEXED,
-        "response": [[0, "Serial Number", ResponseType.BYTES, ""]],
-        "test_responses": [b"(9293333010501\xbb\x07\r"],
-    },
     "QMCHGCR": {
         "name": "QMCHGCR",
         "description": "Max Charging Current Options inquiry",
         "help": " -- queries the maximum charging current setting of the Inverter",
         "response_type": ResultType.MULTIVALUED,
-        "response": [[0, "Max Charging Current Options", ResponseType.STRING, "A"]],
+        "response": [{"index": 0, "description": "Max Charging Current Options", "reading_type": ReadingType.AMPS, "response_type": ResponseType.STRING}],
         "test_responses": [b"(010 020 030 040 050 060 070 080 090 100 110 120\x0c\xcb\r"],
     },
     "QMOD": {
@@ -588,7 +589,7 @@ QUERY_COMMANDS = {
         "response": [[0, "Protocol Id", ResponseType.BYTES, ""]],
         "test_responses": [b"(PI30\x9a\x0b\r"],
     },
-    "QPIz": { # Question: is this a typo? Duplicate of QPI?
+    "QPIz": {  # Question: is this a typo? Duplicate of QPI?
         "name": "QPIz",
         "description": "Protocol ID inquiry",
         "help": " -- queries the device protocol ID. e.g. PI30 for HS series",
@@ -826,7 +827,7 @@ QUERY_COMMANDS = {
 }
 
 
-class pi30(AbstractProtocol):
+class PI30(AbstractProtocol):
     """ pi30 protocol handler """
     def __str__(self):
         return "PI30 protocol handler"
@@ -840,43 +841,49 @@ class pi30(AbstractProtocol):
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
         self.ID_COMMANDS = ["QPI", "QGMN", "QMN"]
-        log.info(f"Using protocol {self._protocol_id} with {len(self.command_definitions)} commands")
-        # log.info(f'Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands')
+        self.check_definitions_count()
 
-    def check_response_and_trim(self, result: Result):
-        # fail if no response
-        if result.raw_response is None:
-            result.is_valid = False
-            result.error = True
-            result.error_messages.append("failed validity check: response was empty")
-            return
-        # FIXME: fail if dict??? not sure what this is for
-        if type(result.raw_response) is dict:
-            result.is_valid = False
-            result.error = True
-            result.error_messages.append("failed validity check: incorrect raw_response format (found dict)")
-            return
-        # fail on short responses
-        if len(result.raw_response) <= 3:
-            result.is_valid = False
-            result.error = True
-            result.error_messages.append(
-                f"failed validity check: response to short len was {len(result.raw_response)}"
-            )
-            return
+    def check_crc(self, response: str):
+        """ crc check, needs override in protocol """
+        log.debug("check crc for %s in pi30", response)
         # check crc matches the calculated one
-        calc_crc_high, calc_crc_low = crc(result.raw_response[:-3])
-        if type(result.raw_response) is str:
-            crc_high, crc_low = ord(result.raw_response[-3]), ord(result.raw_response[-2])
-        else:
-            crc_high, crc_low = result.raw_response[-3], result.raw_response[-2]
+        calc_crc_high, calc_crc_low = crc(response[:-3])
+        crc_high, crc_low = response[-3], response[-2]
         if [calc_crc_high, calc_crc_low] != [crc_high, crc_low]:
-            result.is_valid = False
-            result.error = True
-            result.error_messages.append(
-                f"failed validity check: response has invalid CRC - got '\\x{crc_high:02x}\\x{crc_low:02x}', calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'"
-            )
-            return
-            # if result.raw_response[-3:-1] != bytes([calc_crc_high, calc_crc_low]):
+            raise ValueError(f"response has invalid CRC - got '\\x{crc_high:02x}\\x{crc_low:02x}', \
+                calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'")
         log.debug("CRCs match")
-        return
+
+    # def check_response_and_trim(self, response: str):
+    #     # fail if no response
+    #     if response is None:
+    #         result.is_valid = False
+    #         result.error = True
+    #         result.error_messages.append("failed validity check: response was empty")
+    #         return
+    #     # fail on short responses
+    #     if len(result.raw_response) <= 3:
+    #         result.is_valid = False
+    #         result.error = True
+    #         result.error_messages.append(
+    #             f"failed validity check: response to short len was {len(result.raw_response)}"
+    #         )
+    #         return
+    #     # check crc matches the calculated one
+    #     calc_crc_high, calc_crc_low = crc(result.raw_response[:-3])
+    #     if type(result.raw_response) is str:
+    #         crc_high, crc_low = ord(result.raw_response[-3]), ord(result.raw_response[-2])
+    #     else:
+    #         crc_high, crc_low = result.raw_response[-3], result.raw_response[-2]
+    #     if [calc_crc_high, calc_crc_low] != [crc_high, crc_low]:
+    #         result.is_valid = False
+    #         result.error = True
+    #         result.error_messages.append(
+    #             f"failed validity check: response has invalid CRC - \
+    #                 got '\\x{crc_high:02x}\\x{crc_low:02x}', \
+    #                 calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'"
+    #         )
+    #         return
+    #         # if result.raw_response[-3:-1] != bytes([calc_crc_high, calc_crc_low]):
+    #     log.debug("CRCs match")
+    #     return

@@ -1,7 +1,7 @@
 # minimal config for powermon
 device:
   name: Test_Inverter
-  id: 123456789
+  id: A123456789
   model: 8048MAX
   manufacturer: MPP-Solar
   port:
@@ -15,7 +15,7 @@ commands:
 #   outputs:
 #   - type: screen
 #     format: raw
-- command: QID
+- command: F50
   trigger:
     every: 5  # every 5 seconds
   outputs:

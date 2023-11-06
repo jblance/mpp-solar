@@ -141,6 +141,7 @@ class VictronEnergyDirect(AbstractProtocol):
         ]
         self.DEFAULT_COMMAND = "vedtext"
         self._command_definition = None
+        self.check_definitions_count()
 
     def get_full_command(self, command) -> bytes:
         """

@@ -28,8 +28,8 @@ def get_protocol_definition(protocol):
 
     match protocol_id:
         case Protocol.PI30:
-            from powermon.protocols.pi30 import pi30
-            return pi30()
+            from powermon.protocols.pi30 import PI30
+            return PI30()
         case Protocol.PI30MAX:
             from powermon.protocols.pi30max import pi30max
             return pi30max()
