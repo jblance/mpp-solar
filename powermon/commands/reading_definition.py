@@ -7,7 +7,6 @@ from strenum import LowercaseStrEnum
 
 from powermon.commands.reading import Reading
 
-
 class ResponseType(LowercaseStrEnum):
     """
     the type of the response
@@ -15,16 +14,15 @@ class ResponseType(LowercaseStrEnum):
     """
     ACK = auto()
     INT = auto()
-    OPTION = auto()
+    OPTION_LIST = auto()
     BYTES = "bytes.decode"  # can't use auto() for this value
     FLOAT = auto()
-    STR_KEYED = auto()
+    OPTION_DICTIONARY = auto()
     ENFLAGS = auto()
     STRING = auto()
     FLAGS = auto()
     INFO = auto()
-
-
+    
 class ReadingType(LowercaseStrEnum):
     """
     the type of the reading
@@ -33,13 +31,14 @@ class ReadingType(LowercaseStrEnum):
     """
     ACK = auto()
     WATT_HOURS = auto()
-    AMPS = auto()
     WATTS = auto()
-    STRING = auto()
-    TEMP = auto()
-    OPTION = auto()
-    BYTES = auto()
-    FLOAT = auto()
+    TIME = auto()
+    MESSAGE = auto()
+    FLAG = auto()
+    AMPERAGE = auto()
+    TEMPERATURE = auto()
+    PERCENTAGE = auto()
+    HERTZ = auto()
 
 
 class ReadingDefinition(ABC):
