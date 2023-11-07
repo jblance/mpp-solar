@@ -4,7 +4,7 @@ from powermon import Device
 from powermon.ports import SerialPort
 from powermon.commands.command import Command
 from powermon.outputs.abstractoutput import AbstractOutput
-from powermon.protocols.pi30max import pi30
+from powermon.protocols.pi30 import PI30
 
 
 class DeviceTest(TestCase):
@@ -14,7 +14,7 @@ class DeviceTest(TestCase):
         self.device = None
 
     def setUp(self) -> None:
-        self.port = Mock(spec=SerialPort, protocol=pi30())
+        self.port = Mock(spec=SerialPort, protocol=PI30())
         self.device = Device(name="Test Device", port=self.port)
 
     def test_if_output_processed_in_success_run(self):

@@ -53,7 +53,7 @@ class test_command(unittest.TestCase):
         qed_command_definition = protocol.get_command_with_command_string("QED20210901")
         command = Command(code="QED20210901", commandtype="GETTER", outputs=[], trigger=None)
         command.set_command_definition(qed_command_definition)
-        result = command.build_result(b"00238800")
+        result = command.build_result(b"(00238800!J\r", protocol=protocol)
         reading = result.readings[0]
         self.assertEqual(reading.data_unit, "Wh")
         self.assertEqual(reading.data_value, "238800")

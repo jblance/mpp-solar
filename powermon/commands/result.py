@@ -26,8 +26,8 @@ class Result:
     def __str__(self):
         return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, {' '.join(str(i) for i in self.readings)}"
 
-    def __init__(self, command_code: str, result_type: str, reading_definitions: list[ReadingDefinition] = None,
-                 parameters: dict[str, Parameter] = None, raw_response=None):
+    def __init__(self, command_code: str, result_type: str, raw_response, reading_definitions: list[ReadingDefinition] = None,
+                 parameters: dict[str, Parameter] = None):
         if raw_response is None:
             raise ValueError("raw_response cannot be None")
 

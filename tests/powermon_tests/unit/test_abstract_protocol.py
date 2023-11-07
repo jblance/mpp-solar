@@ -16,7 +16,7 @@ class test_protocol_pi30(unittest.TestCase):
                 "name": "PBT",
                 "description": "Set Battery Type",
                 "help": " -- examples: PBT00 (set battery as AGM), PBT01 (set battery as FLOODED), PBT02 (set battery as USER)",
-                "result_type": ResultType.COMMAND,
+                "result_type": ResultType.ACK,
                 "reading_definitions": [{"index":0, "decription":"Command execution", "reading_type":ReadingType.ACK, "response_type":ResponseType.ACK}],
                 "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
                 "regex": "PBT(0[012])$",
