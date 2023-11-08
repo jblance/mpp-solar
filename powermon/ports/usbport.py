@@ -28,7 +28,7 @@ class USBPort(AbstractPort):
         self.port = None
 
     def to_dto(self):
-        dto = PortDTO(type="usb", path=self.path, protocol=self.get_protocol().toDTO())
+        dto = PortDTO(type="usb", path=self.path, protocol=self.get_protocol().to_dto())
         return dto
 
     def is_connected(self):

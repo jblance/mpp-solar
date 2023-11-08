@@ -40,7 +40,7 @@ class Command():
         log.debug(self)
 
     def build_result(self, raw_response=None, protocol=None) -> Result:
-        log.debug("build_result: code:%s, command_definition:%s", self.code, self.command_definition)
+        log.debug(f"build_result: code:{self.code}, command_definition:{self.command_definition}")
         trimmed_response = protocol.check_response_and_trim(raw_response)
         result = Result(
             self.code, result_type=self.command_definition.result_type,

@@ -94,6 +94,8 @@ class Result:
                 # while response has multiple values, the all relate to a single result
                 readings = self.validate_and_translate_raw_value(self.raw_response, index=0)
                 all_readings.extend(readings)
+            case ResultType.ERROR:
+                self.error = True
             case _:
                 # unknown result type
                 raise ValueError(f"Unknown result type: {self.result_type}")

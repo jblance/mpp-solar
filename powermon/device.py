@@ -103,8 +103,7 @@ class Device:
                     result: Result = self.port.run_command(command)
                 except Exception as exception:  # pylint: disable=W0718
                     log.error("Error decoding result: %s", exception)
-                    result = Result(command_code=command.code, result_type=ResultType.ERROR)
-                    result.error = True
+                    result = Result(command_code=command.code, result_type=ResultType.ERROR, raw_response="")
                     result.error_messages.append(f"Error decoding result: {exception}")
                     result.error_messages.append(f"Exception Type: {exception.__class__.__name__}")
                     result.error_messages.append(f"Exception args: {exception.args}")

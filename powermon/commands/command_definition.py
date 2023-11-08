@@ -14,7 +14,7 @@ log = logging.getLogger("CommandDefinition")
 class CommandDefinition:
     """ object the contains the definition and other metadata about a command """
     def __str__(self):
-        return f"{self.code=}, {self.description=}, {self.result_type=}, {self.command_definition_type=}"
+        return f"{self.code=}, {self.description=}, {self.result_type=}"
 
     def __init__(self, code, description, help_text: str, result_type : ResultType,
                  reading_definitions, parameters, test_responses: list, regex: str):

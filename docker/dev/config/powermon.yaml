@@ -13,10 +13,10 @@ device:
     protocol: PI30
 
 commands:
-- command: QID #Must be in the protocol command list
+- command: Q1 #Must be in the protocol command list
   type: basic
   trigger:
-    every: 5  # seconds
+    every: 60  # seconds
   outputs:
   - type: api_mqtt
     format: 
@@ -36,7 +36,7 @@ api:
   log_level: null
   announce_topic: powermon/announce
   adhoc_topic: powermon/adhoc
-  refresh_interval: 30
+  refresh_interval: 300
 
 # daemon:
 #   type: systemd
