@@ -130,7 +130,7 @@ QUERY_COMMANDS = {
             [
                 19,
                 "Machine Type",
-                ResponseType.STR_KEYED,
+                ResponseType.OPTION,
                 {"00": "Grid tie", "01": "Off Grid", "10": "Hybrid"},
             ],
             [20, "Topology", ResponseType.OPTION, ["transformerless", "transformer"]],
@@ -285,7 +285,7 @@ QUERY_COMMANDS = {
             [
                 22,
                 "Country",
-                ResponseType.STR_KEYED,
+                ResponseType.OPTION,
                 {
                     "00": "India",
                     "01": "Germany",
@@ -335,7 +335,7 @@ QUERY_COMMANDS = {
             [
                 2,
                 "Work mode",
-                ResponseType.STR_KEYED,
+                ResponseType.OPTION,
                 {
                     "P": "Power On Mode",
                     "S": "Standby Mode",
@@ -349,7 +349,7 @@ QUERY_COMMANDS = {
             [
                 3,
                 "Fault code",
-                ResponseType.STR_KEYED,
+                ResponseType.OPTION,
                 {
                     "00": "No fault",
                     "01": "Fan is locked",
@@ -494,7 +494,7 @@ QUERY_COMMANDS = {
             [
                 0,
                 "Device Mode",
-                ResponseType.STR_KEYED,
+                ResponseType.OPTION,
                 {
                     "P": "Power on",
                     "S": "Standby",
