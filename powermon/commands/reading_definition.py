@@ -39,6 +39,7 @@ class ReadingType(LowercaseStrEnum):
     TEMPERATURE = auto()
     PERCENTAGE = auto()
     HERTZ = auto()
+    AMPS = auto()
 
 
 class ReadingDefinition(ABC):
@@ -49,7 +50,7 @@ class ReadingDefinition(ABC):
     def __str__(self):
         return f"{self.index=}, {self.name=}, {self.description=}, {self.response_type=}, {self.unit=}, instance={type(self)}"
 
-    def __init__(self, index, name, response_type, unit, description, device_class, state_class, icon):
+    def __init__(self, index, name, response_type, description, device_class, state_class, icon, unit=""):
         self.index = index
         self.name = name
         self.response_type = response_type
@@ -120,89 +121,33 @@ class ReadingDefinition(ABC):
                     state_class=state_class,
                     icon=icon,
                 )
-            case ReadingType.STRING:
-                return ReadingDefinitionString(
+            case ReadingType.MESSAGE:
+                options_list = None
+                options_dict = None
+                if response_type == ResponseType.OPTION_LIST:
+                    options_list: list[str] = reading_definition_config.get("options")
+                elif response_type == ResponseType.OPTION_DICTIONARY:
+                    options_dict: dict[str, str] = reading_definition_config.get("options")
+                return ReadingDefinitionMessage(
+                    index=index,
+                    name=name,
+                    response_type=response_type,
+                    description=description,
+                    options_list=options_list,
+                    options_dict=options_dict,
+                    device_class=device_class,
+                    state_class=state_class,
+                    icon=icon,
+                )
+            case ReadingType.TEMPERATURE:
+                return ReadingDefinitionTemperature(
                     index=index,
                     name=name,
                     response_type=response_type,
                     description=description,
                     device_class=device_class,
                     state_class=state_class,
-                    icon=icon,
-                )
-            case ReadingType.OPTION:
-                options: list[str] = reading_definition_config.get("options")
-                return ReadingDefinitionOption(
-                    index=index,
-                    description=description,
-                    options=options,
-                    device_class=device_class,
-                    state_class=state_class,
-                    icon=icon,
-                )
-            case ReadingType.BYTES:
-                unit = reading_definition_config[3]
-                return ReadingDefinitionBytes(
-                    index=index,
-                    description=description,
-                    unit=unit,
-                    device_class=device_class,
-                    state_class=state_class,
-                    icon=icon,
-                )
-            case ReadingType.FLOAT:
-                unit = reading_definition_config[3]
-                return ReadingDefinitionFloat(
-                    index=index,
-                    description=description,
-                    unit=unit,
-                    device_class=device_class,
-                    state_class=state_class,
-                    icon=icon,
-                )
-
-            case ReadingType.STR_KEYED:
-                options: dict[str, str] = reading_definition_config[3]
-                return ReadingDefinitionStrKeyed(
-                    index=index,
-                    description=description,
-                    options=options,
-                    device_class=device_class,
-                    state_class=state_class,
-                    icon=icon,
-                )
-
-            case ReadingType.ENFLAGS:
-                flags: dict[str, dict[str, str]] = reading_definition_config[3]
-                return ReadingDefinitionENFlags(
-                    index=index,
-                    description=description,
-                    enflags=flags,
-                    device_class=device_class,
-                    state_class=state_class,
-                    icon=icon,
-                )
-
-            case ReadingType.FLAGS:
-                flags: list[str] = reading_definition_config[3]
-                return ReadingDefinitionFlags(
-                    index=index,
-                    description=description,
-                    flags=flags,
-                    device_class=device_class,
-                    state_class=state_class,
-                    icon=icon,
-                )
-
-            case ResponseType.INFO:
-                template = reading_type.split(":", 1)[1]
-                return ReadingDefinitionInfo(
-                    index=index,
-                    description=description,
-                    template=template,
-                    device_class=device_class,
-                    state_class=state_class,
-                    icon=icon,
+                    icon=icon
                 )
 
             case _:
@@ -222,7 +167,7 @@ class ReadingDefinitionACK(ReadingDefinition):
         state_class: str = None,
         icon: str = None,
     ):
-        super().__init__(index, name, response_type, "", description, device_class, state_class, icon)
+        super().__init__(index, name, response_type, description, device_class, state_class, icon)
  
         self.fail_code = "NAK"
         self.fail_description = "Failed"
@@ -271,7 +216,9 @@ class ReadingDefinitionWattHours(ReadingDefinition):
         state_class: str = None,
         icon: str = None
     ):
-        super().__init__(index, name, response_type, "Wh", description, device_class, state_class, icon)
+        super().__init__(index, name, response_type, description, device_class, state_class, icon, unit="Wh")
+        if response_type not in [ResponseType.INT]:
+            raise TypeError(f"Wh response must be of type int, ResponseType {response_type} is not valid")
         
     def is_valid_response(self, value) -> bool:
         # Do we need to check if it's negative? Should we have max and min bounds?
@@ -293,23 +240,38 @@ class ReadingDefinitionWattHours(ReadingDefinition):
             )
         ]
 
-class ReadingDefinitionString(ReadingDefinition):
+class ReadingDefinitionMessage(ReadingDefinition):
     def __init__(
         self,
         index: int,
         name: str,
         response_type: str,
         description: str,
+        options_list: list[str] = None,
+        options_dict: dict[str, str] = None,
         device_class: str = None,
         state_class: str = None,
         icon: str = None
     ):
-        super().__init__(index, name, response_type, "", description, device_class, state_class, icon)
+        super().__init__(index, name, response_type, description, device_class, state_class, icon, unit="")
+        if response_type == ResponseType.OPTION_LIST and not isinstance(options_list, list):
+            raise TypeError("options_list must be a list if response_type is OPTION_LIST")
+        if response_type == ResponseType.OPTION_DICTIONARY and not isinstance(options_dict, dict):
+            raise TypeError("options_dict must be a dict if response_type is OPTION_DICTIONARY")
+        
+        self.options_list = options_list
+        self.options_dict = options_dict
         
     def is_valid_response(self, value) -> bool:
         return True
 
     def translate_raw_response(self, raw_value) -> str:
+        if self.response_type == ResponseType.OPTION_LIST:
+            value = int(raw_value.decode())
+            return self.options_list[value]
+        elif self.response_type == ResponseType.OPTION_DICTIONARY:
+            value = raw_value.decode()
+            return self.options_dict[value]
         return raw_value.decode('utf-8')
 
     def reading_from_raw_response(self, raw_value) -> list[Reading]:
@@ -389,46 +351,12 @@ class ReadingDefinitionOption(ReadingDefinition):
     def get_description(self) -> str:
         return self.description
 
-class ReadingDefinitionBytes(ReadingDefinition):
-    # Seems to be a catch-all for responses that are not properly implemented
-    def __init__(self, index: int, description: str, unit: str, device_class: str = None, state_class: str = None, icon: str = None):
-        self.index = index
-        self.description = description
-        self.unit = unit
-        self.device_class = device_class
-        self.state_class = state_class
-        self.icon = icon
-
-    def is_valid_response(self, value) -> bool:
-        return True
-
-    def translate_raw_response(self, raw_value) -> str:
-        return raw_value.decode()
-
-    def reading_from_raw_response(self, raw_value) -> list[Reading]:
-        value = self.translate_raw_response(raw_value)
-        return [
-            Reading(
-                data_name=self.description,
-                data_value=value,
-                data_unit="",
-                device_class=self.device_class,
-                state_class=self.state_class,
-                icon=self.icon,
-            )
-        ]
-
-    def get_description(self) -> str:
-        return self.description
-
-class ReadingDefinitionFloat(ReadingDefinition):
-    def __init__(self, index: int, description: str, unit: str, device_class: str = None, state_class: str = None, icon: str = None):
-        self.index = index
-        self.description = description
-        self.unit = unit
-        self.device_class = device_class
-        self.state_class = state_class
-        self.icon = icon
+class ReadingDefinitionTemperature(ReadingDefinition):
+    def __init__(self, index: int, name: str, description: str,  response_type: ResponseType, device_class: str = None, state_class: str = None, icon: str = None):
+        #TODO: find a way to make the unit configurable
+        super().__init__(index, name, response_type, description, device_class, state_class, icon, unit="°C")
+        if response_type not in [ResponseType.INT, ResponseType.FLOAT]:
+            raise TypeError(f"Temperature response must be of type int or float, ResponseType {response_type} is not valid")
 
     def is_valid_response(self, value) -> bool:
         # Do we need to check if it's negative? Should we have max and min bounds?
@@ -444,38 +372,6 @@ class ReadingDefinitionFloat(ReadingDefinition):
                 data_name=self.description,
                 data_value=str(value),
                 data_unit=self.unit,
-                device_class=self.device_class,
-                state_class=self.state_class,
-                icon=self.icon,
-            )
-        ]
-
-    def get_description(self) -> str:
-        return self.description
-
-class ReadingDefinitionStrKeyed(ReadingDefinition):
-    def __init__(self, index: int, description: str, options: dict[str, str], device_class: str = None, state_class: str = None, icon: str = None):
-        self.index = index
-        self.description = description
-        self.options = options
-        self.device_class = device_class
-        self.state_class = state_class
-        self.icon = icon
-
-    def is_valid_response(self, value) -> bool:
-        return value in self.options
-
-    def translate_raw_response(self, raw_value) -> str:
-        value = raw_value.decode()
-        return self.options[value]
-
-    def reading_from_raw_response(self, raw_value) -> list[Reading]:
-        value = self.translate_raw_response(raw_value)
-        return [
-            Reading(
-                data_name=self.description,
-                data_value=value,
-                data_unit="",
                 device_class=self.device_class,
                 state_class=self.state_class,
                 icon=self.icon,
@@ -564,33 +460,4 @@ class ReadingDefinitionFlags(ReadingDefinition):
     def get_description(self) -> str:
         return self.description
 
-class ReadingDefinitionInfo(ReadingDefinition):
-    def __init__(self, index: int, description: str, template: str, device_class: str = None, state_class: str = None, icon: str = None):
-        self.index = index
-        self.description = description
-        self.template = template
-        self.device_class = device_class
-        self.state_class = state_class
-        self.icon = icon
 
-    def translate_raw_response(self, cn) -> str:
-        return eval(self.template)
-
-    def is_info(self) -> bool:
-        return True
-
-    def reading_from_raw_response(self, raw_value) -> list[Reading]:
-        value = self.translate_raw_response(raw_value)
-        return [
-            Reading(
-                data_name=self.description,
-                data_value=value,
-                data_unit="",
-                device_class=self.device_class,
-                state_class=self.state_class,
-                icon=self.icon,
-            )
-        ]
-
-    def get_description(self) -> str:
-        return self.description

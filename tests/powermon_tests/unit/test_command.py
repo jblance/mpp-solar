@@ -49,7 +49,7 @@ class test_command(unittest.TestCase):
                 "regex": "QED(\\d\\d\\d\\d\\d\\d\\d\\d)$",
             }
         }
-        protocol.add_command_definitions(qed_command_definition_new, "GETTER")
+        protocol.add_command_definitions(qed_command_definition_new)
         qed_command_definition = protocol.get_command_with_command_string("QED20210901")
         command = Command(code="QED20210901", commandtype="GETTER", outputs=[], trigger=None)
         command.set_command_definition(qed_command_definition)

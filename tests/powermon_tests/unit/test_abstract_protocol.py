@@ -22,7 +22,7 @@ class test_protocol_pi30(unittest.TestCase):
                 "regex": "PBT(0[012])$",
             }
         }
-        protocol.add_command_definitions(pbt_command_definition_new, "SETTER")
+        protocol.add_command_definitions(pbt_command_definition_new)
         
         #Returns None since it doesn't match the regex
         pbt_definition = protocol.get_command_with_command_string("PBT")
@@ -34,7 +34,6 @@ class test_protocol_pi30(unittest.TestCase):
         
         self.assertEqual(pbt_definition.code, "PBT")
         self.assertEqual(pbt_definition.result_type, ResultType.ACK)
-        self.assertEqual(pbt_definition.get_type(), "SETTER")
         
     def test_command_defintition_parameters(self):
         protocol = AbstractProtocol()
@@ -58,7 +57,7 @@ class test_protocol_pi30(unittest.TestCase):
             }
         }
         
-        protocol.add_command_definitions(qed_command_definition_new, "QUERY")
+        protocol.add_command_definitions(qed_command_definition_new)
         qed_command = protocol.get_command_with_command_string("QED20230115")
         self.assertIsNotNone(qed_command)
         

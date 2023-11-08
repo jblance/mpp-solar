@@ -48,12 +48,12 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             command_dtos[command_tuple[0]] = command_tuple[1].to_dto()
         return command_dtos
 
-    def add_command_definitions(self, command_definitions_config: dict, command_definition_type):
+    def add_command_definitions(self, command_definitions_config: dict):
         """ Add command definitions from the configuration """
         for command_definition_key in command_definitions_config.keys():
             try:
-                log.debug("Attempting to add command_definition_key: %s of type: %s", command_definition_key, command_definition_type)
-                command_definition = CommandDefinition.from_config(command_definitions_config[command_definition_key], command_definition_type)
+                log.debug("Attempting to add command_definition_key: %s", command_definition_key)
+                command_definition = CommandDefinition.from_config(command_definitions_config[command_definition_key])
                 self.command_definitions[command_definition_key] = command_definition
             except ValueError as value_error:
                 log.info("couldnt add command definition for code: %s", command_definition_key)

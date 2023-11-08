@@ -2,7 +2,8 @@ import unittest
 import unittest.mock as mock
 
 from powermon.outputs.mqtt import MQTT
-from powermon.commands.result import Result
+from powermon.commands.result import Result, ResultType
+from powermon.commands.reading_definition import ReadingDefinition, ReadingType, ResponseType
 
 class test_powermon_output_mqtt(unittest.TestCase):
     
@@ -25,7 +26,8 @@ class test_powermon_output_mqtt(unittest.TestCase):
         
         output_mqtt.set_mqtt_broker(mock_mqtt_broker)
         
-        result : Result = Result(command_code="test", raw_response="test")
+        reading_definition = ReadingDefinition.from_config({"index":0, "description":"test", "reading_type":ReadingType.MESSAGE, "response_type":ResponseType.FLOAT, "icon": "mdi:solar-power"},0)
+        result = Result(command_code=None, result_type=ResultType.SINGLE, raw_response=b"0.0", reading_definitions=[reading_definition], parameters=None)
         output_mqtt.process(result)
         
         mock_formatter.format.assert_called_once_with(result)

@@ -985,9 +985,9 @@ class pi30max(PI30):
         super().__init__()
         self._protocol_id = b"PI30MAX"
         # Add pi30max specific commands to pi30 commands
-        super().add_command_definitions(QUERY_COMMANDS, "QUERY")
+        super().add_command_definitions(QUERY_COMMANDS)
         # Add pi30max specific setter commands
-        super().add_command_definitions(SETTER_COMMANDS, "SETTER")
+        super().add_command_definitions(SETTER_COMMANDS)
         # remove and unwanted pi30 commands
         for item in COMMANDS_TO_REMOVE:
             if item in self.command_definitions:

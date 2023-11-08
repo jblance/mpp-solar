@@ -87,6 +87,7 @@ class Result:
             case ResultType.INDEXED:
                 # Response is splitable and order of each item determines decode logic
                 for i, _raw_response in enumerate(self.split_responses(self.raw_response)):
+                    print(f"i: {i}, _raw_response: {_raw_response}")
                     readings = self.validate_and_translate_raw_value(_raw_response, index=i)
                     all_readings.extend(readings)
             case ResultType.MULTIVALUED:
