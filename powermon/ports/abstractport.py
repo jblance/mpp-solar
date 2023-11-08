@@ -23,20 +23,21 @@ class AbstractPort(ABC):
 
     def __init__(self, protocol: AbstractProtocol):
         self.protocol: AbstractProtocol = protocol
+        self.error_message = None
 
-    def connect(self) -> int:  # QUESTION: what does the int signify? 0 success, 1? fail, others???
+    def connect(self) -> bool:
         """ default port connect function """
         log.debug("Port connect not implemented")
-        return 0
+        return False
 
     def disconnect(self) -> None:
         """ default port disconnect function """
         log.debug("Port disconnect not implemented")
 
-    def is_connected(self):
+    @abstractmethod
+    def is_connected(self) -> bool:
         """ default is_connected function """
-        log.debug("Port is_connected not implemented")
-        return True
+        raise NotImplementedError
 
     @abstractmethod
     def send_and_receive(self, command: Command) -> Result:
@@ -58,7 +59,8 @@ class AbstractPort(ABC):
 
         # open port if it is closed
         if not self.is_connected():
-            self.connect()
+            if self.connect() == -1:
+                raise ConnectionError(f"Unable to connect to port: {self.error_message}")
         # FIXME: what if still not connected....
         # ??
 

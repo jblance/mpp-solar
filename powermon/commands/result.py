@@ -4,7 +4,7 @@ import logging
 
 from powermon.commands.reading import Reading
 from powermon.commands.parameter import Parameter
-from powermon.commands.reading_definition import ReadingDefinition
+from powermon.commands.reading_definition import ReadingDefinition, ReadingDefinitionMessage, ResponseType
 from powermon.dto.resultDTO import ResultDTO
 
 log = logging.getLogger("result")
@@ -36,11 +36,22 @@ class Result:
         self.result_type = result_type
         self.raw_response = raw_response
         self.parameters = parameters
+        
         self.reading_definitions = reading_definitions
+        if(self.reading_definitions is None):
+            reading_definition = ReadingDefinitionMessage(index=0, name="default", response_type=ResponseType.STRING , description="default")
+            self.reading_definitions = [reading_definition]
+            
         self.readings: list[Reading] = self.decode_response(raw_response=raw_response)
         self.is_valid = True
         self.error = False
         self.error_messages = []
+        
+        if result_type == ResultType.ERROR:
+            self.is_valid = False
+            self.error = True
+            self.error_messages = [self.raw_response]
+        
         log.debug("Result: %s", self)
 
     def to_dto(self) -> ResultDTO:
@@ -78,7 +89,7 @@ class Result:
 
         # Process response based on result type
         match self.result_type:
-            case ResultType.SINGLE:
+            case ResultType.SINGLE | ResultType.ERROR:
                 readings = self.validate_and_translate_raw_value(self.raw_response, index=0)
                 all_readings.extend(readings)
             case ResultType.ACK:
@@ -94,8 +105,6 @@ class Result:
                 # while response has multiple values, the all relate to a single result
                 readings = self.validate_and_translate_raw_value(self.raw_response, index=0)
                 all_readings.extend(readings)
-            case ResultType.ERROR:
-                self.error = True
             case _:
                 # unknown result type
                 raise ValueError(f"Unknown result type: {self.result_type}")

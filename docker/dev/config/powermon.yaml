@@ -9,14 +9,14 @@ device:
   manufacturer: MPP-Solar
   port:
     path: /dev/hidraw0
-    type: test
+    type: usb
     protocol: PI30
 
 commands:
 - command: Q1 #Must be in the protocol command list
   type: basic
   trigger:
-    every: 60  # seconds
+    every: 30  # seconds
   outputs:
   - type: api_mqtt
     format: 
