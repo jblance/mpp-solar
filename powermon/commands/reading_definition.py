@@ -14,10 +14,9 @@ class ResponseType(LowercaseStrEnum):
     """
     ACK = auto()
     INT = auto()
-    OPTION_LIST = auto()
+    OPTION = auto()
     BYTES = "bytes.decode"  # can't use auto() for this value
     FLOAT = auto()
-    OPTION_DICTIONARY = auto()
     ENFLAGS = auto()
     STRING = auto()
     FLAGS = auto()
@@ -122,19 +121,15 @@ class ReadingDefinition(ABC):
                     icon=icon,
                 )
             case ReadingType.MESSAGE:
-                options_list = None
-                options_dict = None
-                if response_type == ResponseType.OPTION_LIST:
-                    options_list: list[str] = reading_definition_config.get("options")
-                elif response_type == ResponseType.OPTION_DICTIONARY:
-                    options_dict: dict[str, str] = reading_definition_config.get("options")
+                options = None
+                if response_type == ResponseType.OPTION:
+                    options: dict[str, str] = reading_definition_config.get("options")
                 return ReadingDefinitionMessage(
                     index=index,
                     name=name,
                     response_type=response_type,
                     description=description,
-                    options_list=options_list,
-                    options_dict=options_dict,
+                    options=options,
                     device_class=device_class,
                     state_class=state_class,
                     icon=icon,
@@ -247,31 +242,24 @@ class ReadingDefinitionMessage(ReadingDefinition):
         name: str,
         response_type: str,
         description: str,
-        options_list: list[str] = None,
-        options_dict: dict[str, str] = None,
+        options: dict[str, str] = None,
         device_class: str = None,
         state_class: str = None,
         icon: str = None
     ):
         super().__init__(index, name, response_type, description, device_class, state_class, icon, unit="")
-        if response_type == ResponseType.OPTION_LIST and not isinstance(options_list, list):
-            raise TypeError("options_list must be a list if response_type is OPTION_LIST")
-        if response_type == ResponseType.OPTION_DICTIONARY and not isinstance(options_dict, dict):
-            raise TypeError("options_dict must be a dict if response_type is OPTION_DICTIONARY")
+        if response_type == ResponseType.OPTION and not isinstance(options, dict):
+            raise TypeError("options must be a dict if response_type is OPTION")
         
-        self.options_list = options_list
-        self.options_dict = options_dict
+        self.options = options
         
     def is_valid_response(self, value) -> bool:
         return True
 
     def translate_raw_response(self, raw_value) -> str:
-        if self.response_type == ResponseType.OPTION_LIST:
-            value = int(raw_value.decode())
-            return self.options_list[value]
-        elif self.response_type == ResponseType.OPTION_DICTIONARY:
+        if self.response_type == ResponseType.OPTION:
             value = raw_value.decode()
-            return self.options_dict[value]
+            return self.options[value]
         return raw_value.decode('utf-8')
 
     def reading_from_raw_response(self, raw_value) -> list[Reading]:

@@ -249,7 +249,7 @@ QUERY_COMMANDS = {
         "name": "QBOOT",
         "description": "DSP Has Bootstrap inquiry",
         "response_type": ResultType.INDEXED,
-        "response": [[0, "DSP Has Bootstrap", ResponseType.OPTION_LIST, ["No", "Yes"]]],
+        "response": [[0, "DSP Has Bootstrap", ResponseType.OPTION, ["No", "Yes"]]],
         "test_responses": [b"(0\xb9\x1c\r"],
     },
     "QDI": {
@@ -266,28 +266,28 @@ QUERY_COMMANDS = {
             [5, "Battery Bulk Charge Voltage", ResponseType.FLOAT, "V"],
             [6, "Battery Recharge Voltage", ResponseType.FLOAT, "V"],
             [7, "Max Charging Current", ResponseType.INT, "A"],
-            [8, "Input Voltage Range", ResponseType.OPTION_LIST, ["Appliance", "UPS"]],
-            [9, "Output Source Priority", ResponseType.OPTION_LIST, ["Utility first", "Solar first", "SBU first"]],
+            [8, "Input Voltage Range", ResponseType.OPTION, ["Appliance", "UPS"]],
+            [9, "Output Source Priority", ResponseType.OPTION, ["Utility first", "Solar first", "SBU first"]],
             [
                 10,
                 "Charger Source Priority",
-                ResponseType.OPTION_LIST,
+                ResponseType.OPTION,
                 ["Utility first", "Solar first", "Solar + Utility", "Only solar charging permitted"],
             ],
-            [11, "Battery Type", ResponseType.OPTION_LIST, ["AGM", "Flooded", "User"]],
-            [12, "Buzzer", ResponseType.OPTION_LIST, ["enabled", "disabled"]],
-            [13, "Power saving", ResponseType.OPTION_LIST, ["disabled", "enabled"]],
-            [14, "Overload restart", ResponseType.OPTION_LIST, ["disabled", "enabled"]],
-            [15, "Over temperature restart", ResponseType.OPTION_LIST, ["disabled", "enabled"]],
-            [16, "LCD Backlight", ResponseType.OPTION_LIST, ["disabled", "enabled"]],
-            [17, "Primary source interrupt alarm", ResponseType.OPTION_LIST, ["disabled", "enabled"]],
-            [18, "Record fault code", ResponseType.OPTION_LIST, ["disabled", "enabled"]],
-            [19, "Overload bypass", ResponseType.OPTION_LIST, ["disabled", "enabled"]],
-            [20, "LCD reset to default", ResponseType.OPTION_LIST, ["disabled", "enabled"]],
+            [11, "Battery Type", ResponseType.OPTION, ["AGM", "Flooded", "User"]],
+            [12, "Buzzer", ResponseType.OPTION, ["enabled", "disabled"]],
+            [13, "Power saving", ResponseType.OPTION, ["disabled", "enabled"]],
+            [14, "Overload restart", ResponseType.OPTION, ["disabled", "enabled"]],
+            [15, "Over temperature restart", ResponseType.OPTION, ["disabled", "enabled"]],
+            [16, "LCD Backlight", ResponseType.OPTION, ["disabled", "enabled"]],
+            [17, "Primary source interrupt alarm", ResponseType.OPTION, ["disabled", "enabled"]],
+            [18, "Record fault code", ResponseType.OPTION, ["disabled", "enabled"]],
+            [19, "Overload bypass", ResponseType.OPTION, ["disabled", "enabled"]],
+            [20, "LCD reset to default", ResponseType.OPTION, ["disabled", "enabled"]],
             [
                 21,
                 "Output mode",
-                ResponseType.OPTION_LIST,
+                ResponseType.OPTION,
                 [
                     "single machine output",
                     "parallel output",
@@ -303,7 +303,7 @@ QUERY_COMMANDS = {
             [
                 23,
                 "PV OK condition",
-                ResponseType.OPTION_LIST,
+                ResponseType.OPTION,
                 [
                     "As long as one unit of inverters has connect PV, parallel system will consider PV OK",
                     "Only All of inverters have connect PV, parallel system will consider PV OK",
@@ -312,7 +312,7 @@ QUERY_COMMANDS = {
             [
                 24,
                 "PV Power Balance",
-                ResponseType.OPTION_LIST,
+                ResponseType.OPTION,
                 [
                     "PV input max current will be the max charged current",
                     "PV input max power will be the sum of the max charged power and loads power",
@@ -366,7 +366,7 @@ QUERY_COMMANDS = {
             [
                 0,
                 "Device Mode",
-                ResponseType.OPTION_DICTIONARY,
+                ResponseType.OPTION,
                 {"P": "Power on", "S": "Standby", "L": "Line", "B": "Battery", "F": "Fault", "H": "Power saving"},
             ]
         ],
@@ -403,7 +403,7 @@ QUERY_COMMANDS = {
             [
                 0,
                 "Output mode",
-                ResponseType.OPTION_LIST,
+                ResponseType.OPTION,
                 [
                     "single machine output",
                     "parallel output",
@@ -424,12 +424,12 @@ QUERY_COMMANDS = {
         "help": " -- example: QPGS1 queries the values of various metrics from instance 1 of parallel setup Inverters (numbers from 0)",
         "response_type": ResultType.INDEXED,
         "response": [
-            [0, "Parallel instance number", ResponseType.OPTION_LIST, ["Not valid", "valid"]],
+            [0, "Parallel instance number", ResponseType.OPTION, ["Not valid", "valid"]],
             [1, "Serial number", ResponseType.BYTES, ""],
             [
                 2,
                 "Work mode",
-                ResponseType.OPTION_DICTIONARY,
+                ResponseType.OPTION,
                 {
                     "P": "Power On Mode",
                     "S": "Standby Mode",
@@ -442,7 +442,7 @@ QUERY_COMMANDS = {
             [
                 3,
                 "Fault code",
-                ResponseType.OPTION_DICTIONARY,
+                ResponseType.OPTION,
                 {
                     "00": "No fault",
                     "01": "Fan is locked",
@@ -508,7 +508,7 @@ QUERY_COMMANDS = {
             [
                 20,
                 "Output mode",
-                ResponseType.OPTION_LIST,
+                ResponseType.OPTION,
                 [
                     "single machine",
                     "parallel output",
@@ -523,7 +523,7 @@ QUERY_COMMANDS = {
             [
                 21,
                 "Charger source priority",
-                ResponseType.OPTION_LIST,
+                ResponseType.OPTION,
                 ["Utility first", "Solar first", "Solar + Utility", "Solar only"],
             ],
             [22, "Max charger current", ResponseType.INT, "A"],
@@ -648,7 +648,7 @@ QUERY_COMMANDS = {
             [
                 12,
                 "Battery Type",
-                ResponseType.OPTION_LIST,
+                ResponseType.OPTION,
                 [
                     "AGM",
                     "Flooded",
@@ -663,21 +663,21 @@ QUERY_COMMANDS = {
             ],
             [13, "Max AC Charging Current", ResponseType.INT, "A"],
             [14, "Max Charging Current", ResponseType.INT, "A"],
-            [15, "Input Voltage Range", ResponseType.OPTION_LIST, ["Appliance", "UPS"]],
-            [16, "Output Source Priority", ResponseType.OPTION_LIST, ["Utility first", "Solar first", "SBU first"]],
+            [15, "Input Voltage Range", ResponseType.OPTION, ["Appliance", "UPS"]],
+            [16, "Output Source Priority", ResponseType.OPTION, ["Utility first", "Solar first", "SBU first"]],
             [
                 17,
                 "Charger Source Priority",
-                ResponseType.OPTION_LIST,
+                ResponseType.OPTION,
                 ["Utility first", "Solar first", "Solar + Utility", "Only solar charging permitted"],
             ],
             [18, "Max Parallel Units", ResponseType.INT, "units"],
-            [19, "Machine Type", ResponseType.OPTION_DICTIONARY, {"00": "Grid tie", "01": "Off Grid", "10": "Hybrid"}],
-            [20, "Topology", ResponseType.OPTION_LIST, ["transformerless", "transformer"]],
+            [19, "Machine Type", ResponseType.OPTION, {"00": "Grid tie", "01": "Off Grid", "10": "Hybrid"}],
+            [20, "Topology", ResponseType.OPTION, ["transformerless", "transformer"]],
             [
                 21,
                 "Output Mode",
-                ResponseType.OPTION_LIST,
+                ResponseType.OPTION,
                 [
                     "single machine output",
                     "parallel output",
@@ -693,7 +693,7 @@ QUERY_COMMANDS = {
             [
                 23,
                 "PV OK Condition",
-                ResponseType.OPTION_LIST,
+                ResponseType.OPTION,
                 [
                     "As long as one unit of inverters has connect PV, parallel system will consider PV OK",
                     "Only All of inverters have connect PV, parallel system will consider PV OK",
@@ -702,14 +702,14 @@ QUERY_COMMANDS = {
             [
                 24,
                 "PV Power Balance",
-                ResponseType.OPTION_LIST,
+                ResponseType.OPTION,
                 [
                     "PV input max current will be the max charged current",
                     "PV input max power will be the sum of the max charged power and loads power",
                 ],
             ],
             [25, "Max charging time for CV stage", ResponseType.INT, "min"],
-            [26, "Operation Logic", ResponseType.OPTION_LIST, ["Automatic mode", "On-line mode", "ECO mode"]],
+            [26, "Operation Logic", ResponseType.OPTION, ["Automatic mode", "On-line mode", "ECO mode"]],
         ],
         "test_responses": [
             b"(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1\x6F\x7E\r",
@@ -802,7 +802,7 @@ NEW_FORMAT_COMMANDS = {
         "reading_definitions": [
             {"index":0, "reading_type":ReadingType.TIME, "response_type":ResponseType.INT, "description":"Time until the end of absorb charging"},
             {"index":1, "reading_type":ReadingType.TIME, "response_type":ResponseType.INT, "description":"Time until the end of float charging"},
-            {"index":2, "reading_type":ReadingType.MESSAGE, "response_type":ResponseType.OPTION_LIST, "description":"SCC Flag", "options":["SCC not communicating?", "SCC is powered and communicating"]},
+            {"index":2, "reading_type":ReadingType.MESSAGE, "response_type":ResponseType.OPTION, "description":"SCC Flag", "options":{"0":"SCC not communicating?", "1":"SCC is powered and communicating"}},
             {"index":3, "reading_type":ReadingType.FLAG, "response_type":ResponseType.BYTES, "description":"AllowSccOnFlag"},
             {"index":4, "reading_type":ReadingType.AMPERAGE, "response_type":ResponseType.INT, "description":"ChargeAverageCurrent"},
             {"index":5, "reading_type":ReadingType.TEMPERATURE, "response_type":ResponseType.INT, "description":"SCC PWM temperature", "device-class": "temperature"},
@@ -810,7 +810,7 @@ NEW_FORMAT_COMMANDS = {
             {"index":7, "reading_type":ReadingType.TEMPERATURE, "response_type":ResponseType.INT, "description":"Battery temperature", "device-class": "temperature"},
             {"index":8, "reading_type":ReadingType.TEMPERATURE, "response_type":ResponseType.INT, "description":"Transformer temperature", "device-class": "temperature"},
             {"index":9, "reading_type":ReadingType.TEMPERATURE, "response_type":ResponseType.INT, "description":"GPIO13"},
-            {"index":10, "reading_type":ReadingType.MESSAGE, "response_type":ResponseType.OPTION_LIST, "description":"Fan lock status", "options":["Not locked", "Locked"]},
+            {"index":10, "reading_type":ReadingType.MESSAGE, "response_type":ResponseType.OPTION, "description":"Fan lock status", "options":["Not locked", "Locked"]},
             {"index":11, "reading_type":ReadingType.MESSAGE, "response_type":ResponseType.BYTES, "description":"Not used"},
             {"index":12, "reading_type":ReadingType.PERCENTAGE, "response_type":ResponseType.INT, "description":"Fan PWM speed"},
             {"index":13, "reading_type":ReadingType.WATTS, "response_type":ResponseType.INT, "description":"SCC charge power", "icon": "mdi:solar-power", "device-class": "power"},
@@ -819,7 +819,7 @@ NEW_FORMAT_COMMANDS = {
             {"index":16,
                 "description":"Inverter charge status",
                 "reading_type":ReadingType.MESSAGE,
-                "response_type":ResponseType.OPTION_DICTIONARY,
+                "response_type":ResponseType.OPTION,
                 "options":{"10": "nocharging", "11": "bulk stage", "12": "absorb", "13": "float"},
                 "icon": "mdi:book-open",
             },
