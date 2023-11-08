@@ -27,7 +27,8 @@ class ApiCoordinator:
 
     @classmethod
     def from_config(cls, config=None):
-        log.debug(f"ApiCoordinator config: {config}")
+        """ build apicoordinator object from config dict """
+        log.debug("ApiCoordinator config: %s", config)
         if not config:
             log.info("No api definition in config")
             refresh_interval = 300
@@ -52,10 +53,12 @@ class ApiCoordinator:
         self.enabled = enabled
 
     def set_device(self, device: Device):
+        """ store the device in the apicoordinator """
         self.device = device
         # self.announce(self.device)
 
     def set_mqtt_broker(self, mqtt_broker):
+        """ store the mqtt broker in the apicoordinator """
         log.debug("setting mqtt_broker to %s", mqtt_broker)
         self.mqtt_broker = mqtt_broker
 
@@ -70,21 +73,24 @@ class ApiCoordinator:
         # mqtt_broker.publish(self.announceTopic, self.schedule.getScheduleConfigAsJSON())
 
     def get_addcommand_topic(self):
+        """ get the adhoc topic """
         return self.adhoc_topic_format.format(device_id=self.device.device_id)
 
     def addcommand_callback(self, client, userdata, msg):
-        log.info(f"Received `{msg.payload}` on topic `{msg.topic}`")
-        jsonString = msg.payload.decode("utf-8")
-        log.debug(f"Yaml string: {jsonString}")
+        """ add a callback """
+        log.info("Client: %s, with userdata: %s, received `%s` on topic `%s`", client, userdata,msg.payload, msg.topic)
+        json_string = msg.payload.decode("utf-8")
+        log.debug("Yaml string: %s ", json_string)
 
-        dto = CommandDTO.parse_raw(jsonString)
+        dto = CommandDTO.parse_raw(json_string)
 
         trigger = Trigger.from_DTO(dto.trigger)
         command = Command.from_DTO(dto)
         Command(code=dto.command_code, commandtype="basic", outputs=[], trigger=trigger)
         outputs = []
 
-        output = API_MQTT(formatter=SimpleFormat({}))
+        output = API_MQTT()
+        output.set_formatter(SimpleFormat({}))
         outputs.append(output)
 
         command.set_outputs(outputs=outputs)
