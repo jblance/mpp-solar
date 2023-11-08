@@ -802,7 +802,7 @@ NEW_FORMAT_COMMANDS = {
         "reading_definitions": [
             {"index":0, "reading_type":ReadingType.TIME, "response_type":ResponseType.INT, "description":"Time until the end of absorb charging"},
             {"index":1, "reading_type":ReadingType.TIME, "response_type":ResponseType.INT, "description":"Time until the end of float charging"},
-            {"index":2, "reading_type":ReadingType.MESSAGE, "response_type":ResponseType.OPTION, "description":"SCC Flag", "options":{"00":"SCC not communicating?", "01":"SCC is powered and communicating"}},
+            {"index":2, "reading_type":ReadingType.MESSAGE, "response_type":ResponseType.OPTION, "description":"SCC Flag", "options":{"00":"SCC not communicating?", "01":"SCC is powered and communicating", "11":"I am probably decoding wrong, should this be a 3?"}},
             {"index":3, "reading_type":ReadingType.MESSAGE, "response_type":ResponseType.OPTION, "description":"AllowSccOnFlag", "options":{"00":"SCC not allowed to charge", "01":"SCC allowed to charge"}},
             {"index":4, "reading_type":ReadingType.AMPERAGE, "response_type":ResponseType.INT, "description":"ChargeAverageCurrent"},
             {"index":5, "reading_type":ReadingType.TEMPERATURE, "response_type":ResponseType.INT, "description":"SCC PWM temperature", "device-class": "temperature"},

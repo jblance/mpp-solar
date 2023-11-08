@@ -1,7 +1,6 @@
 """ table.py """
 import logging
 
-from mppsolar.helpers import get_max_response_length, pad
 from powermon.formats.abstractformat import AbstractFormat
 from powermon.commands.result import Result
 from powermon.commands.reading import Reading
@@ -108,3 +107,20 @@ class table(AbstractFormat):
             _result.append("\u255a" + ("\u2550" * (width_p + 1)) + "\u2567" + ("\u2550" * (width_v + 1)) + "\u2567" + ("\u2550" * (width_u + 1)) + "\u255d")
         # _result.append("\n")
         return _result
+
+
+def get_max_response_length(responses: list[Reading]):
+    """Helper function for table format"""
+    _max_length = 0
+    for response in responses:
+        data_string = str(response.get_data_value())
+        if len(data_string) > _max_length:
+            _max_length = len(data_string)
+    return _max_length
+
+def pad(text, length):
+    if type(text) == float or type(text) == int:
+        text = str(text)
+    if len(text) > length:
+        return text
+    return text.ljust(length, " ")

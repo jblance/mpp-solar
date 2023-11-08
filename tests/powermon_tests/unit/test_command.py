@@ -56,7 +56,7 @@ class test_command(unittest.TestCase):
         result = command.build_result(b"(00238800!J\r", protocol=protocol)
         reading = result.readings[0]
         self.assertEqual(reading.data_unit, "Wh")
-        self.assertEqual(reading.data_value, "238800")
+        self.assertEqual(reading.data_value, 238800)
         self.assertEqual(reading.data_name, "PV Generated Energy for Day")
         
         

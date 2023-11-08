@@ -26,7 +26,7 @@ class Result:
     def __str__(self):
         return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, {' '.join(str(i) for i in self.readings)}"
 
-    def __init__(self, command_code: str, result_type: str, raw_response, reading_definitions: list[ReadingDefinition] = None,
+    def __init__(self, command_code: str, result_type: str, raw_response: bytes, reading_definitions: list[ReadingDefinition] = None,
                  parameters: dict[str, Parameter] = None):
         if raw_response is None:
             raise ValueError("raw_response cannot be None")
@@ -120,8 +120,10 @@ class Result:
 
     def validate_and_translate_raw_value(self, raw_value: str, index: int) -> list[Reading]:
         if len(self.reading_definitions) <= index:
-            raise IndexError(f"Index {index} is out of range for command {self.command_code}")
-        reading_definition: ReadingDefinition = self.reading_definitions[index]
+            log.debug(f"Index {index} is out of range for command {self.command_code}")
+            reading_definition: ReadingDefinition = ReadingDefinitionMessage(index=index, name="default", response_type=ResponseType.STRING , description=f"Unused response {index}")
+        else:
+            reading_definition: ReadingDefinition = self.reading_definitions[index]
         try:
             return reading_definition.reading_from_raw_response(raw_value)
         except ValueError:

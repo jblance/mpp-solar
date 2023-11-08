@@ -356,7 +356,7 @@ class ReadingDefinitionMessage(ReadingDefinition):
 
     def translate_raw_response(self, raw_value) -> str:
         if self.response_type == ResponseType.OPTION:
-            value = raw_value.decode()
+            value = str(raw_value.decode())
             print(f"Reading:{self.description} Value:{value}")
             
             return self.options[value]
