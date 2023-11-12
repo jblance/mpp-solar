@@ -12,6 +12,25 @@ class test_command_line(unittest.TestCase):
             result = subprocess.run(
                 ["mpp-solar", "-c", "QID", "-p", "test0", "-o", "simple"], check=True, capture_output=True, text=True
             )
+            # print(result.stdout)
+            self.assertEqual(result.stdout, expected)
+            self.assertEqual(result.returncode, 0)
+        except subprocess.CalledProcessError as error:
+            print(error.stdout)
+            print(error.stderr)
+            raise error
+
+    def test_run_mppsolar_screen(self):
+        try:
+            expected = """Command: QPI - Protocol ID inquiry
+--------------------------------------------------------------------------------
+Parameter   Value          \tUnit
+protocol_id PI30           \t    
+--------------------------------------------------------------------------------\n\n\n"""
+            result = subprocess.run(
+                ["mpp-solar", "-c", "QPI", "-p", "test0"], check=True, capture_output=True, text=True
+            )
+            # print(result.stdout)
             self.assertEqual(result.stdout, expected)
             self.assertEqual(result.returncode, 0)
         except subprocess.CalledProcessError as error:

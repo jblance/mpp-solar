@@ -94,12 +94,8 @@ def getMaxLen(data, index=0):
             _maxLen = len(item)
     return _maxLen
 
-def get_max_response_length(responses: list[Reading]):
-    _max_length = 0
-    for response in responses:
-        if len(response.get_data_value()) > _max_length:
-            _max_length = len(response.get_data_value())
-    return _max_length
+def get_max_response_length(data, index=0):
+    return getMaxLen(data, index)
 
 def pad(text, length):
     if type(text) == float or type(text) == int:
