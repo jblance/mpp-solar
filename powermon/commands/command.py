@@ -9,9 +9,9 @@ from powermon.commands.reading_definition import ReadingDefinition
 from powermon.commands.result import Result
 from powermon.commands.trigger import Trigger
 from powermon.dto.commandDTO import CommandDTO
-from powermon.outputs import getOutputs
-from powermon.outputs.abstractoutput import AbstractOutput, OutputType
-from powermon.outputs.api_mqtt import API_MQTT
+from powermon.outputs import OutputType, getOutputs
+from powermon.outputs.abstractoutput import AbstractOutput
+from powermon.outputs.api_mqtt import ApiMqtt
 
 # from time import localtime, strftime
 
@@ -25,6 +25,19 @@ class Command():
     - trigger
     - outputs
     """
+    def __str__(self):
+        if self.code is None:
+            return "empty command object"
+
+        last_run = self.trigger.get_last_run()
+        next_run = self.trigger.get_next_run()
+
+        _outs = ""
+        for output in self.outputs:
+            _outs += str(output)
+
+        return f"Command: {self.code=} {self.full_command=}, {self.type=}, \
+            [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {self.command_definition=}"
 
     def __init__(self, code: str, commandtype: str, outputs: list[AbstractOutput], trigger: Trigger):
         self.code = code
@@ -38,6 +51,26 @@ class Command():
         self.command_definition: CommandDefinition = None
         self.device_id = None  # TODO: shouldnt need this
         log.debug(self)
+
+    @classmethod
+    def from_config(cls, config=None) -> "Command":
+        """build object from config dict"""
+        # need to have a config defined
+        # minimum is
+        # - command: QPI
+        if not config:
+            log.warning("Invalid command config")
+            raise TypeError("Invalid command config")
+            # return None
+
+        code = config.get("command")
+        if code is None:
+            log.info("command must be defined")
+            raise TypeError("command must be defined")
+        commandtype = config.get("type", "basic")
+        outputs = getOutputs(config.get("outputs", ""))
+        trigger = Trigger.fromConfig(config=config.get("trigger"))
+        return cls(code=code, commandtype=commandtype, outputs=outputs, trigger=trigger)
 
     def build_result(self, raw_response=None, protocol=None) -> Result:
         log.debug("build_result: code:%s, command_definition:%s", self.code, self.command_definition)
@@ -59,7 +92,6 @@ class Command():
 
     def set_command_definition(self, command_definition: CommandDefinition):
         """store the definition of the command"""
-        # QUESTION: is this true, why cant we store a None definition?
         if command_definition is None:
             raise ValueError("CommandDefinition cannot be None")
 
@@ -90,38 +122,7 @@ class Command():
     def get_parameters(self) -> dict[str, Parameter]:
         return self.command_definition.parameters
 
-    def __str__(self):
-        if self.code is None:
-            return "empty command object"
 
-        last_run = self.trigger.get_last_run()
-        next_run = self.trigger.get_next_run()
-
-        _outs = ""
-        for output in self.outputs:
-            _outs += str(output)
-
-        return f"Command: {self.code=} {self.full_command=}, {self.type=}, [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {self.command_definition=}"
-
-    @classmethod
-    def from_config(cls, config=None) -> "Command":
-        """build object from config dict"""
-        # need to have a config defined
-        # minimum is
-        # - command: QPI
-        if not config:
-            log.warning("Invalid command config")
-            raise TypeError("Invalid command config")
-            # return None
-
-        code = config.get("command")
-        if code is None:
-            log.info("command must be defined")
-            raise TypeError("command must be defined")
-        commandtype = config.get("type", "basic")
-        outputs = getOutputs(config.get("outputs", ""))
-        trigger = Trigger.fromConfig(config=config.get("trigger"))
-        return cls(code=code, commandtype=commandtype, outputs=outputs, trigger=trigger)
 
     @classmethod
     def from_DTO(cls, command_dto: CommandDTO) -> "Command":
@@ -130,13 +131,9 @@ class Command():
         outputs = []
         for output_dto in command_dto.outputs:
             if output_dto.type == OutputType.API_MQTT:
-                outputs.append(API_MQTT.from_DTO(output_dto))
+                outputs.append(ApiMqtt.from_DTO(output_dto))
         command.set_outputs(outputs=outputs)
         return command
-
-    def set_mqtt_broker(self, mqtt_broker):
-        for output in self.outputs:
-            output.set_mqtt_broker(mqtt_broker)
 
     def is_due(self):
         """is this command due to run?"""

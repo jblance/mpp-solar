@@ -20,7 +20,8 @@ class Device:
     """
 
     def __str__(self):
-        return f"Device: {self.name}, {self.device_id=}, {self.model=}, {self.manufacturer=}, port: {self.port}, commands:{self.commands}"
+        return f"Device: {self.name}, {self.device_id=}, {self.model=}, {self.manufacturer=}, \
+            port: {self.port}, mqtt_broker: {self.mqtt_broker}, commands:{self.commands}"
 
     @classmethod
     def from_config(cls, config=None):
@@ -49,9 +50,11 @@ class Device:
         self.manufacturer = manufacturer
         self.port: AbstractPort = port
         self.commands: list[Command] = []
+        self.mqtt_broker = None
 
     def add_command(self, command: Command) -> None:
         """add a command to the devices' list of commands"""
+        log.debug("Adding command: %s", command)
         if command is None:
             return
         # get command definition from protocol
@@ -65,6 +68,10 @@ class Device:
     def get_port(self) -> AbstractPort:
         """return the port associated with this device"""
         return self.port
+
+    def set_mqtt_broker(self, mqtt_broker):
+        """ store the mqtt broker """
+        self.mqtt_broker = mqtt_broker
 
     def to_dto(self) -> DeviceDTO:
         """convert the Device to a Data Transfer Object"""
@@ -114,4 +121,4 @@ class Device:
                 output: AbstractOutput
                 for output in command.outputs:
                     log.debug("Using Output: %s", output)
-                    output.process(result=result)  # FIXME: should also have device, mqtt_broker
+                    output.process(result=result, device=self)

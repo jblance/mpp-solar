@@ -154,19 +154,16 @@ def main():
     log.info("config: %s", config)
 
     # build mqtt broker object (optional)
-    # QUESTION: should mqtt_broker be part of device...
     mqtt_broker = MqttBroker.from_config(config=config.get("mqttbroker"))
     log.info(mqtt_broker)
 
     # build device object (required)
     device = Device.from_config(config=config.get("device"))
+    device.set_mqtt_broker(mqtt_broker)
     log.debug(device)
     # add commands to device command list
     for command_config in config.get("commands"):
-        command = Command.from_config(command_config)
-        command.set_mqtt_broker(mqtt_broker)  # QUESTION: what command needs mqtt broker
-        if command is not None:
-            device.add_command(command)
+        device.add_command(Command.from_config(command_config))
     log.info(device)
 
     # build the daemon object (optional)
