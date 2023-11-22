@@ -8,7 +8,7 @@ from powermon.device import Device
 from powermon.dto.commandDTO import CommandDTO
 from powermon.dto.apicoordinatorDTO import ApicoordinatorDTO
 from powermon.formats.simple import SimpleFormat
-from powermon.outputs.api_mqtt import API_MQTT
+from powermon.outputs.api_mqtt import ApiMqtt
 
 log = logging.getLogger("APICoordinator")
 
@@ -89,7 +89,7 @@ class ApiCoordinator:
         Command(code=dto.command_code, commandtype="basic", outputs=[], trigger=trigger)
         outputs = []
 
-        output = API_MQTT()
+        output = ApiMqtt()
         output.set_formatter(SimpleFormat({}))
         outputs.append(output)
 

@@ -1,43 +1,51 @@
+""" outputs / abstractoutput.py """
 import logging
 from abc import ABC, abstractmethod
-from enum import auto
 
-from strenum import LowercaseStrEnum
-
-# from powermon.dto.outputDTO import OutputDTO
-from powermon.formats.abstractformat import AbstractFormat
-from powermon.libs.mqttbroker import MqttBroker
+# from powermon.libs.mqttbroker import MqttBroker
 from powermon.commands.result import Result
+from powermon.dto.outputDTO import OutputDTO
+from powermon.formats.abstractformat import AbstractFormat
 
 log = logging.getLogger("Output")
 
-class OutputType(LowercaseStrEnum):
-    API_MQTT = auto()
-    MQTT = auto()
-    SCREEN = auto()
 
 class AbstractOutput(ABC):
+    """ base class for all output modules """
+    def __init__(self, name=None) -> None:
+        self.name = name
+        self.command_code : str = "not_set"
+        self.device_id : str = "not_set"
+        self.topic = None
+        self.formatter = None
 
     def set_formatter(self, formatter : AbstractFormat):
+        """ set the formatter for this output """
         self.formatter = formatter
 
-    def get_topic(self) -> str:
-        return ""
-
     @abstractmethod
-    def process(self, result: Result):
-        pass
-
-    def set_mqtt_broker(self, mqtt_broker: MqttBroker):
-        pass
+    def process(self, result: Result, device=None):
+        """ entry point of any output class """
+        raise NotImplementedError("need to implement process function")
 
     def set_command(self, command_name):
-        pass
+        """ set the command_code """
+        self.command_code = command_name
 
     def set_device_id(self, device_id):
-        pass
+        """ store the device_id """
+        self.device_id = device_id
 
+    def set_topic(self, topic):
+        self.topic = topic
 
-    def to_dto(self):
-        return NotImplemented
-    
+    def get_topic(self):
+        return self.topic
+
+    def to_dto(self) -> OutputDTO:
+        """ convert output object to a data transfer object """
+        if self.formatter is None:
+            format_dto = "None"
+        else:
+            format_dto = self.formatter.to_dto()
+        return OutputDTO(type=self.name, format=format_dto)

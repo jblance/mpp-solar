@@ -1,3 +1,4 @@
+""" formats / simple.py """
 import logging
 from powermon.formats.abstractformat import AbstractFormat
 from powermon.dto.formatDTO import FormatDTO

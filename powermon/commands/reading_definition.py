@@ -1,11 +1,15 @@
 """ reading_definition.py """
 import calendar  # needed for INFO type evaluating templates
+import logging
 from abc import ABC, abstractmethod
 from enum import auto
 
 from strenum import LowercaseStrEnum
 
 from powermon.commands.reading import Reading
+
+log = logging.getLogger("ReadingDefinition")
+
 
 class ResponseType(LowercaseStrEnum):
     """
@@ -84,7 +88,7 @@ class ReadingDefinition(ABC):
             reading_definitions: dict[int, "ReadingDefinition"] = {}
             for i, reading_definition_config in enumerate(reading_definitions_config):
                 reading_definition = cls.from_config(reading_definition_config, i)
-                print(reading_definition)
+                log.debug("reading definition: %s", reading_definition)
                 reading_definitions[reading_definition.index] = reading_definition
             return reading_definitions
 

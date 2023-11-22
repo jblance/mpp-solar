@@ -1,9 +1,10 @@
-""" table.py """
+""" formats / table.py """
 import logging
 
-from powermon.formats.abstractformat import AbstractFormat
-from powermon.commands.result import Result
 from powermon.commands.reading import Reading
+from powermon.commands.result import Result
+from powermon.formats.abstractformat import (AbstractFormat,
+                                             get_max_response_lengths, pad)
 
 log = logging.getLogger("table")
 
@@ -18,7 +19,7 @@ class table(AbstractFormat):
         self.extra_info = formatConfig.get("extra_info", False)
         self.draw_lines = formatConfig.get("draw_lines", False)
         self.command_description = "unknown command"
-        
+
     def set_command_description(self, command_description):
         self.command_description = command_description
 
@@ -46,16 +47,18 @@ class table(AbstractFormat):
 
         # Determine column widths
         _pad = 1
+        
+        width_p, width_v, width_u = get_max_response_lengths(filtered_responses)
         # Width of parameter column
-        width_p = get_max_response_length(filtered_responses) + _pad
+        width_p += _pad
         if width_p < 9 + _pad:
             width_p = 9 + _pad
         # Width of value column
-        width_v = get_max_response_length(result.get_responses()) + _pad
+        width_v += _pad
         if width_v < 6 + _pad:
             width_v = 6 + _pad
         # Width of units column
-        width_u = get_max_response_length(result.get_responses()) + _pad
+        width_u += _pad
         if width_u < 5 + _pad:
             width_u = 5 + _pad
         # Total line length
