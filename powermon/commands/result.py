@@ -89,7 +89,7 @@ class Result:
 
         # Process response based on result type
         match self.result_type:
-            case ResultType.SINGLE | ResultType.ERROR:
+            case ResultType.SINGLE:
                 readings = self.validate_and_translate_raw_value(self.raw_response, index=0)
                 all_readings.extend(readings)
             case ResultType.ACK:
@@ -103,6 +103,9 @@ class Result:
                     all_readings.extend(readings)
             case ResultType.MULTIVALUED:
                 # while response has multiple values, the all relate to a single result
+                readings = self.validate_and_translate_raw_value(self.raw_response, index=0)
+                all_readings.extend(readings)
+            case ResultType.ERROR:
                 readings = self.validate_and_translate_raw_value(self.raw_response, index=0)
                 all_readings.extend(readings)
             case _:
@@ -120,7 +123,7 @@ class Result:
 
     def validate_and_translate_raw_value(self, raw_value: str, index: int) -> list[Reading]:
         if len(self.reading_definitions) <= index:
-            log.debug(f"Index {index} is out of range for command {self.command_code}")
+            log.debug("Index %s is out of range for command %s", index, self.command_code)
             reading_definition: ReadingDefinition = ReadingDefinitionMessage(index=index, name="default", response_type=ResponseType.STRING , description=f"Unused response {index}")
         else:
             reading_definition: ReadingDefinition = self.reading_definitions[index]

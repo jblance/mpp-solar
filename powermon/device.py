@@ -58,7 +58,11 @@ class Device:
         if command is None:
             return
         # get command definition from protocol
-        command.set_command_definition(self.port.protocol.get_command_with_command_string(command.code))
+        command_definition = self.port.protocol.get_command_with_command_string(command.code)
+        if command_definition is None:
+            log.error("Cannot find command code: %s, in protocol: %s", command.code, self.port.protocol.get_protocol_id())
+            raise RuntimeError(f"Invalid command code: {command.code}, in protocol: {self.port.protocol.get_protocol_id()}")
+        command.set_command_definition(command_definition)
         # set the device_id in the command
         command.set_device_id(self.device_id)
         # append to commands list

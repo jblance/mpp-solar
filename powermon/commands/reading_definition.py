@@ -63,10 +63,6 @@ class ReadingDefinition(ABC):
         self.state_class = state_class
         self.icon = icon
 
-    def is_valid_response(self, value) -> bool:
-        raise NotImplementedError
-
-
     def get_description(self) -> str:
         return self.description
 
@@ -233,10 +229,6 @@ class ReadingDefinitionDefault(ReadingDefinition):
     ):
         super().__init__(index, name, response_type, description, device_class, state_class, icon, unit=unit)
 
-        
-    def is_valid_response(self, value) -> bool:
-        return True #anything goes for default
-
     def translate_raw_response(self, raw_value) -> str:
         return raw_value.decode()
 
@@ -270,9 +262,6 @@ class ReadingDefinitionACK(ReadingDefinition):
         self.fail_description = "Failed"
         self.success_code = "ACK"
         self.success_description = "Successful"
-
-    def is_valid_response(self, value) -> bool:
-        return value == self.success_code or value == self.fail_code
 
     def reading_from_raw_response(self, raw_value) -> list[Reading]:
         value = raw_value.decode()
@@ -316,10 +305,6 @@ class ReadingDefinitionWattHours(ReadingDefinition):
         super().__init__(index, name, response_type, description, device_class, state_class, icon, unit="Wh")
         if response_type not in [ResponseType.INT]:
             raise TypeError(f"Wh response must be of type int, ResponseType {response_type} is not valid")
-        
-    def is_valid_response(self, value) -> bool:
-        # Do we need to check if it's negative? Should we have max and min bounds?
-        return isinstance(value, int)
 
     def translate_raw_response(self, raw_value) -> str:
         return int(raw_value.decode())
@@ -354,9 +339,6 @@ class ReadingDefinitionMessage(ReadingDefinition):
             raise TypeError(f"For Reading Defininition {self.name}, options must be a dict if response_type is OPTION")
         
         self.options = options
-        
-    def is_valid_response(self, value) -> bool:
-        return True
 
     def translate_raw_response(self, raw_value) -> str:
         if self.response_type == ResponseType.OPTION:
@@ -385,10 +367,6 @@ class ReadingDefinitionTemperature(ReadingDefinition):
         super().__init__(index, name, response_type, description, device_class, state_class, icon, unit="°C")
         if response_type not in [ResponseType.INT, ResponseType.FLOAT]:
             raise TypeError(f"Temperature response must be of type int or float, ResponseType {response_type} is not valid")
-
-    def is_valid_response(self, value) -> bool:
-        # Do we need to check if it's negative? Should we have max and min bounds?
-        return isinstance(value, float)
 
     def translate_raw_response(self, raw_value) -> float:
         return float(raw_value.decode())
@@ -419,9 +397,6 @@ class ReadingDefinitionENFlags(ReadingDefinition):
         self.device_class = device_class
         self.state_class = state_class
         self.icon = icon
-
-    def is_valid_response(self, value) -> bool:
-        return True
 
     def translate_raw_response(self, raw_value) -> dict[str, str]:
         return_values = {}
@@ -463,9 +438,6 @@ class ReadingDefinitionFlags(ReadingDefinition):
         self.device_class = device_class
         self.state_class = state_class
         self.icon = icon
-
-    def is_valid_response(self, value) -> bool:
-        return value in self.flags
 
     def translate_raw_response(self, raw_value) -> dict[str, int]:
         return_value = {}

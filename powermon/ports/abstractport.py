@@ -59,7 +59,7 @@ class AbstractPort(ABC):
 
         # open port if it is closed
         if not self.is_connected():
-            if self.connect() == -1:
+            if not self.connect():
                 raise ConnectionError(f"Unable to connect to port: {self.error_message}")
         # FIXME: what if still not connected....
         # ??

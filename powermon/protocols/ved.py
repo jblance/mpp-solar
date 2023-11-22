@@ -132,7 +132,7 @@ class VictronEnergyDirect(AbstractProtocol):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"VED"
-        super().add_command_definitions(COMMANDS)
+        self.add_command_definitions(COMMANDS)
         self.STATUS_COMMANDS = [
             "vedtext",
         ]
