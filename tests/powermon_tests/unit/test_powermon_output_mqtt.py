@@ -24,11 +24,10 @@ class test_powermon_output_mqtt(unittest.TestCase):
         mock_formatter.sendsMultipleMessages.return_value = False
         output_mqtt.set_formatter(mock_formatter)
         
-        output_mqtt.set_mqtt_broker(mock_mqtt_broker)
         
         reading_definition = ReadingDefinition.from_config({"index":0, "description":"test", "reading_type":ReadingType.MESSAGE, "response_type":ResponseType.FLOAT, "icon": "mdi:solar-power"},0)
         result = Result(command_code=None, result_type=ResultType.SINGLE, raw_response=b"0.0", reading_definitions=[reading_definition], parameters=None)
-        output_mqtt.process(result)
+        output_mqtt.process(result, mock_mqtt_broker)
         
         mock_formatter.format.assert_called_once_with(result)
         mock_mqtt_broker.publish.assert_called_once_with(test_topic, mock_formatter.format.return_value)

@@ -121,4 +121,4 @@ class Device:
                 output: AbstractOutput
                 for output in command.outputs:
                     log.debug("Using Output: %s", output)
-                    output.process(result=result, device=self)
+                    output.process(result=result, mqtt_broker=self.mqtt_broker)

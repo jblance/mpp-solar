@@ -25,7 +25,7 @@ class MQTT(AbstractOutput):
     def get_topic(self) -> str:
         return self.results_topic
 
-    def process(self, result: Result, device=None):
+    def process(self, result: Result, mqtt_broker=None):
         log.info("Using output processor: MQTT")
         # exit if no data
         if result is None:
@@ -37,7 +37,7 @@ class MQTT(AbstractOutput):
             log.error("No formatter supplied")
             raise RuntimeError("No formatter supplied")
 
-        if device.mqtt_broker is None:
+        if mqtt_broker is None:
             log.error("No mqtt broker supplied")
             raise RuntimeError("No mqtt broker supplied")
 
@@ -48,9 +48,9 @@ class MQTT(AbstractOutput):
         # publish
         # TODO: check this approach (single vs multiple and tidy/consolidate)
         if self.formatter.sendsMultipleMessages():
-            device.mqtt_broker.publishMultiple(formatted_data)
+            mqtt_broker.publishMultiple(formatted_data)
         else:
-            device.mqtt_broker.publish(self.results_topic, formatted_data)
+            mqtt_broker.publish(self.results_topic, formatted_data)
 
     @classmethod
     def from_config(cls, output_config) -> "MQTT":

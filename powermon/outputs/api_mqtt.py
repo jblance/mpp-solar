@@ -25,18 +25,18 @@ class ApiMqtt(AbstractOutput):
     def get_topic(self) -> str:
         return CommandDTO.get_command_result_topic().format(device_id=self.device_id, command_name=self.command_code)
 
-    def process(self, result: Result, device=None):
+    def process(self, result: Result, mqtt_broker=None):
         # exit if no data
         if result.raw_response is None:
             return
 
         # exit if no broker
-        if self.mqtt_broker is None:
+        if mqtt_broker is None:
             log.error("No mqtt broker supplied")
             raise RuntimeError("No mqtt broker supplied")
 
         result_dto = result.to_dto()
-        device.mqtt_broker.publish(self.get_topic(), result_dto.json())
+        mqtt_broker.publish(self.get_topic(), result_dto.json())
 
     @classmethod
     def from_DTO(cls, dto: OutputDTO) -> "ApiMqtt":

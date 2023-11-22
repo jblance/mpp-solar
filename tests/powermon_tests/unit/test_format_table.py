@@ -43,11 +43,12 @@ class test_format_table(unittest.TestCase):
         self.assertEqual(formatted_data, expected)
         
     def test_format_table_large_value(self):
-        expected = ['----------------------------------------------------------------------------------------------------',
-                    'Command: None - unknown command                                                                   ',
-                    '----------------------------------------------------------------------------------------------------',
-                    'Parameter                       Value                           Unit                           ',
-                    'test                            123456789012345678901234567890  Wh                             ',]
+        self.maxDiff = 2000
+        expected = ['------------------------------------------------------',
+                    'Command: None - unknown command                     ',
+                    '------------------------------------------------------',
+                    'Parameter  Value                           Unit  ',
+                    'test       123456789012345678901234567890  Wh    ',]
         table_formatter = table({})
         table_formatter.draw_lines = False
         

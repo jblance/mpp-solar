@@ -24,7 +24,7 @@ class AbstractOutput(ABC):
         self.formatter = formatter
 
     @abstractmethod
-    def process(self, result: Result, device=None):
+    def process(self, result: Result, mqtt_broker=None):
         """ entry point of any output class """
         raise NotImplementedError("need to implement process function")
 

@@ -28,7 +28,7 @@ def get_max_response_lengths(readings: list[Reading]):
     _max_unit = 0
     for reading in readings:
         _max_name = max(len(reading.get_data_name()), _max_name)
-        _max_value = max(len(reading.get_data_value()), _max_value)
+        _max_value = max(len(str(reading.get_data_value())), _max_value)
         _max_unit = max(len(reading.get_data_unit()), _max_unit)
     return _max_name, _max_value, _max_unit
 
