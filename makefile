@@ -1,5 +1,5 @@
 mppsolar-tests: 
-	python3 -m unittest discover -s tests/mppsolar_tests -f -v
+	python3 -m unittest discover -s tests/mppsolar_tests -f 
 	
 powermon-unit-tests: 
 	python3 -m unittest discover -s tests/powermon_tests/unit -f -v
@@ -15,9 +15,9 @@ tests: powermon-unit-tests powermon-integration-tests mppsolar-tests
 pypi:
 	rm -rf dist/*
 	#python3 -m build 
-	poetry version patch
 	./make_version.sh
 	poetry build
+	poetry version patch
 	./make_version_dev.sh
 	ls -l dist/
 	cat mppsolar/version.py

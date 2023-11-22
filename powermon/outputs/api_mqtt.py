@@ -1,7 +1,8 @@
+""" api_mqtt.py """
 import logging
 
 from powermon.outputs.abstractoutput import AbstractOutput
-from powermon.dto.resultDTO import ResultDTO
+# from powermon.dto.resultDTO import ResultDTO
 from powermon.commands.result import Result
 from powermon.libs.mqttbroker import MqttBroker
 from powermon.dto.outputDTO import OutputDTO
@@ -12,19 +13,18 @@ log = logging.getLogger("API_MQTT")
 
 
 class API_MQTT(AbstractOutput):
-    
-    
-    
     def __init__(self) -> None:
         self.command_code : str = "not_set"
         self.device_id : str = "not_set"
+        self.formatter = None
+        self.mqtt_broker = None
 
         self.topic_base : str = "powermon/"
         self.topic_type : str = "results/"
 
     def __str__(self):
         return "outputs the results to the supplied mqtt broker: eg powermon/status/total_output_active_power/value 1250"
-    
+
     def set_formatter(self, formatter):
         self.formatter = formatter
 
@@ -43,7 +43,6 @@ class API_MQTT(AbstractOutput):
     def to_dto(self) -> OutputDTO:
         return OutputDTO(type="api_mqtt", format=self.formatter.to_dto())
 
-
     def process(self, result: Result):
         # exit if no data
         if result.raw_response is None:
@@ -57,13 +56,12 @@ class API_MQTT(AbstractOutput):
         result_dto = result.to_dto()
         self.mqtt_broker.publish(self.get_topic(), result_dto.json())
 
-        
     @classmethod
     def from_DTO(cls, dto: OutputDTO) -> "API_MQTT":
         formatter = SimpleFormat.from_DTO(dto.format)
         api_mqtt = cls()
         api_mqtt.set_formatter(formatter)
-    
+
     @classmethod
     def from_config(cls, output_config) -> "API_MQTT":
         return cls()
