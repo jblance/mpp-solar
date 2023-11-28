@@ -9,7 +9,7 @@ device:
     protocol: PI30MAX
 
 commands:
-- command: QPIGS  #0
+- command: F50  #0
   type: basic #so far not neccessary, might remove
   # trigger: # default to something sensible (only one of the below is needed/used)
   # - loops: 6 # run every 6 loops
@@ -43,6 +43,10 @@ commands:
 - command: QMOD  #3
   trigger:
     loops: 50
+- command: QPI  #4
+  outputs:
+  - type: mqtt
+    format: mqttsimple
 
 daemon:
   # type: initd

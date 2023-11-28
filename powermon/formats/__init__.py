@@ -1,3 +1,4 @@
+""" formats / __init__.py """
 import logging
 from enum import auto
 
@@ -9,6 +10,7 @@ log = logging.getLogger("formats")
 
 
 class FormatterType(LowercaseStrEnum):
+    """ enumeration of valid formatter types """
     HASS = auto()
     HTMLTABLE = auto()
     RAW = auto()
@@ -17,18 +19,16 @@ class FormatterType(LowercaseStrEnum):
     TABLE = auto()
     TOPICS = auto()
 
-
 DEFAULT_FORMAT = FormatterType.SIMPLE
-
 
 
 def getFormatfromConfig(formatConfig) -> AbstractFormat:
     # Get values from config
-    log.debug("getFormatfromConfig, formatConfig: %s" % (formatConfig))
+    log.debug("getFormatfromConfig, formatConfig: %s", formatConfig)
 
     # formatConfig can be None, a str (eg 'simple') or a dict
     if formatConfig is None:
-        formatType = DEFAULT_FORMAT
+        formatType = FormatterType.SIMPLE
         formatConfig = {}
     elif isinstance(formatConfig, str):
         formatType = formatConfig
@@ -36,7 +36,7 @@ def getFormatfromConfig(formatConfig) -> AbstractFormat:
         formatConfig["type"] = formatType
     else:
         formatType = formatConfig.get("type")
-    log.debug("getFormatfromConfig, formatType: %s" % (formatType))
+    log.debug("getFormatfromConfig, formatType: %s", formatType)
 
     formatter = None
     #TODO: should we replace this config processing with from_config methods on each type to remain consistent?
@@ -60,7 +60,7 @@ def getFormatfromConfig(formatConfig) -> AbstractFormat:
             from powermon.formats.raw import raw
             formatter = raw(formatConfig)
         case _:
-            log.warning("No formatter found for: %s" % formatType)
+            log.warning("No formatter found for: %s", formatType)
             formatter = None
 
     return formatter

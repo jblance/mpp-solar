@@ -4,7 +4,7 @@ from powermon import Device
 from powermon.ports import SerialPort
 from powermon.commands.command import Command
 from powermon.outputs.abstractoutput import AbstractOutput
-from powermon.protocols.pi30max import pi30
+from powermon.protocols.pi30 import PI30
 
 
 class DeviceTest(TestCase):
@@ -14,7 +14,7 @@ class DeviceTest(TestCase):
         self.device = None
 
     def setUp(self) -> None:
-        self.port = Mock(spec=SerialPort, protocol=pi30())
+        self.port = Mock(spec=SerialPort, protocol=PI30())
         self.device = Device(name="Test Device", port=self.port)
 
     def test_if_output_processed_in_success_run(self):
@@ -24,7 +24,7 @@ class DeviceTest(TestCase):
 
         # Add command into command list with dueToRun=True to emulate running command
         output = Mock(spec=AbstractOutput)
-        self.device.add_command(Mock(spec=Command, code="QPIRI", outputs=[output], dueToRun=Mock(return_value=True)))
+        self.device.add_command(Mock(spec=Command, code="Q1", outputs=[output], dueToRun=Mock(return_value=True)))
 
         # Run main device loop. Expecting positive result
         # self.assertTrue(self.device.run())

@@ -1,3 +1,4 @@
+""" formats / abstractformat.py """
 from abc import ABC, abstractmethod
 import logging
 import re
@@ -9,6 +10,27 @@ from powermon.commands.reading import Reading
 
 # from time import sleep
 log = logging.getLogger("Formatter")
+
+
+def pad(text, length):
+    """ expand supplied value to 'length' with spaces, return unchanged if already longer """
+    if isinstance(text, float) or isinstance(text, int):
+        text = str(text)
+    if len(text) > length:
+        return text
+    return text.ljust(length, " ")
+
+
+def get_max_response_lengths(readings: list[Reading]):
+    """ find the max length from a list of Readings """
+    _max_name = 0
+    _max_value = 0
+    _max_unit = 0
+    for reading in readings:
+        _max_name = max(len(reading.get_data_name()), _max_name)
+        _max_value = max(len(str(reading.get_data_value())), _max_value)
+        _max_unit = max(len(reading.get_data_unit()), _max_unit)
+    return _max_name, _max_value, _max_unit
 
 
 class AbstractFormat(ABC):

@@ -20,7 +20,8 @@ class Device:
     """
 
     def __str__(self):
-        return f"Device: {self.name}, {self.device_id=}, {self.model=}, {self.manufacturer=}, port: {self.port}, commands:{self.commands}"
+        return f"Device: {self.name}, {self.device_id=}, {self.model=}, {self.manufacturer=}, \
+            port: {self.port}, mqtt_broker: {self.mqtt_broker}, commands:{self.commands}"
 
     @classmethod
     def from_config(cls, config=None):
@@ -49,13 +50,19 @@ class Device:
         self.manufacturer = manufacturer
         self.port: AbstractPort = port
         self.commands: list[Command] = []
+        self.mqtt_broker = None
 
     def add_command(self, command: Command) -> None:
         """add a command to the devices' list of commands"""
+        log.debug("Adding command: %s", command)
         if command is None:
             return
         # get command definition from protocol
-        command.set_command_definition(self.port.protocol.get_command_with_command_string(command.code))
+        command_definition = self.port.protocol.get_command_with_command_string(command.code)
+        if command_definition is None:
+            log.error("Cannot find command code: %s, in protocol: %s", command.code, self.port.protocol.get_protocol_id())
+            raise RuntimeError(f"Invalid command code: {command.code}, in protocol: {self.port.protocol.get_protocol_id()}")
+        command.set_command_definition(command_definition)
         # set the device_id in the command
         command.set_device_id(self.device_id)
         # append to commands list
@@ -65,6 +72,10 @@ class Device:
     def get_port(self) -> AbstractPort:
         """return the port associated with this device"""
         return self.port
+
+    def set_mqtt_broker(self, mqtt_broker):
+        """ store the mqtt broker """
+        self.mqtt_broker = mqtt_broker
 
     def to_dto(self) -> DeviceDTO:
         """convert the Device to a Data Transfer Object"""
@@ -103,15 +114,15 @@ class Device:
                     result: Result = self.port.run_command(command)
                 except Exception as exception:  # pylint: disable=W0718
                     log.error("Error decoding result: %s", exception)
-                    result = Result(command_code=command.code, result_type=ResultType.ERROR)
-                    result.error = True
+                    result = Result(command_code=command.code, result_type=ResultType.ERROR, raw_response=b"Error decoding result")
                     result.error_messages.append(f"Error decoding result: {exception}")
                     result.error_messages.append(f"Exception Type: {exception.__class__.__name__}")
                     result.error_messages.append(f"Exception args: {exception.args}")
+                    raise exception
                 result.set_device_id(self.device_id)  # FIXME: think this is limiting, should pass device and mqtt_broker to output
 
                 # loop through each output and process result
                 output: AbstractOutput
                 for output in command.outputs:
                     log.debug("Using Output: %s", output)
-                    output.process(result=result)  # FIXME: should also have device, mqtt_broker
+                    output.process(result=result, mqtt_broker=self.mqtt_broker)

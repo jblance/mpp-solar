@@ -14,10 +14,10 @@ log = logging.getLogger("CommandDefinition")
 class CommandDefinition:
     """ object the contains the definition and other metadata about a command """
     def __str__(self):
-        return f"{self.code=}, {self.description=}, {self.result_type=}, {self.command_definition_type=}"
+        return f"{self.code=}, {self.description=}, {self.result_type=}"
 
     def __init__(self, code, description, help_text: str, result_type : ResultType,
-                 reading_definitions, parameters, test_responses: list, regex: str, command_definition_type: str):
+                 reading_definitions, parameters, test_responses: list, regex: str):
         if reading_definitions is None or len(reading_definitions) == 0:
             raise ValueError(f"reading definitions cannot be None for command_code: {code}")
         # if test_responses is None or len(test_responses) == 0:
@@ -30,7 +30,6 @@ class CommandDefinition:
         self.parameters : dict[str, Parameter] = parameters
         self.test_responses : list[bytes] = test_responses
         self.regex : str | None = regex
-        self.command_definition_type : str = command_definition_type
 
     def to_dto(self) -> CommandDefinitionDTO:
         """ convert command definition object to data transfer object """
@@ -50,9 +49,9 @@ class CommandDefinition:
             return self.code == command_code
         return re.match(self.regex, command_code) is not None
 
-    def get_type(self) -> str:
+    def get_type(self) -> ResultType:
         """ return the command definition type """
-        return self.command_definition_type
+        return self.result_type
 
     def get_response_definition_count(self) -> int:
         """ return the number of reading definitions """
@@ -71,7 +70,7 @@ class CommandDefinition:
             return
 
     @classmethod
-    def from_config(cls, protocol_dictionary : dict, command_definition_type) -> "CommandDefinition":
+    def from_config(cls, protocol_dictionary : dict) -> "CommandDefinition":
         """ build command definition object from config dict """
         code = protocol_dictionary.get("name")
         description = protocol_dictionary.get("description")
@@ -86,5 +85,5 @@ class CommandDefinition:
         return cls(
             code=code, description=description, help_text=help_text, result_type=result_type,
             reading_definitions=reading_definitions, parameters=parameters, test_responses=test_responses,
-            regex=regex, command_definition_type=command_definition_type
+            regex=regex
         )

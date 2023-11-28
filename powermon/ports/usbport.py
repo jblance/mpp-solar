@@ -4,7 +4,7 @@ import os
 import time
 
 from powermon.dto.portDTO import PortDTO
-from powermon.commands.result import Result
+from powermon.commands.result import Result, ResultType
 from powermon.ports.abstractport import AbstractPort
 from powermon.protocols import get_protocol_definition
 from powermon.commands.command import Command
@@ -28,21 +28,25 @@ class USBPort(AbstractPort):
         self.port = None
 
     def to_dto(self):
-        dto = PortDTO(type="usb", path=self.path, protocol=self.get_protocol().toDTO())
+        dto = PortDTO(type="usb", path=self.path, protocol=self.get_protocol().to_dto())
         return dto
 
-    def is_connected(self):
+    def is_connected(self) -> bool:
         return self.port is not None
 
-    def connect(self) -> int:
+    def connect(self) -> bool:
+        if(self.is_connected()):
+            log.debug("USBPort already connected")
+            return True
+        
         log.debug(f"USBPort connecting. path:{self.path}, protocol: {self.get_protocol()}")
         try:
             self.port = os.open(self.path, os.O_RDWR | os.O_NONBLOCK)
             log.debug(f"USBPort port number ${self.port}")
         except Exception as e:
             log.warning(f"Error openning usb port: {e}")
-            self.error = e
-        return self.port
+            self.error_message = e
+        return self.is_connected()
 
     def disconnect(self) -> None:
         log.debug("USBPort disconnecting: %i", self.port)
@@ -51,6 +55,9 @@ class USBPort(AbstractPort):
         self.port = None
 
     def send_and_receive(self, command: Command) -> Result:
+        if not self.is_connected():
+            log.warning("USBPort not connected")
+            return Result(command_code=command.code, result_type=ResultType.ERROR, raw_response=b"USBPort not connected")
         response_line = bytes()
 
         # Send the command to the open usb connection

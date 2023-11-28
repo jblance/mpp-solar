@@ -11,8 +11,8 @@ services:
 
   mppsolar:
     network_mode: host
-    # devices:
-    #  - /dev/hidraw0:/dev/hidraw0
+    devices:
+      - /dev/hidraw0:/dev/hidraw0
     volumes:
     #Bind over the configuration
       - type: bind

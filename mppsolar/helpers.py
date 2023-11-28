@@ -2,8 +2,6 @@
 import logging
 import importlib
 
-from powermon.commands.reading import Reading
-
 log = logging.getLogger("helpers")
 
 

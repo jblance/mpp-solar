@@ -245,46 +245,6 @@ SETTER_COMMANDS = {
 }
 
 QUERY_COMMANDS = {
-    "QID": {
-        "name": "QID",
-        "description": "Device Serial Number inquiry",
-        "help": " -- queries the device serial number",
-        "result_type": ResultType.SINGLE,
-        "reading_definitions": [{"description": "Serial Number", "reading_type": ReadingType.STRING, "response_type": ResponseType.STRING}],
-        "test_responses": [b"(9293333010501\xbb\x07\r"],
-    },
-    # "Q1": {
-    #     "name": "Q1",
-    #     "description": "Q1 query",
-    #     "result_type": ResultType.INDEXED,
-    #     "reading_definitions": [
-    #         {"index": 0, "description": "Time until the end of absorb charging", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING},
-    #         {"index": 1, "description": "Time until the end of float charging", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING},
-    #         {"index": 2, "description": "SCC Flag", "response_type": ResponseType.OPTION, "options": ["SCC not communicating?", "SCC is powered and communicating"], "reading_type": ReadingType.STRING},
-    #         {"index": 3, "description": "AllowSccOnFlag", "response_type": ResponseType.BYTES, "reading_type": ReadingType.STRING},
-    #         {"index": 4, "description": "ChargeAverageCurrent", "response_type": ResponseType.BYTES, "reading_type": ReadingType.STRING},
-    #         {"index": 5, "description": "SCC PWM temperature", "response_type": ResponseType.INT, "reading_type": ReadingType.TEMP, "device-class": "temperature"},
-    #         {"index": 6, "description": "Inverter temperature", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING, "device-class": "temperature"},
-    #         {"index": 7, "description": "Battery temperature", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING, "device-class": "temperature"},
-    #         {"index": 8, "description": "Transformer temperature", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING, "device-class": "temperature"},
-    #         {"index": 9, "description": "GPIO13", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING},
-    #         {"index": 10, "description": "Fan lock status", "response_type": ResponseType.OPTION, "options": ["Not locked", "Locked"], "reading_type": ReadingType.STRING},
-    #         {"index": 11, "description": "Not used", "response_type": ResponseType.BYTES, "reading_type": ReadingType.STRING},
-    #         {"index": 12, "description": "Fan PWM speed", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING},
-    #         {"index": 13, "description": "SCC charge power", "response_type": ResponseType.INT, "reading_type": ReadingType.STRING, "icon": "mdi:solar-power", "device-class": "power"},
-    #         {"index": 14, "description": "Parallel Warning", "response_type": ResponseType.BYTES, "reading_type": ReadingType.STRING},
-    #         {"index": 15, "description": "Sync frequency", "response_type": ResponseType.FLOAT, "reading_type": ReadingType.STRING},
-    #         {
-    #             "index": 16,
-    #             "description": "Inverter charge status",
-    #             "response_type": ResponseType.STRING,
-    #             "options": {"10": "nocharging", "11": "bulk stage", "12": "absorb", "13": "float"},
-    #             "reading_type": ReadingType.STRING,
-    #             "icon": "mdi:book-open",
-    #         }
-    #     ],
-    #     "test_responses": [b"(00000 00000 01 01 00 059 045 053 068 00 00 000 0040 0580 0000 50.00 139\xb9\r"],
-    # },
     "QBOOT": {
         "name": "QBOOT",
         "description": "DSP Has Bootstrap inquiry",
@@ -406,7 +366,7 @@ QUERY_COMMANDS = {
             [
                 0,
                 "Device Mode",
-                ResponseType.STR_KEYED,
+                ResponseType.OPTION,
                 {"P": "Power on", "S": "Standby", "L": "Line", "B": "Battery", "F": "Fault", "H": "Power saving"},
             ]
         ],
@@ -469,7 +429,7 @@ QUERY_COMMANDS = {
             [
                 2,
                 "Work mode",
-                ResponseType.STR_KEYED,
+                ResponseType.OPTION,
                 {
                     "P": "Power On Mode",
                     "S": "Standby Mode",
@@ -482,7 +442,7 @@ QUERY_COMMANDS = {
             [
                 3,
                 "Fault code",
-                ResponseType.STR_KEYED,
+                ResponseType.OPTION,
                 {
                     "00": "No fault",
                     "01": "Fan is locked",
@@ -712,7 +672,7 @@ QUERY_COMMANDS = {
                 ["Utility first", "Solar first", "Solar + Utility", "Only solar charging permitted"],
             ],
             [18, "Max Parallel Units", ResponseType.INT, "units"],
-            [19, "Machine Type", ResponseType.STR_KEYED, {"00": "Grid tie", "01": "Off Grid", "10": "Hybrid"}],
+            [19, "Machine Type", ResponseType.OPTION, {"00": "Grid tie", "01": "Off Grid", "10": "Hybrid"}],
             [20, "Topology", ResponseType.OPTION, ["transformerless", "transformer"]],
             [
                 21,
@@ -826,6 +786,49 @@ QUERY_COMMANDS = {
     },
 }
 
+NEW_FORMAT_COMMANDS = {
+    "QID": {
+        "name": "QID",
+        "description": "Device Serial Number inquiry",
+        "help": " -- queries the device serial number",
+        "result_type": ResultType.SINGLE,
+        "reading_definitions": [{"description": "Serial Number", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING}],
+        "test_responses": [b"(9293333010501\xbb\x07\r"],
+    },
+    "Q1": {
+        "name": "Q1",
+        "description": "Q1 query",
+        "result_type": ResultType.INDEXED,
+        "reading_definitions": [
+            {"index":0, "reading_type":ReadingType.TIME, "response_type":ResponseType.INT, "description":"Time until the end of absorb charging"},
+            {"index":1, "reading_type":ReadingType.TIME, "response_type":ResponseType.INT, "description":"Time until the end of float charging"},
+            {"index":2, "reading_type":ReadingType.MESSAGE, "response_type":ResponseType.OPTION, "description":"SCC Flag", "options":{"00":"SCC not communicating?", "01":"SCC is powered and communicating", "11":"I am probably decoding wrong, should this be a 3?"}},
+            {"index":3, "reading_type":ReadingType.MESSAGE, "response_type":ResponseType.OPTION, "description":"AllowSccOnFlag", "options":{"00":"SCC not allowed to charge", "01":"SCC allowed to charge"}},
+            {"index":4, "reading_type":ReadingType.AMPERAGE, "response_type":ResponseType.INT, "description":"ChargeAverageCurrent"},
+            {"index":5, "reading_type":ReadingType.TEMPERATURE, "response_type":ResponseType.INT, "description":"SCC PWM temperature", "device-class": "temperature"},
+            {"index":6, "reading_type":ReadingType.TEMPERATURE, "response_type":ResponseType.INT, "description":"Inverter temperature", "device-class": "temperature"},
+            {"index":7, "reading_type":ReadingType.TEMPERATURE, "response_type":ResponseType.INT, "description":"Battery temperature", "device-class": "temperature"},
+            {"index":8, "reading_type":ReadingType.TEMPERATURE, "response_type":ResponseType.INT, "description":"Transformer temperature", "device-class": "temperature"},
+            {"index":9, "reading_type":ReadingType.TEMPERATURE, "response_type":ResponseType.INT, "description":"GPIO13"},
+            {"index":10, "reading_type":ReadingType.MESSAGE, "response_type":ResponseType.OPTION, "description":"Fan lock status", "options":{"00":"Not locked", "01":"Locked"}},
+            {"index":11, "reading_type":ReadingType.MESSAGE, "response_type":ResponseType.BYTES, "description":"Not used"},
+            {"index":12, "reading_type":ReadingType.PERCENTAGE, "response_type":ResponseType.INT, "description":"Fan PWM speed"},
+            {"index":13, "reading_type":ReadingType.WATTS, "response_type":ResponseType.INT, "description":"SCC charge power", "icon": "mdi:solar-power", "device-class": "power"},
+            {"index":14, "reading_type":ReadingType.MESSAGE, "response_type":ResponseType.BYTES, "description":"Parallel Warning"},
+            {"index":15, "reading_type":ReadingType.FREQUENCY, "response_type":ResponseType.FLOAT, "description":"Sync frequency"},
+            {"index":16,
+                "description":"Inverter charge status",
+                "reading_type":ReadingType.MESSAGE,
+                "response_type":ResponseType.OPTION,
+                "options":{"10": "nocharging", "11": "bulk stage", "12": "absorb", "13": "float"},
+                "icon": "mdi:book-open",
+            },
+        ],
+        "test_responses": [b"(00000 00000 01 01 00 059 045 053 068 00 00 000 0040 0580 0000 50.00 139\xb9\r"],
+    },
+    
+}
+
 
 class PI30(AbstractProtocol):
     """ pi30 protocol handler """
@@ -835,8 +838,7 @@ class PI30(AbstractProtocol):
     def __init__(self) -> None:
         super().__init__()
         self._protocol_id = b"PI30"
-        self.add_command_definitions(QUERY_COMMANDS, "QUERY")
-        self.add_command_definitions(SETTER_COMMANDS, "SETTER")
+        self.add_command_definitions(NEW_FORMAT_COMMANDS)
         self.STATUS_COMMANDS = ["QPIGS", "Q1"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
