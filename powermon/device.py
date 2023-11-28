@@ -6,7 +6,7 @@ from powermon.commands.result import Result, ResultType
 from powermon.dto.deviceDTO import DeviceDTO
 from powermon.errors import ConfigError
 from powermon.outputs.abstractoutput import AbstractOutput
-from powermon.ports import getPortFromConfig
+from powermon.ports import from_config as port_from_config
 from powermon.ports.abstractport import AbstractPort
 
 # Set-up logger
@@ -34,7 +34,7 @@ class Device:
         model = config.get("model")
         manufacturer = config.get("manufacturer")
 
-        port = getPortFromConfig(config.get("port"))
+        port = port_from_config(config.get("port"))
 
         # raise error if unable to configure port
         if not port:
