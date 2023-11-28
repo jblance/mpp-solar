@@ -1,4 +1,5 @@
 [MASTER]
 extension-pkg-whitelist=pydantic
-ignored-modules=pydantic,paho
+ignored-modules=pydantic,paho,strenum
 max-line-length=140
+disable=C0415

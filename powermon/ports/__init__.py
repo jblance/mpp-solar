@@ -29,7 +29,7 @@ class PortType(LowercaseStrEnum):
     ESP32 = auto()
 
 
-def getPortFromConfig(port_config):
+def from_config(port_config):
     """ get a port object from config data """
     log.debug("port_config: %s", port_config)
 
