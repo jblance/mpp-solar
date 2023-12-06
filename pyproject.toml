@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mppsolar"
-version = "0.16.14"
+version = "0.16.15"
 description = "Package to communicate with Solar inverters and BMSs"
 authors = ["John Blance"]
 readme = "README.md"
