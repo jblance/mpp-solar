@@ -461,7 +461,7 @@ SETTER_COMMANDS = {
 
 class pi30m044(pi30max):
     def __str__(self):
-        return "PI30 protocol handler for PIP8048 and similar inverters"
+        return "PI30 protocol handler for Voltronic Axpert Max 7.2k (general_model_name 044, model_name MKS2-7200)"
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
