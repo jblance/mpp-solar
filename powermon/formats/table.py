@@ -40,7 +40,7 @@ class table(AbstractFormat):
             return _result
 
         filtered_responses: list[Reading] = self.format_and_filter_data(result)
-        log.debug("displayData: %s", *filtered_responses)
+        log.debug("displayData: %s", "\n".join((str(a) for a in filtered_responses)))
 
         # build header
         command_code = result.command_code
