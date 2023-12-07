@@ -200,7 +200,7 @@ def main():
             api_coordinator.run()
 
             # only run loop once if required
-            if args.once:
+            if config.get("loop") == "once":
                 break
 
             # add small delay in loop

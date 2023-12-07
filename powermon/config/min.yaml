@@ -15,7 +15,7 @@ commands:
 #   outputs:
 #   - type: screen
 #     format: raw
-- command: F50
+- command: Q1
   trigger:
     every: 5  # every 5 seconds
   outputs:
@@ -23,3 +23,4 @@ commands:
     format:
       type: table
       draw_lines: True
+loop: once
