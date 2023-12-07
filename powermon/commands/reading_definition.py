@@ -25,7 +25,8 @@ class ResponseType(LowercaseStrEnum):
     STRING = auto()
     FLAGS = auto()
     INFO = auto()
-    
+
+
 class ReadingType(LowercaseStrEnum):
     """
     the type of the reading
@@ -215,6 +216,7 @@ class ReadingDefinition(ABC):
                     f"Reading description: {description} has unknown reading_type definition type: {reading_type}"
                 )
 
+
 class ReadingDefinitionDefault(ReadingDefinition):
     def __init__(
         self,
@@ -245,6 +247,7 @@ class ReadingDefinitionDefault(ReadingDefinition):
             )
         ]
 
+
 class ReadingDefinitionACK(ReadingDefinition):
     def __init__(
         self,
@@ -257,7 +260,7 @@ class ReadingDefinitionACK(ReadingDefinition):
         icon: str = None,
     ):
         super().__init__(index, name, response_type, description, device_class, state_class, icon)
- 
+
         self.fail_code = "NAK"
         self.fail_description = "Failed"
         self.success_code = "ACK"
@@ -321,6 +324,7 @@ class ReadingDefinitionWattHours(ReadingDefinition):
                 icon=self.icon,
             )
         ]
+
 
 class ReadingDefinitionMessage(ReadingDefinition):
     def __init__(
