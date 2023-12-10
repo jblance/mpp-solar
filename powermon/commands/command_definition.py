@@ -14,7 +14,7 @@ log = logging.getLogger("CommandDefinition")
 class CommandDefinition:
     """ object the contains the definition and other metadata about a command """
     def __str__(self):
-        return f"{self.code=}, {self.description=}, {self.result_type=}"
+        return f"CommandDefinition: {self.code=}, {self.description=}, {self.result_type=}"
 
     def __init__(self, code, description, help_text: str, result_type : ResultType,
                  reading_definitions, parameters, test_responses: list, regex: str):
@@ -30,6 +30,32 @@ class CommandDefinition:
         self.parameters : dict[str, Parameter] = parameters
         self.test_responses : list[bytes] = test_responses
         self.regex : str | None = regex
+
+    @classmethod
+    def from_config(cls, protocol_dictionary : dict) -> "CommandDefinition":
+        """ build command definition object from config dict """
+        code = protocol_dictionary.get("name")
+        description = protocol_dictionary.get("description")
+        help_text = protocol_dictionary.get("help_text")
+        test_responses = protocol_dictionary.get("test_responses")
+        regex = protocol_dictionary.get("regex", None)
+        result_type = protocol_dictionary.get("result_type")  # QUESTION: this where ResultType.ACK logic could differ
+        match result_type:
+            case ResultType.ACK:
+                pass
+            case _:
+                reading_definitions : dict[int, ReadingDefinition] = \
+                    ReadingDefinition.multiple_from_config(protocol_dictionary.get("reading_definitions"))
+
+        # FIXME: are parameters useful....
+        parameters : dict[str, Parameter] = Parameter.multiple_from_config(protocol_dictionary.get("parameters"))
+
+        log.debug("code: %s description: %s reading_definitions: %s", code, description, reading_definitions)
+        return cls(
+            code=code, description=description, help_text=help_text, result_type=result_type,
+            reading_definitions=reading_definitions, parameters=parameters, test_responses=test_responses,
+            regex=regex
+        )
 
     def to_dto(self) -> CommandDefinitionDTO:
         """ convert command definition object to data transfer object """
@@ -69,21 +95,4 @@ class CommandDefinition:
             parameter.set_value(parameter_value)
             return
 
-    @classmethod
-    def from_config(cls, protocol_dictionary : dict) -> "CommandDefinition":
-        """ build command definition object from config dict """
-        code = protocol_dictionary.get("name")
-        description = protocol_dictionary.get("description")
-        help_text = protocol_dictionary.get("help_text")
-        result_type = protocol_dictionary.get("result_type")  # QUESTION: this where ResultType.ACK logic could differ
-        reading_definitions : dict[int, ReadingDefinition] = \
-            ReadingDefinition.multiple_from_config(protocol_dictionary.get("reading_definitions"))
-        parameters : dict[str, Parameter] = Parameter.multiple_from_config(protocol_dictionary.get("parameters"))
-        test_responses = protocol_dictionary.get("test_responses")
-        regex = protocol_dictionary.get("regex", None)
-        log.debug("code: %s description: %s reading_definitions: %s", code, description, reading_definitions)
-        return cls(
-            code=code, description=description, help_text=help_text, result_type=result_type,
-            reading_definitions=reading_definitions, parameters=parameters, test_responses=test_responses,
-            regex=regex
-        )
+
