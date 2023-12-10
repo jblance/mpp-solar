@@ -25,7 +25,7 @@ class Table(AbstractFormat):
     # def set_command_description(self, command_description):
     #     self.command_description = command_description
 
-    def format(self, result: Result) -> list[str]:
+    def format(self, result: Result, device_info) -> list[str]:
         log.info("Using output formatter: %s", self.name)
 
         _result = []
@@ -60,13 +60,13 @@ class Table(AbstractFormat):
         # Check if command / description line is longer and extend line if needed
         cmd_str = f"Command: {result.command_definition.code} - {result.command_definition.description}"
         width_c = len(cmd_str)
-        log.debug(f"{width_c=}, {line_length=}, {width_p=}, {width_v=}, {width_u=}")
+        # log.debug(f"{width_c=}, {line_length=}, {width_p=}, {width_v=}, {width_u=}")
         if line_length < (width_c + 7):
             line_length = width_c + 7
         # Check if columns too short and expand units if needed
         if (width_p + width_v + width_u + 7) <= line_length:
             width_u = line_length - (width_p + width_v + 7)
-        log.debug(f"{width_c=}, {line_length=}, {width_p=}, {width_v=}, {width_u=}")
+        # log.debug(f"{width_c=}, {line_length=}, {width_p=}, {width_v=}, {width_u=}")
 
         # print header
         if self.draw_lines:
@@ -104,20 +104,3 @@ class Table(AbstractFormat):
             _result.append("\u255a" + ("\u2550" * (width_p + 1)) + "\u2567" + ("\u2550" * (width_v + 1)) + "\u2567" + ("\u2550" * (width_u + 1)) + "\u255d")
         # _result.append("\n")
         return _result
-
-
-def get_max_response_length(responses: list[Reading]):
-    """Helper function for table format"""
-    _max_length = 0
-    for response in responses:
-        data_string = str(response.get_data_value())
-        if len(data_string) > _max_length:
-            _max_length = len(data_string)
-    return _max_length
-
-def pad(text, length):
-    if type(text) == float or type(text) == int:
-        text = str(text)
-    if len(text) > length:
-        return text
-    return text.ljust(length, " ")

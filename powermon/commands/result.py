@@ -35,7 +35,6 @@ class Result:
             {self.raw_response=}, {' '.join(str(i) for i in self.readings)}"
 
     def __init__(self, result_type: ResultType, command_definition, raw_response: bytes, trimmed_response: bytes):
-        
         self.raw_response = raw_response
         self.trimmed_response = trimmed_response
 

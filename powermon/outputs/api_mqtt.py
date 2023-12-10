@@ -25,7 +25,7 @@ class ApiMqtt(AbstractOutput):
     def get_topic(self) -> str:
         return CommandDTO.get_command_result_topic().format(device_id=self.device_id, command_name=self.command_code)
 
-    def process(self, result: Result, mqtt_broker=None):
+    def process(self, result: Result, mqtt_broker=None, device_info=None):
         # exit if no data
         if result.raw_response is None:
             return

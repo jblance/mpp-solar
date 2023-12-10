@@ -11,11 +11,11 @@ class htmltable(AbstractFormat):
         super().__init__(formatConfig)
         self.name = "htmltable"
         
-    def set_command_description(self, command_description):
-        pass
+    # def set_command_description(self, command_description):
+    #     pass
 
-    def format(self, result: Result):
-        log.info("Using output formatter: %s" % self.name)
+    def format(self, result: Result, device_info):
+        log.info("Using output formatter: %s", self.name)
 
         _result = []
 

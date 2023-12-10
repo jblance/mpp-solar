@@ -46,11 +46,11 @@ def getFormatfromConfig(formatConfig) -> AbstractFormat:
             from powermon.formats.htmltable import htmltable
             formatter = htmltable(formatConfig)
         case FormatterType.HASS:
-            from powermon.formats.hass import hass
-            formatter = hass(formatConfig, None)  # Not passing device to hass formatter, A HASS coordinator should do the device announcement
-        case FormatterType.TOPICS:
-            from powermon.formats.topics import Topics
-            formatter = Topics(formatConfig)
+            from powermon.formats.hass import Hass
+            formatter = Hass(formatConfig)
+        # case FormatterType.TOPICS:
+        #     from powermon.formats.topics import Topics
+        #     formatter = Topics(formatConfig)
         case FormatterType.SIMPLE:
             from powermon.formats.simple import SimpleFormat
             formatter = SimpleFormat(formatConfig)

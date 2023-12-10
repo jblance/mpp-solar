@@ -1,3 +1,4 @@
+""" formats / hass.py """
 import json as js
 import logging
 from datetime import datetime
@@ -8,32 +9,33 @@ from powermon.commands.reading import Reading
 log = logging.getLogger("hass")
 
 
-class hass(AbstractFormat):
-    def __init__(self, formatConfig, device):
+class Hass(AbstractFormat):
+    """ formatter to generate home assistant auto config mqtt messages """
+    def __init__(self, formatConfig):
         super().__init__(formatConfig)
         self.name = "hass"
         self.extra_info = formatConfig.get("extra_info", False)
         self.discovery_prefix = formatConfig.get("discovery_prefix", "homeassistant")
         self.entity_id_prefix = formatConfig.get("entity_id_prefix", "mpp")
-        if device is None:
-            self.device_name = "MPP Solar"
-            self.device_id = "mpp-solar"
-            self.device_model = "MPP Solar"
-            self.device_manufacturer = "MPP Solar"
-        else:
-            self.device_name = device.name
-            self.device_id = device.device_id
-            self.device_model = device.model
-            self.device_manufacturer = device.manufacturer
+        # if device is None:
+        #     self.device_name = "MPP Solar"
+        #     self.device_id = "mpp-solar"
+        #     self.device_model = "MPP Solar"
+        #     self.device_manufacturer = "MPP Solar"
+        # else:
+        #     self.device_name = device.name
+        #     self.device_id = device.device_id
+        #     self.device_model = device.model
+        #     self.device_manufacturer = device.manufacturer
 
     def sendsMultipleMessages(self) -> bool:
         return True
-    
-    def set_command_description(self, command_description):
-        pass
 
-    def format(self, result: Result) -> list:
-        log.info("Using output formatter: %s" % self.name)
+    # def set_command_description(self, command_description):
+    #     pass
+
+    def format(self, result: Result, device_info) -> list:
+        log.info("Using output formatter: %s", self.name)
 
         config_msgs = []
         value_msgs = []
@@ -42,7 +44,7 @@ class hass(AbstractFormat):
         if result.readings is None:
             return _result
         display_data : list[Reading] = self.format_and_filter_data(result)
-        log.debug(f"displayData: {display_data}")
+        log.debug("displayData: %s", display_data)
 
         # build data to display
         for response in display_data:
@@ -66,7 +68,6 @@ class hass(AbstractFormat):
                     value = "OFF"
                 elif value == 1 or value == "1" or value == "enabled":
                     value = "ON"
-
 
             # Object ID
             object_id = f"{self.entity_id_prefix}_{data_name}".lower()
@@ -94,10 +95,10 @@ class hass(AbstractFormat):
             # Add device info
             # payload["device"] = {"name": f"{device_name}", "identifiers": ["mppsolar"], "model": "PIP6048MAX", "manufacturer": "MPP-Solar"}
             payload["device"] = {
-                "name": self.device_name,
-                "identifiers": [self.device_id],
-                "model": self.device_model,
-                "manufacturer": self.device_manufacturer,
+                "name": device_info.name,
+                "identifiers": [device_info.device_id],
+                "model": device_info.model,
+                "manufacturer": device_info.manufacturer,
             }
 
             # Add unit of measurement

@@ -22,7 +22,7 @@ class Screen(AbstractOutput):
         log.info("Using output sender: screen")
         log.debug("formatter: %s, result: %s, mqtt_broker: %s, device_info: %s", self.formatter, result, mqtt_broker, device_info)
 
-        formatted_data = self.formatter.format(result)
+        formatted_data = self.formatter.format(result, device_info)
         if formatted_data is None:
             print("Nothing returned from data formatting")
             return

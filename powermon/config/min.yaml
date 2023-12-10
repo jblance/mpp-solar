@@ -21,6 +21,5 @@ commands:
   outputs:
   - type: screen
     format:
-      type: table
-      draw_lines: True
+      type: hass
 loop: once

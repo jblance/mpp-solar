@@ -2,8 +2,6 @@
 import logging
 
 from powermon.commands.command_definition import CommandDefinition
-from powermon.commands.parameter import Parameter
-from powermon.commands.reading_definition import ReadingDefinition
 from powermon.commands.result import Result
 from powermon.commands.trigger import Trigger
 from powermon.dto.commandDTO import CommandDTO
@@ -39,12 +37,11 @@ class Command():
         self.code = code
         self.type = commandtype
 
-        self.set_outputs(outputs)
+        self.outputs = outputs
         self.trigger: Trigger = trigger
 
         self.full_command = None
 
-        # self.device_id = None  # TODO: shouldnt need this
         log.debug(self)
 
     @classmethod
@@ -63,7 +60,7 @@ class Command():
             log.info("command must be defined")
             raise ConfigError("command must be defined in config")
         commandtype = config.get("type", "basic")
-        outputs = multiple_from_config(config.get("outputs", ""))  # FIXME: change to multiple_from_config
+        outputs = multiple_from_config(config.get("outputs", ""))
         trigger = Trigger.from_config(config=config.get("trigger"))
         return cls(code=code, commandtype=commandtype, outputs=outputs, trigger=trigger)
 
@@ -76,11 +73,10 @@ class Command():
         for output_dto in command_dto.outputs:
             if output_dto.type == OutputType.API_MQTT:
                 outputs.append(ApiMqtt.from_DTO(output_dto))
-        command.set_outputs(outputs=outputs)
+        command.outputs = outputs
         return command
 
     def build_result(self, raw_response=None, protocol=None) -> Result:
-        #$(self, result_type: ResultType, command_definition, raw_response: bytes)
         """ build a result object from the raw_response """
         log.debug("build_result: for command with 'code: %s, command_definition: %s'", self.code, self.command_definition)
         trimmed_response = protocol.check_response_and_trim(raw_response)
@@ -103,7 +99,7 @@ class Command():
         self._full_command = full_command
 
     @property
-    def command_definition(self):
+    def command_definition(self) -> CommandDefinition:
         """ the definition of this command """
         return self._command_definition
 
@@ -118,26 +114,14 @@ class Command():
             raise ValueError(f"Command code {self.code} is not valid for command definition regex {command_definition.regex}")
         self._command_definition = command_definition
 
-        # set command description in each of the outputs
-        # QUESTION: why, cant we just pass the command object?
-        # for output in self.outputs:
-        #     output.formatter.set_command_description(self.command_definition.description)
+    @property
+    def outputs(self) -> list[AbstractOutput]:
+        """ a list of output objects """
+        return self._outputs
 
-    def get_reading_definitions(self) -> list[ReadingDefinition]:
-        return self.command_definition.reading_definitions
-
-    def set_outputs(self, outputs: list[AbstractOutput]):
-        self.outputs = outputs
-        # for output in self.outputs:
-        #     output.set_command(self.code)  # TODO: shouldnt need this
-
-    # def set_device_id(self, device_id):  # TODO: shouldnt need this
-    #     self.device_id = device_id
-    #     for output in self.outputs:
-    #         output.set_device_id(device_id)
-
-    def get_parameters(self) -> dict[str, Parameter]:
-        return self.command_definition.parameters
+    @outputs.setter
+    def outputs(self, outputs: list[AbstractOutput]):
+        self._outputs = outputs
 
     def is_due(self):
         """ is this command due to run? """
@@ -148,6 +132,7 @@ class Command():
         self.trigger.touch()
 
     def to_dto(self):
+        """ return the command data transfer object """
         return CommandDTO(
             command_code=self.code,
             device_id="not set",

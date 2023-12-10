@@ -1,14 +1,13 @@
 """ formats / abstractformat.py """
-from abc import ABC, abstractmethod
 import logging
 import re
+from abc import ABC, abstractmethod
 
-from powermon.dto.formatDTO import FormatDTO
-from powermon.commands.result import Result
 from powermon.commands.reading import Reading
+from powermon.commands.result import Result
+# from powermon.device import DeviceInfo
+from powermon.dto.formatDTO import FormatDTO
 
-
-# from time import sleep
 log = logging.getLogger("Formatter")
 
 
@@ -57,7 +56,7 @@ class AbstractFormat(ABC):
     #     pass
 
     @abstractmethod
-    def format(self, result: Result) -> list:
+    def format(self, result: Result, device_info) -> list:
         pass
 
     def to_dto(self) -> FormatDTO:
