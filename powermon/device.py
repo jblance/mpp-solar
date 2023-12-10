@@ -8,6 +8,7 @@ from powermon.errors import ConfigError
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.ports import from_config as port_from_config
 from powermon.ports.abstractport import AbstractPort
+from powermon.libs.mqttbroker import MqttBroker
 
 # Set-up logger
 log = logging.getLogger("Device")
@@ -52,6 +53,26 @@ class Device:
         self.commands: list[Command] = []
         self.mqtt_broker = None
 
+    @property
+    def port(self) -> AbstractPort:
+        """ the port associated with this device """
+        return self._port
+
+    @port.setter
+    def port(self, value):
+        log.debug("Setting port to: %s", value)
+        self._port = value
+
+    @property
+    def mqtt_broker(self) -> MqttBroker:
+        """ the mqtt_broker object """
+        return self._mqtt_broker
+
+    @mqtt_broker.setter
+    def mqtt_broker(self, value):
+        log.debug("Setting mqtt_broker to: %s", value)
+        self._mqtt_broker = value
+
     def add_command(self, command: Command) -> None:
         """add a command to the devices' list of commands"""
         log.debug("Adding command: %s", command)
@@ -62,20 +83,12 @@ class Device:
         if command_definition is None:
             log.error("Cannot find command code: %s, in protocol: %s", command.code, self.port.protocol.get_protocol_id())
             raise RuntimeError(f"Invalid command code: {command.code}, in protocol: {self.port.protocol.get_protocol_id()}")
-        command.set_command_definition(command_definition)
+        command.set_command_definition(command_definition)  # FIXME: move to property approach
         # set the device_id in the command
         command.set_device_id(self.device_id)
         # append to commands list
         self.commands.append(command)
         log.debug("added command (%s), command list length: %i", command, len(self.commands))
-
-    def get_port(self) -> AbstractPort:
-        """return the port associated with this device"""
-        return self.port
-
-    def set_mqtt_broker(self, mqtt_broker):
-        """ store the mqtt broker """
-        self.mqtt_broker = mqtt_broker
 
     def to_dto(self) -> DeviceDTO:
         """convert the Device to a Data Transfer Object"""
@@ -119,7 +132,7 @@ class Device:
                     result.error_messages.append(f"Exception Type: {exception.__class__.__name__}")
                     result.error_messages.append(f"Exception args: {exception.args}")
                     raise exception
-                result.set_device_id(self.device_id)  # FIXME: think this is limiting, should pass device and mqtt_broker to output
+                result.device_id = self.device_id  # FIXME: think this is limiting, should pass device and mqtt_broker to output
 
                 # loop through each output and process result
                 output: AbstractOutput

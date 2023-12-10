@@ -22,9 +22,13 @@ class ResultType(Enum):
 
 
 class Result:
-    """ object to contain all the info of a result """
+    """
+    object to contain all the info of a result
+    - has the 'raw response' from the device
+    """
     def __str__(self):
-        return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, {' '.join(str(i) for i in self.readings)}"
+        return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, \
+            {self.raw_response=}, {' '.join(str(i) for i in self.readings)}"
 
     def __init__(self, command_code: str, result_type: str, raw_response: bytes, reading_definitions: list[ReadingDefinition] = None,
                  parameters: dict[str, Parameter] = None):
@@ -36,22 +40,22 @@ class Result:
         self.result_type = result_type
         self.raw_response = raw_response
         self.parameters = parameters
-        
+
         self.reading_definitions = reading_definitions
-        if(self.reading_definitions is None):
-            reading_definition = ReadingDefinitionMessage(index=0, name="default", response_type=ResponseType.STRING , description="default")
+        if self.reading_definitions is None:
+            reading_definition = ReadingDefinitionMessage(index=0, name="default", response_type=ResponseType.STRING, description="default")
             self.reading_definitions = [reading_definition]
-            
-        self.readings: list[Reading] = self.decode_response(raw_response=raw_response)
+
+        self.readings: list[Reading] = raw_response
         self.is_valid = True
         self.error = False
         self.error_messages = []
-        
+
         if result_type == ResultType.ERROR:
             self.is_valid = False
             self.error = True
             self.error_messages = [self.raw_response]
-        
+
         log.debug("Result: %s", self)
 
     def to_dto(self) -> ResultDTO:
@@ -59,22 +63,34 @@ class Result:
         reading_dtos = []
         for reading in self.readings:
             reading_dtos.append(reading.to_dto())
-        return ResultDTO(device_identifier=self.get_device_id(), command_code=self.command_code, data=reading_dtos)
+        return ResultDTO(device_identifier=self.device_id, command_code=self.command_code, data=reading_dtos)
 
-    def get_command_code(self) -> str:
-        return self.command_code
+    @property
+    def command_code(self) -> str:
+        return self._command_code
 
-    def set_device_id(self, device_id):
-        self.device_id = device_id
+    @command_code.setter
+    def command_code(self, value):
+        self._command_code = value
 
-    def get_device_id(self) -> str:
-        return self.device_id
+    @property
+    def device_id(self) -> str:
+        return self._device_id
 
-    def get_responses(self) -> list[Reading]:
-        return self.readings
+    @device_id.setter
+    def device_id(self, device_id):
+        self._device_id = device_id
+
+    @property
+    def readings(self) -> list[Reading]:
+        return self._readings
+
+    @readings.setter
+    def readings(self, raw_response):
+        self._readings = self.decode_response(raw_response=raw_response)
 
     def add_readings(self, responses: list[Reading]) -> bool:
-        self.readings.extend(responses)
+        self._readings.extend(responses)
         return True
 
     # If we split results into different types then each type can have its own decode_response
@@ -98,7 +114,7 @@ class Result:
             case ResultType.INDEXED:
                 # Response is splitable and order of each item determines decode logic
                 for i, _raw_response in enumerate(self.split_responses(self.raw_response)):
-                    print(f"i: {i}, _raw_response: {_raw_response}")
+                    log.debug("ResultType.INDEXED, i: %s, _raw_response: %s", i, _raw_response)
                     readings = self.validate_and_translate_raw_value(_raw_response, index=i)
                     all_readings.extend(readings)
             case ResultType.MULTIVALUED:
@@ -119,7 +135,7 @@ class Result:
         Default implementation of split and trim
         """
         # CRC should be removed by protocol, so just split split
-        return response.split(None) # split differs by protocol
+        return response.split(None)  # split differs by protocol
 
     def validate_and_translate_raw_value(self, raw_value: str, index: int) -> list[Reading]:
         if len(self.reading_definitions) <= index:

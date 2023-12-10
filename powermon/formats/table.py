@@ -6,10 +6,12 @@ from powermon.commands.result import Result
 from powermon.formats.abstractformat import (AbstractFormat,
                                              get_max_response_lengths, pad)
 
-log = logging.getLogger("table")
+log = logging.getLogger("Table")
 
 
-class table(AbstractFormat):
+class Table(AbstractFormat):
+    """ table formatter - formats results in a table suitable for std out """
+
     def __str__(self):
         return "outputs the results to standard out in a table (optionally formatted with line art boxes)"
 
@@ -29,14 +31,14 @@ class table(AbstractFormat):
         _result = []
 
         # check for error in result
-        #if result.error:
+        # if result.error:
         #    data = {}
         #    data["Error"] = [f"Command: {result.command_code} incurred an error or errors during execution or processing", ""]
         #    data["Error Count"] = [len(result.error_messages), ""]
         #    for i, message in enumerate(result.error_messages):
         #        data[f"Error #{i}"] = [message, ""]
 
-        if len(result.get_responses()) == 0:
+        if len(result.readings) == 0:
             return _result
 
         filtered_responses: list[Reading] = self.format_and_filter_data(result)
@@ -47,7 +49,7 @@ class table(AbstractFormat):
 
         # Determine column widths
         _pad = 1
-        
+
         width_p, width_v, width_u = get_max_response_lengths(filtered_responses)
         # Width of parameter column
         width_p += _pad

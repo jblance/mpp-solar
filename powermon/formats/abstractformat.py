@@ -62,7 +62,7 @@ class AbstractFormat(ABC):
 
     def to_dto(self) -> FormatDTO:
         return FormatDTO(type=self.name)
-    
+
     # Override this if the format sends multiple messages
     def sendsMultipleMessages(self) -> bool:
         return False
@@ -70,12 +70,12 @@ class AbstractFormat(ABC):
     def format_and_filter_data(self, result: Result) -> list[Reading]:
 
         display_data = []
-        for response in result.get_responses():
-            if response is None:
-                raise ValueError("response cannot be None")
-            formatted_key = self.formatKey(response.get_data_name())
+        for reading in result.readings:
+            if reading is None:
+                raise ValueError("reading cannot be None")
+            formatted_key = self.formatKey(reading.get_data_name())
             if self.isKeyWanted(formatted_key):
-                display_data.append(response)
+                display_data.append(reading)
         return display_data
 
     def formatKey(self, key) -> str:

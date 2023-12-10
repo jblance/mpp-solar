@@ -159,7 +159,7 @@ def main():
 
     # build device object (required)
     device = Device.from_config(config=config.get("device"))
-    device.set_mqtt_broker(mqtt_broker)
+    device.mqtt_broker = mqtt_broker
     log.debug(device)
     # add commands to device command list
     for command_config in config.get("commands"):
