@@ -74,7 +74,7 @@ class AbstractPort(ABC):
         command.touch()
         # update full_command - expand any template / add crc etc
         # updates every run incase something has changed
-        command.set_full_command(self.protocol.get_full_command(command.code))
+        command.full_command = self.protocol.get_full_command(command.code)
 
         # run the command via the 'send_and_receive port function
         result = self.send_and_receive(command)

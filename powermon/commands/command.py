@@ -72,6 +72,18 @@ class Command():
         trigger = Trigger.fromConfig(config=config.get("trigger"))
         return cls(code=code, commandtype=commandtype, outputs=outputs, trigger=trigger)
 
+    @classmethod
+    def from_DTO(cls, command_dto: CommandDTO) -> "Command":
+        """ build object from data transfer object """
+        trigger = Trigger.from_DTO(command_dto.trigger)
+        command = cls(code=command_dto.command_code, commandtype="basic", outputs=[], trigger=trigger)
+        outputs = []
+        for output_dto in command_dto.outputs:
+            if output_dto.type == OutputType.API_MQTT:
+                outputs.append(ApiMqtt.from_DTO(output_dto))
+        command.set_outputs(outputs=outputs)
+        return command
+
     def build_result(self, raw_response=None, protocol=None) -> Result:
         """ build a result object from the raw_response """
         log.debug("build_result: for command with 'code: %s, command_definition: %s'", self.code, self.command_definition)
@@ -83,13 +95,15 @@ class Command():
         )
         return result
 
-    def set_full_command(self, full_command):
-        """store the full command"""
-        self.full_command = full_command
-
-    def get_full_command(self) -> str | None:
+    @property
+    def full_command(self) -> str | None:
         """return the full command, including CRC and/or headers"""
-        return self.full_command
+        return self._full_command
+
+    @full_command.setter
+    def full_command(self, full_command):
+        """store the full command"""
+        self._full_command = full_command
 
     def set_command_definition(self, command_definition: CommandDefinition):
         """store the definition of the command"""
@@ -123,19 +137,8 @@ class Command():
     def get_parameters(self) -> dict[str, Parameter]:
         return self.command_definition.parameters
 
-    @classmethod
-    def from_DTO(cls, command_dto: CommandDTO) -> "Command":
-        trigger = Trigger.from_DTO(command_dto.trigger)
-        command = cls(code=command_dto.command_code, commandtype="basic", outputs=[], trigger=trigger)
-        outputs = []
-        for output_dto in command_dto.outputs:
-            if output_dto.type == OutputType.API_MQTT:
-                outputs.append(ApiMqtt.from_DTO(output_dto))
-        command.set_outputs(outputs=outputs)
-        return command
-
     def is_due(self):
-        """is this command due to run?"""
+        """ is this command due to run? """
         return self.trigger.is_due()
 
     def touch(self):
