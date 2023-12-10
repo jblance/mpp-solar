@@ -14,6 +14,15 @@ from powermon.libs.mqttbroker import MqttBroker
 log = logging.getLogger("Device")
 
 
+class DeviceInfo:
+    """ struct like class to contain info about the device """
+    def __init__(self, name, device_id, model, manufacturer):
+        self.name = name
+        self.device_id = device_id
+        self.model = model
+        self.manufacturer = manufacturer
+
+
 class Device:
     """
     A device is a port with a protocol
@@ -21,8 +30,9 @@ class Device:
     """
 
     def __str__(self):
-        return f"Device: {self.name}, {self.device_id=}, {self.model=}, {self.manufacturer=}, \
-            port: {self.port}, mqtt_broker: {self.mqtt_broker}, commands:{self.commands}"
+        return f"Device: {self.device_info.name}, {self.device_info.device_id=}, " + \
+            f"{self.device_info.model=}, {self.device_info.manufacturer=}, " + \
+            f"port: {self.port}, mqtt_broker: {self.mqtt_broker}, commands:{self.commands}"
 
     @classmethod
     def from_config(cls, config=None):
@@ -45,10 +55,7 @@ class Device:
         return cls(name=name, device_id=device_id, model=model, manufacturer=manufacturer, port=port)
 
     def __init__(self, name: str, device_id: str = "", model: str = "", manufacturer: str = "", port: AbstractPort = None):
-        self.name = name
-        self.device_id = device_id
-        self.model = model
-        self.manufacturer = manufacturer
+        self.device_info = DeviceInfo(name=name, device_id=device_id, model=model, manufacturer=manufacturer)
         self.port: AbstractPort = port
         self.commands: list[Command] = []
         self.mqtt_broker = None
@@ -79,13 +86,10 @@ class Device:
         if command is None:
             return
         # get command definition from protocol
-        command_definition = self.port.protocol.get_command_with_command_string(command.code)
-        if command_definition is None:
-            log.error("Cannot find command code: %s, in protocol: %s", command.code, self.port.protocol.get_protocol_id())
-            raise RuntimeError(f"Invalid command code: {command.code}, in protocol: {self.port.protocol.get_protocol_id()}")
-        command.set_command_definition(command_definition)  # FIXME: move to property approach
+        command.command_definition = self.port.protocol.get_command_with_command_string(command.code)
+
         # set the device_id in the command
-        command.set_device_id(self.device_id)
+        # command.set_device_id(self.device_id)
         # append to commands list
         self.commands.append(command)
         log.debug("added command (%s), command list length: %i", command, len(self.commands))
@@ -96,9 +100,9 @@ class Device:
         command: Command
         for command in self.commands:
             commands.append(command.to_dto())
-        dto = DeviceDTO(device_id=self.device_id,
-                        model=self.model,
-                        manufacturer=self.manufacturer,
+        dto = DeviceDTO(device_id=self.device_info.device_id,
+                        model=self.device_info.model,
+                        manufacturer=self.device_info.manufacturer,
                         port=self.port.to_dto(),
                         commands=commands)
         return dto
@@ -121,7 +125,7 @@ class Device:
 
         for command in self.commands:
             if force or command.is_due():
-                log.debug("Running command: %s", command.code)
+                log.info("Running command: %s", command)
                 try:
                     # run command
                     result: Result = self.port.run_command(command)
@@ -132,10 +136,10 @@ class Device:
                     result.error_messages.append(f"Exception Type: {exception.__class__.__name__}")
                     result.error_messages.append(f"Exception args: {exception.args}")
                     raise exception
-                result.device_id = self.device_id  # FIXME: think this is limiting, should pass device and mqtt_broker to output
+                # result.device_id = self.device_id  # FIXME: think this is limiting, should pass device and mqtt_broker to output
 
                 # loop through each output and process result
                 output: AbstractOutput
                 for output in command.outputs:
                     log.debug("Using Output: %s", output)
-                    output.process(result=result, mqtt_broker=self.mqtt_broker)
+                    output.process(result=result, mqtt_broker=self.mqtt_broker, device_info=self.device_info)
