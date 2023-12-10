@@ -19,7 +19,8 @@ class ResponseType(LowercaseStrEnum):
     ACK = auto()
     INT = auto()
     OPTION = auto()
-    BYTES = "bytes.decode"  # can't use auto() for this value
+    # BYTES = "bytes.decode"  # can't use auto() for this value
+    BYTES = auto()
     FLOAT = auto()
     ENFLAGS = auto()
     STRING = auto()
@@ -64,15 +65,27 @@ class ReadingDefinition(ABC):
         self.state_class = state_class
         self.icon = icon
 
-    def get_description(self) -> str:
-        return self.description
+    @property
+    def description(self) -> str:
+        """ text description of this reading """
+        return self._description
+
+    @description.setter
+    def description(self, value):
+        """ set the description """
+        # log.debug("Setting description to '%s'", value)
+        self._description = value
+
+    def translate_raw_response(self, raw_value):
+        """ interpret the raw response into a python basic type """
+        return raw_value.decode()
 
     @abstractmethod
     def reading_from_raw_response(self, raw_value) -> list[Reading]:
         raise NotImplementedError
 
     def get_invalid_message(self, raw_value) -> str:
-        return f"Invalid response for {self.get_description()}: {raw_value}"
+        return f"Invalid response for {self.description}: {raw_value}"
 
     def is_info(self) -> bool:
         return False
@@ -231,9 +244,6 @@ class ReadingDefinitionDefault(ReadingDefinition):
     ):
         super().__init__(index, name, response_type, description, device_class, state_class, icon, unit=unit)
 
-    def translate_raw_response(self, raw_value) -> str:
-        return raw_value.decode()
-
     def reading_from_raw_response(self, raw_value) -> list[Reading]:
         value = self.translate_raw_response(raw_value)
         return [
@@ -294,6 +304,7 @@ class ReadingDefinitionACK(ReadingDefinition):
     def get_description(self) -> str:
         return self.description
 
+
 class ReadingDefinitionWattHours(ReadingDefinition):
     def __init__(
         self,
@@ -341,14 +352,13 @@ class ReadingDefinitionMessage(ReadingDefinition):
         super().__init__(index, name, response_type, description, device_class, state_class, icon, unit="")
         if response_type == ResponseType.OPTION and not isinstance(options, dict):
             raise TypeError(f"For Reading Defininition {self.name}, options must be a dict if response_type is OPTION")
-        
+
         self.options = options
 
     def translate_raw_response(self, raw_value) -> str:
         if self.response_type == ResponseType.OPTION:
             value = str(raw_value.decode())
             print(f"Reading:{self.description} Value:{value}")
-            
             return self.options[value]
         return raw_value.decode('utf-8')
 
@@ -365,9 +375,10 @@ class ReadingDefinitionMessage(ReadingDefinition):
             )
         ]
 
+
 class ReadingDefinitionTemperature(ReadingDefinition):
-    def __init__(self, index: int, name: str, description: str,  response_type: ResponseType, device_class: str = None, state_class: str = None, icon: str = None):
-        #TODO: find a way to make the unit configurable
+    def __init__(self, index: int, name: str, description: str, response_type: ResponseType, device_class: str = None, state_class: str = None, icon: str = None):
+        # TODO: find a way to make the unit configurable
         super().__init__(index, name, response_type, description, device_class, state_class, icon, unit="°C")
         if response_type not in [ResponseType.INT, ResponseType.FLOAT]:
             raise TypeError(f"Temperature response must be of type int or float, ResponseType {response_type} is not valid")
@@ -390,6 +401,7 @@ class ReadingDefinitionTemperature(ReadingDefinition):
 
     def get_description(self) -> str:
         return self.description
+
 
 class ReadingDefinitionENFlags(ReadingDefinition):
     def __init__(
@@ -433,6 +445,7 @@ class ReadingDefinitionENFlags(ReadingDefinition):
 
     def get_description(self) -> str:
         return self.description
+
 
 class ReadingDefinitionFlags(ReadingDefinition):
     def __init__(self, index: int, description: str, flags: list[str], device_class: str = None, state_class: str = None, icon: str = None):
