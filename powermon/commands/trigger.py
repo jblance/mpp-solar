@@ -1,15 +1,18 @@
+""" commands / trigger/py """
+import datetime
 import logging
 import time
-import datetime
-from strenum import LowercaseStrEnum
 from enum import auto
-from powermon.dto.triggerDTO import TriggerDTO
 
+from strenum import LowercaseStrEnum
+
+from powermon.dto.triggerDTO import TriggerDTO
 
 log = logging.getLogger("Trigger")
 
 
 class TriggerType(LowercaseStrEnum):
+    """ enum of valid types of triggers """
     EVERY = auto()
     LOOPS = auto()
     AT = auto()
@@ -18,7 +21,7 @@ class TriggerType(LowercaseStrEnum):
 
 
 class Trigger:
-
+    """ the trigger class """
     DATE_FORMAT = "%d %b %Y %H:%M:%S"
 
     def __init__(self, trigger_type, value=None):
@@ -32,7 +35,8 @@ class Trigger:
         return f"trigger: {self.trigger_type} {self.value} loops togo: {self.togo}"
 
     @classmethod
-    def fromConfig(cls, config=None):
+    def from_config(cls, config=None):
+        """ build trigger object from config dict """
         if not config:
             # no trigger defined, default to every 60 seconds
             trigger_type = TriggerType.EVERY
@@ -59,6 +63,7 @@ class Trigger:
         return cls(trigger_type=dto.trigger_type, value=dto.value)    
 
     def touch(self):
+        """ update last and next run times """
         # store run time (as secs since epoch)
         self.last_run = time.time()
         # update next run time
