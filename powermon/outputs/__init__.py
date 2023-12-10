@@ -1,9 +1,11 @@
+""" outputs / __init__.py """
 import logging
 from enum import auto
 
 from strenum import LowercaseStrEnum
 
-from powermon.formats import getFormatfromConfig, DEFAULT_FORMAT
+from powermon.errors import ConfigError
+from powermon.formats import DEFAULT_FORMAT, getFormatfromConfig
 
 # Set-up logger
 log = logging.getLogger("outputs")
@@ -20,13 +22,11 @@ class OutputType(LowercaseStrEnum):
 def getOutputClass(output_type, formatter, output_config={}):
     output_class = None
     # Only import the required class
-    log.debug("outputType %s" % output_type)
+    log.debug("outputType %s", output_type)
     if output_type == OutputType.MQTT:
         from powermon.outputs.mqtt import MQTT
-        #add from config here
         output_class = MQTT.from_config(output_config)
         output_class.set_formatter(formatter)
-        #output_class = MQTT(output_config=output_config, mqtt_broker=mqtt_broker, formatter=formatter)
     elif output_type == OutputType.API_MQTT:
         from powermon.outputs.api_mqtt import ApiMqtt
         output_class = ApiMqtt.from_config(output_config)
@@ -63,55 +63,32 @@ def getOutputs(outputsConfig):
     return _outputs
 
 
-#TODO: clean up the multiple types of outputconfig, there should only be one type
+# TODO: clean up the multiple types of outputconfig, there should only be one type
 def parseOutputConfig(outputConfig):
     log.debug("parseOutputConfig, config: %s", outputConfig)
-    topic_override = None
-    # outputConfig can be None, a str (eg 'screen') a dict (eg {'format': 'table'}) or a list (eg [{'type': 'screen', 'format': 'simple'}])
+    # outputConfig can be None, a str (eg 'screen') a dict (eg {'format': 'table'})
     if outputConfig is None:
         log.debug("got blank outputConfig")
-        outputType = DEFAULT_OUTPUT
-        _format = getFormatfromConfig(DEFAULT_FORMAT)
-        log.debug("got format: %s", (_format))
-        _output = getOutputClass(outputType, formatter=_format)
-        log.debug("got output: %s", (_output))
-        return _output
+        output_type = DEFAULT_OUTPUT
+        format_config = DEFAULT_FORMAT
     elif isinstance(outputConfig, str):
         # eg 'screen'
         log.debug("got str type outputConfig: %s", outputConfig)
-        outputType = outputConfig
-        _format = getFormatfromConfig(DEFAULT_FORMAT)
-        log.debug("got format: %s", (_format))
-        _output = getOutputClass(outputType, formatter=_format)
-        log.debug("got output: %s", (_output))
-        return _output
+        output_type = outputConfig
+        format_config = DEFAULT_FORMAT
     elif isinstance(outputConfig, dict):
         # eg {'format': 'table'}
         log.debug("got dict type outputConfig: %s", outputConfig)
-        outputType = outputConfig.get("type", DEFAULT_OUTPUT)
-        formatConfig = outputConfig.get("format", DEFAULT_FORMAT)
-
-        _format = getFormatfromConfig(formatConfig)
-        log.debug("got format: %s", _format)
-        _output = getOutputClass(outputType, formatter=_format)
-        log.debug("got output: %s", _output)
-        return _output
-    elif isinstance(outputConfig, list):
-        # eg [{'type': 'screen', 'format': 'simple'}], possibly multiple outputs
-        # loop through outputs
-        log.debug("got list type outputConfig: %s", outputConfig)
-        raise Exception("Problem in outputs init - list type for outputConfig")
-
-        # for item in outputConfig:
-        #     _out = parseOutputConfig(item, topic, schedule_name, device, mqtt_broker)
-        #     if _out is not None:
-        #         outputs.append(_out)
-        # return outputs
+        output_type = outputConfig.get("type", DEFAULT_OUTPUT)
+        format_config = outputConfig.get("format", DEFAULT_FORMAT)
     else:
-        # miss configured output?
-        log.warn("outputConfig (%s) doesnt match expectations, defaulting", outputConfig)
-        outputType = DEFAULT_OUTPUT
-        formatConfig = DEFAULT_FORMAT
+        # incorrect output config
+        log.debug("got problematic (type: %s) outputConfig: %s", type(outputConfig), outputConfig)
+        raise ConfigError(f"Problem in outputs init, type: '{type(outputConfig)}', config: '{outputConfig}'")
 
-    _format = getFormatfromConfig(formatConfig)
+
+    _format = getFormatfromConfig(format_config)
     log.debug("got format: %s", (_format))
+    _output = getOutputClass(output_type, formatter=_format)
+    log.debug("got output: %s", _output)
+    return _output

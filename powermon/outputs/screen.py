@@ -20,7 +20,7 @@ class Screen(AbstractOutput):
 
     def process(self, result: Result, mqtt_broker=None):
         log.info("Using output sender: screen")
-        log.debug("formatter: %s", self.formatter)
+        log.debug("formatter: %s, result: %s, mqtt_broker: %s", self.formatter, result, mqtt_broker)
 
         formatted_data = self.formatter.format(result)
         if formatted_data is None:

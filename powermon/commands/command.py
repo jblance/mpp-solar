@@ -73,7 +73,8 @@ class Command():
         return cls(code=code, commandtype=commandtype, outputs=outputs, trigger=trigger)
 
     def build_result(self, raw_response=None, protocol=None) -> Result:
-        log.debug(f"build_result: code:{self.code}, command_definition:{self.command_definition}")
+        """ build a result object from the raw_response """
+        log.debug("build_result: for command with 'code: %s, command_definition: %s'", self.code, self.command_definition)
         trimmed_response = protocol.check_response_and_trim(raw_response)
         result = Result(
             self.code, result_type=self.command_definition.result_type,
@@ -121,8 +122,6 @@ class Command():
 
     def get_parameters(self) -> dict[str, Parameter]:
         return self.command_definition.parameters
-
-
 
     @classmethod
     def from_DTO(cls, command_dto: CommandDTO) -> "Command":
