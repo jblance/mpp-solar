@@ -4,7 +4,6 @@ from enum import auto
 
 from strenum import LowercaseStrEnum
 
-from powermon.errors import ConfigError
 from powermon.formats import DEFAULT_FORMAT, getFormatfromConfig
 
 # Set-up logger
@@ -14,6 +13,7 @@ DEFAULT_OUTPUT = "screen"
 
 
 class OutputType(LowercaseStrEnum):
+    """ enum of valid output types """
     SCREEN = auto()
     MQTT = auto()
     API_MQTT = auto()
@@ -38,55 +38,38 @@ def getOutputClass(output_type, formatter, output_config={}):
     return output_class
 
 
-def getOutputs(outputsConfig):
+def multiple_from_config(outputs_config):
+    """ return one or more output classes from a config """
     # outputs can be None,
     # str (eg screen),
     # list (eg [{'type': 'screen', 'format': 'simple'}, {'type': 'screen', 'format': {'type': 'htmltable'}}])
     # dict (eg {'format': 'table'})
     # print("outputs %s, type: %s" % (outputs, type(outputs)))
     _outputs = []
-    log.debug("processing outputsConfig: %s", outputsConfig)
-    if outputsConfig is None:
-        _outputs.append(parseOutputConfig({"type": "screen", "format": "simple"}))
-    elif isinstance(outputsConfig, str):
+    log.debug("processing outputs_config: %s", outputs_config)
+    if outputs_config is None:
+        _outputs.append(parse_output_config({"type": "screen", "format": DEFAULT_FORMAT}))
+    elif isinstance(outputs_config, str):
         # eg 'screen'
-        _outputs.append(parseOutputConfig(outputsConfig))
-    elif isinstance(outputsConfig, list):
+        _outputs.append(parse_output_config({"type": outputs_config, "format": DEFAULT_FORMAT}))
+    elif isinstance(outputs_config, list):
         # eg [{'type': 'screen', 'format': 'simple'}, {'type': 'screen', 'format': {'type': 'htmltable'}}]
-        for outputConfig in outputsConfig:
-            _outputs.append(parseOutputConfig(outputConfig))
-    elif isinstance(outputsConfig, dict):
+        for output_config in outputs_config:
+            _outputs.append(parse_output_config(output_config))
+    elif isinstance(outputs_config, dict):
         # eg {'format': 'table'}
-        _outputs.append(parseOutputConfig(outputsConfig))
+        _outputs.append(parse_output_config(outputs_config))
     else:
         pass
     return _outputs
 
 
-# TODO: clean up the multiple types of outputconfig, there should only be one type
-def parseOutputConfig(outputConfig):
-    log.debug("parseOutputConfig, config: %s", outputConfig)
-    # outputConfig can be None, a str (eg 'screen') a dict (eg {'format': 'table'})
-    if outputConfig is None:
-        log.debug("got blank outputConfig")
-        output_type = DEFAULT_OUTPUT
-        format_config = DEFAULT_FORMAT
-    elif isinstance(outputConfig, str):
-        # eg 'screen'
-        log.debug("got str type outputConfig: %s", outputConfig)
-        output_type = outputConfig
-        format_config = DEFAULT_FORMAT
-    elif isinstance(outputConfig, dict):
-        # eg {'format': 'table'}
-        log.debug("got dict type outputConfig: %s", outputConfig)
-        output_type = outputConfig.get("type", DEFAULT_OUTPUT)
-        format_config = outputConfig.get("format", DEFAULT_FORMAT)
-    else:
-        # incorrect output config
-        log.debug("got problematic (type: %s) outputConfig: %s", type(outputConfig), outputConfig)
-        raise ConfigError(f"Problem in outputs init, type: '{type(outputConfig)}', config: '{outputConfig}'")
-
-
+def parse_output_config(output_config):
+    """ generate a single output object from a config """
+    log.debug("parse_output_config, config: %s", output_config)
+    log.debug("got dict type output_config: %s", output_config)
+    output_type = output_config.get("type", DEFAULT_OUTPUT)
+    format_config = output_config.get("format", DEFAULT_FORMAT)
     _format = getFormatfromConfig(format_config)
     log.debug("got format: %s", (_format))
     _output = getOutputClass(output_type, formatter=_format)

@@ -2,19 +2,15 @@
 import logging
 
 from powermon.commands.command_definition import CommandDefinition
-# from powermon.commands.result import ResultType
 from powermon.commands.parameter import Parameter
-# from powermon.commands.reading import Reading
 from powermon.commands.reading_definition import ReadingDefinition
 from powermon.commands.result import Result
 from powermon.commands.trigger import Trigger
 from powermon.dto.commandDTO import CommandDTO
-from powermon.outputs import OutputType, getOutputs
+from powermon.errors import ConfigError
+from powermon.outputs import OutputType, multiple_from_config
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.outputs.api_mqtt import ApiMqtt
-
-# from time import localtime, strftime
-
 
 log = logging.getLogger("Command")
 
@@ -41,15 +37,12 @@ class Command():
 
     def __init__(self, code: str, commandtype: str, outputs: list[AbstractOutput], trigger: Trigger):
         self.code = code
-        self.command_description = "Not set"
         self.type = commandtype
-        self.set_outputs(outputs)
 
+        self.set_outputs(outputs)
         self.trigger: Trigger = trigger
 
-        self.full_command = None
-        self.command_definition: CommandDefinition = None
-        self.device_id = None  # TODO: shouldnt need this
+        # self.device_id = None  # TODO: shouldnt need this
         log.debug(self)
 
     @classmethod
@@ -60,16 +53,16 @@ class Command():
         # - command: QPI
         if not config:
             log.warning("Invalid command config")
-            raise TypeError("Invalid command config")
+            raise ConfigError("Invalid command config")
             # return None
 
         code = config.get("command")
         if code is None:
             log.info("command must be defined")
-            raise TypeError("command must be defined")
+            raise ConfigError("command must be defined in config")
         commandtype = config.get("type", "basic")
-        outputs = getOutputs(config.get("outputs", ""))
-        trigger = Trigger.fromConfig(config=config.get("trigger"))
+        outputs = multiple_from_config(config.get("outputs", ""))  # FIXME: change to multiple_from_config
+        trigger = Trigger.from_config(config=config.get("trigger"))
         return cls(code=code, commandtype=commandtype, outputs=outputs, trigger=trigger)
 
     @classmethod
@@ -102,10 +95,16 @@ class Command():
 
     @full_command.setter
     def full_command(self, full_command):
-        """store the full command"""
+        """ store the full command """
         self._full_command = full_command
 
-    def set_command_definition(self, command_definition: CommandDefinition):
+    @property
+    def command_definition(self):
+        """ the definition of this command """
+        return self._command_definition
+
+    @command_definition.setter
+    def command_definition(self, command_definition: CommandDefinition):
         """store the definition of the command"""
         if command_definition is None:
             raise ValueError("CommandDefinition cannot be None")
@@ -113,26 +112,25 @@ class Command():
         # Check if the definition is valid for the command
         if command_definition.is_command_code_valid(self.code) is False:
             raise ValueError(f"Command code {self.code} is not valid for command definition regex {command_definition.regex}")
-        self.command_definition = command_definition
-        self.command_description = command_definition.description
+        self._command_definition = command_definition
 
         # set command description in each of the outputs
         # QUESTION: why, cant we just pass the command object?
-        for output in self.outputs:
-            output.formatter.set_command_description(self.command_description)
+        # for output in self.outputs:
+        #     output.formatter.set_command_description(self.command_definition.description)
 
     def get_reading_definitions(self) -> list[ReadingDefinition]:
         return self.command_definition.reading_definitions
 
     def set_outputs(self, outputs: list[AbstractOutput]):
         self.outputs = outputs
-        for output in self.outputs:
-            output.set_command(self.code)  # TODO: shouldnt need this
+        # for output in self.outputs:
+        #     output.set_command(self.code)  # TODO: shouldnt need this
 
-    def set_device_id(self, device_id):  # TODO: shouldnt need this
-        self.device_id = device_id
-        for output in self.outputs:
-            output.set_device_id(device_id)
+    # def set_device_id(self, device_id):  # TODO: shouldnt need this
+    #     self.device_id = device_id
+    #     for output in self.outputs:
+    #         output.set_device_id(device_id)
 
     def get_parameters(self) -> dict[str, Parameter]:
         return self.command_definition.parameters
@@ -142,12 +140,13 @@ class Command():
         return self.trigger.is_due()
 
     def touch(self):
+        """ update trigger run time """
         self.trigger.touch()
 
     def to_dto(self):
         return CommandDTO(
             command_code=self.code,
-            device_id=self.device_id,
+            device_id="not set",
             result_topic=self.outputs[0].get_topic(),
             trigger=self.trigger.to_dto(),
             outputs=[output.to_dto() for output in self.outputs],
