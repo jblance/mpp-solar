@@ -18,12 +18,12 @@ class ResponseType(LowercaseStrEnum):
     """
     ACK = auto()
     INT = auto()
-    OPTION = auto()
-    # BYTES = "bytes.decode"  # can't use auto() for this value
-    BYTES = auto()
     FLOAT = auto()
-    ENFLAGS = auto()
     STRING = auto()
+    BYTES = auto()
+    OPTION = auto()  # response identifies which option from a list is the info
+    # BYTES = "bytes.decode"  # can't use auto() for this value
+    ENFLAGS = auto()
     FLAGS = auto()
     INFO = auto()
 
@@ -38,6 +38,7 @@ class ReadingType(LowercaseStrEnum):
     WATT_HOURS = auto()
     WATTS = auto()
     TIME = auto()
+    TIME_SECONDS = auto()
     MESSAGE = auto()
     FLAG = auto()
     AMPERAGE = auto()
@@ -56,6 +57,8 @@ class ReadingDefinition(ABC):
         return f"{self.index=}, {self.name=}, {self.description=}, {self.response_type=}, {self.unit=}, instance={type(self)}"
 
     def __init__(self, index, name, response_type, description, device_class, state_class, icon, unit=""):
+        # {"index": 13, "reading_type": ReadingType.WATTS, "response_type": ResponseType.INT,
+        #  "description": "SCC charge power", "icon": "mdi:solar-power", "device-class": "power"}
         self.index = index
         self.name = name
         self.response_type = response_type
@@ -92,6 +95,7 @@ class ReadingDefinition(ABC):
 
     @classmethod
     def multiple_from_config(cls, reading_definitions_config: list[dict]) -> dict[int, "ReadingDefinition"]:
+        """ build list of reading definitions from config """
         if reading_definitions_config is None:
             return {}
         else:
@@ -104,6 +108,7 @@ class ReadingDefinition(ABC):
 
     @classmethod
     def from_config(cls, reading_definition_config: dict, i) -> "ReadingDefinition":
+        """ build a reading definition object from a config dict """
         index = i
         name = reading_definition_config.get("name")
         description = reading_definition_config.get("description")
@@ -158,7 +163,7 @@ class ReadingDefinition(ABC):
                     state_class=state_class,
                     icon=icon
                 )
-            case ReadingType.TIME:
+            case ReadingType.TIME_SECONDS:
                 return ReadingDefinitionDefault(
                     index=index,
                     name=name,
@@ -358,7 +363,7 @@ class ReadingDefinitionMessage(ReadingDefinition):
     def translate_raw_response(self, raw_value) -> str:
         if self.response_type == ResponseType.OPTION:
             value = str(raw_value.decode())
-            print(f"Reading:{self.description} Value:{value}")
+            print(f"Reading:{self.description} Value:{value}")  # FIXME: remove
             return self.options[value]
         return raw_value.decode('utf-8')
 
@@ -398,9 +403,6 @@ class ReadingDefinitionTemperature(ReadingDefinition):
                 icon=self.icon,
             )
         ]
-
-    def get_description(self) -> str:
-        return self.description
 
 
 class ReadingDefinitionENFlags(ReadingDefinition):
@@ -443,9 +445,6 @@ class ReadingDefinitionENFlags(ReadingDefinition):
 
         return responses
 
-    def get_description(self) -> str:
-        return self.description
-
 
 class ReadingDefinitionFlags(ReadingDefinition):
     def __init__(self, index: int, description: str, flags: list[str], device_class: str = None, state_class: str = None, icon: str = None):
@@ -473,8 +472,3 @@ class ReadingDefinitionFlags(ReadingDefinition):
                 )
             )
         return responses
-
-    def get_description(self) -> str:
-        return self.description
-
-
