@@ -33,7 +33,7 @@ class Command():
             _outs += str(output)
 
         return f"Command: {self.code=} {self.full_command=}, {self.type=}, \
-            [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {self.command_definition=}"
+            [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {str(self.command_definition)}"
 
     def __init__(self, code: str, commandtype: str, outputs: list[AbstractOutput], trigger: Trigger):
         self.code = code
@@ -41,6 +41,8 @@ class Command():
 
         self.set_outputs(outputs)
         self.trigger: Trigger = trigger
+
+        self.full_command = None
 
         # self.device_id = None  # TODO: shouldnt need this
         log.debug(self)
@@ -78,13 +80,15 @@ class Command():
         return command
 
     def build_result(self, raw_response=None, protocol=None) -> Result:
+        #$(self, result_type: ResultType, command_definition, raw_response: bytes)
         """ build a result object from the raw_response """
         log.debug("build_result: for command with 'code: %s, command_definition: %s'", self.code, self.command_definition)
         trimmed_response = protocol.check_response_and_trim(raw_response)
         result = Result(
-            self.code, result_type=self.command_definition.result_type,
-            reading_definitions=self.get_reading_definitions(),
-            parameters=self.command_definition.parameters, raw_response=trimmed_response
+            result_type=self.command_definition.result_type,
+            command_definition=self.command_definition,
+            raw_response=raw_response,
+            trimmed_response=trimmed_response
         )
         return result
 

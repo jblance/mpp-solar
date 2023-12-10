@@ -52,9 +52,9 @@ class AbstractFormat(ABC):
         if _keyExclusionFilterString is not None:
             self._keyExclusionfilter = re.compile(_keyExclusionFilterString)
 
-    @abstractmethod
-    def set_command_description(self, command_description):
-        pass
+    # @abstractmethod
+    # def set_command_description(self, command_description):
+    #     pass
 
     @abstractmethod
     def format(self, result: Result) -> list:

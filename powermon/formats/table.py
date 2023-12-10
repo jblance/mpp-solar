@@ -20,23 +20,15 @@ class Table(AbstractFormat):
         self.name = "table"
         self.extra_info = formatConfig.get("extra_info", False)
         self.draw_lines = formatConfig.get("draw_lines", False)
-        self.command_description = "unknown command"
+        # self.command_description = "unknown command"
 
-    def set_command_description(self, command_description):
-        self.command_description = command_description
+    # def set_command_description(self, command_description):
+    #     self.command_description = command_description
 
     def format(self, result: Result) -> list[str]:
         log.info("Using output formatter: %s", self.name)
 
         _result = []
-
-        # check for error in result
-        # if result.error:
-        #    data = {}
-        #    data["Error"] = [f"Command: {result.command_code} incurred an error or errors during execution or processing", ""]
-        #    data["Error Count"] = [len(result.error_messages), ""]
-        #    for i, message in enumerate(result.error_messages):
-        #        data[f"Error #{i}"] = [message, ""]
 
         if len(result.readings) == 0:
             return _result
@@ -45,7 +37,7 @@ class Table(AbstractFormat):
         log.debug("displayData: %s", "\n".join((str(a) for a in filtered_responses)))
 
         # build header
-        command_code = result.command_code
+        # command_code = result.command_definition.code
 
         # Determine column widths
         _pad = 1
@@ -66,14 +58,14 @@ class Table(AbstractFormat):
         # Total line length
         line_length = width_p + width_v + width_u + 7
         # Check if command / description line is longer and extend line if needed
-        cmd_str = f"Command: {command_code} - {self.command_description}"
+        cmd_str = f"Command: {result.command_definition.code} - {result.command_definition.description}"
         width_c = len(cmd_str)
         log.debug(f"{width_c=}, {line_length=}, {width_p=}, {width_v=}, {width_u=}")
         if line_length < (width_c + 7):
             line_length = width_c + 7
         # Check if columns too short and expand units if needed
         if (width_p + width_v + width_u + 7) <= line_length:
-            width_u = line_length - (width_p + width_v + 7) 
+            width_u = line_length - (width_p + width_v + 7)
         log.debug(f"{width_c=}, {line_length=}, {width_p=}, {width_v=}, {width_u=}")
 
         # print header
