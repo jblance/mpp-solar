@@ -23,7 +23,7 @@ class TestIO(BaseIO):
             # Have test data defined, so use that
             number_of_test_responses = len(command_defn["test_responses"])
             # have we specified which test response to use?
-            check = re.match("test(\d+)", self._device, flags=re.IGNORECASE)  # noqa: W605
+            check = re.match(r"test(\d+)", self._device, flags=re.IGNORECASE)  # noqa: W605
             if check:
                 # use the specified response if that one exists
                 try:
