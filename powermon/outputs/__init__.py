@@ -109,7 +109,7 @@ def parseOutputConfig(outputConfig):
         # return outputs
     else:
         # miss configured output?
-        log.warn("outputConfig (%s) doesnt match expectations, defaulting", outputConfig)
+        log.warning("outputConfig (%s) doesnt match expectations, defaulting", outputConfig)
         outputType = DEFAULT_OUTPUT
         formatConfig = DEFAULT_FORMAT
 
