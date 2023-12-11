@@ -434,7 +434,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     response_defn = get_resp_defn(lookup_key, command_defn["response"])
                     if response_defn is None:
                         # No definition for this key, so ignore???
-                        log.warn(f"No definition for {response}")
+                        log.warning(f"No definition for {response}")
                         continue
                     # key = response_defn[0] #0
                     data_type = response_defn[3]  # 1
@@ -513,7 +513,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         response_defn = command_defn["response"][i]
                     if response_defn is None:
                         # No definition for this key, so ignore???
-                        log.warn(f"No definition for {response}")
+                        log.warning(f"No definition for {response}")
                         response_defn = [
                             "str",
                             1,

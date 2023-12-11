@@ -23,7 +23,7 @@ class TestIO(BaseIO):
             # Have test data defined, so use that
             number_of_test_responses = len(command_defn["test_responses"])
             # have we specified which test response to use?
-            check = re.match("test(\d+)", self._device, flags=re.IGNORECASE)  # noqa: W605
+            check = re.match(r"test(\d+)", self._device, flags=re.IGNORECASE)  # noqa: W605
             if check:
                 # use the specified response if that one exists
                 try:
@@ -33,7 +33,7 @@ class TestIO(BaseIO):
                 if desired_test_response < number_of_test_responses:
                     self._test_data = command_defn["test_responses"][desired_test_response]
                 else:
-                    log.warn(
+                    log.warning(
                         f"Test response requested: {desired_test_response} exceeds highest id available (IDs start at 0): {number_of_test_responses-1}, returning random one"
                     )
                     self._test_data = command_defn["test_responses"][
@@ -46,7 +46,7 @@ class TestIO(BaseIO):
                 ]
         else:
             # No test responses defined
-            log.warn("Testing a command with no test responses defined")
+            log.warning("Testing a command with no test responses defined")
         response = self._test_data
         log.debug(f"Raw response {response}")
         return response

@@ -101,7 +101,7 @@ class Trigger:
                 return False
         elif self.trigger_type == TriggerType.AT:
             if self.next_run is None:
-                #log.warn("at type trigger failed to set next run for %s" % command)
+                #log.warning("at type trigger failed to set next run for %s" % command)
                 return False
             if self.next_run <= now:
                 return True
@@ -112,7 +112,7 @@ class Trigger:
                 return True
             else:
                 return False
-        #log.warn("no isDue set for %s" % command)
+        #log.warning("no isDue set for %s" % command)
         return False
 
     def determine_next_run(self) -> float:

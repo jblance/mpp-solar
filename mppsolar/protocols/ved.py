@@ -175,7 +175,7 @@ class ved(AbstractProtocol):
             cmd = f":{cmd}{checksum:02X}\n"
             log.debug(f"full command: {cmd}")
             return cmd
-        log.warn("unable to generate full command - is the definition wrong?")
+        log.warning("unable to generate full command - is the definition wrong?")
         return None
 
     def check_response_valid(self, response) -> Tuple[bool, dict]:
