@@ -102,7 +102,7 @@ class MqttBroker:
             self.mqttc.loop_start()
             sleep(1)
         except ConnectionRefusedError as exc:
-            log.warn(f"{self.name} refused connection '{exc}'")
+            log.warning(f"{self.name} refused connection '{exc}'")
 
     def start(self):
         if self.disabled:
@@ -146,7 +146,7 @@ class MqttBroker:
             log.debug(f"Subscribing to topic {topic}")
             self.mqttc.subscribe(topic, qos=0)
         else:
-            log.warn(f"Did not subscribe to topic {topic} as not connected to broker")
+            log.warning(f"Did not subscribe to topic {topic} as not connected to broker")
 
     def publishMultiple(self, data):
         if self.disabled:
@@ -169,7 +169,7 @@ class MqttBroker:
             self.connect()
             sleep(1)
             if not self._isConnected:
-                log.warn("mqtt broker did not connect")
+                log.warning("mqtt broker did not connect")
                 return
         try:
             infot = self.mqttc.publish(topic, payload)
