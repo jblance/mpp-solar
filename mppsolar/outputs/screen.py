@@ -46,23 +46,15 @@ class screen(baseoutput):
             excl_filter = re.compile(excl_filter)
 
         # remove raw response
-        if "raw_response" in data:
-            data.pop("raw_response")
+        data.pop("raw_response", None)
 
         # build header
-        if "_command" in data:
-            command = data.pop("_command")
-        else:
-            command = "Unknown command"
-        if "_command_description" in data:
-            description = data.pop("_command_description")
-        else:
-            description = "No description found"
+        command = data.pop("_command", "Unknown command")
+        description = data.pop("_command_description", "No description found")
 
         # build data to display
         displayData = {}
-        for key in data:
-            _values = data[key]
+        for key, _values in data.items():
             # remove spaces
             if remove_spaces:
                 key = key.replace(" ", "_")
@@ -83,11 +75,11 @@ class screen(baseoutput):
             maxP = 9
         # maxV = getMaxLen(data.values())
         print(f"{pad('Parameter', maxP+1)}{'Value':<15}\tUnit")
-        for key in displayData:
-            value = displayData[key][0]
-            unit = displayData[key][1]
-            if len(displayData[key]) > 2 and displayData[key][2]:
-                extra = displayData[key][2]
+        for key, values in displayData.items():
+            value = values[0]
+            unit = values[1]
+            if len(values) > 2 and values[2]:
+                extra = values[2]
                 print(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}\t{extra}")
             else:
                 print(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}")

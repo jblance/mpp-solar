@@ -46,23 +46,15 @@ class boxdraw(baseoutput):
             excl_filter = re.compile(excl_filter)
 
         # remove raw response
-        if "raw_response" in data:
-            data.pop("raw_response")
+        data.pop("raw_response", None)
 
         # build header
-        if "_command" in data:
-            command = data.pop("_command")
-        else:
-            command = "Unknown command"
-        if "_command_description" in data:
-            description = data.pop("_command_description")
-        else:
-            description = "No description found"
+        command = data.pop("_command", "Unknown command")
+        description = data.pop("_command_description", "No description found")
 
         # build data to display
         displayData = {}
-        for key in data:
-            _values = data[key]
+        for key, _values in data.items():
             # remove spaces
             if remove_spaces:
                 key = key.replace(" ", "_")
@@ -109,9 +101,9 @@ class boxdraw(baseoutput):
         print("\u255f" + ("\u2500" * (width_p + 1)) + "\u253c" + ("\u2500" * (width_v + 1)) + "\u253c" + ("\u2500" * (width_u + 1)) + "\u2562")
 
         # print data
-        for key in displayData:
-            value = displayData[key][0]
-            unit = displayData[key][1]
+        for key, values in displayData.items():
+            value = values[0]
+            unit = values[1]
             print(f"\u2551 {pad(key, width_p)}\u2502 {pad(value, width_v)}\u2502 {pad(unit, width_u)}\u2551")
 
         # print footer

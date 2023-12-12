@@ -43,9 +43,7 @@ class StateHandler(object):
             await asyncio.sleep(0.5)
 
     def is_command_result_topic(self, topic: str) -> bool:
-        if "result" in topic:
-            return True
-        return False 
+        return "result" in topic
 
     def recieved_announcement(self, message) -> DeviceDTO:
         device = DeviceDTO.parse_raw(message)

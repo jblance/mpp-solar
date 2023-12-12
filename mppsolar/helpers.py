@@ -6,9 +6,7 @@ log = logging.getLogger("helpers")
 
 
 def get_kwargs(kwargs, key, default=None):
-    if key not in kwargs or not kwargs[key]:
-        return default
-    return kwargs[key]
+    return kwargs.get(key) or default
 
 
 def key_wanted(key, filter=None, excl_filter=None):

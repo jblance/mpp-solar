@@ -453,8 +453,7 @@ class pi30revo(AbstractProtocol):
         byte_cmd = bytes(command, "utf-8")
         if (
             self._command_defn
-            and "crctype" in self._command_defn
-            and self._command_defn["crctype"] == "chk"
+            and self._command_defn.get("crctype") == "chk"
         ):
             log.debug(f"Using CHK checksum approach for command {self._command}")
             checksum = chk(byte_cmd)
