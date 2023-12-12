@@ -22,20 +22,17 @@ def main():
     parser.add_argument(
         "-n",
         "--name",
-        type=str,
         help="Specifies the device name - used to differentiate different devices",
         default="unnamed",
     )
     parser.add_argument(
         "-p",
         "--port",
-        type=str,
         help="Specifies the device communications port (/dev/ttyUSB0 [default], /dev/hidraw0, test, ...)",
         default="/dev/ttyUSB0",
     )
     parser.add_argument(
         "--porttype",
-        type=str,
         help="overrides the device communications port type",
         default=None,
     )
@@ -44,7 +41,6 @@ def main():
             "-P",
             "--protocol",
             nargs="?",
-            type=str,
             const="help",
             help="Specifies the device command and response protocol, (default: JK04)",
             default="JK04",
@@ -54,7 +50,6 @@ def main():
             "-P",
             "--protocol",
             nargs="?",
-            type=str,
             const="help",
             help="Specifies the device command and response protocol, (default: PI30)",
             default="PI30",
@@ -62,7 +57,6 @@ def main():
     parser.add_argument(
         "-T",
         "--tag",
-        type=str,
         help="Override the command name and use this instead (for mqtt and influx type output processors)",
     )
     parser.add_argument(
@@ -76,7 +70,6 @@ def main():
         "-o",
         "--output",
         nargs="?",
-        type=str,
         help="Specifies the output processor(s) to use [comma separated if multiple] (screen [default]) leave blank to give list",
         const="help",
         default="screen",
@@ -85,70 +78,60 @@ def main():
         "--keepcase",
         action="store_true",
         help="Do not convert the field names to lowercase",
-        default=False,
     )
     parser.add_argument(
         "--filter",
-        type=str,
         help="Specifies the filter to reduce the output - only those fields that match will be output (uses re.search)",
         default=None,
     )
     parser.add_argument(
         "--exclfilter",
-        type=str,
         help="Specifies the filter to reduce the output - any fields that match will be excluded from the output (uses re.search)",
         default=None,
     )
     parser.add_argument(
         "-q",
         "--mqttbroker",
-        type=str,
         help="Specifies the mqtt broker to publish to if using a mqtt output (localhost [default], hostname, ip.add.re.ss ...)",
         default="localhost",
     )
     parser.add_argument(
         "--mqttport",
-        type=str,
+        type=int,
         help="Specifies the mqtt broker port if needed (default: 1883)",
         default=1883,
     )
     parser.add_argument(
         "--mqtttopic",
-        type=str,
         help="provides an override topic (or prefix) for mqtt messages (default: None)",
         default=None,
     )
     parser.add_argument(
         "--mqttuser",
-        type=str,
         help="Specifies the username to use for authenticated mqtt broker publishing",
         default=None,
     )
     parser.add_argument(
         "--mqttpass",
-        type=str,
         help="Specifies the password to use for authenticated mqtt broker publishing",
         default=None,
     )
     parser.add_argument(
         "--udpport",
-        type=str,
+        type=int,
         help="Specifies the UDP port if needed (default: 5555)",
         default="5555",
     )
     parser.add_argument(
         "--postgres_url",
-        type=str,
         help="PostgresSQL connection url, example postgresql://user:password@server:5432/postgres",
     )
     parser.add_argument(
         "--mongo_url",
-        type=str,
         help="Mongo connection url, example mongodb://user:password@ip:port/admindb",
     )
     parser.add_argument(
         "--mongo_db",
-        type=str,
         help="Mongo db name (default: mppsolar)",
         default="mppsolar",
     )
@@ -172,7 +155,6 @@ def main():
             "-C",
             "--configfile",
             nargs="?",
-            type=str,
             help="Full location of config file (default None, /etc/jkbms/jkbms.conf if -C supplied)",
             const="/etc/jkbms/jkbms.conf",
             default=None,
@@ -182,7 +164,6 @@ def main():
             "-C",
             "--configfile",
             nargs="?",
-            type=str,
             help="Full location of config file (default None, /etc/mpp-solar/mpp-solar.conf if -C supplied)",
             const="/etc/mpp-solar/mpp-solar.conf",
             default=None,

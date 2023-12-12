@@ -51,15 +51,12 @@ class prom(baseoutput):
             excl_filter = re.compile(excl_filter)
         if name == "unnamed":
             name = "mpp_solar"
+      
         # remove raw response
-        if "raw_response" in data:
-            data.pop("raw_response")
+        data.pop("raw_response", None)
+        data.pop("_command_description", None)
 
         cmd = data.pop("_command", None)
-
-        # build header
-        if "_command_description" in data:
-            data.pop("_command_description")
 
         # build data to display
         displayData = {}

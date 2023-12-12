@@ -618,13 +618,13 @@ class pi18(AbstractProtocol):
         # Determine if crc is needed or not
         CRC = True
         # For commands that dont need CRC
-        if "nocrc" in self._command_defn and self._command_defn["nocrc"] is True:
+        if self._command_defn.get("nocrc") is True:
             CRC = False
         # for protocols that mostly dont need CRC
         if self.NOCRC:
             CRC = False
         # override to allow crc
-        if "nocrc" in self._command_defn and self._command_defn["nocrc"] is False:
+        if self._command_defn.get("nocrc") is False:
             CRC = True
         log.debug("CRC: %s" % CRC)
 

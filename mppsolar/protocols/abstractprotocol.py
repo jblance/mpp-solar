@@ -176,10 +176,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             key = ""
             for x in raw_value:
                 key += f"{x:02x}"
-            if key in data_units:
-                r = data_units[key]
-            else:
-                r = f"Invalid key: {key}"
+            r = data_units.get(key, f"Invalid key: {key}")
             return [(data_name, r, "", None)]
         if data_type == "str_keyed":
             log.debug("str_keyed defn")
@@ -199,10 +196,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             #     },
             # ]
             key = raw_value.decode()
-            if key in data_units:
-                r = data_units[key]
-            else:
-                r = f"Invalid key: {key}"
+            r = data_units.get(key, f"Invalid key: {key}")
             return [(data_name, r, "", extra_info)]
         format_string = f"{data_type}(raw_value)"
         log.debug(f"Processing format string {format_string}")
@@ -228,14 +222,10 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
         # TODO: sort this so it isnt so carp
         data = self.decode(result.raw_response, command.name)
-        # remove raw response
-        if "raw_response" in data:
-            data.pop("raw_response")
-        # remove command details
-        if "_command" in data:
-            data.pop("_command")
-        if "_command_description" in data:
-            data.pop("_command_description")
+        # Clean data
+        data.pop("raw_response", None)
+        data.pop("_command", None)
+        data.pop("_command_description", None)
         result.decoded_response = data
         return result
 

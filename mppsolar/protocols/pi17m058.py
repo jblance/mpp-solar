@@ -75,5 +75,4 @@ class pi17m058(pi17):
         self.COMMANDS.update(SETTER_COMMANDS)
         # remove and unwanted pi30 commands
         for item in COMMANDS_TO_REMOVE:
-            if item in self.COMMANDS:
-                self.COMMANDS.pop(item)
+            self.COMMANDS.pop(item, None)

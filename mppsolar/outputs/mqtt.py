@@ -19,12 +19,9 @@ class mqtt(baseoutput):
 
         data = get_kwargs(kwargs, "data")
         # Clean data
-        if "_command" in data:
-            command = data.pop("_command")
-        if "_command_description" in data:
-            data.pop("_command_description")
-        if "raw_response" in data:
-            data.pop("raw_response")
+        command = data.pop("_command", None)
+        data.pop("_command_description", None)
+        data.pop("raw_response", None)
 
         # check if config supplied
         config = get_kwargs(kwargs, "config")
@@ -62,8 +59,7 @@ class mqtt(baseoutput):
 
         # build data to output
         _data = {}
-        for key in data:
-            _values = data[key]
+        for key, _values in data.items():
             # remove spaces
             if remove_spaces:
                 key = key.replace(" ", "_")
@@ -77,9 +73,9 @@ class mqtt(baseoutput):
         # Build array of mqtt messages
         msgs = []
         # Loop through responses
-        for key in _data:
-            value = _data[key][0]
-            unit = _data[key][1]
+        for key, values in _data.items():
+            value = values[0]
+            unit = values[1]
             log.debug(
                 f"build_msgs: prefix {topic_prefix}, key {key}, value {value}, unit {unit}"
             )

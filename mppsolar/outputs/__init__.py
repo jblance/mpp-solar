@@ -86,10 +86,7 @@ def output_results(results, command, mqtt_broker, fullconfig={}):
     for op in outputs:
         # filter = config.get("CONFIG", "filter")
         # log.debug(f"Using output filter: {filter}")
-        if "name" in op:
-            output = get_output(op["name"])
-        else:
-            output = get_output("screen")
+        output = get_output(op.get("name", "screen"))
         output.output(
             data=dict(results),
             config=op,
@@ -101,12 +98,11 @@ def output_results(results, command, mqtt_broker, fullconfig={}):
 def to_json(data, keep_case, excl_filter, filter):
     output = {}
     # Loop through responses
-    for key in data:
-        value = data[key]
+    for key, value in data.items():
         log.debug(f"value: {value}")
         if isinstance(value, list):
-            value = data[key][0]
-        # unit = data[key][1]
+            value = value[0]
+        # unit = value[1]
         # remove spaces
         key = key.replace(" ", "_")
         if not keep_case:
@@ -120,13 +116,12 @@ def to_json(data, keep_case, excl_filter, filter):
 def to_json_units(data, keep_case, excl_filter, filter):
     output = {}
     # Loop through responses
-    for key in data:
-        value = data[key]
+    for key, value in data.items():
         unit = None
         log.debug(f"value: {value}")
         if isinstance(value, list):
-            value = data[key][0]
-            unit = data[key][1]
+            unit = value[1]
+            value = value[0]
         # remove spaces
         key = key.replace(" ", "_")
         if not keep_case:

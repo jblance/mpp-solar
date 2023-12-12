@@ -45,21 +45,14 @@ class simpleunits(baseoutput):
         if excl_filter is not None:
             excl_filter = re.compile(excl_filter)
 
-        # remove raw response
-        if "raw_response" in data:
-            data.pop("raw_response")
-
-        # build header
-        if "_command" in data:
-            data.pop("_command")
-
-        if "_command_description" in data:
-            data.pop("_command_description")
+        # Clean data
+        data.pop("raw_response", None)
+        data.pop("_command", None)
+        data.pop("_command_description", None)
 
         # build data to display
         displayData = {}
-        for key in data:
-            _values = data[key]
+        for key, _values in data.items():
             # remove spaces
             if remove_spaces:
                 key = key.replace(" ", "_")
@@ -71,9 +64,9 @@ class simpleunits(baseoutput):
         log.debug(f"displayData: {displayData}")
 
         # print data
-        for key in displayData:
-            value = displayData[key][0]
-            unit = displayData[key][1]
+        for key, values in displayData.items():
+            value = values[0]
+            unit = values[1]
             if unit:
                 print(f"{key}={value}({unit})")
             else:
