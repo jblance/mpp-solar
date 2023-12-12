@@ -153,6 +153,14 @@ def main():
         default="mppsolar",
     )
     parser.add_argument(
+        "--pushurl",
+        help=(
+            "Any server used to send data to (PushGateway for Prometheus, for instance), "
+            "(default: http://localhost:9091/metrics/job/pushgateway)"
+        ),
+        default="http://localhost:9091/metrics/job/pushgateway",
+    )
+    parser.add_argument(
         "-c",
         "--command",
         nargs="?",
@@ -261,6 +269,7 @@ def main():
     excl_filter = args.exclfilter
     keep_case = args.keepcase
     mqtt_topic = args.mqtttopic
+    push_url = args.pushurl
 
     _commands = []
     # Initialize Daemon
@@ -318,6 +327,7 @@ def main():
             postgres_url = config[section].get("postgres_url", fallback=None)
             mongo_url = config[section].get("mongo_url", fallback=None)
             mongo_db = config[section].get("mongo_db", fallback=None)
+            push_url = config[section].get("push_url", fallback=push_url)
             #
             device_class = get_device_class(_type)
             log.debug(f"device_class {device_class}")
@@ -334,6 +344,7 @@ def main():
                 postgres_url=postgres_url,
                 mongo_url=mongo_url,
                 mongo_db=mongo_db,
+                push_url=push_url,
             )
             # build array of commands
             commands = _command.split("#")
@@ -372,6 +383,7 @@ def main():
             udp_port=udp_port,
             mongo_url=mongo_url,
             mongo_db=mongo_db,
+            push_url=push_url,
         )
         #
 
@@ -440,6 +452,7 @@ def main():
                     postgres_url=postgres_url,
                     mongo_url=mongo_url,
                     mongo_db=mongo_db,
+                    push_url=push_url,
                     # mqtt_port=mqtt_port,
                     # mqtt_user=mqtt_user,
                     # mqtt_pass=mqtt_pass,
