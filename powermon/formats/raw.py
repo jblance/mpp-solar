@@ -11,11 +11,11 @@ class raw(AbstractFormat):
         self.name = "raw"
         self.extra_info = formatConfig.get("extra_info", False)
         
-    def set_command_description(self, command_description):
-        pass
+    # def set_command_description(self, command_description):
+    #     pass
 
-    def format(self, result: Result):
-        log.info("Using output formatter: %s" % self.name)
+    def format(self, result: Result, device_info):
+        log.info("Using output formatter: %s", self.name)
 
         data = result.raw_response
         log.debug(f"data: {data}")

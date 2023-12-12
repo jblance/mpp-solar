@@ -79,7 +79,7 @@ class SerialPort(AbstractPort):
             response_line = self.serial_port.read_until(b"\r")
             log.debug("serial response was: %s", response_line)
             # response = self.get_protocol().check_response_and_trim(response_line)
-            result = command.build_result(raw_response=response_line, protocol=self.get_protocol())
+            result = command.build_result(raw_response=response_line, protocol=self.protocol)
             return result
         except Exception as e:
             log.warning("Serial read error: %s", e)

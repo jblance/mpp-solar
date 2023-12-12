@@ -1,14 +1,13 @@
 """ formats / abstractformat.py """
-from abc import ABC, abstractmethod
 import logging
 import re
+from abc import ABC, abstractmethod
 
-from powermon.dto.formatDTO import FormatDTO
-from powermon.commands.result import Result
 from powermon.commands.reading import Reading
+from powermon.commands.result import Result
+# from powermon.device import DeviceInfo
+from powermon.dto.formatDTO import FormatDTO
 
-
-# from time import sleep
 log = logging.getLogger("Formatter")
 
 
@@ -52,17 +51,17 @@ class AbstractFormat(ABC):
         if _keyExclusionFilterString is not None:
             self._keyExclusionfilter = re.compile(_keyExclusionFilterString)
 
-    @abstractmethod
-    def set_command_description(self, command_description):
-        pass
+    # @abstractmethod
+    # def set_command_description(self, command_description):
+    #     pass
 
     @abstractmethod
-    def format(self, result: Result) -> list:
+    def format(self, result: Result, device_info) -> list:
         pass
 
     def to_dto(self) -> FormatDTO:
         return FormatDTO(type=self.name)
-    
+
     # Override this if the format sends multiple messages
     def sendsMultipleMessages(self) -> bool:
         return False
@@ -70,12 +69,12 @@ class AbstractFormat(ABC):
     def format_and_filter_data(self, result: Result) -> list[Reading]:
 
         display_data = []
-        for response in result.get_responses():
-            if response is None:
-                raise ValueError("response cannot be None")
-            formatted_key = self.formatKey(response.get_data_name())
+        for reading in result.readings:
+            if reading is None:
+                raise ValueError("reading cannot be None")
+            formatted_key = self.formatKey(reading.get_data_name())
             if self.isKeyWanted(formatted_key):
-                display_data.append(response)
+                display_data.append(reading)
         return display_data
 
     def formatKey(self, key) -> str:

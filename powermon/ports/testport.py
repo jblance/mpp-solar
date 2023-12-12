@@ -34,7 +34,7 @@ class TestPort(AbstractPort):
         return "Test port"
 
     def to_dto(self) -> PortDTO:
-        dto = PortDTO(type="test", protocol=self.get_protocol().to_dto())
+        dto = PortDTO(type="test", protocol=self.protocol.to_dto())
         return dto
 
     def is_connected(self):
@@ -68,5 +68,5 @@ class TestPort(AbstractPort):
         log.debug("Raw response: %s", response_line)
 
         # response = self.get_protocol().check_response_and_trim(response_line)
-        result = command.build_result(raw_response=response_line, protocol=self.get_protocol())
+        result = command.build_result(raw_response=response_line, protocol=self.protocol)
         return result

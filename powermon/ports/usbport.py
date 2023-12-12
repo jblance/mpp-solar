@@ -28,18 +28,18 @@ class USBPort(AbstractPort):
         self.port = None
 
     def to_dto(self):
-        dto = PortDTO(type="usb", path=self.path, protocol=self.get_protocol().to_dto())
+        dto = PortDTO(type="usb", path=self.path, protocol=self.protocol.to_dto())
         return dto
 
     def is_connected(self) -> bool:
         return self.port is not None
 
     def connect(self) -> bool:
-        if(self.is_connected()):
+        if self.is_connected():
             log.debug("USBPort already connected")
             return True
         
-        log.debug(f"USBPort connecting. path:{self.path}, protocol: {self.get_protocol()}")
+        log.debug(f"USBPort connecting. path:{self.path}, protocol: {self.protocol}")
         try:
             self.port = os.open(self.path, os.O_RDWR | os.O_NONBLOCK)
             log.debug(f"USBPort port number ${self.port}")
@@ -100,6 +100,6 @@ class USBPort(AbstractPort):
                 break
         log.debug("usb response was: %s", response_line)
         # response = self.get_protocol().check_response_and_trim(response_line)
-        result = command.build_result(raw_response=response_line, protocol=self.get_protocol())
+        result = command.build_result(raw_response=response_line, protocol=self.protocol)
 
         return result

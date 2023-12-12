@@ -49,9 +49,15 @@ class AbstractPort(ABC):
         """ convert port object to data transfer object """
         raise NotImplementedError
 
-    def get_protocol(self) -> AbstractProtocol:
+    @property
+    def protocol(self) -> AbstractProtocol:
         """ return the protocol associated with this port """
-        return self.protocol
+        return self._protocol
+
+    @protocol.setter
+    def protocol(self, value):
+        log.debug("Setting protocol to: %s", value)
+        self._protocol = value
 
     def run_command(self, command: Command) -> Result:
         """ run_command takes a command object, runs the command and returns a result object (replaces process_command) """
@@ -62,13 +68,13 @@ class AbstractPort(ABC):
             if not self.connect():
                 raise ConnectionError(f"Unable to connect to port: {self.error_message}")
         # FIXME: what if still not connected....
-        # ??
+        # should, log an error and wait to try to reconnect (increasing backoff times)
 
         # update run times
         command.touch()
         # update full_command - expand any template / add crc etc
         # updates every run incase something has changed
-        command.set_full_command(self.get_protocol().get_full_command(command.code))
+        command.full_command = self.protocol.get_full_command(command.code)
 
         # run the command via the 'send_and_receive port function
         result = self.send_and_receive(command)
