@@ -37,9 +37,8 @@ class domoticz_autodiscover(mqtt):
         data.pop("raw_response", None)
 
         # Loop through responses
-        for _key in data:
-            # value = data[_key][0]
-            unit = data[_key][1]
+        for _key, values in data.items():
+            unit = values[1]
             # remove spaces
             key = _key.replace(" ", "_")
             if not keep_case:

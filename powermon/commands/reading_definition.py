@@ -412,10 +412,7 @@ class ReadingDefinitionENFlags(ReadingDefinition):
             elif item == "D":
                 status = "disabled"
             else:
-                if item in self.enflags:
-                    _key = self.enflags[item]["name"]
-                else:
-                    _key = f"unknown_{i}"
+                _key = self.enflags.get(item, {}).get("name") or f"unknown_{i}"
                 return_values[_key] = status
         return return_values
 

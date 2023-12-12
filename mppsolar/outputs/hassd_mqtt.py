@@ -21,12 +21,9 @@ class hassd_mqtt(mqtt):
         log.debug(f"kwargs {kwargs}")
         data = get_kwargs(kwargs, "data")
         # Clean data
-        if "_command" in data:
-            command = data.pop("_command")
-        if "_command_description" in data:
-            data.pop("_command_description")
-        if "raw_response" in data:
-            data.pop("raw_response")
+        command = data.pop("_command", None)
+        data.pop("_command_description", None)
+        data.pop("raw_response", None)
 
         # check if config supplied
         config = get_kwargs(kwargs, "config")
@@ -75,19 +72,19 @@ class hassd_mqtt(mqtt):
         value_msgs = []
 
         # Loop through responses
-        for key in data:
+        for key, values in data.items():
             orig_key = key
-            value = data[key][0]
-            unit = data[key][1]
+            value = values[0]
+            unit = values[1]
             icon = None
-            if len(data[key]) > 2 and data[key][2] and "icon" in data[key][2]:
-                icon = data[key][2]["icon"]
+            if len(values) > 2 and values[2] and "icon" in values[2]:
+                icon = values[2]["icon"]
             device_class = None
-            if len(data[key]) > 2 and data[key][2] and "device-class" in data[key][2]:
-                device_class = data[key][2]["device-class"]
+            if len(values) > 2 and values[2] and "device-class" in values[2]:
+                device_class = values[2]["device-class"]
             state_class = None
-            if len(data[key]) > 2 and data[key][2] and "state_class" in data[key][2]:
-                state_class = data[key][2]["state_class"]
+            if len(values) > 2 and values[2] and "state_class" in values[2]:
+                state_class = values[2]["state_class"]
 
             # remove spaces
             if remove_spaces:
@@ -158,7 +155,6 @@ class hassd_mqtt(mqtt):
                 #
                 # VALUE SETTING
                 #
-                # unit = data[key][1]
                 # 'tag'/status/total_output_active_power/value 1250
                 # 'tag'/status/total_output_active_power/unit W
                 topic = f"homeassistant/{sensor}/mpp_{tag}_{key}/state"

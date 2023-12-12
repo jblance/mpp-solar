@@ -39,8 +39,8 @@ class influx2_mqtt(mqtt):
         if tag is None:
             tag = cmd
         # Loop through responses
-        for key in data:
-            value = data[key][0]
+        for key, values in data.items():
+            value = values[0]
             # remove spaces
             key = key.replace(" ", "_")
             if not keep_case:

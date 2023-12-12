@@ -51,20 +51,16 @@ class prom(baseoutput):
             excl_filter = re.compile(excl_filter)
         if name == "unnamed":
             name = "mpp_solar"
+      
         # remove raw response
-        if "raw_response" in data:
-            data.pop("raw_response")
+        data.pop("raw_response", None)
+        data.pop("_command_description", None)
 
         cmd = data.pop("_command", None)
 
-        # build header
-        if "_command_description" in data:
-            data.pop("_command_description")
-
         # build data to display
         displayData = {}
-        for key in data:
-            _values = data[key]
+        for key, _values in data.items():
             # remove spaces
             if remove_spaces:
                 key = key.replace(" ", "_")
@@ -77,8 +73,8 @@ class prom(baseoutput):
 
         # print data
         print(f'machine_role{{role="mpp_solar"}} 1')
-        for key in displayData:
-            value = displayData[key][0]
+        for key, values in displayData.items():
+            value = values[0]
             if isinstance(value, str):
                 print(f'mpp_solar_{key}{{inverter="{name}",device="{dev}",cmd="{cmd}",myStr="{value}"}} 1')
             else:

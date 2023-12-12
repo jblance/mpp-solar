@@ -990,8 +990,7 @@ class pi30max(PI30):
         super().add_command_definitions(SETTER_COMMANDS)
         # remove and unwanted pi30 commands
         for item in COMMANDS_TO_REMOVE:
-            if item in self.command_definitions:
-                self.command_definitions.pop(item)
+            self.command_definitions.pop(item, None)
         self.STATUS_COMMANDS = ["QPIGS", "QPIGS2"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
