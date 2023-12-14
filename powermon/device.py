@@ -129,14 +129,18 @@ class Device:
                 try:
                     # run command
                     result: Result = self.port.run_command(command)
+                    log.info("Got result: %s", result)
                 except Exception as exception:  # pylint: disable=W0718
+                    # specific errors need to incorporated into Result as part of the processing
+                    # so any exceptions at this stage will be truely unexpected
                     log.error("Error decoding result: %s", exception)
-                    result = Result(command_code=command.code, result_type=ResultType.ERROR, raw_response=b"Error decoding result")
-                    result.error_messages.append(f"Error decoding result: {exception}")
-                    result.error_messages.append(f"Exception Type: {exception.__class__.__name__}")
-                    result.error_messages.append(f"Exception args: {exception.args}")
+                    # result = Result(result_type=ResultType.ERROR, command_definition=None, \
+                    #   raw_response=b"Error decoding result", trimmed_response=b"Error decoding result")
+                    # result.error_messages.append(f"Error decoding result: {exception}")
+                    # result.error_messages.append(f"Exception Type: {exception.__class__.__name__}")
+                    # result.error_messages.append(f"Exception args: {exception.args}")
                     raise exception
-                # result.device_id = self.device_id  # FIXME: think this is limiting, should pass device and mqtt_broker to output
+                # result.device_id = self.device_id
 
                 # loop through each output and process result
                 output: AbstractOutput
