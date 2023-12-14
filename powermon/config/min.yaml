@@ -7,7 +7,7 @@ device:
   port:
     type: test
     path: /dev/ttyUSB0
-    response_number: 0
+    # response_number: 0
     protocol: PI30
 
 commands:
@@ -15,11 +15,14 @@ commands:
 #   outputs:
 #   - type: screen
 #     format: raw
-- command: Q1
+- command: QMOD
+# - command: QFLAG
   trigger:
     every: 5  # every 5 seconds
   outputs:
   - type: screen
     format:
-      type: hass
+      type: table
+      draw_lines: True
+      extra_info: True
 loop: once
