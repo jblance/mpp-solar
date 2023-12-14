@@ -1,6 +1,11 @@
-from bluepy import btle
 import logging
 
+try:
+    from bluepy import btle
+except ImportError:
+    print("You are missing dependencies in order to be able to use that output.")
+    print("To install them, use that command:")
+    print("    python -m pip install 'mppsolar[ble]'")
 
 from .baseio import BaseIO
 from ..helpers import get_kwargs

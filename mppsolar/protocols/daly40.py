@@ -2,8 +2,6 @@ import logging
 
 from .daly import daly
 
-# from .pi30 import COMMANDS
-
 log = logging.getLogger("daly40")
 
 # (AAA BBB CCC DDD EEE

@@ -13,21 +13,34 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.00"
+paho-mqtt = ">=1.6"
 pyserial = ">3"
 pydantic = ">=1.8.0"
 
 # Extra dependencies
-fastapi = { version = ">=0.68.0", extras = ["api"] }
-fastapi-mqtt = { version = ">=1.1", extras = ["api"] }
-sqlalchemy = { version = "^2.0.15", extras = ["api"] }
-uvicorn = { version = ">=0.15.0", extras = ["api"] }
-bleak = { version = "^0.20.2", extras = ["ble"] }
-bluepy = { version = "^1.3.0", extras = ["ble"] }
-paho-mqtt = { version = ">=1.6", extras = ["mqtt"] }
-requests = { version = ">=2.31.0", extras = ["push"] }
-PyYAML = { version = ">=62.31.0", extras = ["powermon"] }
-strenum = { version = "^0.4.1", extras = ["powermon"] }
-systemd = { version = ">=0.17.1", extras = ["systemd"] }
+bleak = { version = "^0.20.2", optional = true }
+bluepy = { version = "^1.3.0", optional = true }
+cysystemd = { version = ">=1.6.0", optional = true }
+fastapi = { version = ">=0.68.0", optional = true }
+fastapi-mqtt = { version = ">=1.1", optional = true }
+# paho-mqtt = { version = ">=1.6", optional = true }
+pymongo = { version = ">=4.6.1", optional = true }
+psycopg2-binary = { version = ">=2.9.9", optional = true }
+PyYAML = { version = ">=6", optional = true }
+requests = { version = ">=2.31.0", optional = true }
+sqlalchemy = { version = "^2.0.15", optional = true }
+strenum = { version = "^0.4.1", optional = true }
+uvicorn = { version = ">=0.15.0", optional = true }
+
+[tool.poetry.extras]
+api = ["fastapi", "fastapi-mqtt", "sqlalchemy", "uvicorn"]
+ble = ["bleak", "bluepy"]
+# mqtt = ["paho-mqtt"]
+mongo = ["pymongo"]
+pgsql = ["psycopg2-binary"]
+powermon = ["PyYAML", "strenum"]
+push = ["requests"]
+systemd = ["cysystemd"]
 
 [tool.poetry.group.dev]
 optional = true

@@ -2,8 +2,6 @@ import logging
 
 from .abstractprotocol import AbstractProtocol
 
-# from .pi30 import COMMANDS
-
 log = logging.getLogger("pi16")
 
 # (AAA BBB CCC DDD EEE

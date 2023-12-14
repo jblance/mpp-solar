@@ -2,10 +2,8 @@ import abc
 import calendar  # noqa: F401
 import logging
 import re
-from datetime import datetime
 from typing import Tuple
 from pydantic import BaseModel
-# from powermon.dto.protocolDTO import ProtocolDTO
 
 from ..helpers import get_resp_defn, get_value
 from .protocol_helpers import BigHex2Short, BigHex2Float  # noqa: F401

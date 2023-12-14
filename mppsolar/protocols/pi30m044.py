@@ -1,5 +1,4 @@
 import logging
-#import datetime.datetime
 
 from .pi30max import pi30max
 

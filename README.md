@@ -21,7 +21,12 @@ Currently has support for:
 
 ## Install ##
 - `pip install mppsolar` (minimal install), or
-- `pip install mppsolar[ble]` (install including BLE support aka jkbms), or
+- `pip install mppsolar[api]` (install server stuff), or
+- `pip install mppsolar[ble]` (for Bluetooth support aka jkbms), or
+- `pip install mppsolar[mongo]` (for MongoDB output), or
+- `pip install mppsolar[pgsql]` (for PostgreSQL output), or
+- `pip install mppsolar[push]` (for Pometheus PushGateway output), or
+- `pip install mppsolar[systemd]` (for `--daemon` on Linux), or
 - `docker pull jblance/mppsolar:latest` (docker install)
 
 
