@@ -33,7 +33,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         definitions_count = len(self.command_definitions)
         if definitions_count == 0:
             raise PowermonProtocolError(f"Attempted to load protocol '{self._protocol_id}' which has no valid commands")
-        log.info("Using protocol:%s with %i commands", self._protocol_id, definitions_count)
+        log.info("Using protocol:%s with %i commands (%s)", self._protocol_id, definitions_count, ', '.join(self.command_definitions.keys()))
         # log.info(f'Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands')
 
     def to_dto(self) -> ProtocolDTO:

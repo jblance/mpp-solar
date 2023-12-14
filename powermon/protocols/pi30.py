@@ -10,15 +10,15 @@ from powermon.protocols.abstractprotocol import AbstractProtocol
 log = logging.getLogger("pi30")
 
 SETTER_COMMANDS = {
-    "F": {
-        "name": "F",
-        "description": "Set Device Output Frequency",
-        "help": " -- examples: F50 (set output frequency to 50Hz) or F60 (set output frequency to 60Hz)",
-        "result_type": ResultType.ACK,
-        "reading_definitions": [{"description": "Command execution", "response_type": ResponseType.ACK, "options": {"NAK": "Failed", "ACK": "Successful"}, "reading_type": ReadingType.ACK}],
-        "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
-        "regex": "F([56]0)$",
-    },
+    # "F": {
+    #     "name": "F",
+    #     "description": "Set Device Output Frequency",
+    #     "help": " -- examples: F50 (set output frequency to 50Hz) or F60 (set output frequency to 60Hz)",
+    #     "result_type": ResultType.ACK,
+    #     "reading_definitions": [{"description": "Command execution", "response_type": ResponseType.ACK, "options": {"NAK": "Failed", "ACK": "Successful"}, "reading_type": ReadingType.ACK}],
+    #     "test_responses": [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",],
+    #     "regex": "F([56]0)$",
+    # },
     "MCHGC": {
         "name": "MCHGC",
         "description": "Set Max Charging Current (for parallel units)",
@@ -324,31 +324,6 @@ QUERY_COMMANDS = {
             b"(230.0 50.0 0030 42.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 0 0 1 0 54.0 0 1 000\x9E\x60\r"
         ],
     },
-    "QFLAG": {
-        "name": "QFLAG",
-        "description": "Flag Status inquiry",
-        "help": " -- queries the enabled / disabled state of various Inverter settings (e.g. buzzer, overload, interrupt alarm)",
-        "response_type": ResultType.INDEXED,
-        "response": [
-            [
-                0,
-                "Device Status",
-                ResponseType.ENFLAGS,
-                {
-                    "a": {"name": "Buzzer", "state": "disabled"},
-                    "b": {"name": "Overload Bypass", "state": "disabled"},
-                    "j": {"name": "Power Saving", "state": "disabled"},
-                    "k": {"name": "LCD Reset to Default", "state": "disabled"},
-                    "u": {"name": "Overload Restart", "state": "disabled"},
-                    "v": {"name": "Over Temperature Restart", "state": "disabled"},
-                    "x": {"name": "LCD Backlight", "state": "disabled"},
-                    "y": {"name": "Primary Source Interrupt Alarm", "state": "disabled"},
-                    "z": {"name": "Record Fault Code", "state": "disabled"},
-                },
-            ]
-        ],
-        "test_responses": [b"(EakxyDbjuvz\x2F\x29\r"],
-    },
     "QMCHGCR": {
         "name": "QMCHGCR",
         "description": "Max Charging Current Options inquiry",
@@ -356,21 +331,6 @@ QUERY_COMMANDS = {
         "response_type": ResultType.MULTIVALUED,
         "response": [{"index": 0, "description": "Max Charging Current Options", "reading_type": ReadingType.AMPS, "response_type": ResponseType.STRING}],
         "test_responses": [b"(010 020 030 040 050 060 070 080 090 100 110 120\x0c\xcb\r"],
-    },
-    "QMOD": {
-        "name": "QMOD",
-        "description": "Mode inquiry",
-        "help": " -- queries the Inverter mode",
-        "response_type": ResultType.INDEXED,
-        "response": [
-            [
-                0,
-                "Device Mode",
-                ResponseType.OPTION,
-                {"P": "Power on", "S": "Standby", "L": "Line", "B": "Battery", "F": "Fault", "H": "Power saving"},
-            ]
-        ],
-        "test_responses": [b"(S\xe5\xd9\r"],
     },
     "QMN": {
         "name": "QMN",
@@ -720,54 +680,6 @@ QUERY_COMMANDS = {
             b"(230.0 34.7 230.0 50.0 34.7 8000 8000 48.0 48.0 42.0 54.0 52.5 2 010 030 1 2 2 9 01 0 0 50.0 0 1 480 0 070\xd9`\r",
         ],
     },
-    "QPIWS": {
-        "name": "QPIWS",
-        "description": "Warning status inquiry",
-        "help": " -- queries any active warnings flags from the Inverter",
-        "response_type": ResultType.INDEXED,
-        "response": [
-            [
-                0,
-                "Warning",
-                ResponseType.FLAGS,
-                [
-                    "",
-                    "Inverter fault",
-                    "Bus over fault",
-                    "Bus under fault",
-                    "Bus soft fail fault",
-                    "Line fail warning",
-                    "OPV short warning",
-                    "Inverter voltage too low fault",
-                    "Inverter voltage too high fault",
-                    "Over temperature fault",
-                    "Fan locked fault",
-                    "Battery voltage to high fault",
-                    "Battery low alarm warning",
-                    "Reserved",
-                    "Battery under shutdown warning",
-                    "Reserved",
-                    "Overload fault",
-                    "EEPROM fault",
-                    "Inverter over current fault",
-                    "Inverter soft fail fault",
-                    "Self test fail fault",
-                    "OP DC voltage over fault",
-                    "Bat open fault",
-                    "Current sensor fail fault",
-                    "Battery short fault",
-                    "Power limit warning",
-                    "PV voltage high warning",
-                    "MPPT overload fault",
-                    "MPPT overload warning",
-                    "Battery too low to charge warning",
-                    "",
-                    "",
-                ],
-            ]
-        ],
-        "test_responses": [b"(00000100000000001000000000000000\x56\xA6\r"],
-    },
     "QVFW": {
         "name": "QVFW",
         "description": "Main CPU firmware version inquiry",
@@ -786,7 +698,16 @@ QUERY_COMMANDS = {
     },
 }
 
-NEW_FORMAT_COMMANDS = {
+NEW_SETTER_COMMANDS = {
+    "F": {
+        "name": "F",
+        "description": "Set Device Output Frequency",
+        "help": " -- examples: F50 (set output frequency to 50Hz) or F60 (set output frequency to 60Hz)",
+        "result_type": ResultType.ACK,
+        "regex": "F([56]0)$",
+    },
+}
+NEW_QUERY_COMMANDS = {
     "QID": {
         "name": "QID",
         "description": "Device Serial Number inquiry",
@@ -825,6 +746,88 @@ NEW_FORMAT_COMMANDS = {
         ],
         "test_responses": [b"(00000 00000 01 01 00 059 045 053 068 00 00 000 0040 0580 0000 50.00 139\xb9\r"],
     },
+    "QFLAG": {
+        "name": "QFLAG",
+        "description": "Flag Status inquiry",
+        "help": " -- queries the enabled / disabled state of various Inverter settings (e.g. buzzer, overload, interrupt alarm)",
+        "result_type": ResultType.SINGLE,
+        "reading_definitions": [
+            {"description": "Device Status", "reading_type": ReadingType.MULTI_ENABLE_DISABLE,
+                "response_type": ResponseType.ENABLE_DISABLE_FLAGS,
+                "options": {
+                    "a": "Buzzer",
+                    "b": "Overload Bypass", 
+                    "j": "Power Saving", 
+                    "k": "LCD Reset to Default",
+                    "u": "Overload Restart", 
+                    "v": "Over Temperature Restart",
+                    "x": "LCD Backlight",
+                    "y": "Primary Source Interrupt Alarm",
+                    "z": "Record Fault Code",
+                },
+            }
+        ],
+        "test_responses": [b"(EakxyDbjuvz\x2F\x29\r"],
+    },
+    "QMOD": {
+        "name": "QMOD",
+        "description": "Mode inquiry",
+        "help": " -- queries the Inverter mode",
+        "result_type": ResultType.SINGLE,
+        "reading_definitions": [
+            {"description": "Device Mode", "reading_type": ReadingType.MESSAGE,
+                "response_type": ResponseType.OPTION,
+                "options": {"P": "Power on", "S": "Standby", "L": "Line", "B": "Battery", "F": "Fault", "H": "Power saving"},
+            }
+        ],
+        "test_responses": [b"(S\xe5\xd9\r"],
+    },
+    "QPIWS": {
+        "name": "QPIWS",
+        "description": "Warning status inquiry",
+        "help": " -- queries any active warnings flags from the Inverter",
+        "result_type": ResultType.SINGLE,
+        "reading_definitions": [
+            {"description": "Warning", "reading_type": ReadingType.FLAGS,
+                "response_type": ResponseType.FLAGS,
+                "flags": [
+                    "",
+                    "Inverter fault",
+                    "Bus over fault",
+                    "Bus under fault",
+                    "Bus soft fail fault",
+                    "Line fail warning",
+                    "OPV short warning",
+                    "Inverter voltage too low fault",
+                    "Inverter voltage too high fault",
+                    "Over temperature fault",
+                    "Fan locked fault",
+                    "Battery voltage to high fault",
+                    "Battery low alarm warning",
+                    "Reserved",
+                    "Battery under shutdown warning",
+                    "Reserved",
+                    "Overload fault",
+                    "EEPROM fault",
+                    "Inverter over current fault",
+                    "Inverter soft fail fault",
+                    "Self test fail fault",
+                    "OP DC voltage over fault",
+                    "Bat open fault",
+                    "Current sensor fail fault",
+                    "Battery short fault",
+                    "Power limit warning",
+                    "PV voltage high warning",
+                    "MPPT overload fault",
+                    "MPPT overload warning",
+                    "Battery too low to charge warning",
+                    "",
+                    "",
+                ],
+            }
+        ],
+        "test_responses": [b"(00000100000000001000000000000000\x56\xA6\r"],
+    },
 }
 
 
@@ -836,7 +839,8 @@ class PI30(AbstractProtocol):
     def __init__(self) -> None:
         super().__init__()
         self._protocol_id = b"PI30"
-        self.add_command_definitions(NEW_FORMAT_COMMANDS)
+        self.add_command_definitions(NEW_QUERY_COMMANDS)
+        self.add_command_definitions(NEW_SETTER_COMMANDS)
         self.STATUS_COMMANDS = ["QPIGS", "Q1"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
