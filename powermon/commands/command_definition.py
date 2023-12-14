@@ -4,8 +4,8 @@ import re
 
 from powermon.commands.parameter import Parameter
 # from powermon.commands.reading import Reading
-from powermon.commands.reading_definition import ReadingDefinition
-from powermon.commands.result import ResultType
+from powermon.commands.reading_definition import ReadingDefinition, ReadingType
+from powermon.commands.result import ResultType, ResponseType
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
 
 log = logging.getLogger("CommandDefinition")
@@ -42,7 +42,10 @@ class CommandDefinition:
         result_type = protocol_dictionary.get("result_type")  # QUESTION: this where ResultType.ACK logic could differ
         match result_type:
             case ResultType.ACK:
-                pass
+                # All ResultType.ACK are the same, so put config here instead of duplicating it in the protocol
+                reading_definitions : dict[int, ReadingDefinition] = \
+                    ReadingDefinition.multiple_from_config([{"description": description, "response_type": ResponseType.ACK, "reading_type": ReadingType.ACK}])
+                test_responses = [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",]
             case _:
                 reading_definitions : dict[int, ReadingDefinition] = \
                     ReadingDefinition.multiple_from_config(protocol_dictionary.get("reading_definitions"))
@@ -94,5 +97,3 @@ class CommandDefinition:
         for parameter in self.parameters.values():
             parameter.set_value(parameter_value)
             return
-
-
