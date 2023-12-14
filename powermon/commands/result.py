@@ -31,8 +31,8 @@ class Result:
     - list of Readings (processed results)
     """
     def __str__(self):
-        return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, \
-            {self.raw_response=}, {' '.join(str(i) for i in self.readings)}"
+        return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, " + \
+        ','.join(str(reading) for reading in self._readings)
 
     def __init__(self, result_type: ResultType, command_definition, raw_response: bytes, trimmed_response: bytes):
         self.raw_response = raw_response
@@ -101,18 +101,18 @@ class Result:
         Take the response and decode into a list of Readings depending on the result type
         """
 
-        log.info("result.response passed to decode: %s", response)
+        log.info("result.response passed to decode: %s, result_type %s", response, self.result_type)
 
         all_readings : list[Reading] = []
 
         # Process response based on result type
         match self.result_type:
             case ResultType.SINGLE:
-                readings = self.validate_and_translate_raw_value(response, index=0)
-                all_readings.extend(readings)
+                reading = self.reading_from_response(response)
+                all_readings.append(reading)
             case ResultType.ACK:
-                readings = self.validate_and_translate_raw_value(response, index=0)
-                all_readings.extend(readings)
+                reading = self.reading_from_response(response)
+                all_readings.append(reading)
             case ResultType.ORDERED:
                 # Response is splitable and order of each item determines decode logic
                 for i, _raw_response in enumerate(self.split_responses(response)):
@@ -129,7 +129,7 @@ class Result:
             case _:
                 # unknown result type
                 raise ValueError(f"Unknown result type: {self.result_type}")
-
+        log.debug("got readings: %s", ",".join(str(i) for i in all_readings))
         return all_readings
 
     def split_responses(self, response) -> list:
@@ -139,10 +139,22 @@ class Result:
         # CRC should be removed by protocol, so just split split
         return response.split(None)  # split differs by protocol
 
+    def reading_from_response(self, response) -> Reading:
+        """ return a reading from a raw_response that applies to a single reading """
+        reading_definition: ReadingDefinition = self.command_definition.reading_definitions[0]
+        try:
+            return reading_definition.reading_from_raw_response(response)[0]
+        except ValueError:
+            error = Reading(data_name=reading_definition.get_description(),
+                            data_value=reading_definition.get_invalid_message(response), data_unit="")
+            error.is_valid = False
+            return [error]
+
+
     def validate_and_translate_raw_value(self, raw_value: str, index: int) -> list[Reading]:
         if len(self.command_definition.reading_definitions) <= index:
             log.debug("Index %s is out of range for command %s", index, self.command_definition.command_code)
-            reading_definition: ReadingDefinition = ReadingDefinitionMessage(index=index, name="default", response_type=ResponseType.STRING , description=f"Unused response {index}")
+            reading_definition: ReadingDefinition = ReadingDefinitionMessage(index=index, response_type=ResponseType.STRING , description=f"Unused response {index}")
         else:
             reading_definition: ReadingDefinition = self.command_definition.reading_definitions[index]
         try:
