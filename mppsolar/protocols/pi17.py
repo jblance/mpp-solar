@@ -2,10 +2,6 @@ import logging
 
 from .abstractprotocol import AbstractProtocol
 
-# from .protocol_helpers import crcPI as crc
-
-# from .pi30 import COMMANDS
-
 log = logging.getLogger("pi17")
 
 QUERY_COMMANDS = {

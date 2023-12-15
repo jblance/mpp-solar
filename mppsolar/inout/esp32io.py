@@ -1,6 +1,7 @@
 import logging
-from machine import UART
 import time
+
+from machine import UART
 
 from .baseio import BaseIO
 from ..helpers import get_kwargs

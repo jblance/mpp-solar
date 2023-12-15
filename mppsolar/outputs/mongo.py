@@ -2,12 +2,17 @@ import datetime
 import logging
 import re
 
-import pymongo as pymongo
+try:
+    import pymongo as pymongo
+except ImportError:
+    print("You are missing dependencies in order to be able to use that output.")
+    print("To install them, use that command:")
+    print("    python -m pip install 'mppsolar[mongo]'")
+    pymongo = None
 
 from . import to_json
 from .baseoutput import baseoutput
 from ..helpers import get_kwargs
-# from ..helpers import key_wanted
 
 log = logging.getLogger("mongo")
 
@@ -20,6 +25,9 @@ class mongo(baseoutput):
         log.debug(f"__init__: kwargs {kwargs}")
 
     def output(self, *args, **kwargs):
+        if not pymongo:
+            return
+
         data = get_kwargs(kwargs, "data")
         # tag = get_kwargs(kwargs, "tag")
         keep_case = get_kwargs(kwargs, "keep_case")

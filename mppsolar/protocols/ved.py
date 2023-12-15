@@ -4,8 +4,6 @@ from typing import Tuple
 from .abstractprotocol import AbstractProtocol
 from .protocol_helpers import vedHexChecksum
 
-# from .pi30 import COMMANDS
-
 log = logging.getLogger("ved")
 
 # (AAA BBB CCC DDD EEE

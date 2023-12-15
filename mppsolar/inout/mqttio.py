@@ -5,9 +5,6 @@ import time
 
 import paho.mqtt.client as mqttc
 
-# import paho.mqtt.publish as publish
-# import paho.mqtt.subscribe as subscribe
-
 from ..helpers import get_kwargs
 from .baseio import BaseIO
 

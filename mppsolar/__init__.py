@@ -257,7 +257,13 @@ def main():
     if args.daemon:
         import time
 
-        import systemd.daemon
+        try:
+            import systemd.daemon
+        except ImportError:
+            print("You are missing dependencies in order to be able to use the --daemon flag.")
+            print("To install them, use that command:")
+            print("    python -m pip install 'mppsolar[systemd]'")
+            exit(1)
 
         # Tell systemd that our service is ready
         systemd.daemon.notify("READY=1")

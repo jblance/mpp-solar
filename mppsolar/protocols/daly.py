@@ -4,8 +4,6 @@ from typing import Tuple
 from .abstractprotocol import AbstractProtocol
 from .protocol_helpers import crc8 as dalyChecksum
 
-# from .pi30 import COMMANDS
-
 log = logging.getLogger("daly")
 
 # (AAA BBB CCC DDD EEE

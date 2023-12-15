@@ -2,7 +2,6 @@
 import logging
 import math
 
-# from binascii import unhexlify
 from struct import unpack
 
 log = logging.getLogger("protocol_helpers")

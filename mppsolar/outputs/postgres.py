@@ -1,9 +1,15 @@
 import logging
 from datetime import datetime
 
-import psycopg2 as psycopg2
-from psycopg2._json import Json
-from psycopg2.extensions import register_adapter
+try:
+    import psycopg2 as psycopg2
+    from psycopg2._json import Json
+    from psycopg2.extensions import register_adapter
+except ImportError:
+    print("You are missing dependencies in order to be able to use that output.")
+    print("To install them, use that command:")
+    print("    python -m pip install 'mppsolar[pgsql]'")
+    psycopg2 = None
 
 from . import to_json, get_common_params
 from .baseoutput import baseoutput
@@ -11,38 +17,38 @@ from ..helpers import get_kwargs
 
 log = logging.getLogger("postgres")
 
-"""
-To use, run `sudo apt-get install libpq-dev`
-
-Creating table in Postgresql in advance:
-
--- auto-generated definition
-create table mppsolar
-(
-    id      serial
-        constraint mppsolar_pk
-            primary key,
-    command varchar,
-    data    json,
-    updated timestamp
-);
-
-create index mppsolar_command_updated_index
-    on mppsolar (command, updated);
-
-
-"""
-
 
 class postgres(baseoutput):
+    """
+    Creating table in PostgreSQL in advance:
+
+        -- auto-generated definition
+        create table mppsolar
+        (
+            id      serial
+                constraint mppsolar_pk
+                    primary key,
+            command varchar,
+            data    json,
+            updated timestamp
+        );
+
+        create index mppsolar_command_updated_index
+            on mppsolar (command, updated);
+"""
+
     def __str__(self):
-        return "outputs all the results to PostgresSQL"
+        return "outputs all the results to PostgreSQL"
 
     def __init__(self, *args, **kwargs) -> None:
         log.debug(f"__init__: kwargs {kwargs}")
-        register_adapter(dict, Json)
+        if psycopg2:
+            register_adapter(dict, Json)
 
     def output(self, *args, **kwargs):
+        if not psycopg2:
+            return
+
         (data, tag, keep_case, filter_, excl_filter) = get_common_params(kwargs)
 
         postgres_url = get_kwargs(kwargs, "postgres_url")
