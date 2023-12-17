@@ -315,6 +315,7 @@ def main():
             mongo_url = config[section].get("mongo_url", fallback=None)
             mongo_db = config[section].get("mongo_db", fallback=None)
             push_url = config[section].get("push_url", fallback=push_url)
+            mqtt_topic = config[section].get("mqtt_topic", fallback=mqtt_topic)
             #
             device_class = get_device_class(_type)
             log.debug(f"device_class {device_class}")
