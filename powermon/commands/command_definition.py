@@ -43,6 +43,7 @@ class CommandDefinition:
         match result_type:
             case ResultType.ACK:
                 # All ResultType.ACK are the same, so put config here instead of duplicating it in the protocol
+                log.debug("ResultType.ACK so defaulting reading_definitions")
                 reading_definitions : dict[int, ReadingDefinition] = \
                     ReadingDefinition.multiple_from_config([{"description": description, "response_type": ResponseType.ACK, "reading_type": ReadingType.ACK}])
                 test_responses = [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",]

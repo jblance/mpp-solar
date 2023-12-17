@@ -82,7 +82,6 @@ class Device:
 
     def add_command(self, command: Command) -> None:
         """add a command to the devices' list of commands"""
-        log.debug("Adding command: %s", command)
         if command is None:
             return
         # get command definition from protocol

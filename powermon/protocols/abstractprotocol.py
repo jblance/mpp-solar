@@ -7,7 +7,7 @@ from mppsolar.protocols.protocol_helpers import crcPI as crc
 # from powermon.commands.command import Command
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingDefinition
-# from powermon.commands.result import Result, ResultType
+from powermon.commands.result import ResultType
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
 from powermon.dto.protocolDTO import ProtocolDTO
 from powermon.errors import PowermonProtocolError, PowermonWIP
@@ -48,12 +48,18 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             command_dtos[command_tuple[0]] = command_tuple[1].to_dto()
         return command_dtos
 
-    def add_command_definitions(self, command_definitions_config: dict):
+    def add_command_definitions(self, command_definitions_config: dict, command_type: str = None):
         """ Add command definitions from the configuration """
         for command_definition_key in command_definitions_config.keys():
             try:
                 log.debug("Attempting to add command_definition_key: %s", command_definition_key)
-                command_definition = CommandDefinition.from_config(command_definitions_config[command_definition_key])
+                _config = command_definitions_config[command_definition_key]
+                if command_type == "SETTER_ACK":
+                    # Adding command definition with supplied type, so add config
+                    if "result_type" not in _config:
+                        log.debug("Adding SETTER_ACK type command, so defaulting result_type")
+                        _config["result_type"] = ResultType.ACK
+                command_definition = CommandDefinition.from_config(_config)
                 self.command_definitions[command_definition_key] = command_definition
             except ValueError as value_error:
                 log.info("couldnt add command definition for code: %s", command_definition_key)

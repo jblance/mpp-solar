@@ -703,7 +703,6 @@ NEW_SETTER_COMMANDS = {
         "name": "F",
         "description": "Set Device Output Frequency",
         "help": " -- examples: F50 (set output frequency to 50Hz) or F60 (set output frequency to 60Hz)",
-        "result_type": ResultType.ACK,
         "regex": "F([56]0)$",
     },
 }
@@ -840,7 +839,7 @@ class PI30(AbstractProtocol):
         super().__init__()
         self._protocol_id = b"PI30"
         self.add_command_definitions(NEW_QUERY_COMMANDS)
-        self.add_command_definitions(NEW_SETTER_COMMANDS)
+        self.add_command_definitions(NEW_SETTER_COMMANDS, command_type="SETTER_ACK")
         self.STATUS_COMMANDS = ["QPIGS", "Q1"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"

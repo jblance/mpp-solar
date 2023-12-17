@@ -42,7 +42,6 @@ class Command():
 
         self.full_command = None
 
-        log.debug(self)
 
     @classmethod
     def from_config(cls, config=None) -> "Command":
@@ -106,6 +105,7 @@ class Command():
     @command_definition.setter
     def command_definition(self, command_definition: CommandDefinition):
         """store the definition of the command"""
+        log.debug("Setting command_definition to: %s", command_definition)
         if command_definition is None:
             raise ValueError("CommandDefinition cannot be None")
 

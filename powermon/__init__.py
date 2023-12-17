@@ -163,6 +163,7 @@ def main():
     log.debug(device)
     # add commands to device command list
     for command_config in config.get("commands"):
+        log.info("Adding command, config: %s", command_config)
         device.add_command(Command.from_config(command_config))
     log.info(device)
 
