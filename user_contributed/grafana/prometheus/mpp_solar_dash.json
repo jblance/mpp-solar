@@ -1261,9 +1261,9 @@
         },
         "gridPos": {
           "h": 8,
-          "w": 4,
-          "x": 5,
-          "y": 11
+          "w": 5,
+          "x": 0,
+          "y": 19
         },
         "id": 48,
         "options": {
@@ -1296,89 +1296,6 @@
         ],
         "title": "Inverter heat_sink temperature",
         "type": "bargauge"
-      }
-    },
-    {
-      "name": "Grid Voltage",
-      "uid": "kk4MJF3Vz",
-      "kind": 1,
-      "model": {
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
-        },
-        "description": "As detected by each inverter",
-        "fieldConfig": {
-          "defaults": {
-            "mappings": [],
-            "max": 130,
-            "min": 90,
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "light-yellow",
-                  "value": null
-                },
-                {
-                  "color": "#6ED0E0",
-                  "value": 90
-                },
-                {
-                  "color": "green",
-                  "value": 110
-                },
-                {
-                  "color": "#EAB839",
-                  "value": 125
-                },
-                {
-                  "color": "red",
-                  "value": 130
-                }
-              ]
-            }
-          },
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 8,
-          "w": 3,
-          "x": 9,
-          "y": 11
-        },
-        "id": 42,
-        "options": {
-          "orientation": "auto",
-          "reduceOptions": {
-            "calcs": [
-              "lastNotNull"
-            ],
-            "fields": "",
-            "values": false
-          },
-          "showThresholdLabels": false,
-          "showThresholdMarkers": true
-        },
-        "pluginVersion": "8.5.13",
-        "targets": [
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "${DS_PROMETHEUS}"
-            },
-            "editorMode": "builder",
-            "exemplar": false,
-            "expr": "mpp_solar_ac_input_voltage",
-            "instant": true,
-            "interval": "",
-            "legendFormat": "{{inverter}} Grid Volts",
-            "range": false,
-            "refId": "A"
-          }
-        ],
-        "title": "Grid Voltage",
-        "type": "gauge"
       }
     },
     {
@@ -1425,8 +1342,8 @@
         "gridPos": {
           "h": 8,
           "w": 3,
-          "x": 12,
-          "y": 11
+          "x": 5,
+          "y": 19
         },
         "id": 22,
         "options": {
@@ -1509,8 +1426,8 @@
         "gridPos": {
           "h": 8,
           "w": 3,
-          "x": 15,
-          "y": 11
+          "x": 8,
+          "y": 19
         },
         "id": 24,
         "options": {
@@ -1545,6 +1462,89 @@
       }
     },
     {
+      "name": "Grid Voltage",
+      "uid": "kk4MJF3Vz",
+      "kind": 1,
+      "model": {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "description": "As detected by each inverter",
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "max": 130,
+            "min": 90,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "light-yellow",
+                  "value": null
+                },
+                {
+                  "color": "#6ED0E0",
+                  "value": 90
+                },
+                {
+                  "color": "green",
+                  "value": 110
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 125
+                },
+                {
+                  "color": "red",
+                  "value": 130
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 19
+        },
+        "id": 42,
+        "options": {
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "pluginVersion": "8.5.13",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${DS_PROMETHEUS}"
+            },
+            "editorMode": "builder",
+            "exemplar": false,
+            "expr": "mpp_solar_ac_input_voltage",
+            "instant": true,
+            "interval": "",
+            "legendFormat": "{{inverter}} Grid Volts",
+            "range": false,
+            "refId": "A"
+          }
+        ],
+        "title": "Grid Voltage",
+        "type": "gauge"
+      }
+    },
+    {
       "name": "Inverter AC Watts",
       "uid": "PRG6bFq4k",
       "kind": 1,
@@ -1570,7 +1570,7 @@
           "h": 11,
           "w": 12,
           "x": 0,
-          "y": 20
+          "y": 28
         },
         "hiddenSeries": false,
         "id": 56,
@@ -1670,131 +1670,6 @@
       }
     },
     {
-      "name": "Inverter AC Load %",
-      "uid": "VpachCjVk",
-      "kind": 1,
-      "model": {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
-        },
-        "description": "Inverter AC Load Percent",
-        "fieldConfig": {
-          "defaults": {
-            "links": [],
-            "unit": "percent"
-          },
-          "overrides": []
-        },
-        "fill": 1,
-        "fillGradient": 0,
-        "gridPos": {
-          "h": 11,
-          "w": 12,
-          "x": 12,
-          "y": 20
-        },
-        "hiddenSeries": false,
-        "id": 54,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "max": true,
-          "min": true,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "nullPointMode": "null",
-        "options": {
-          "alertThreshold": true
-        },
-        "percentage": false,
-        "pluginVersion": "8.5.13",
-        "pointradius": 2,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [
-          {
-            "$$hashKey": "object:115",
-            "alias": "/Yesterday/",
-            "dashLength": 1,
-            "dashes": true,
-            "fill": 0,
-            "fillGradient": 0
-          }
-        ],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "${DS_PROMETHEUS}"
-            },
-            "editorMode": "code",
-            "expr": "mpp_solar_load_percentage{}",
-            "interval": "",
-            "legendFormat": "{{inverter}} AC Load %",
-            "range": true,
-            "refId": "A"
-          },
-          {
-            "datasource": {
-              "type": "prometheus",
-              "uid": "${DS_PROMETHEUS}"
-            },
-            "editorMode": "code",
-            "expr": "mpp_solar_load_percentage{} offset 24h",
-            "hide": false,
-            "interval": "",
-            "legendFormat": "{{inverter}} AC Load % Yesterday",
-            "range": true,
-            "refId": "B"
-          }
-        ],
-        "thresholds": [],
-        "timeRegions": [],
-        "title": "Inverter AC Load %",
-        "tooltip": {
-          "shared": true,
-          "sort": 1,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "mode": "time",
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "$$hashKey": "object:87",
-            "format": "percent",
-            "logBase": 1,
-            "show": true
-          },
-          {
-            "$$hashKey": "object:88",
-            "format": "short",
-            "logBase": 1,
-            "show": true
-          }
-        ],
-        "yaxis": {
-          "align": false
-        }
-      }
-    },
-    {
       "name": "Battery Voltage graph",
       "uid": "VOHd2jjVz",
       "kind": 1,
@@ -1820,7 +1695,7 @@
           "h": 11,
           "w": 12,
           "x": 0,
-          "y": 42
+          "y": 50
         },
         "hiddenSeries": false,
         "id": 28,
@@ -1944,7 +1819,7 @@
           "h": 15,
           "w": 24,
           "x": 0,
-          "y": 102
+          "y": 110
         },
         "hiddenSeries": false,
         "id": 34,
@@ -3360,48 +3235,57 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "Array power by Inverter",
+      "description": "",
       "fieldConfig": {
         "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
-          "max": 8000,
-          "min": 90,
+          "max": 80,
+          "min": -80,
+          "noValue": "N/A",
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "super-light-blue",
+                "color": "dark-red",
                 "value": null
               },
               {
-                "color": "#6ED0E0",
-                "value": 90
-              },
-              {
-                "color": "green",
-                "value": 110
-              },
-              {
-                "color": "#EAB839",
-                "value": 6000
-              },
-              {
-                "color": "red",
-                "value": 7733
+                "color": "dark-green",
+                "value": 1
               }
             ]
           },
-          "unit": "watt"
+          "unit": "voltamp"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "Total"
+            },
+            "properties": [
+              {
+                "id": "min",
+                "value": -240
+              },
+              {
+                "id": "max",
+                "value": 240
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 5,
+        "h": 13,
         "w": 6,
         "x": 12,
         "y": 6
       },
-      "id": 60,
+      "id": 63,
       "options": {
         "orientation": "auto",
         "reduceOptions": {
@@ -3422,17 +3306,25 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "exemplar": false,
-          "expr": "(mpp_solar_pv1_input_current{cmd!~\"QPIGS\"} * mpp_solar_pv1_input_voltage{cmd!~\"QPIGS\"}) + (mpp_solar_pv2_input_voltage{cmd!~\"QPIGS2\"} * mpp_solar_pv2_input_current{cmd!~\"QPIGS2\"})",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "{{inverter}} Array Wattage",
-          "range": false,
-          "rawQuery": false,
+          "expr": "mpp_solar_battery_charging_current{cmd!~\"QPIGS\"} - mpp_solar_battery_discharge_current{cmd!~\"QPIGS\"}",
+          "hide": false,
+          "legendFormat": "{{inverter}}",
+          "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(mpp_solar_battery_charging_current{cmd!~\"QPIGS\"} - mpp_solar_battery_discharge_current{cmd!~\"QPIGS\"})",
+          "legendFormat": "Total",
+          "range": true,
+          "refId": "B"
         }
       ],
-      "title": "Array Power by Inverter",
+      "title": "Battery Charge Current",
       "type": "gauge"
     },
     {
@@ -3707,6 +3599,86 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
+      "description": "Array power by Inverter",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "max": 8000,
+          "min": 90,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "super-light-blue",
+                "value": null
+              },
+              {
+                "color": "#6ED0E0",
+                "value": 90
+              },
+              {
+                "color": "green",
+                "value": 110
+              },
+              {
+                "color": "#EAB839",
+                "value": 6000
+              },
+              {
+                "color": "red",
+                "value": 7733
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 5,
+        "y": 11
+      },
+      "id": 60,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.5.13",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "(mpp_solar_pv1_input_current{cmd!~\"QPIGS\"} * mpp_solar_pv1_input_voltage{cmd!~\"QPIGS\"}) + (mpp_solar_pv2_input_voltage{cmd!~\"QPIGS2\"} * mpp_solar_pv2_input_current{cmd!~\"QPIGS2\"})",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{inverter}} Array Wattage",
+          "range": false,
+          "rawQuery": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Array Power by Inverter",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
       "description": "Internal heatsink temperature of each inverter",
       "fieldConfig": {
         "defaults": {
@@ -3743,9 +3715,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 4,
-        "x": 5,
-        "y": 11
+        "w": 5,
+        "x": 0,
+        "y": 19
       },
       "id": 48,
       "libraryPanel": {
@@ -3808,108 +3780,6 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "As detected by each inverter",
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [],
-          "max": 130,
-          "min": 90,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "light-yellow",
-                "value": null
-              },
-              {
-                "color": "#6ED0E0",
-                "value": 90
-              },
-              {
-                "color": "green",
-                "value": 110
-              },
-              {
-                "color": "#EAB839",
-                "value": 125
-              },
-              {
-                "color": "red",
-                "value": 130
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 3,
-        "x": 9,
-        "y": 11
-      },
-      "id": 42,
-      "libraryPanel": {
-        "description": "As detected by each inverter",
-        "meta": {
-          "connectedDashboards": 2,
-          "created": "2023-07-26T09:35:46Z",
-          "createdBy": {
-            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
-            "id": 1,
-            "name": "admin"
-          },
-          "folderName": "MPPSOLAR",
-          "folderUid": "lwpa6rCVz",
-          "updated": "2023-07-27T09:58:48Z",
-          "updatedBy": {
-            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
-            "id": 1,
-            "name": "admin"
-          }
-        },
-        "name": "Grid Voltage",
-        "type": "gauge",
-        "uid": "kk4MJF3Vz",
-        "version": 3
-      },
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "pluginVersion": "8.5.13",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "builder",
-          "exemplar": false,
-          "expr": "mpp_solar_ac_input_voltage",
-          "instant": true,
-          "interval": "",
-          "legendFormat": "{{inverter}} Grid Volts",
-          "range": false,
-          "refId": "A"
-        }
-      ],
-      "title": "Grid Voltage",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
       "description": "Battery voltage",
       "fieldConfig": {
         "defaults": {
@@ -3945,8 +3815,8 @@
       "gridPos": {
         "h": 8,
         "w": 3,
-        "x": 12,
-        "y": 11
+        "x": 5,
+        "y": 19
       },
       "id": 22,
       "libraryPanel": {
@@ -4048,8 +3918,8 @@
       "gridPos": {
         "h": 8,
         "w": 3,
-        "x": 15,
-        "y": 11
+        "x": 8,
+        "y": 19
       },
       "id": 24,
       "libraryPanel": {
@@ -4107,12 +3977,114 @@
       "type": "gauge"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "As detected by each inverter",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "max": 130,
+          "min": 90,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "light-yellow",
+                "value": null
+              },
+              {
+                "color": "#6ED0E0",
+                "value": 90
+              },
+              {
+                "color": "green",
+                "value": 110
+              },
+              {
+                "color": "#EAB839",
+                "value": 125
+              },
+              {
+                "color": "red",
+                "value": 130
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 19
+      },
+      "id": 42,
+      "libraryPanel": {
+        "description": "As detected by each inverter",
+        "meta": {
+          "connectedDashboards": 2,
+          "created": "2023-07-26T09:35:46Z",
+          "createdBy": {
+            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
+            "id": 1,
+            "name": "admin"
+          },
+          "folderName": "MPPSOLAR",
+          "folderUid": "lwpa6rCVz",
+          "updated": "2023-07-27T09:58:48Z",
+          "updatedBy": {
+            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
+            "id": 1,
+            "name": "admin"
+          }
+        },
+        "name": "Grid Voltage",
+        "type": "gauge",
+        "uid": "kk4MJF3Vz",
+        "version": 3
+      },
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.5.13",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "builder",
+          "exemplar": false,
+          "expr": "mpp_solar_ac_input_voltage",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{inverter}} Grid Volts",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Grid Voltage",
+      "type": "gauge"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 19
+        "y": 27
       },
       "id": 47,
       "panels": [],
@@ -4141,7 +4113,7 @@
         "h": 11,
         "w": 12,
         "x": 0,
-        "y": 20
+        "y": 28
       },
       "hiddenSeries": false,
       "id": 56,
@@ -4286,7 +4258,7 @@
         "h": 11,
         "w": 12,
         "x": 12,
-        "y": 20
+        "y": 28
       },
       "hiddenSeries": false,
       "id": 54,
@@ -4299,30 +4271,6 @@
         "show": true,
         "total": false,
         "values": true
-      },
-      "libraryPanel": {
-        "description": "Inverter AC Load Percent",
-        "meta": {
-          "connectedDashboards": 2,
-          "created": "2023-07-20T22:18:34Z",
-          "createdBy": {
-            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
-            "id": 1,
-            "name": "admin"
-          },
-          "folderName": "MPPSOLAR",
-          "folderUid": "lwpa6rCVz",
-          "updated": "2023-08-07T08:29:59Z",
-          "updatedBy": {
-            "avatarUrl": "/avatar/46d229b033af06a191ff2267bca9ae56",
-            "id": 1,
-            "name": "admin"
-          }
-        },
-        "name": "Inverter AC Load %",
-        "type": "graph",
-        "uid": "VpachCjVk",
-        "version": 8
       },
       "lines": true,
       "linewidth": 1,
@@ -4465,7 +4413,7 @@
         "h": 11,
         "w": 12,
         "x": 0,
-        "y": 31
+        "y": 39
       },
       "hiddenSeries": false,
       "id": 32,
@@ -4626,7 +4574,7 @@
         "h": 11,
         "w": 12,
         "x": 12,
-        "y": 31
+        "y": 39
       },
       "hiddenSeries": false,
       "id": 30,
@@ -4733,7 +4681,7 @@
         "h": 11,
         "w": 12,
         "x": 0,
-        "y": 42
+        "y": 50
       },
       "hiddenSeries": false,
       "id": 28,
@@ -4915,7 +4863,7 @@
         "h": 11,
         "w": 12,
         "x": 12,
-        "y": 42
+        "y": 50
       },
       "hiddenSeries": false,
       "id": 26,
@@ -5036,7 +4984,7 @@
         "h": 15,
         "w": 24,
         "x": 0,
-        "y": 53
+        "y": 61
       },
       "hiddenSeries": false,
       "id": 61,
@@ -5071,7 +5019,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "editorMode": "builder",
+          "editorMode": "code",
           "expr": "mpp_solar_battery_charging_current{cmd!~\"QPIGS\"} - mpp_solar_battery_discharge_current{cmd!~\"QPIGS\"}",
           "legendFormat": "{{inverter}} Charge",
           "range": true,
@@ -5116,7 +5064,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 68
+        "y": 76
       },
       "id": 52,
       "panels": [],
@@ -5145,7 +5093,7 @@
         "h": 13,
         "w": 12,
         "x": 0,
-        "y": 69
+        "y": 77
       },
       "hiddenSeries": false,
       "id": 58,
@@ -5265,7 +5213,7 @@
         "h": 13,
         "w": 12,
         "x": 12,
-        "y": 69
+        "y": 77
       },
       "hiddenSeries": false,
       "id": 59,
@@ -5385,7 +5333,7 @@
         "h": 20,
         "w": 24,
         "x": 0,
-        "y": 82
+        "y": 90
       },
       "hiddenSeries": false,
       "id": 43,
@@ -5551,7 +5499,7 @@
         "h": 15,
         "w": 24,
         "x": 0,
-        "y": 102
+        "y": 110
       },
       "hiddenSeries": false,
       "id": 34,
@@ -5698,7 +5646,7 @@
       }
     }
   ],
-  "refresh": "10s",
+  "refresh": "30s",
   "schemaVersion": 36,
   "style": "dark",
   "tags": [],
@@ -5713,6 +5661,6 @@
   "timezone": "browser",
   "title": "mpp_solar",
   "uid": "EOSZe9jVz",
-  "version": 115,
+  "version": 124,
   "weekStart": ""
 }
