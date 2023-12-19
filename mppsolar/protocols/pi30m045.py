@@ -301,7 +301,7 @@ SETTER_COMMANDS = {
             b"(NAK\x73\x73\r",
             b"(ACK\x39\x20\r",
         ],
-        "regex": "MUCHGC(\\d\\d\\d\\d)$",
+        "regex": "MUCHGC(\\d[01]\\d[02])$",
     },
 }
 
