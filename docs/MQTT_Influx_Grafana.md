@@ -64,7 +64,7 @@ sudo systemctl unmask influxdb.service
 sudo systemctl start influxdb
 sudo systemctl enable influxdb.service
 ```
-* Run influx
+* Run influxd
 ```
 influx
 ```
