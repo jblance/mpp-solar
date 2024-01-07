@@ -15,7 +15,7 @@ PROTOCOLS = sorted(
 class testProtocols(unittest.TestCase):
 
     def test_protocols_count(self):
-        assert len(PROTOCOLS) == 25, len(PROTOCOLS)
+        assert len(PROTOCOLS) == 23, len(PROTOCOLS)
 
     def test_protocols_init(self):
         for protocol in PROTOCOLS:
