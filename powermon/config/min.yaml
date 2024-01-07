@@ -15,8 +15,7 @@ commands:
 #   outputs:
 #   - type: screen
 #     format: raw
-- command: F60
-# - command: QFLAG
+- command: Q1
   trigger:
     every: 5  # every 5 seconds
   outputs:

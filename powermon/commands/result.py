@@ -108,10 +108,12 @@ class Result:
         # Process response based on result type
         match self.result_type:
             case ResultType.SINGLE:
-                reading = self.reading_from_response(response)
+                reading_definition: ReadingDefinition = self.command_definition.reading_definitions[0]
+                reading = self.reading_from_response(response, reading_definition)
                 all_readings.append(reading)
             case ResultType.ACK:
-                reading = self.reading_from_response(response)
+                reading_definition: ReadingDefinition = self.command_definition.reading_definitions[0]
+                reading = self.reading_from_response(response, reading_definition)
                 all_readings.append(reading)
             case ResultType.ORDERED:
                 # Response is splitable and order of each item determines decode logic
@@ -139,9 +141,8 @@ class Result:
         # CRC should be removed by protocol, so just split split
         return response.split(None)  # split differs by protocol
 
-    def reading_from_response(self, response) -> Reading:
-        """ return a reading from a raw_response that applies to a single reading """
-        reading_definition: ReadingDefinition = self.command_definition.reading_definitions[0]
+    def reading_from_response(self, response, reading_definition) -> Reading:
+        """ return a reading from a raw_response using the supplied reading definition """
         try:
             return reading_definition.reading_from_raw_response(response)[0]
         except ValueError:
