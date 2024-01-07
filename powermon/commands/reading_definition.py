@@ -15,12 +15,13 @@ class ResponseType(LowercaseStrEnum):
     - determines how to read and translate to useful info
     """
     ACK = auto()
+    BOOL = auto()      # 0 is false, 1 is true
     INT = auto()
     FLOAT = auto()
     STRING = auto()
     BYTES = auto()
-    OPTION = auto()  # response identifies which option from a list is the info
-    # BYTES = "bytes.decode"  # can't use auto() for this value
+    OPTION = auto()  # response identifies which option from a dict (called 'options') is the info
+    LIST = auto()  # response identifies which option from a list (called 'options') is the info
     ENABLE_DISABLE_FLAGS = auto()
     FLAGS = auto()
     INFO = auto()
@@ -33,18 +34,19 @@ class ReadingType(LowercaseStrEnum):
     - allows translations
     """
     ACK = auto()
-    WATT_HOURS = auto()
+    AMPS = auto()
     WATTS = auto()
+    WATT_HOURS = auto()
+    VOLTS = auto()
     TIME = auto()
     TIME_SECONDS = auto()
     MESSAGE = auto()
+    MESSAGE_AMPS = auto()
     FLAGS = auto()
     MULTI_ENABLE_DISABLE = auto()
-    AMPERAGE = auto()
     TEMPERATURE = auto()
     PERCENTAGE = auto()
     FREQUENCY = auto()
-    AMPS = auto()
 
 
 class ReadingDefinition():
@@ -101,6 +103,8 @@ class ReadingDefinition():
         """ interpret the raw response into a python basic type """
         log.debug("translate_raw_response: %s from type: %s", raw_value, self.response_type)
         match self.response_type:
+            case ResponseType.BOOL:
+                return bool(int(raw_value.decode('utf-8')))
             case ResponseType.INT:
                 return int(raw_value.decode('utf-8'))
             case ResponseType.FLOAT:
@@ -109,6 +113,11 @@ class ReadingDefinition():
                 if not isinstance(self.options, dict):
                     raise TypeError(f"For Reading Defininition {self.description}, options must be a dict if response_type is OPTION")
                 value = str(raw_value.decode('utf-8'))
+                return self.options[value]
+            case ResponseType.LIST:
+                if not isinstance(self.options, list):
+                    raise TypeError(f"For Reading Defininition {self.description}, options must be a list if response_type is LIST")
+                value = int(raw_value.decode('utf-8'))
                 return self.options[value]
             case _:
                 return raw_value.decode('utf-8')
@@ -174,6 +183,11 @@ class ReadingDefinition():
                 reading = ReadingDefinitionMessage(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
+            case ReadingType.MESSAGE_AMPS:
+                reading = ReadingDefinitionMessage(
+                    index=index, response_type=response_type, description=description,
+                    device_class=device_class, state_class=state_class, icon=icon)
+                reading.unit = "A"
             case ReadingType.TEMPERATURE:
                 reading = ReadingDefinitionTemperature(
                     index=index, response_type=response_type, description=description,
@@ -192,11 +206,16 @@ class ReadingDefinition():
                 reading =  ReadingDefinitionFlags(
                     index=index, response_type=response_type, description=description, flags=flags,
                     device_class=device_class, state_class=state_class, icon=icon)
-            case ReadingType.AMPERAGE:
+            case ReadingType.AMPS:
                 reading =  ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
                 reading.unit = "A"
+            case ReadingType.VOLTS:
+                reading =  ReadingDefinitionNumeric(
+                    index=index, response_type=response_type, description=description,
+                    device_class=device_class, state_class=state_class, icon=icon)
+                reading.unit = "V"
             case ReadingType.PERCENTAGE:
                 reading =  ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
