@@ -7,7 +7,7 @@ device:
   port:
     type: test
     path: /dev/ttyUSB0
-    # response_number: 0
+    response_number: 1
     protocol: PI30
 
 commands:
@@ -15,7 +15,7 @@ commands:
 #   outputs:
 #   - type: screen
 #     format: raw
-- command: Q1
+- command: QPIRI
   trigger:
     every: 5  # every 5 seconds
   outputs:

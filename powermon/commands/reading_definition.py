@@ -35,11 +35,13 @@ class ReadingType(LowercaseStrEnum):
     """
     ACK = auto()
     AMPS = auto()
+    APPARENT_POWER = auto()
     WATTS = auto()
     WATT_HOURS = auto()
     VOLTS = auto()
     TIME = auto()
     TIME_SECONDS = auto()
+    TIME_MINUTES = auto()
     MESSAGE = auto()
     MESSAGE_AMPS = auto()
     FLAGS = auto()
@@ -99,6 +101,15 @@ class ReadingDefinition():
     def options(self, value):
         self._options = value
 
+    @property
+    def default(self):
+        """ default value for error situations """
+        return self._default
+
+    @default.setter
+    def default(self, value):
+        self._default = value
+
     def translate_raw_response(self, raw_value):
         """ interpret the raw response into a python basic type """
         log.debug("translate_raw_response: %s from type: %s", raw_value, self.response_type)
@@ -106,19 +117,28 @@ class ReadingDefinition():
             case ResponseType.BOOL:
                 return bool(int(raw_value.decode('utf-8')))
             case ResponseType.INT:
-                return int(raw_value.decode('utf-8'))
+                try:
+                    result = int(raw_value.decode('utf-8'))
+                    return result
+                except ValueError as e:
+                    if self.default: 
+                        return self.default
+                    raise ValueError(f"For Reading Defininition '{self.description}', expected an INT, got {raw_value}") from e
             case ResponseType.FLOAT:
                 return float(raw_value.decode('utf-8'))
             case ResponseType.OPTION:
                 if not isinstance(self.options, dict):
-                    raise TypeError(f"For Reading Defininition {self.description}, options must be a dict if response_type is OPTION")
+                    raise TypeError(f"For Reading Defininition '{self.description}', options must be a dict if response_type is OPTION")
                 value = str(raw_value.decode('utf-8'))
                 return self.options[value]
             case ResponseType.LIST:
                 if not isinstance(self.options, list):
-                    raise TypeError(f"For Reading Defininition {self.description}, options must be a list if response_type is LIST")
+                    raise TypeError(f"For Reading Defininition '{self.description}', options must be a list if response_type is LIST")
                 value = int(raw_value.decode('utf-8'))
-                return self.options[value]
+                try:
+                    return self.options[value]
+                except IndexError as e:
+                    raise IndexError(f"For Reading Defininition '{self.description}', len: {len(self.options)}, got index: {value}") from e
             case _:
                 return raw_value.decode('utf-8')
 
@@ -179,6 +199,11 @@ class ReadingDefinition():
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
                 reading.unit = "Wh"
+            case ReadingType.APPARENT_POWER:
+                reading = ReadingDefinitionNumeric(
+                    index=index, response_type=response_type, description=description,
+                    device_class=device_class, state_class=state_class, icon=icon)
+                reading.unit = "VA"
             case ReadingType.MESSAGE:
                 reading = ReadingDefinitionMessage(
                     index=index, response_type=response_type, description=description,
@@ -201,6 +226,11 @@ class ReadingDefinition():
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
                 reading.unit = "s"
+            case ReadingType.TIME_MINUTES:
+                reading =  ReadingDefinitionNumeric(
+                    index=index, response_type=response_type, description=description,
+                    device_class=device_class, state_class=state_class, icon=icon)
+                reading.unit = "min"
             case ReadingType.FLAGS:
                 flags = reading_definition_config.get("flags")
                 reading =  ReadingDefinitionFlags(
@@ -241,6 +271,8 @@ class ReadingDefinition():
         options: dict[str, str] = reading_definition_config.get("options")
         if options is not None:
             reading.options = options
+        # check for a default setting
+        reading.default = reading_definition_config.get("default")
         return reading
 
 

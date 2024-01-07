@@ -11,3 +11,7 @@ class PowermonProtocolError(Exception):
 
 class PowermonWIP(Exception):
     """Exception for work not yet done"""
+
+
+class CommandDefinitionMissing(Exception):
+    """ Exception for missing / not found command definition """

@@ -10,7 +10,7 @@ from powermon.commands.reading_definition import ReadingDefinition
 from powermon.commands.result import ResultType
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
 from powermon.dto.protocolDTO import ProtocolDTO
-from powermon.errors import PowermonProtocolError, PowermonWIP
+from powermon.errors import PowermonProtocolError, PowermonWIP, CommandDefinitionMissing
 
 log = logging.getLogger("AbstractProtocol")
 
@@ -125,7 +125,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     command_definition.set_parameter_value(match.group(1))
                     return command_definition
         log.info("No command_defn found for %s", command)
-        return None
+        raise CommandDefinitionMissing(f"No command definition found for command: {command}")
 
     def check_crc(self, response: str):
         """ crc check, needs override in protocol """

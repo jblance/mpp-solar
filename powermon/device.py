@@ -2,9 +2,9 @@
 import logging
 
 from powermon.commands.command import Command
-from powermon.commands.result import Result, ResultType
+from powermon.commands.result import Result
 from powermon.dto.deviceDTO import DeviceDTO
-from powermon.errors import ConfigError
+from powermon.errors import ConfigError, CommandDefinitionMissing
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.ports import from_config as port_from_config
 from powermon.ports.abstractport import AbstractPort
@@ -85,7 +85,11 @@ class Device:
         if command is None:
             return
         # get command definition from protocol
-        command.command_definition = self.port.protocol.get_command_with_command_string(command.code)
+        try:
+            command.command_definition = self.port.protocol.get_command_with_command_string(command.code)
+        except CommandDefinitionMissing as ex:
+            print(ex)
+            return
 
         # set the device_id in the command
         # command.set_device_id(self.device_id)
