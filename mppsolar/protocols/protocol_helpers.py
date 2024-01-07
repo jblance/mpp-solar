@@ -347,9 +347,9 @@ def crcPI(data_bytes):
     crc_low = crc & 0xFF
     crc_high = (crc >> 8) & 0xFF
 
-    if crc_low == 0x28 or crc_low == 0x0D or crc_low == 0x0A:
+    if crc_low == 0x28 or crc_low == 0x0D or crc_low == 0x0A or crc_low == 0x00:
         crc_low += 1
-    if crc_high == 0x28 or crc_high == 0x0D or crc_high == 0x0A:
+    if crc_high == 0x28 or crc_high == 0x0D or crc_high == 0x0A or crc_high == 0x00:
         crc_high += 1
 
     crc = crc_high << 8
