@@ -17,7 +17,7 @@ class CommandDefinition:
         return f"CommandDefinition: {self.code=}, {self.description=}, {self.result_type=}"
 
     def __init__(self, code, description, help_text: str, result_type : ResultType,
-                 reading_definitions, parameters, test_responses: list, regex: str):
+                 reading_definitions, parameters={}, test_responses: list = [], regex: str = None):
         if reading_definitions is None or len(reading_definitions) == 0:
             raise ValueError(f"reading definitions cannot be None for command_code: {code}")
         # if test_responses is None or len(test_responses) == 0:

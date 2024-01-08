@@ -12,19 +12,21 @@ from powermon.commands.parameter import ParameterType, ParameterFormat
 class test_command(unittest.TestCase):
     def test_command_definition_none(self):
         command = Command(code="test", commandtype="test", outputs=[], trigger=None)
-        self.assertRaises(ValueError, command.set_command_definition, None)
+        with self.assertRaises(ValueError):
+            command.command_definition = None
         
     def test_command_definition_invalid(self):
         command = Command(code="test", commandtype="test", outputs=[], trigger=None)
         command_definition = mock.Mock()
         command_definition.is_command_code_valid.return_value = False
-        self.assertRaises(ValueError, command.set_command_definition, command_definition)
+        with self.assertRaises(ValueError):
+            command.command_definition = command_definition
         
     def test_command_definition_valid(self):
         command = Command(code="test", commandtype="test", outputs=[], trigger=None)
         command_definition = mock.Mock()
         command_definition.is_command_code_valid.return_value = True
-        command.set_command_definition(command_definition)
+        command.command_definition = command_definition
         self.assertEqual(command.command_definition, command_definition)
         
     # This test is covering a few too many objects to be a unit test
@@ -52,7 +54,7 @@ class test_command(unittest.TestCase):
         protocol.add_command_definitions(qed_command_definition_new)
         qed_command_definition = protocol.get_command_with_command_string("QED20210901")
         command = Command(code="QED20210901", commandtype="GETTER", outputs=[], trigger=None)
-        command.set_command_definition(qed_command_definition)
+        command.command_definition = qed_command_definition
         result = command.build_result(b"(00238800!J\r", protocol=protocol)
         reading = result.readings[0]
         self.assertEqual(reading.data_unit, "Wh")

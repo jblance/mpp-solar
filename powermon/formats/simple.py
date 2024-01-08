@@ -30,7 +30,7 @@ class SimpleFormat(AbstractFormat):
         #        data[f"Error #{i}"] = [message, ""]
 
 
-        if len(result.get_responses()) == 0:
+        if len(result.readings) == 0:
             return _result
 
         display_data : list[Reading] = self.format_and_filter_data(result)

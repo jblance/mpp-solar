@@ -1,9 +1,11 @@
 import unittest
 
+from powermon.device import DeviceInfo
 from powermon.formats.simple import SimpleFormat
 from powermon.commands.result import Result, ResultType
 from powermon.commands.reading import Reading
 from powermon.commands.reading_definition import ReadingDefinition, ReadingType, ResponseType
+from powermon.commands.command_definition import CommandDefinition
 
 class test_formats_simple(unittest.TestCase):
     
@@ -11,10 +13,12 @@ class test_formats_simple(unittest.TestCase):
         expected = ["test=238800Wh"]
         simple_formatter = SimpleFormat({})
         
-        reading_definition = ReadingDefinition.from_config({"index":0, "description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device-class": "energy", "state-class": "total"},0)
-        _result = Result(command_code=None, result_type=ResultType.SINGLE, raw_response=b"238800", reading_definitions=[reading_definition], parameters=None)
+        device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
+        reading_definition = ReadingDefinition.from_config({"description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device-class": "energy", "state_class": "total"},0)
+        command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
+        _result = Result(result_type=ResultType.SINGLE, raw_response=b"(238800\xcd\xcd\r", command_definition=command_definition, trimmed_response=b"238800")
         
-        formatted_data = simple_formatter.format(_result)
+        formatted_data = simple_formatter.format(_result, device_info)
         
         self.assertEqual(formatted_data, expected)
 
@@ -23,11 +27,12 @@ class test_formats_simple(unittest.TestCase):
         expected = ["test=238800Wh energy"]
         simple_formatter = SimpleFormat({"extra_info": True})
         
-        reading_definition = ReadingDefinition.from_config({"index":0, "description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "device-class": "energy"},0)
-        _result = Result(command_code=None, result_type=ResultType.SINGLE, raw_response=b"238800", reading_definitions=[reading_definition], parameters=None)
+        device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
+        reading_definition = ReadingDefinition.from_config({"description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "device-class": "energy"},0)
+        command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
+        _result = Result(result_type=ResultType.SINGLE, raw_response=b"(238800\xcd\xcd\r", command_definition=command_definition, trimmed_response=b"238800")
         
-        
-        formatted_data = simple_formatter.format(_result)
+        formatted_data = simple_formatter.format(_result, device_info)
         
         self.assertEqual(formatted_data, expected)
         
@@ -35,11 +40,12 @@ class test_formats_simple(unittest.TestCase):
         expected = ["test=238800Wh mdi:solar-power"]
         simple_formatter = SimpleFormat({"extra_info": True})
         
-        reading_definition = ReadingDefinition.from_config({"index":0, "description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power"},0)
-        _result = Result(command_code=None, result_type=ResultType.SINGLE, raw_response=b"238800", reading_definitions=[reading_definition], parameters=None)
+        device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
+        reading_definition = ReadingDefinition.from_config({"description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power"},0)
+        command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
+        _result = Result(result_type=ResultType.SINGLE, raw_response=b"(238800\xcd\xcd\r", command_definition=command_definition, trimmed_response=b"238800")
         
-        
-        formatted_data = simple_formatter.format(_result)
+        formatted_data = simple_formatter.format(_result, device_info)
         
         self.assertEqual(formatted_data, expected)
         
@@ -47,11 +53,12 @@ class test_formats_simple(unittest.TestCase):
         expected = ["test=238800Wh energy mdi:solar-power total"]
         simple_formatter = SimpleFormat({"extra_info": True})
         
-        reading_definition = ReadingDefinition.from_config({"index":0, "description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device-class": "energy", "state-class": "total"},0)
-        _result = Result(command_code=None, result_type=ResultType.SINGLE, raw_response=b"238800", reading_definitions=[reading_definition], parameters=None)
-
+        device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
+        reading_definition = ReadingDefinition.from_config({"description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device-class": "energy", "state_class": "total"},0)
+        command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
+        _result = Result(result_type=ResultType.SINGLE, raw_response=b"(238800\xcd\xcd\r", command_definition=command_definition, trimmed_response=b"238800")
         
-        formatted_data = simple_formatter.format(_result)
+        formatted_data = simple_formatter.format(_result, device_info)
         
         self.assertEqual(formatted_data, expected)
         
@@ -60,13 +67,14 @@ class test_formats_simple(unittest.TestCase):
                     "test2=28.0°C"]
         simple_formatter = SimpleFormat({})
         
-        reading_definition = ReadingDefinition.from_config({"index":0, "description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device-class": "energy", "state-class": "total"},0)
-        reading_definition2 = ReadingDefinition.from_config({"index":1, "description":"test2", "reading_type":ReadingType.TEMPERATURE, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device-class": "energy", "state-class": "total"},1)
+        reading_definition = ReadingDefinition.from_config({"description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device-class": "energy", "state-class": "total"},0)
+        reading_definition2 = ReadingDefinition.from_config({"description":"test2", "reading_type":ReadingType.TEMPERATURE, "response_type":ResponseType.FLOAT, "icon": "mdi:solar-power", "device-class": "energy", "state-class": "total"},1)
+        device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
         
-        _result = Result(command_code=None, result_type=ResultType.INDEXED, raw_response=b"230 28", reading_definitions=[reading_definition, reading_definition2], parameters=None)
-
+        command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition, reading_definition2])
+        _result = Result(result_type=ResultType.ORDERED, raw_response=b"(238800\xcd\xcd\r", command_definition=command_definition, trimmed_response=b"230 28")
         
-        formatted_data = simple_formatter.format(_result)
+        formatted_data = simple_formatter.format(_result, device_info)
         
         self.assertEqual(formatted_data, expected)
     
