@@ -31,3 +31,6 @@ docker-up:
 
 docker-powermon-dev-up:
 	docker compose -f docker-compose.development.yaml up --build
+
+poetry-dev:
+	poetry install --no-root --with=dev --extras=powermon
