@@ -25,6 +25,7 @@ class ResponseType(LowercaseStrEnum):
     ENABLE_DISABLE_FLAGS = auto()
     FLAGS = auto()
     INFO = auto()
+    TEMPLATE_BYTES = auto()
 
 
 class ReadingType(LowercaseStrEnum):
@@ -110,6 +111,17 @@ class ReadingDefinition():
     def default(self, value):
         self._default = value
 
+    @property
+    def format_template(self):
+        """ a template that allows re-formating of value """
+        return self._format_template
+
+    @format_template.setter
+    def format_template(self, value):
+        if value is not None:
+            log.debug("format templater for '%s': %s", self.description, value)
+        self._format_template = value
+
     def translate_raw_response(self, raw_value):
         """ interpret the raw response into a python basic type """
         log.debug("translate_raw_response: %s from type: %s", raw_value, self.response_type)
@@ -139,6 +151,12 @@ class ReadingDefinition():
                     return self.options[value]
                 except IndexError as e:
                     raise IndexError(f"For Reading Defininition '{self.description}', len: {len(self.options)}, got index: {value}") from e
+            case ResponseType.TEMPLATE_BYTES:
+                r = raw_value.decode('utf-8')
+                if self.format_template:
+                    res = eval(self.format_template)
+                    return res
+                return r
             case _:
                 return raw_value.decode('utf-8')
 
@@ -273,6 +291,8 @@ class ReadingDefinition():
             reading.options = options
         # check for a default setting
         reading.default = reading_definition_config.get("default")
+        # check for a format template
+        reading.format_template = reading_definition_config.get("format_template")
         return reading
 
 
