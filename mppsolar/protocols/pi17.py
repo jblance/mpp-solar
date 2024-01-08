@@ -61,6 +61,12 @@ QUERY_COMMANDS = {
                 "Machine number",
                 {
                     "000": "Infini-Solar 10KW/3P",
+                    "001": "Infini-Solar 15KW/3P",
+                    "002": "Infini-Solar 15KW/3P-custom",
+                    "003": "Infini-Solar WP (Infini WP 12K/15K)",
+                    "004": "Infini-Solar WP 30KW/3P",
+                    "005": "Infini-Solar WP LV 6KW/2P",
+                    "006": "Infini-Solar WP TWIN",
                 },
             ],
             ["int", "Output rated VA", "kW"],
