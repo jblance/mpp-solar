@@ -1,3 +1,4 @@
+""" powermon / protocols / pi30max.py """
 import logging
 
 from powermon.commands.result import ResultType
@@ -9,88 +10,78 @@ from powermon.commands.parameter import ParameterFormat
 
 log = logging.getLogger("pi30max")
 
-QUERY_COMMANDS = {
+NEW_QUERY_COMMANDS = {
     "QSID": {
         "name": "QSID",
         "description": "Device Serial Number inquiry",
         "help": " -- queries the device serial number (length greater than 14)",
-        "response_type": ResultType.INDEXED,
-        #"response": [[0, "Serial Number", "bytes.decode:r[2:int(r[0:2])+2]", "", {"icon": "mdi:identifier"}]],
-        "response": [[0, "Serial Number", ResponseType.BYTES, "", {"icon": "mdi:identifier"}]],
-        "test_responses": [
-            b"(1492932105105335005535\x94\x0e\r",
-        ],
+        "result_type": ResultType.SINGLE,
+        "reading_definitions": [{"description": "Serial Number", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.TEMPLATE_BYTES, "format_template" : "r[2:int(r[0:2])+2]", "icon": "mdi:identifier"}],
+        "test_responses": [b"(1492932105105335005535\x94\x0e\r", ],
     },
     "QVFW3": {
         "name": "QVFW3",
         "description": "Remote CPU firmware version inquiry",
-        "response_type": ResultType.INDEXED,
-        "response": [[0, "Remote CPU firmware version", ResponseType.BYTES, "", {"icon": "mdi:identifier"}]],
-        "test_responses": [
-            b"(VERFW:00072.70\x53\xA7\r",
-        ],
+        "result_type": ResultType.SINGLE,
+        "reading_definitions": [{"description": "Remote CPU firmware version", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.TEMPLATE_BYTES, "format_template" : "r.removeprefix('VERFW:')", "icon": "mdi:identifier"}],
+        "test_responses": [b"(VERFW:00072.70\x53\xA7\r", ],
     },
     "VERFW": {
         "name": "VERFW",
         "description": "Bluetooth version inquiry",
-        "response_type": ResultType.INDEXED,
-        "response": [[0, "Bluetooth version", ResponseType.BYTES, "", {"icon": "mdi:identifier"}]],
+        "result_type": ResultType.SINGLE,
+        "reading_definitions": [{"description": "Bluetooth firmware version", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.TEMPLATE_BYTES, "format_template" : "r.removeprefix('VERFW:')", "icon": "mdi:identifier"}],
+        "test_responses": [b"(VERFW:00072.70\x53\xA7\r", ],
+    },
+    "QFLAG": {
+        "name": "QFLAG",
+        "description": "Flag Status inquiry",
+        "help": " -- queries the enabled / disabled state of various Inverter settings (e.g. buzzer, overload, interrupt alarm)",
+        "result_type": ResultType.SINGLE,
+        "reading_definitions": [
+            {
+                "description": "Device Status",
+                "reading_type": ReadingType.MULTI_ENABLE_DISABLE,
+                "response_type": ResponseType.ENABLE_DISABLE_FLAGS,
+                "options": {
+                    "a": "Buzzer",
+                    "b": "Overload Bypass",
+                    "d": "Solar Feed to Grid",
+                    "k": "LCD Reset to Default",
+                    "u": "Overload Restart",
+                    "v": "Over Temperature Restart",
+                    "x": "LCD Backlight",
+                    "y": "Primary Source Interrupt Alarm",
+                    "z": "Record Fault Code",
+                },
+            }
+        ],
         "test_responses": [
-            b"(VERFW:00072.70\x53\xA7\r",
+            b"(EakxyDbduvz\x8d\x73\r",
         ],
     },
     "QPIRI": {
         "name": "QPIRI",
         "description": "Current Settings inquiry",
-        "response_type": ResultType.INDEXED,
-        "response": [
-            [
-                0,
-                "AC Input Voltage",
-                ResponseType.FLOAT,
-                "V",
-                {"icon": "mdi:transmission-tower-import", "device-class": "voltage"},
-            ],
-            [1, "AC Input Current", ResponseType.FLOAT, "A", {"icon": "mdi:current-ac", "device-class": "current"}],
-            [
-                2,
-                "AC Output Voltage",
-                ResponseType.FLOAT,
-                "V",
-                {"icon": "mdi:transmission-tower-export", "device-class": "voltage"},
-            ],
-            [3, "AC Output Frequency", ResponseType.FLOAT, "Hz", {"icon": "mdi:current-ac", "device-class": "frequency"}],
-            [4, "AC Output Current", ResponseType.FLOAT, "A", {"icon": "mdi:current-ac", "device-class": "current"}],
-            [5, "AC Output Apparent Power", ResponseType.INT, "VA", {"icon": "mdi:power-plug", "device-class": "apparent_power"}],
-            [
-                6,
-                "AC Output Active Power",
-                ResponseType.INT,
-                "W",
-                {"icon": "mdi:power-plug", "device-class": "power", "state_class": "measurement"},
-            ],
-            [7, "Battery Voltage", ResponseType.FLOAT, "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
-            [8, "Battery Recharge Voltage", ResponseType.FLOAT, "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
-            [9, "Battery Under Voltage", ResponseType.FLOAT, "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
-            [
-                10,
-                "Battery Bulk Charge Voltage",
-                ResponseType.FLOAT,
-                "V",
-                {"icon": "mdi:battery-outline", "device-class": "voltage"},
-            ],
-            [
-                11,
-                "Battery Float Charge Voltage",
-                ResponseType.FLOAT,
-                "V",
-                {"icon": "mdi:battery-outline", "device-class": "voltage"},
-            ],
-            [
-                12,
-                "Battery Type",
-                ResponseType.OPTION,
-                [
+        "result_type": ResultType.ORDERED,
+        "reading_definitions": [
+            {"description": "AC Input Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:transmission-tower-import", "device-class": "voltage"},
+            {"description": "AC Input Current", "reading_type": ReadingType.AMPS, "response_type":ResponseType.FLOAT, "icon": "mdi:current-ac", "device-class": "current"},
+            {"description": "AC Output Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:transmission-tower-export", "device-class": "voltage"},
+            {"description": "AC Output Frequency", "reading_type": ReadingType.FREQUENCY, "response_type": ResponseType.FLOAT, "icon": "mdi:current-ac", "device-class": "frequency"},
+            {"description": "AC Output Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.FLOAT, "icon": "mdi:current-ac", "device-class": "current"},
+            {"description": "AC Output Apparent Power", "reading_type": ReadingType.APPARENT_POWER, "response_type": ResponseType.INT, "icon": "mdi:power-plug", "device-class": "apparent_power"},
+            {"description": "AC Output Active Power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.INT, "icon": "mdi:power-plug", "device-class": "power", "state_class": "measurement"},
+            {"description": "Battery Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:battery-outline", "device-class": "voltage"},
+            {"description": "Battery Recharge Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:battery-outline", "device-class": "voltage"},
+            {"description": "Battery Under Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:battery-outline", "device-class": "voltage"},
+            {"description": "Battery Bulk Charge Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:battery-outline", "device-class": "voltage"},
+            {"description": "Battery Float Charge Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:battery-outline", "device-class": "voltage"},
+            {
+                "description": "Battery Type",
+                "reading_type": ReadingType.MESSAGE,
+                "response_type": ResponseType.LIST,
+                "options": [
                     "AGM",
                     "Flooded",
                     "User",
@@ -98,47 +89,43 @@ QUERY_COMMANDS = {
                     "Shinheung",
                     "WECO",
                     "Soltaro",
+                    "TBD",
                     "LIb-protocol compatible",
                     "3rd party Lithium",
                 ],
-            ],
-            [13, "Max AC Charging Current", ResponseType.INT, "A", {"icon": "mdi:current-ac", "device-class": "current"}],
-            [14, "Max Charging Current", ResponseType.INT, "A", {"icon": "mdi:current-ac", "device-class": "current"}],
-            [15, "Input Voltage Range", ResponseType.OPTION, ["Appliance", "UPS"]],
-            [
-                16,
-                "Output Source Priority",
-                ResponseType.OPTION,
-                [
+            },
+            {"description": "Max AC Charging Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT, "icon": "mdi:current-ac", "device-class": "current"},
+            {"description": "Max Charging Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT, "icon": "mdi:current-ac", "device-class": "current"},
+            {"description": "Input Voltage Range", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Appliance", "UPS"]},
+            {
+                "description": "Output Source Priority",
+                "reading_type": ReadingType.MESSAGE,
+                "response_type": ResponseType.LIST,
+                "options": [
                     "Utility Solar Battery",
                     "Solar Utility Battery",
                     "Solar Battery Utility",
                 ],
-            ],
-            [
-                17,
-                "Charger Source Priority",
-                ResponseType.OPTION,
-                [
+            },
+            {
+                "description": "Charger Source Priority",
+                "reading_type": ReadingType.MESSAGE,
+                "response_type": ResponseType.LIST,
+                "options": [
                     "Utility first",
                     "Solar first",
                     "Solar + Utility",
                     "Only solar charging permitted",
                 ],
-            ],
-            [18, "Max Parallel Units", ResponseType.INT, "units"],
-            [
-                19,
-                "Machine Type",
-                ResponseType.OPTION,
-                {"00": "Grid tie", "01": "Off Grid", "10": "Hybrid"},
-            ],
-            [20, "Topology", ResponseType.OPTION, ["transformerless", "transformer"]],
-            [
-                21,
-                "Output Mode",
-                ResponseType.OPTION,
-                [
+            },
+            {"description": "Max Parallel Units", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
+            {"description": "Machine Type", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.OPTION, "options": {"00": "Grid tie", "01": "Off Grid", "10": "Hybrid"}},
+            {"description": "Topology", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["transformerless", "transformer"]},
+            {
+                "description": "Output Mode",
+                "reading_type": ReadingType.MESSAGE,
+                "response_type": ResponseType.LIST,
+                "options": [
                     "single machine output",
                     "parallel output",
                     "Phase 1 of 3 Phase output",
@@ -149,113 +136,57 @@ QUERY_COMMANDS = {
                     "Phase 2 of 2 phase output (180°)",
                     "unknown output",
                 ],
-            ],
-            [22, "Battery Redischarge Voltage", ResponseType.FLOAT, "V"],
-            [
-                23,
-                "PV OK Condition",
-                ResponseType.OPTION,
-                [
+            },
+            {"description": "Battery Redischarge Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
+            {
+                "description": "PV OK Condition",
+                "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST,
+                "options": [
                     "As long as one unit of inverters has connect PV, parallel system will consider PV OK",
                     "Only All of inverters have connect PV, parallel system will consider PV OK",
                 ],
-            ],
-            [
-                24,
-                "PV Power Balance",
-                ResponseType.OPTION,
-                [
+            },
+            {
+                "description": "PV Power Balance",
+                "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST,
+                "options": [
                     "PV input max current will be the max charged current",
                     "PV input max power will be the sum of the max charged power and loads power",
                 ],
-            ],
-            [25, "Max charging time for CV stage", ResponseType.INT, "min"],
-            [
-                26,
-                "Operation Logic",
-                ResponseType.OPTION,
-                ["Automatic mode", "On-line mode", "ECO mode"],
-            ],
-            [27, "Max discharging current", ResponseType.INT, "A", {"icon": "mdi:current-ac", "device-class": "current"}],
+            },
+            {"description": "Max charging time for CV stage", "reading_type": ReadingType.TIME_MINUTES, "response_type": ResponseType.INT},
+            {"description": "Operation Logic", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Automatic mode", "On-line mode", "ECO mode"]},
+            {"description": "Max discharging current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT, "icon": "mdi:current-ac", "device-class": "current"},
         ],
         "test_responses": [
             b"(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1\x6F\x7E\r",
         ],
     },
-    "QFLAG": {
-        "name": "QFLAG",
-        "description": "Flag Status inquiry",
-        "help": " -- queries the enabled / disabled state of various Inverter settings (e.g. buzzer, overload, interrupt alarm)",
-        "response_type": ResultType.INDEXED,
-        "response": [
-            [
-                0,
-                "Device Status",
-                ResponseType.ENFLAGS,
-                {
-                    "a": {"name": "Buzzer", "state": "disabled"},
-                    "b": {"name": "Overload Bypass", "state": "disabled"},
-                    "d": {"name": "Solar Feed to Grid", "state": "disabled"},
-                    "k": {"name": "LCD Reset to Default", "state": "disabled"},
-                    "u": {"name": "Overload Restart", "state": "disabled"},
-                    "v": {"name": "Over Temperature Restart", "state": "disabled"},
-                    "x": {"name": "LCD Backlight", "state": "disabled"},
-                    "y": {
-                        "name": "Primary Source Interrupt Alarm",
-                        "state": "disabled",
-                    },
-                    "z": {"name": "Record Fault Code", "state": "disabled"},
-                },
-            ]
-        ],
-        "test_responses": [
-            b"(EakxyDbduvz\x8d\x73\r",
-        ],
-    },
     "QPIGS": {
         "name": "QPIGS",
         "description": "General Status Parameters inquiry",
-        "response_type": ResultType.INDEXED,
-        "response": [
-            [0, "AC Input Voltage", ResponseType.FLOAT, "V", {"icon": "mdi:transmission-tower-export", "device-class": "voltage"}],
-            [1, "AC Input Frequency", ResponseType.FLOAT, "Hz", {"icon": "mdi:current-ac", "device-class": "frequency"}],
-            [2, "AC Output Voltage", ResponseType.FLOAT, "V", {"icon": "mdi:power-plug", "device-class": "voltage"}],
-            [3, "AC Output Frequency", ResponseType.FLOAT, "Hz", {"icon": "mdi:current-ac", "device-class": "frequency"}],
-            [4, "AC Output Apparent Power", ResponseType.INT, "VA", {"icon": "mdi:power-plug", "device-class": "apparent_power"}],
-            [5, "AC Output Active Power", ResponseType.INT, "W", {"icon": "mdi:power-plug", "device-class": "power", "state_class": "measurement"}],
-            [6, "AC Output Load", ResponseType.INT, "%", {"icon": "mdi:brightness-percent"}],
-            [7, "BUS Voltage", ResponseType.INT, "V", {"icon": "mdi:details", "device-class": "voltage"}],
-            [8, "Battery Voltage", ResponseType.FLOAT, "V", {"icon": "mdi:battery-outline", "device-class": "voltage"}],
-            [9, "Battery Charging Current", ResponseType.INT, "A", {"icon": "mdi:current-dc", "device-class": "current"}],
-            [10, "Battery Capacity", ResponseType.INT, "%", {"device-class": "battery"}],
-            [
-                11,
-                "Inverter Heat Sink Temperature",
-                ResponseType.INT,
-                "°C",
-                {"icon": "mdi:details", "device-class": "temperature"},
-            ],
-            [12, "PV1 Input Current", ResponseType.FLOAT, "A", {"icon": "mdi:solar-power", "device-class": "current"}],
-            [13, "PV1 Input Voltage", ResponseType.FLOAT, "V", {"icon": "mdi:solar-power", "device-class": "voltage"}],
-            [
-                14,
-                "Battery Voltage from SCC",
-                ResponseType.FLOAT,
-                "V",
-                {"icon": "mdi:battery-outline", "device-class": "voltage"},
-            ],
-            [
-                15,
-                "Battery Discharge Current",
-                ResponseType.INT,
-                "A",
-                {"icon": "mdi:battery-negative", "device-class": "current"},
-            ],
-            [
-                16,
-                "Device Status",
-                ResponseType.FLAGS,
-                [
+        "result_type": ResultType.ORDERED,
+        "reading_definitions": [
+            {"description": "AC Input Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:transmission-tower-export", "device-class": "voltage"},
+            {"description": "AC Input Frequency", "reading_type": ReadingType.FREQUENCY, "response_type": ResponseType.FLOAT, "icon": "mdi:current-ac", "device-class": "frequency"},
+            {"description": "AC Output Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:power-plug", "device-class": "voltage"},
+            {"description": "AC Output Frequency", "reading_type": ReadingType.FREQUENCY, "response_type": ResponseType.FLOAT, "icon": "mdi:current-ac", "device-class": "frequency"},
+            {"description": "AC Output Apparent Power", "reading_type": ReadingType.APPARENT_POWER, "response_type": ResponseType.INT, "icon": "mdi:power-plug", "device-class": "apparent_power"},
+            {"description": "AC Output Active Power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.INT, "icon": "mdi:power-plug", "device-class": "power", "state_class": "measurement"},
+            {"description": "AC Output Load", "reading_type": ReadingType.PERCENTAGE, "response_type": ResponseType.INT, "icon": "mdi:brightness-percent"},
+            {"description": "BUS Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.INT, "icon": "mdi:details", "device-class": "voltage"},
+            {"description": "Battery Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:battery-outline", "device-class": "voltage"},
+            {"description": "Battery Charging Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT, "icon": "mdi:current-dc", "device-class": "current"},
+            {"description": "Battery Capacity", "reading_type": ReadingType.PERCENTAGE, "response_type": ResponseType.INT, "device-class": "battery"},
+            {"description": "Inverter Heat Sink Temperature", "reading_type": ReadingType.TEMPERATURE, "response_type": ResponseType.INT, "icon": "mdi:details", "device-class": "temperature"},
+            {"description": "PV1 Input Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.FLOAT, "icon": "mdi:solar-power", "device-class": "current"},
+            {"description": "PV1 Input Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:solar-power", "device-class": "voltage"},
+            {"description": "Battery Voltage from SCC", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:battery-outline", "device-class": "voltage"},
+            {"description": "Battery Discharge Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT, "icon": "mdi:battery-negative", "device-class": "current"},
+            {
+                "description": "Device Status",
+                "reading_type": ReadingType.FLAGS, "response_type": ResponseType.FLAGS,
+                "flags": [
                     "Is SBU Priority Version Added",
                     "Is Configuration Changed",
                     "Is SCC Firmware Updated",
@@ -265,45 +196,33 @@ QUERY_COMMANDS = {
                     "Is SCC Charging On",
                     "Is AC Charging On",
                 ],
-            ],
-            [17, "Battery Voltage Offset for Fans On", ResponseType.INT, "10mV"],
-            [18, "EEPROM Version", ResponseType.INT, ""],
-            [
-                19,
-                "PV1 Charging Power",
-                ResponseType.INT,
-                "W",
-                {"icon": "mdi:solar-power", "device-class": "power", "state_class": "measurement"},
-            ],
-            [
-                20,
-                "Device Status2",
-                ResponseType.FLAGS,
-                ["Is Charging to Float", "Is Switched On", "Is Dustproof Installed"],
-            ],
-            [21, "Solar Feed to Grid", ResponseType.OPTION, ["Disabled", "Enabled"]],
-            [
-                22,
-                "Country",
-                ResponseType.OPTION,
-                {
+            },
+            {"description": "Battery Voltage Offset for Fans On (10mV)", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.INT},
+            {"description": "EEPROM Version",  "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
+            {"description": "PV1 Charging Power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.INT, "icon": "mdi:solar-power", "device-class": "power", "state_class": "measurement"},
+            {"description": "Device Status2", "reading_type": ReadingType.FLAGS, "response_type": ResponseType.FLAGS, "flags": ["Is Charging to Float", "Is Switched On", "Is Dustproof Installed"]},
+            {"description": "Solar Feed to Grid",  "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Disabled", "Enabled"]},
+            {"description": "Country", 
+                "reading_type": ReadingType.MESSAGE, 
+                "response_type": ResponseType.OPTION, 
+                "options": {
                     "00": "India",
                     "01": "Germany",
                     "02": "South America",
                 },
-            ],
-            [
-                23,
-                "Solar Feed to Grid Power",
-                ResponseType.INT,
-                "W",
-                {"icon": "mdi:solar-power", "device-class": "power", "state_class": "measurement"},
-            ],
+            },
+            {"description": "Solar Feed to Grid Power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.INT, "icon": "mdi:solar-power", "device-class": "power", "state_class": "measurement"},
         ],
         "test_responses": [
             b"(227.2 50.0 230.3 50.0 0829 0751 010 447 54.50 020 083 0054 02.7 323.6 00.00 00000 00010110 00 00 00879 010\xf1\x8c\r",
+            b"(227.2 50.0 230.3 50.0 0829 0751 010 447 54.50 020 083 0054 02.7 323.6 00.00 00000 00010110 00 00 00879 010 1 02 123\x1c\x84\r",
         ],
     },
+}
+QUERY_COMMANDS = {
+    
+    
+    
     "QPIGS2": {
         "name": "QPIGS2",
         "description": "General Status Parameters inquiry 2",
@@ -902,74 +821,38 @@ QUERY_COMMANDS = {
 SETTER_COMMANDS = {
     "PLEDE": {
         "name": "PLEDE",
-        "description": "Enable/disable LED function",
+        "description": "Enable-Disable LED function",
         "help": " -- examples: PLEDE0 (disable LED), PLEDE1 (enable LED)",
-        "response_type": ResultType.ACK,
-        "response": [[0, "Command execution", ResponseType.ACK, {"NAK": "Failed", "ACK": "Successful"}]],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
         "regex": "PLEDE([01])$",
     },
     "PLEDS": {
         "name": "PLEDS",
         "description": "Set LED speed",
         "help": " -- examples: PLEDS0 (set LED speed low), PLEDS1 (set LED speed medium), PLEDS2 (set LED speed high)",
-        "response_type": ResultType.ACK,
-        "response": [[0, "Command execution", ResponseType.ACK, {"NAK": "Failed", "ACK": "Successful"}]],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
         "regex": "PLEDS([012])$",
     },
     "PLEDM": {
         "name": "PLEDM",
         "description": "Set LED effect",
         "help": " -- examples: PLEDM0 (set LED effect breathing), PLEDM2 (set LED effect solid), PLEDM3 (set LED right scrolling)",
-        "response_type": ResultType.ACK,
-        "response": [[0, "Command execution", ResponseType.ACK, {"NAK": "Failed", "ACK": "Successful"}]],
-        "test_responses": [
-            b"(NAK\x73\x73\r",
-            b"(ACK\x39\x20\r",
-        ],
         "regex": "PLEDM([0123])$",
     },
     "PLEDB": {
         "name": "PLEDB",
         "description": "Set LED brightness",
         "help": " -- examples: PLEDB1 (set LED brightness low), PLEDB5 (set LED brightness normal), PLEDB9 (set LED brightness high)",
-        "response_type": ResultType.ACK,
-        "response": [[0, "Command execution", ResponseType.ACK, {"NAK": "Failed", "ACK": "Successful"}]],
-        "test_responses": [
-            b"(ACK\x39\x20\r",
-            b"(NAK\x73\x73\r",
-        ],
         "regex": "PLEDB([123456789])$",
     },
     "PLEDT": {
         "name": "PLEDT",
         "description": "Set LED total number of colors",
         "help": " -- examples: PLEDT2 (set 2 LED colors), PLEDT3 (set 3 LED colors)",
-        "response_type": ResultType.ACK,
-        "response": [[0, "Command execution", ResponseType.ACK, {"NAK": "Failed", "ACK": "Successful"}]],
-        "test_responses": [
-            b"(ACK\x39\x20\r",
-            b"(NAK\x73\x73\r",
-        ],
         "regex": "PLEDT([123])$",
     },
     "PLEDC": {
         "name": "PLEDC",
         "description": "Set LED color",
         "help": " -- examples: PLEDCnRRRGGGBBB (n: 1 line mode, 2 AVR mode, 3 battery mode)",
-        "response_type": ResultType.ACK,
-        "response": [[0, "Command execution", ResponseType.ACK, {"NAK": "Failed", "ACK": "Successful"}]],
-        "test_responses": [
-            b"(ACK\x39\x20\r",
-            b"(NAK\x73\x73\r",
-        ],
         "regex": "PLEDC(\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d)$",
     },
 }
@@ -977,17 +860,18 @@ SETTER_COMMANDS = {
 COMMANDS_TO_REMOVE = ["QVFW2"]
 
 
-class pi30max(PI30):
+class PI30MAX(PI30):
+    """ PI30 protocol handler for LV6048MAX and similar inverters """
     def __str__(self):
         return "PI30 protocol handler for LV6048MAX and similar inverters"
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self) -> None:
         super().__init__()
         self._protocol_id = b"PI30MAX"
         # Add pi30max specific commands to pi30 commands
-        super().add_command_definitions(QUERY_COMMANDS)
+        self.add_command_definitions(NEW_QUERY_COMMANDS)
         # Add pi30max specific setter commands
-        super().add_command_definitions(SETTER_COMMANDS)
+        self.add_command_definitions(SETTER_COMMANDS, command_type="SETTER_ACK")
         # remove and unwanted pi30 commands
         for item in COMMANDS_TO_REMOVE:
             self.command_definitions.pop(item, None)
