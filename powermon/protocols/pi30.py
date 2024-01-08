@@ -573,7 +573,7 @@ QUERY_COMMANDS = {
         "description": "Main CPU firmware version inquiry",
         "help": " -- queries the main CPU firmware version",
         "result_type": ResultType.SINGLE,
-        "reading_definitions": [{"reading_type": ReadingType.MESSAGE, "description": "Main CPU firmware version", "response_type": ResponseType.BYTES}],
+        "reading_definitions": [{"reading_type": ReadingType.MESSAGE, "description": "Main CPU firmware version", "response_type": ResponseType.TEMPLATE_BYTES, "format_template" : "r.removeprefix('VERFW:')"}],
         "test_responses": [b"(VERFW:00072.70\x53\xA7\r"],
     },
     "QVFW2": {
@@ -581,7 +581,7 @@ QUERY_COMMANDS = {
         "description": "Secondary CPU firmware version inquiry",
         "help": " -- queries the secondary CPU firmware version",
         "result_type": ResultType.SINGLE,
-        "reading_definitions": [{"reading_type": ReadingType.MESSAGE, "description": "Secondary CPU firmware version", "response_type": ResponseType.BYTES}],
+        "reading_definitions": [{"reading_type": ReadingType.MESSAGE, "description": "Secondary CPU firmware version", "response_type": ResponseType.TEMPLATE_BYTES, "format_template" : "r.removeprefix('VERFW:')"}],
         "test_responses": [b"(VERFW:00072.70\x53\xA7\r"],
     },
     "QID": {
