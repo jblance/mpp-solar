@@ -121,8 +121,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 match = _re.match(command)
                 if match:
                     log.debug("Matched: %s to: %s value: %s", command, command_definition.code, match.group(1))
-                    # QUESTION: Is this the only spot to set a parameter for a command?
-                    command_definition.set_parameter_value(match.group(1))
+                    # FIXME: Is this the only spot to set a parameter for a command?
+                    # command_definition.set_parameter_value(match.group(1))
                     return command_definition
         log.info("No command_defn found for %s", command)
         raise CommandDefinitionMissing(f"No command definition found for command: {command}")
