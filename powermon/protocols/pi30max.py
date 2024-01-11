@@ -66,10 +66,10 @@ NEW_QUERY_COMMANDS = {
         "result_type": ResultType.ORDERED,
         "reading_definitions": [
             {"description": "AC Input Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:transmission-tower-import", "device-class": "voltage"},
-            {"description": "AC Input Current", "reading_type": ReadingType.AMPS, "response_type":ResponseType.FLOAT, "icon": "mdi:current-ac", "device-class": "current"},
+            {"description": "AC Input Current", "reading_type": ReadingType.CURRENT, "response_type":ResponseType.FLOAT, "icon": "mdi:current-ac", "device-class": "current"},
             {"description": "AC Output Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:transmission-tower-export", "device-class": "voltage"},
             {"description": "AC Output Frequency", "reading_type": ReadingType.FREQUENCY, "response_type": ResponseType.FLOAT, "icon": "mdi:current-ac", "device-class": "frequency"},
-            {"description": "AC Output Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.FLOAT, "icon": "mdi:current-ac", "device-class": "current"},
+            {"description": "AC Output Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.FLOAT, "icon": "mdi:current-ac", "device-class": "current"},
             {"description": "AC Output Apparent Power", "reading_type": ReadingType.APPARENT_POWER, "response_type": ResponseType.INT, "icon": "mdi:power-plug", "device-class": "apparent_power"},
             {"description": "AC Output Active Power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.INT, "icon": "mdi:power-plug", "device-class": "power", "state_class": "measurement"},
             {"description": "Battery Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:battery-outline", "device-class": "voltage"},
@@ -94,8 +94,8 @@ NEW_QUERY_COMMANDS = {
                     "3rd party Lithium",
                 ],
             },
-            {"description": "Max AC Charging Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT, "icon": "mdi:current-ac", "device-class": "current"},
-            {"description": "Max Charging Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT, "icon": "mdi:current-ac", "device-class": "current"},
+            {"description": "Max AC Charging Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT, "icon": "mdi:current-ac", "device-class": "current"},
+            {"description": "Max Charging Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT, "icon": "mdi:current-ac", "device-class": "current"},
             {"description": "Input Voltage Range", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Appliance", "UPS"]},
             {
                 "description": "Output Source Priority",
@@ -156,7 +156,7 @@ NEW_QUERY_COMMANDS = {
             },
             {"description": "Max charging time for CV stage", "reading_type": ReadingType.TIME_MINUTES, "response_type": ResponseType.INT},
             {"description": "Operation Logic", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Automatic mode", "On-line mode", "ECO mode"]},
-            {"description": "Max discharging current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT, "icon": "mdi:current-ac", "device-class": "current"},
+            {"description": "Max discharging current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT, "icon": "mdi:current-ac", "device-class": "current"},
         ],
         "test_responses": [
             b"(230.0 21.7 230.0 50.0 21.7 5000 4000 48.0 46.0 42.0 56.4 54.0 0 10 010 1 0 0 6 01 0 0 54.0 0 1\x6F\x7E\r",
@@ -176,13 +176,13 @@ NEW_QUERY_COMMANDS = {
             {"description": "AC Output Load", "reading_type": ReadingType.PERCENTAGE, "response_type": ResponseType.INT, "icon": "mdi:brightness-percent"},
             {"description": "BUS Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.INT, "icon": "mdi:details", "device-class": "voltage"},
             {"description": "Battery Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:battery-outline", "device-class": "voltage"},
-            {"description": "Battery Charging Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT, "icon": "mdi:current-dc", "device-class": "current"},
+            {"description": "Battery Charging Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT, "icon": "mdi:current-dc", "device-class": "current"},
             {"description": "Battery Capacity", "reading_type": ReadingType.PERCENTAGE, "response_type": ResponseType.INT, "device-class": "battery"},
             {"description": "Inverter Heat Sink Temperature", "reading_type": ReadingType.TEMPERATURE, "response_type": ResponseType.INT, "icon": "mdi:details", "device-class": "temperature"},
-            {"description": "PV1 Input Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.FLOAT, "icon": "mdi:solar-power", "device-class": "current"},
+            {"description": "PV1 Input Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.FLOAT, "icon": "mdi:solar-power", "device-class": "current"},
             {"description": "PV1 Input Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:solar-power", "device-class": "voltage"},
             {"description": "Battery Voltage from SCC", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:battery-outline", "device-class": "voltage"},
-            {"description": "Battery Discharge Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT, "icon": "mdi:battery-negative", "device-class": "current"},
+            {"description": "Battery Discharge Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT, "icon": "mdi:battery-negative", "device-class": "current"},
             {
                 "description": "Device Status",
                 "reading_type": ReadingType.FLAGS, "response_type": ResponseType.FLAGS,
@@ -867,14 +867,13 @@ class PI30MAX(PI30):
 
     def __init__(self) -> None:
         super().__init__()
-        self._protocol_id = b"PI30MAX"
+        self.protocol_id = b"PI30MAX"
         # Add pi30max specific commands to pi30 commands
         self.add_command_definitions(NEW_QUERY_COMMANDS)
         # Add pi30max specific setter commands
-        self.add_command_definitions(SETTER_COMMANDS, command_type="SETTER_ACK")
+        self.add_command_definitions(SETTER_COMMANDS, result_type=ResultType.ACK)
         # remove and unwanted pi30 commands
-        for item in COMMANDS_TO_REMOVE:
-            self.command_definitions.pop(item, None)
+        self.remove_command_definitions(COMMANDS_TO_REMOVE)
         self.STATUS_COMMANDS = ["QPIGS", "QPIGS2"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"

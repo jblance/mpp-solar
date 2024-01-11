@@ -174,12 +174,12 @@ QUERY_COMMANDS = {
         "reading_definitions": [
             {"description": "AC Output Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
             {"description": "AC Output Frequency",  "reading_type": ReadingType.FREQUENCY, "response_type": ResponseType.FLOAT},
-            {"description": "Max AC Charging Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT},
+            {"description": "Max AC Charging Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
             {"description": "Battery Under Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
             {"description": "Battery Float Charge Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
             {"description": "Battery Bulk Charge Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
             {"description": "Battery Recharge Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
-            {"description": "Max Charging Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT},
+            {"description": "Max Charging Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
             {"description": "Input Voltage Range", "reading_type": ReadingType.MESSAGE,"response_type": ResponseType.LIST, "options": ["Appliance", "UPS"]},
             {"description": "Output Source Priority", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Utility first", "Solar first", "SBU first"]},
             {
@@ -328,13 +328,13 @@ QUERY_COMMANDS = {
             {"description": "AC Output Load", "reading_type": ReadingType.PERCENTAGE, "response_type": ResponseType.INT, "icon": "mdi:brightness-percent"},
             {"description": "BUS Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.INT, "icon": "mdi:details", "device-class": "voltage"},
             {"description": "Battery Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:battery-outline", "device-class": "voltage"},
-            {"description": "Battery Charging Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT, "icon": "mdi:current-dc", "device-class": "current"},
+            {"description": "Battery Charging Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT, "icon": "mdi:current-dc", "device-class": "current"},
             {"description": "Battery Capacity", "reading_type": ReadingType.PERCENTAGE, "response_type": ResponseType.INT, "device-class": "battery"},
             {"description": "Inverter Heat Sink Temperature", "reading_type": ReadingType.TEMPERATURE, "response_type": ResponseType.INT, "icon": "mdi:details", "device-class": "temperature"},
-            {"description": "PV Input Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.FLOAT, "icon": "mdi:solar-power", "device-class": "current"},
+            {"description": "PV Input Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.FLOAT, "icon": "mdi:solar-power", "device-class": "current"},
             {"description": "PV Input Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:solar-power", "device-class": "voltage"},
             {"description": "Battery Voltage from SCC", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:battery-outline", "device-class": "voltage"},
-            {"description": "Battery Discharge Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT, "icon": "mdi:battery-negative", "device-class": "current"},
+            {"description": "Battery Discharge Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT, "icon": "mdi:battery-negative", "device-class": "current"},
             {
                 "description": "Device Status",
                 "reading_type": ReadingType.FLAGS,
@@ -350,8 +350,8 @@ QUERY_COMMANDS = {
                     "Is AC Charging On",
                 ],
             },
-            {"description": "RSV1", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT},
-            {"description": "RSV2", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT},
+            {"description": "RSV1", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
+            {"description": "RSV2", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
             {"description": "PV Input Power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.INT, "icon": "mdi:solar-power", "device-class": "power", "state_class": "measurement"},
             {"description": "Device Status2", "reading_type": ReadingType.FLAGS, "response_type": ResponseType.FLAGS, "flags": ["Is Charging to Float", "Is Switched On", "Is Reserved"]},
         ],
@@ -366,10 +366,10 @@ QUERY_COMMANDS = {
         "result_type": ResultType.ORDERED,
         "reading_definitions": [
             {"description": "AC Input Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
-            {"description": "AC Input Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.FLOAT},
+            {"description": "AC Input Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.FLOAT},
             {"description": "AC Output Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
             {"description": "AC Output Frequency", "reading_type": ReadingType.FREQUENCY, "response_type": ResponseType.FLOAT},
-            {"description": "AC Output Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.FLOAT},
+            {"description": "AC Output Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.FLOAT},
             {"description": "AC Output Apparent Power", "reading_type": ReadingType.APPARENT_POWER, "response_type": ResponseType.INT},
             {"description": "AC Output Active Power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.INT},
             {"description": "Battery Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
@@ -394,8 +394,8 @@ QUERY_COMMANDS = {
                     "3rd party Lithium",
                 ],
             },
-            {"description": "Max AC Charging Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT},
-            {"description": "Max Charging Current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT},
+            {"description": "Max AC Charging Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
+            {"description": "Max Charging Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
             {"description": "Input Voltage Range", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Appliance", "UPS"]},
             {"description": "Output Source Priority", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Utility first", "Solar first", "SBU first"]},
             {"description": "Charger Source Priority", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Utility first", "Solar first", "Solar + Utility", "Only solar charging permitted"]},
@@ -510,10 +510,10 @@ QUERY_COMMANDS = {
             {"description": "AC output active power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.INT},
             {"description": "Load percentage", "reading_type": ReadingType.PERCENTAGE, "response_type": ResponseType.INT},
             {"description": "Battery voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
-            {"description": "Battery charging current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT},
+            {"description": "Battery charging current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
             {"description": "Battery capacity", "reading_type": ReadingType.PERCENTAGE, "response_type": ResponseType.INT},
             {"description": "PV Input Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
-            {"description": "Total charging current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT},
+            {"description": "Total charging current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
             {"description": "Total AC output apparent power", "reading_type": ReadingType.APPARENT_POWER, "response_type": ResponseType.INT},
             {"description": "Total output active power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.INT},
             {"description": "Total AC output percentage", "reading_type": ReadingType.PERCENTAGE, "response_type": ResponseType.INT},
@@ -553,11 +553,11 @@ QUERY_COMMANDS = {
                 "response_type": ResponseType.LIST,
                 "options": ["Utility first", "Solar first", "Solar + Utility", "Solar only"],
             },
-            {"description": "Max charger current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT},
-            {"description": "Max charger range", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT},
-            {"description": "Max AC charger current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT},
-            {"description": "PV input current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT},
-            {"description": "Battery discharge current", "reading_type": ReadingType.AMPS, "response_type": ResponseType.INT},
+            {"description": "Max charger current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
+            {"description": "Max charger range", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
+            {"description": "Max AC charger current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
+            {"description": "PV input current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
+            {"description": "Battery discharge current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
             {"description": "Unknown float", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.FLOAT},
             {"description": "Unknown flags?", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.BYTES},
         ],
@@ -601,7 +601,7 @@ QUERY_COMMANDS = {
             {"reading_type": ReadingType.TIME_SECONDS, "response_type": ResponseType.INT, "description": "Time until the end of float charging"},
             {"reading_type": ReadingType.MESSAGE, "response_type": ResponseType.OPTION, "description": "SCC Flag", "options": {"00": "SCC not communicating?", "01": "SCC is powered and communicating", "11": "I am probably decoding wrong, should this be a 3?"}},
             {"reading_type": ReadingType.MESSAGE, "response_type": ResponseType.OPTION, "description": "AllowSccOnFlag", "options": {"00": "SCC not allowed to charge", "01": "SCC allowed to charge"}},
-            {"reading_type": ReadingType.AMPS, "response_type": ResponseType.INT, "description": "ChargeAverageCurrent"},
+            {"reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT, "description": "ChargeAverageCurrent"},
             {"reading_type": ReadingType.TEMPERATURE, "response_type": ResponseType.INT, "description": "SCC PWM temperature", "device-class": "temperature"},
             {"reading_type": ReadingType.TEMPERATURE, "response_type": ResponseType.INT, "description": "Inverter temperature", "device-class": "temperature"},
             {"reading_type": ReadingType.TEMPERATURE, "response_type": ResponseType.INT, "description": "Battery temperature", "device-class": "temperature"},
@@ -714,9 +714,9 @@ class PI30(AbstractProtocol):
 
     def __init__(self) -> None:
         super().__init__()
-        self._protocol_id = b"PI30"
+        self.protocol_id = b"PI30"
         self.add_command_definitions(QUERY_COMMANDS)
-        self.add_command_definitions(SETTER_COMMANDS, command_type="SETTER_ACK")
+        self.add_command_definitions(SETTER_COMMANDS, result_type=ResultType.ACK)
         self.STATUS_COMMANDS = ["QPIGS", "Q1"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
@@ -730,40 +730,8 @@ class PI30(AbstractProtocol):
         calc_crc_high, calc_crc_low = crc(response[:-3])
         crc_high, crc_low = response[-3], response[-2]
         if [calc_crc_high, calc_crc_low] != [crc_high, crc_low]:
-            raise ValueError(f"response has invalid CRC - got '\\x{crc_high:02x}\\x{crc_low:02x}', \
-                calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'")
+            log.warning(f"response has invalid CRC - got '\\x{crc_high:02x}\\x{crc_low:02x}', \
+                calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'", )
+            return False
         log.debug("CRCs match")
-
-    # def check_response_and_trim(self, response: str):
-    #     # fail if no response
-    #     if response is None:
-    #         result.is_valid = False
-    #         result.error = True
-    #         result.error_messages.append("failed validity check: response was empty")
-    #         return
-    #     # fail on short responses
-    #     if len(result.raw_response) <= 3:
-    #         result.is_valid = False
-    #         result.error = True
-    #         result.error_messages.append(
-    #             f"failed validity check: response to short len was {len(result.raw_response)}"
-    #         )
-    #         return
-    #     # check crc matches the calculated one
-    #     calc_crc_high, calc_crc_low = crc(result.raw_response[:-3])
-    #     if type(result.raw_response) is str:
-    #         crc_high, crc_low = ord(result.raw_response[-3]), ord(result.raw_response[-2])
-    #     else:
-    #         crc_high, crc_low = result.raw_response[-3], result.raw_response[-2]
-    #     if [calc_crc_high, calc_crc_low] != [crc_high, crc_low]:
-    #         result.is_valid = False
-    #         result.error = True
-    #         result.error_messages.append(
-    #             f"failed validity check: response has invalid CRC - \
-    #                 got '\\x{crc_high:02x}\\x{crc_low:02x}', \
-    #                 calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'"
-    #         )
-    #         return
-    #         # if result.raw_response[-3:-1] != bytes([calc_crc_high, calc_crc_low]):
-    #     log.debug("CRCs match")
-    #     return
+        return True
