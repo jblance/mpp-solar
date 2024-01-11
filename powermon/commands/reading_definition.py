@@ -35,7 +35,7 @@ class ReadingType(LowercaseStrEnum):
     - allows translations
     """
     ACK = auto()
-    AMPS = auto()
+    CURRENT = auto()
     APPARENT_POWER = auto()
     WATTS = auto()
     WATT_HOURS = auto()
@@ -154,7 +154,7 @@ class ReadingDefinition():
             case ResponseType.TEMPLATE_BYTES:
                 r = raw_value.decode('utf-8')
                 if self.format_template:
-                    res = eval(self.format_template)
+                    res = eval(self.format_template)  # pylint: disable=W0123
                     return res
                 return r
             case _:
@@ -254,7 +254,7 @@ class ReadingDefinition():
                 reading =  ReadingDefinitionFlags(
                     index=index, response_type=response_type, description=description, flags=flags,
                     device_class=device_class, state_class=state_class, icon=icon)
-            case ReadingType.AMPS:
+            case ReadingType.CURRENT:
                 reading =  ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
