@@ -86,7 +86,7 @@ class Device:
             return
         # get command definition from protocol
         try:
-            command.command_definition = self.port.protocol.get_command_with_command_string(command.code)
+            command.command_definition = self.port.protocol.get_command_definition(command.code)
         except CommandDefinitionMissing as ex:
             print(ex)
             return
@@ -149,4 +149,4 @@ class Device:
                 output: AbstractOutput
                 for output in command.outputs:
                     log.debug("Using Output: %s", output)
-                    output.process(result=result, mqtt_broker=self.mqtt_broker, device_info=self.device_info)
+                    output.process(command=command, result=result, mqtt_broker=self.mqtt_broker, device_info=self.device_info)
