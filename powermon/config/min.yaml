@@ -8,14 +8,18 @@ device:
     type: test
     path: /dev/ttyUSB0
     response_number: 1
-    protocol: PI30
+    protocol: PI30MAX
 
 commands:
 # - command: QMCHGCR
 #   outputs:
 #   - type: screen
 #     format: raw
-- command: QPIRI
+- command: QPIGS
+  override:
+    temperature: F
+    pv1_charging_power:
+      units: kW
   trigger:
     every: 5  # every 5 seconds
   outputs:
