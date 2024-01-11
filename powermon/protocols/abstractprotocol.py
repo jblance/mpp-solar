@@ -10,7 +10,7 @@ from powermon.commands.reading_definition import ReadingDefinition
 from powermon.commands.result import ResultType
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
 from powermon.dto.protocolDTO import ProtocolDTO
-from powermon.errors import PowermonProtocolError, PowermonWIP, CommandDefinitionMissing
+from powermon.errors import PowermonProtocolError, PowermonWIP, CommandDefinitionMissing, InvalidResponse
 
 log = logging.getLogger("AbstractProtocol")
 
@@ -19,14 +19,43 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
     """ base definition for all protocols """
 
     def __init__(self) -> None:
-        self._command = None
-        self._command_dict = None
         self.command_definitions: dict[str, CommandDefinition] = {}
         self.STATUS_COMMANDS = None
         self.SETTINGS_COMMANDS = None
         self.DEFAULT_COMMAND = None
         self.ID_COMMANDS = None
-        self._protocol_id = None
+
+    @property
+    def protocol_id(self) -> bytes:
+        """ return the protocol id """
+        return self._protocol_id
+
+    @protocol_id.setter
+    def protocol_id(self, value):
+        self._protocol_id = value
+
+    def add_command_definitions(self, command_definitions_config: dict, result_type: ResultType = None):
+        """ Add command definitions from the configuration """
+        for command_definition_key in command_definitions_config.keys():
+            try:
+                log.debug("Attempting to add command_definition_key: %s", command_definition_key)
+                _config = command_definitions_config[command_definition_key]
+                if result_type is not None:
+                    # Adding command definition with supplied type, so override config
+                    log.debug("result_type override to %s", result_type)
+                    _config["result_type"] = result_type
+                command_definition = CommandDefinition.from_config(_config)
+                self.command_definitions[command_definition_key] = command_definition
+            except ValueError as value_error:
+                log.info("couldnt add command definition for code: %s", command_definition_key)
+                log.info("error was: %s", value_error)
+
+    def remove_command_definitions(self, commands_to_remove: list = None):
+        """ Remove specified command definitions """
+        if commands_to_remove is None:
+            return
+        for command_to_remove in commands_to_remove:
+            self.command_definitions.pop(command_to_remove, None)
 
     def check_definitions_count(self):
         """ check and report number of command definitions, error if 0 """
@@ -48,33 +77,12 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             command_dtos[command_tuple[0]] = command_tuple[1].to_dto()
         return command_dtos
 
-    def add_command_definitions(self, command_definitions_config: dict, command_type: str = None):
-        """ Add command definitions from the configuration """
-        for command_definition_key in command_definitions_config.keys():
-            try:
-                log.debug("Attempting to add command_definition_key: %s", command_definition_key)
-                _config = command_definitions_config[command_definition_key]
-                if command_type == "SETTER_ACK":
-                    # Adding command definition with supplied type, so add config
-                    if "result_type" not in _config:
-                        log.debug("Adding SETTER_ACK type command, so defaulting result_type")
-                        _config["result_type"] = ResultType.ACK
-                command_definition = CommandDefinition.from_config(_config)
-                self.command_definitions[command_definition_key] = command_definition
-            except ValueError as value_error:
-                log.info("couldnt add command definition for code: %s", command_definition_key)
-                log.info("error was: %s", value_error)
-
     def list_commands(self) -> dict[str, CommandDefinition]:
         """ list available commands for the protocol """
         if self._protocol_id is None:
             log.error("Attempted to list commands with no protocol defined")
             raise ValueError("Attempted to list commands with no protocol defined")
         return self.command_definitions
-
-    def get_protocol_id(self) -> bytes:
-        """ return the protocol id """
-        return self._protocol_id
 
     def get_full_command(self, command) -> bytes:
         """ generate the full command including crc and \n as needed """
@@ -87,7 +95,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.debug("full command: %s", full_command)
         return full_command
 
-    def get_response_definition(self, command_definition: CommandDefinition, index=None, key=None) -> ReadingDefinition:
+    def get_reading_definition(self, command_definition: CommandDefinition, index=None, key=None) -> ReadingDefinition:
         """ get the definition of a specific response component """
         # QUESTION: is this not a readingdefinition? ie get_reading_definition??
         definitions_count = command_definition.get_response_definition_count()
@@ -103,11 +111,10 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         else:
             raise PowermonWIP("get_response_defn needs index or key")
 
-    def get_command_with_command_string(self, command) -> CommandDefinition:
+    def get_command_definition(self, command: str) -> CommandDefinition:
         """
         Get the command definition for a given command string
         """
-
         # Handle the commands that don't have a regex
         if command in self.command_definitions and self.command_definitions[command].regex is None:
             log.debug("Found command %s in protocol %s", command, self._protocol_id)
@@ -130,17 +137,34 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
     def check_crc(self, response: str):
         """ crc check, needs override in protocol """
         log.debug("check crc for %s", response)
-        return
+        return True
 
-    def check_response_and_trim(self, response: str) -> str:
-        """
-        Simplest validity check, CRC checks should be added to individual protocols
-        """
-        log.debug("response: %s", response)
+    def check_valid(self, response: str):
+        """ check response is valid """
         if response is None:
-            raise ValueError("Response is None")
+            raise InvalidResponse("Response is None")
         if len(response) <= 3:
-            raise ValueError("Response is too short")
-        self.check_crc(response)
+            raise InvalidResponse("Response is too short")
+        return True
+
+    def trim_response(self, response: str) -> str:
+        """ Remove extra characters from response """
+        log.debug("response: %s", response)
+        if not self.check_valid(response):
+            raise ValueError("Response was invalid")
         response = response[1:-3]
         return response
+
+    def split_response(self, response: str, command_definition = None) -> list | dict:
+        """ split response into individual items, return as ordered list or keyed dict """
+        result_type = getattr(command_definition, "result_type", None)
+        log.debug("splitting %s, result_type %s", response, result_type)
+        match result_type:
+            case None:
+                return []
+            case ResultType.ACK | ResultType.SINGLE | ResultType.MULTIVALUED:
+                return response
+            case _:
+                responses = response.split()
+                log.debug("responses: '%s'", responses)
+                return responses

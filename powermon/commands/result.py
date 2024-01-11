@@ -26,25 +26,24 @@ class ResultType(Enum):
 class Result:
     """
     object to contain all the info of a result, including
-    - command definition
-    - 'raw response' from the device (also the trimmed version)
+    - command definition <- should this be the command object???
+    - 'raw response' from the device
     - list of Readings (processed results)
     """
     def __str__(self):
         return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, " + \
         ','.join(str(reading) for reading in self._readings)
 
-    def __init__(self, result_type: ResultType, command_definition, raw_response: bytes, trimmed_response: bytes):
-        self.raw_response = raw_response
-        self.trimmed_response = trimmed_response
-
+    def __init__(self, result_type: ResultType, command_definition, raw_response: bytes, responses: list | dict):
         self.is_valid = True
         self.error = False
         self.error_messages = []
 
         self.result_type = result_type
         self.command_definition = command_definition
-        self.readings: list[Reading] = trimmed_response
+
+        self.raw_response = raw_response
+        self.readings: list[Reading] = responses
 
         log.debug("Result: %s", self)
 
@@ -58,15 +57,6 @@ class Result:
         if value is None:
             raise ValueError("raw_response cannot be None")
         self._raw_response = value
-
-    @property
-    def trimmed_response(self):
-        """ the raw_response trimmed of unneeded bits """
-        return self._trimmed_response
-
-    @trimmed_response.setter
-    def trimmed_response(self, value):
-        self._trimmed_response = value
 
     @property
     def result_type(self):
@@ -87,59 +77,50 @@ class Result:
         return self._readings
 
     @readings.setter
-    def readings(self, trimmed_response):
-        self._readings = self.decode_response(response=trimmed_response)
+    def readings(self, responses):
+        self._readings = self.decode_responses(responses=responses)
 
-    def add_readings(self, responses: list[Reading]) -> bool:
+    def add_readings(self, readings: list[Reading]) -> bool:
         """ add a list of readings to the current list """
-        self._readings.extend(responses)
+        self._readings.extend(readings)
         return True
 
-    # If we split results into different types then each type can have its own decode_response
-    def decode_response(self, response) -> list[Reading]:
+    def decode_responses(self, responses=None) -> list[Reading]:
         """
         Take the response and decode into a list of Readings depending on the result type
         """
-
-        log.info("result.response passed to decode: %s, result_type %s", response, self.result_type)
-
+        log.info("result.response passed to decode: %s, result_type %s", responses, self.result_type)
         all_readings : list[Reading] = []
+
+        if responses is None:
+            return all_readings
 
         # Process response based on result type
         match self.result_type:
-            case ResultType.SINGLE:
-                reading_definition: ReadingDefinition = self.command_definition.reading_definitions[0]
-                readings = self.readings_from_response(response, reading_definition)
-                all_readings.extend(readings)
-            case ResultType.ACK:
-                reading_definition: ReadingDefinition = self.command_definition.reading_definitions[0]
-                readings = self.readings_from_response(response, reading_definition)
+            case ResultType.ACK | ResultType.SINGLE | ResultType.MULTIVALUED:
+                # Get the reading definition (theres only one)
+                reading_definition: ReadingDefinition = self.command_definition.get_reading_definition()
+                # Process the response using the reading_definition, into readings
+                readings = self.readings_from_response(responses, reading_definition)
                 all_readings.extend(readings)
             case ResultType.ORDERED:
                 # Response is splitable and order of each item determines decode logic
-                for i, _raw_response in enumerate(self.split_responses(response)):
+                for i, _raw_response in enumerate(responses):
                     log.debug("ResultType.ORDERED, i: %s, _raw_response: %s", i, _raw_response)
                     readings = self.validate_and_translate_raw_value(_raw_response, index=i)
                     all_readings.extend(readings)
             case ResultType.MULTIVALUED:
                 # while response has multiple values, the all relate to a single result
-                readings = self.validate_and_translate_raw_value(response, index=0)
+                readings = self.validate_and_translate_raw_value(responses, index=0)
                 all_readings.extend(readings)
             case ResultType.ERROR:
-                readings = self.validate_and_translate_raw_value(response, index=0)
+                readings = self.validate_and_translate_raw_value(responses, index=0)
                 all_readings.extend(readings)
             case _:
                 # unknown result type
                 raise ValueError(f"Unknown result type: {self.result_type}")
         log.debug("got readings: %s", ",".join(str(i) for i in all_readings))
         return all_readings
-
-    def split_responses(self, response) -> list:
-        """
-        Default implementation of split and trim
-        """
-        # CRC should be removed by protocol, so just split split
-        return response.split(None)  # split differs by protocol
 
     def readings_from_response(self, response, reading_definition) -> Reading:
         """ return readings from a raw_response using the supplied reading definition """
@@ -150,7 +131,6 @@ class Result:
                             data_value=reading_definition.get_invalid_message(response), data_unit="")
             error.is_valid = False
             return [error]
-
 
     def validate_and_translate_raw_value(self, raw_value: str, index: int) -> list[Reading]:
         if len(self.command_definition.reading_definitions) <= index:
