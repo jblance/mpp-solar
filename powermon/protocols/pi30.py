@@ -4,6 +4,7 @@ import logging
 from mppsolar.protocols.protocol_helpers import crcPI as crc
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
+from powermon.errors import InvalidCRC
 from powermon.protocols.abstractprotocol import AbstractProtocol
 
 log = logging.getLogger("pi30")
@@ -717,11 +718,12 @@ class PI30(AbstractProtocol):
         self.protocol_id = b"PI30"
         self.add_command_definitions(QUERY_COMMANDS)
         self.add_command_definitions(SETTER_COMMANDS, result_type=ResultType.ACK)
+        self.check_definitions_count(expected=44)
         self.STATUS_COMMANDS = ["QPIGS", "Q1"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
         self.ID_COMMANDS = ["QPI", "QGMN", "QMN"]
-        self.check_definitions_count()
+        
 
     def check_crc(self, response: str):
         """ crc check, needs override in protocol """
@@ -730,8 +732,7 @@ class PI30(AbstractProtocol):
         calc_crc_high, calc_crc_low = crc(response[:-3])
         crc_high, crc_low = response[-3], response[-2]
         if [calc_crc_high, calc_crc_low] != [crc_high, crc_low]:
-            log.warning(f"response has invalid CRC - got '\\x{crc_high:02x}\\x{crc_low:02x}', \
+            raise InvalidCRC(f"response has invalid CRC - got '\\x{crc_high:02x}\\x{crc_low:02x}', \
                 calculated '\\x{calc_crc_high:02x}\\x{calc_crc_low:02x}'", )
-            return False
         log.debug("CRCs match")
         return True
