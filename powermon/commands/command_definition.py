@@ -10,11 +10,18 @@ log = logging.getLogger("CommandDefinition")
 
 
 class CommandDefinition:
-    """ object the contains the definition and other metadata about a command """
+    """ object the contains the definition and other metadata about a command, including: 
+    - code
+    - regex (opt)
+    - description
+    - result type
+    - reading definitions
+    - test responses
+    """
     def __str__(self):
         return f"CommandDefinition: {self.code=}, {self.description=}, {self.result_type=}"
 
-    def __init__(self, code, description, help_text: str, result_type : ResultType, reading_definitions, test_responses: list = [], regex: str = None):
+    def __init__(self, code, description, help_text: str, result_type : ResultType, reading_definitions, test_responses: list = None, regex: str = None):
         """ init CommandDefinition class """
         if reading_definitions is None or len(reading_definitions) == 0:
             raise ValueError(f"reading definitions cannot be None for command_code: {code}")
@@ -72,8 +79,21 @@ class CommandDefinition:
             return self.code == command_code
         return re.match(self.regex, command_code) is not None
 
-    def get_response_definition_count(self) -> int:
-        """ return the number of reading definitions """
+    # def get_response_definition_count(self) -> int:
+    #     """ return the number of reading definitions """
+    #     if self.reading_definitions is None:
+    #         return 0
+    #     return len(self.reading_definitions)
+
+    def get_reading_definition(self, lookup=None):
+        """ return the reading definition that corresponds to lookup """
+        log.debug("looking for reading definition with: %s, result_type is: %s", lookup, self.result_type)
         if self.reading_definitions is None:
-            return 0
-        return len(self.reading_definitions)
+            return None
+        match self.result_type:
+            case ResultType.ACK | ResultType.SINGLE | ResultType.MULTIVALUED:
+                return self.reading_definitions[0]
+            case _:
+                print(f"no get_reading_definition for {self.result_type=}")
+                exit()
+        return None
