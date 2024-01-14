@@ -25,7 +25,7 @@ class ApiMqtt(AbstractOutput):
     def get_topic(self) -> str:
         return CommandDTO.get_command_result_topic().format(device_id=self.device_id, command_name=self.command_code)
 
-    def process(self, result: Result, mqtt_broker=None, device_info=None):
+    def process(self, command=None, result: Result=None, mqtt_broker=None, device_info=None):
         # exit if no data
         if result.raw_response is None:
             return
@@ -39,8 +39,8 @@ class ApiMqtt(AbstractOutput):
         mqtt_broker.publish(self.get_topic(), result_dto.json())
 
     @classmethod
-    def from_DTO(cls, dto: OutputDTO) -> "ApiMqtt":
-        formatter = SimpleFormat.from_DTO(dto.format)
+    def from_dto(cls, dto: OutputDTO) -> "ApiMqtt":
+        formatter = SimpleFormat.from_dto(dto.format)
         api_mqtt = cls()
         api_mqtt.set_formatter(formatter)
 

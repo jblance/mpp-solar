@@ -84,8 +84,8 @@ class ApiCoordinator:
 
         dto = CommandDTO.parse_raw(json_string)
 
-        trigger = Trigger.from_DTO(dto.trigger)
-        command = Command.from_DTO(dto)
+        trigger = Trigger.from_dto(dto.trigger)
+        command = Command.from_dto(dto)
         Command(code=dto.command_code, commandtype="basic", outputs=[], trigger=trigger)
         outputs = []
 
@@ -93,8 +93,8 @@ class ApiCoordinator:
         output.set_formatter(SimpleFormat({}))
         outputs.append(output)
 
-        command.set_outputs(outputs=outputs)
-        command.set_mqtt_broker(self.mqtt_broker)
+        command.outputs = outputs
+        command.mqtt_broker = self.mqtt_broker
 
         self.device.add_command(command)
 

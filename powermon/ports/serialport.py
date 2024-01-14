@@ -17,7 +17,7 @@ class SerialPort(AbstractPort):
     """ serial port object - normally a usb to serial adapter """
 
     def __str__(self):
-        return f"SerialPort: {self.path=}, {self.baud=}, protocol:{self.protocol}, {self.serial_port=}, {self.error=}"
+        return f"SerialPort: {self.path=}, {self.baud=}, protocol:{self.protocol}, {self.serial_port=}, {self.error_message=}"
 
     @classmethod
     def from_config(cls, config=None):
@@ -33,10 +33,10 @@ class SerialPort(AbstractPort):
         self.path = path
         self.baud = baud
         self.serial_port = None
-        self.error = None
+        # self.error_message = None
 
     def to_dto(self) -> PortDTO:
-        dto = PortDTO(type="serial", path=self.path, baud=self.baud, protocol=self.protocol.toDTO())
+        dto = PortDTO(type="serial", path=self.path, baud=self.baud, protocol=self.protocol.to_dto())
         return dto
 
     def is_connected(self):
@@ -48,11 +48,11 @@ class SerialPort(AbstractPort):
             self.serial_port = serial.Serial(port=self.path, baudrate=self.baud, timeout=1, write_timeout=1)
         except ValueError as e:
             log.error("Incorrect configuration for serial port: %s", e)
-            self.error = str(e)
+            self.error_message = str(e)
             self.serial_port = None
         except serial.SerialException as e:
             log.error("Error opening serial port: %s", e)
-            self.error = str(e)
+            self.error_message = str(e)
             self.serial_port = None
         return 0
 
