@@ -95,7 +95,7 @@ class SerialPortConfig(BaseModel):
     """ model/allowed elements for serial port config """
     type: Literal["serial"]
     path: str
-    baud: None | int
+    baud: None | int  = Field(default=None)
     protocol: None | str
 
 

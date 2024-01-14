@@ -133,7 +133,7 @@ class ReadingDefinition():
                     result = int(raw_value.decode('utf-8'))
                     return result
                 except ValueError as e:
-                    if self.default: 
+                    if self.default:
                         return self.default
                     raise ValueError(f"For Reading Defininition '{self.description}', expected an INT, got {raw_value}") from e
             case ResponseType.FLOAT:
@@ -340,8 +340,8 @@ class ReadingDefinitionTemperature(ReadingDefinitionNumeric):
     """ ReadingDefinition for temperature readings - will include translation eg celcius to fahrenheit """
     def __init__(self, index: int, description: str, response_type: ResponseType,
                 device_class: str = None, state_class: str = None, icon: str = None):
-        # TODO: find a way to make the unit configurable
         super().__init__(index, response_type, description, device_class, state_class, icon)
+        # TODO: find a way to make the unit configurable
         self.unit="°C"
 
 
