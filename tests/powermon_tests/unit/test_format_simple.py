@@ -59,6 +59,7 @@ class test_formats_simple(unittest.TestCase):
         _result = Result(result_type=ResultType.SINGLE, raw_response=b"(238800\xcd\xcd\r", command_definition=command_definition, trimmed_response=b"238800")
         
         formatted_data = simple_formatter.format(_result, device_info)
+        print(formatted_data)
         
         self.assertEqual(formatted_data, expected)
         

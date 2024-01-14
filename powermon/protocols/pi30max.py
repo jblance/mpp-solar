@@ -16,7 +16,9 @@ NEW_QUERY_COMMANDS = {
         "description": "Device Serial Number inquiry",
         "help": " -- queries the device serial number (length greater than 14)",
         "result_type": ResultType.SINGLE,
-        "reading_definitions": [{"description": "Serial Number", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.TEMPLATE_BYTES, "format_template" : "r[2:int(r[0:2])+2]", "icon": "mdi:identifier"}],
+        "reading_definitions": [{"description": "Serial Number",
+                                    "reading_type": ReadingType.MESSAGE, "icon": "mdi:identifier",
+                                    "response_type": ResponseType.TEMPLATE_BYTES, "format_template" : "r[2:int(r[0:2])+2]"}],
         "test_responses": [b"(1492932105105335005535\x94\x0e\r", ],
     },
     "QVFW3": {
@@ -167,25 +169,43 @@ NEW_QUERY_COMMANDS = {
         "description": "General Status Parameters inquiry",
         "result_type": ResultType.ORDERED,
         "reading_definitions": [
-            {"description": "AC Input Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:transmission-tower-export", "device-class": "voltage"},
-            {"description": "AC Input Frequency", "reading_type": ReadingType.FREQUENCY, "response_type": ResponseType.FLOAT, "icon": "mdi:current-ac", "device-class": "frequency"},
+            {"description": "AC Input Voltage",
+                "reading_type": ReadingType.VOLTS, "icon": "mdi:transmission-tower-export", "device-class": "voltage",
+                "response_type": ResponseType.FLOAT},
+            {"description": "AC Input Frequency", "reading_type": ReadingType.FREQUENCY,
+                "response_type": ResponseType.FLOAT,
+                "icon": "mdi:current-ac", "device-class": "frequency"},
             {"description": "AC Output Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:power-plug", "device-class": "voltage"},
-            {"description": "AC Output Frequency", "reading_type": ReadingType.FREQUENCY, "response_type": ResponseType.FLOAT, "icon": "mdi:current-ac", "device-class": "frequency"},
-            {"description": "AC Output Apparent Power", "reading_type": ReadingType.APPARENT_POWER, "response_type": ResponseType.INT, "icon": "mdi:power-plug", "device-class": "apparent_power"},
-            {"description": "AC Output Active Power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.INT, "icon": "mdi:power-plug", "device-class": "power", "state_class": "measurement"},
+            {"description": "AC Output Frequency",
+                "reading_type": ReadingType.FREQUENCY, "icon": "mdi:current-ac", "device-class": "frequency",
+                "response_type": ResponseType.FLOAT},
+            {"description": "AC Output Apparent Power",
+                "reading_type": ReadingType.APPARENT_POWER, "icon": "mdi:power-plug", "device-class": "apparent_power",
+                "response_type": ResponseType.INT},
+            {"description": "AC Output Active Power",
+                "reading_type": ReadingType.WATTS, "icon": "mdi:power-plug", "device-class": "power", "state_class": "measurement",
+                "response_type": ResponseType.INT},
             {"description": "AC Output Load", "reading_type": ReadingType.PERCENTAGE, "response_type": ResponseType.INT, "icon": "mdi:brightness-percent"},
             {"description": "BUS Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.INT, "icon": "mdi:details", "device-class": "voltage"},
             {"description": "Battery Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:battery-outline", "device-class": "voltage"},
-            {"description": "Battery Charging Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT, "icon": "mdi:current-dc", "device-class": "current"},
+            {"description": "Battery Charging Current",
+                "reading_type": ReadingType.CURRENT, "icon": "mdi:current-dc", "device-class": "current",
+                "response_type": ResponseType.INT},
             {"description": "Battery Capacity", "reading_type": ReadingType.PERCENTAGE, "response_type": ResponseType.INT, "device-class": "battery"},
-            {"description": "Inverter Heat Sink Temperature", "reading_type": ReadingType.TEMPERATURE, "response_type": ResponseType.INT, "icon": "mdi:details", "device-class": "temperature"},
+            {"description": "Inverter Heat Sink Temperature",
+                "reading_type": ReadingType.TEMPERATURE, "icon": "mdi:details", "device-class": "temperature",
+                "response_type": ResponseType.INT},
             {"description": "PV1 Input Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.FLOAT, "icon": "mdi:solar-power", "device-class": "current"},
             {"description": "PV1 Input Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:solar-power", "device-class": "voltage"},
-            {"description": "Battery Voltage from SCC", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:battery-outline", "device-class": "voltage"},
-            {"description": "Battery Discharge Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT, "icon": "mdi:battery-negative", "device-class": "current"},
-            {
-                "description": "Device Status",
-                "reading_type": ReadingType.FLAGS, "response_type": ResponseType.FLAGS,
+            {"description": "Battery Voltage from SCC",
+                "reading_type": ReadingType.VOLTS, "icon": "mdi:battery-outline", "device-class": "voltage",
+                "response_type": ResponseType.FLOAT},
+            {"description": "Battery Discharge Current",
+                "reading_type": ReadingType.CURRENT, "icon": "mdi:battery-negative", "device-class": "current",
+                "response_type": ResponseType.INT},
+            {"description": "Device Status",
+                "reading_type": ReadingType.FLAGS,
+                "response_type": ResponseType.FLAGS,
                 "flags": [
                     "Is SBU Priority Version Added",
                     "Is Configuration Changed",
@@ -195,14 +215,17 @@ NEW_QUERY_COMMANDS = {
                     "Is Charging On",
                     "Is SCC Charging On",
                     "Is AC Charging On",
-                ],
-            },
+                ]},
             {"description": "Battery Voltage Offset for Fans On (10mV)", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.INT},
             {"description": "EEPROM Version",  "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
-            {"description": "PV1 Charging Power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.INT, "icon": "mdi:solar-power", "device-class": "power", "state_class": "measurement"},
-            {"description": "Device Status2", "reading_type": ReadingType.FLAGS, "response_type": ResponseType.FLAGS, "flags": ["Is Charging to Float", "Is Switched On", "Is Dustproof Installed"]},
+            {"description": "PV1 Charging Power",
+                "reading_type": ReadingType.WATTS, "icon": "mdi:solar-power", "device-class": "power", "state_class": "measurement",
+                "response_type": ResponseType.INT},
+            {"description": "Device Status2",
+                "reading_type": ReadingType.FLAGS, 
+                "response_type": ResponseType.FLAGS, "flags": ["Is Charging to Float", "Is Switched On", "Is Dustproof Installed"]},
             {"description": "Solar Feed to Grid",  "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Disabled", "Enabled"]},
-            {"description": "Country", 
+            {"description": "Country",
                 "reading_type": ReadingType.MESSAGE, 
                 "response_type": ResponseType.OPTION, 
                 "options": {
@@ -211,7 +234,9 @@ NEW_QUERY_COMMANDS = {
                     "02": "South America",
                 },
             },
-            {"description": "Solar Feed to Grid Power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.INT, "icon": "mdi:solar-power", "device-class": "power", "state_class": "measurement"},
+            {"description": "Solar Feed to Grid Power",
+                "reading_type": ReadingType.WATTS, "icon": "mdi:solar-power", "device-class": "power", "state_class": "measurement",
+                "response_type": ResponseType.INT},
         ],
         "test_responses": [
             b"(227.2 50.0 230.3 50.0 0829 0751 010 447 54.50 020 083 0054 02.7 323.6 00.00 00000 00010110 00 00 00879 010\xf1\x8c\r",
@@ -220,9 +245,6 @@ NEW_QUERY_COMMANDS = {
     },
 }
 QUERY_COMMANDS = {
-    
-    
-    
     "QPIGS2": {
         "name": "QPIGS2",
         "description": "General Status Parameters inquiry 2",
@@ -874,7 +896,10 @@ class PI30MAX(PI30):
         self.add_command_definitions(SETTER_COMMANDS, result_type=ResultType.ACK)
         # remove and unwanted pi30 commands
         self.remove_command_definitions(COMMANDS_TO_REMOVE)
+        # check for valid load of definitions
+        self.check_definitions_count(expected=52)
+
         self.STATUS_COMMANDS = ["QPIGS", "QPIGS2"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
-        self.check_definitions_count()
+        

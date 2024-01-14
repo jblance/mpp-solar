@@ -6,16 +6,26 @@ device:
   manufacturer: MPP-Solar
   port:
     type: test
-    path: /dev/ttyUSB0
-    response_number: 1
-    protocol: PI30MAX
+    # path: /dev/ttyUSB0
+    # response_number: 1
+    protocol: PI30
 
 commands:
-# - command: QMCHGCR
-#   outputs:
-#   - type: screen
-#     format: raw
 - command: QPIGS
+  outputs:
+  - type: screen
+    format: 
+      type: table
+      draw_lines: True
+      extra_info: True
+- command: QMCHGCR
+  outputs:
+  - type: screen
+    format: 
+      type: table
+      draw_lines: True
+      extra_info: True
+- command: F50
   override:
     temperature: F
     pv1_charging_power:
