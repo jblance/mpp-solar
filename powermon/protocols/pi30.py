@@ -465,6 +465,7 @@ QUERY_COMMANDS = {
                     "B": "Battery Mode",
                     "F": "Fault Mode",
                     "H": "Power Saving Mode",
+                    "Y": "Bypass",
                 },
             },
             {

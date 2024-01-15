@@ -513,6 +513,7 @@ QUERY_COMMANDS = {
                     "B": "Battery",
                     "F": "Fault",
                     "H": "Power saving",
+                    "Y": "Bypass",
                 },
             ]
         ],
