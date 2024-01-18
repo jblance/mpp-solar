@@ -11,7 +11,7 @@ device:
     protocol: PI30MAX
 
 commands:
-- command: QEY2021
+- command: QCHPT
   outputs:
   - type: screen
     format: 

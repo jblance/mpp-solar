@@ -25,8 +25,8 @@ class ResponseType(LowercaseStrEnum):
     ENABLE_DISABLE_FLAGS = auto()
     FLAGS = auto()
     INFO = auto()
-    INFO_FROM_COMMAND = auto()
-    TEMPLATE_BYTES = auto()
+    INFO_FROM_COMMAND = auto()  # process the supplied command using a template
+    TEMPLATE_BYTES = auto()  # process the response value using a template
 
 
 class ReadingType(LowercaseStrEnum):
@@ -43,9 +43,13 @@ class ReadingType(LowercaseStrEnum):
     VOLTS = auto()
     DATE_TIME = auto()
     YEAR = auto()
+    MONTH = auto()
+    DAY = auto()
     TIME = auto()
     TIME_SECONDS = auto()
     TIME_MINUTES = auto()
+    TIME_HOURS = auto()
+    TIME_DAYS = auto()
     MESSAGE = auto()
     MESSAGE_AMPS = auto()
     FLAGS = auto()
@@ -163,7 +167,7 @@ class ReadingDefinition():
             case ResponseType.INFO_FROM_COMMAND:
                 cn = raw_value
                 if self.format_template:
-                    print(self.format_template)
+                    # print(self.format_template)
                     res = eval(self.format_template)  # pylint: disable=W0123
                     return res
                 return cn
@@ -194,13 +198,13 @@ class ReadingDefinition():
         return False
 
     @classmethod
-    def multiple_from_config(cls, reading_definitions_config: list[dict]) -> dict[int, "ReadingDefinition"]:
+    def multiple_from_config(cls, reading_definition_configs: list[dict]) -> dict[int, "ReadingDefinition"]:
         """ build list of reading definitions from config """
-        if reading_definitions_config is None:
+        if reading_definition_configs is None:
             return {}
         else:
             reading_definitions: dict[int, "ReadingDefinition"] = {}
-            for i, reading_definition_config in enumerate(reading_definitions_config):
+            for i, reading_definition_config in enumerate(reading_definition_configs):
                 reading_definition = cls.from_config(reading_definition_config, i)
                 log.debug("reading definition: %s", reading_definition)
                 reading_definitions[reading_definition.index] = reading_definition
@@ -257,6 +261,14 @@ class ReadingDefinition():
                 reading = ReadingDefinitionMessage(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
+            case ReadingType.MONTH:
+                reading = ReadingDefinitionMessage(
+                    index=index, response_type=response_type, description=description,
+                    device_class=device_class, state_class=state_class, icon=icon)
+            case ReadingType.DAY:
+                reading = ReadingDefinitionMessage(
+                    index=index, response_type=response_type, description=description,
+                    device_class=device_class, state_class=state_class, icon=icon)
             case ReadingType.TIME_SECONDS:
                 reading =  ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
@@ -267,6 +279,16 @@ class ReadingDefinition():
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
                 reading.unit = "min"
+            case ReadingType.TIME_HOURS:
+                reading =  ReadingDefinitionNumeric(
+                    index=index, response_type=response_type, description=description,
+                    device_class=device_class, state_class=state_class, icon=icon)
+                reading.unit = "hours"
+            case ReadingType.TIME_DAYS:
+                reading =  ReadingDefinitionNumeric(
+                    index=index, response_type=response_type, description=description,
+                    device_class=device_class, state_class=state_class, icon=icon)
+                reading.unit = "days"
             case ReadingType.FLAGS:
                 flags = reading_definition_config.get("flags")
                 reading =  ReadingDefinitionFlags(
