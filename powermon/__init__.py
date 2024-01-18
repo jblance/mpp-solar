@@ -11,14 +11,14 @@ from platform import python_version
 import yaml
 from pydantic import ValidationError
 
-from powermon.version import __version__  # noqa: F401
 from powermon.commands.command import Command
-from powermon.config.config_model import ConfigModel
+from powermon.config_model import ConfigModel
 from powermon.device import Device
 from powermon.libs.apicoordinator import ApiCoordinator
 from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
 from powermon.protocols import list_protocols
+from powermon.version import __version__  # noqa: F401
 
 # Set-up logger
 log = logging.getLogger("")
