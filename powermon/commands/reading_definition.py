@@ -40,6 +40,8 @@ class ReadingType(LowercaseStrEnum):
     WATTS = auto()
     WATT_HOURS = auto()
     VOLTS = auto()
+    DATE_TIME = auto()
+    YEAR = auto()
     TIME = auto()
     TIME_SECONDS = auto()
     TIME_MINUTES = auto()
@@ -237,6 +239,14 @@ class ReadingDefinition():
                     device_class=device_class, state_class=state_class, icon=icon)
             case ReadingType.MULTI_ENABLE_DISABLE:
                 reading =  ReadingDefinitionENFlags(
+                    index=index, response_type=response_type, description=description,
+                    device_class=device_class, state_class=state_class, icon=icon)
+            case ReadingType.DATE_TIME:  # TODO: fix this to process date_time into locale based date time
+                reading = ReadingDefinitionMessage(
+                    index=index, response_type=response_type, description=description,
+                    device_class=device_class, state_class=state_class, icon=icon)
+            case ReadingType.YEAR:
+                reading = ReadingDefinitionMessage(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
             case ReadingType.TIME_SECONDS:
