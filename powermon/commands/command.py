@@ -99,12 +99,8 @@ class Command():
         trimmed_response = protocol.trim_response(raw_response)
         # split response
         responses = protocol.split_response(trimmed_response, self.command_definition)
-        result = Result(
-            result_type=self.command_definition.result_type,
-            command_definition=self.command_definition,
-            raw_response=raw_response,
-            responses=responses
-        )
+        # build the Result object
+        result = Result(command=self, raw_response=raw_response, responses=responses)
         return result
 
     @property
