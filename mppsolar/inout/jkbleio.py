@@ -1,3 +1,4 @@
+""" mppsolar / inout / jkbleio.py """
 import logging
 
 try:
@@ -90,9 +91,12 @@ class JkBleIO(BaseIO):
             return self.record
 
         # Get the device name
-        serviceId = self._device.getServiceByUUID(btle.AssignedNumbers.genericAccess)
-        deviceName = serviceId.getCharacteristics(btle.AssignedNumbers.deviceName)[0]
-        log.info("Connected to {}".format(deviceName.read()))
+        try:
+            serviceId = self._device.getServiceByUUID(btle.AssignedNumbers.genericAccess)
+            deviceName = serviceId.getCharacteristics(btle.AssignedNumbers.deviceName)[0]
+            log.info("Connected to {}".format(deviceName.read()))
+        except btle.BTLEGattError as e:
+            log.warning(f"Error getting device name: {e}")
 
         # Connect to the notify service
         serviceNotifyUuid = "ffe0"
@@ -115,15 +119,15 @@ class JkBleIO(BaseIO):
         # ## TODO sort below
         # Need to dynamically find this handle....
         log.info(
-            "Enable 0x0b handle", self._device.writeCharacteristic(0x0B, b"\x01\x00")
+            "Enable 0x0b handle %s", self._device.writeCharacteristic(0x0B, b"\x01\x00")
         )
         log.info(
-            "Enable read handle",
-            self._device.writeCharacteristic(handleRead, b"\x01\x00"),
+            "Enable read handle %s",
+            self._device.writeCharacteristic(handleRead, b"\x01\x00")
         )
         log.info(
-            "Write getInfo to read handle",
-            self._device.writeCharacteristic(handleRead, getInfo),
+            "Write getInfo to read handle %s",
+            self._device.writeCharacteristic(handleRead, getInfo)
         )
         secs = 0
         while True:
