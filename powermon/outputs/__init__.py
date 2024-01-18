@@ -26,15 +26,15 @@ def getOutputClass(output_type, formatter, output_config={}):
     if output_type == OutputType.MQTT:
         from powermon.outputs.mqtt import MQTT
         output_class = MQTT.from_config(output_config)
-        output_class.set_formatter(formatter)
+        output_class.formatter = formatter
     elif output_type == OutputType.API_MQTT:
         from powermon.outputs.api_mqtt import ApiMqtt
         output_class = ApiMqtt.from_config(output_config)
-        output_class.set_formatter(formatter)
+        output_class.formatter = formatter
     else:
         from powermon.outputs.screen import Screen
         output_class = Screen.from_config(output_config)
-        output_class.set_formatter(formatter)
+        output_class.formatter = formatter
     return output_class
 
 
