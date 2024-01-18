@@ -79,13 +79,7 @@ class CommandDefinition:
             return self.code == command_code
         return re.match(self.regex, command_code) is not None
 
-    # def get_response_definition_count(self) -> int:
-    #     """ return the number of reading definitions """
-    #     if self.reading_definitions is None:
-    #         return 0
-    #     return len(self.reading_definitions)
-
-    def get_reading_definition(self, lookup=None) -> ReadingDefinition:
+    def get_reading_definition(self, lookup=None, position=0) -> ReadingDefinition:
         """ return the reading definition that corresponds to lookup """
         log.debug("looking for reading definition with: %s, result_type is: %s", lookup, self.result_type)
         if self.reading_definitions is None:
@@ -93,7 +87,13 @@ class CommandDefinition:
         match self.result_type:
             case ResultType.ACK | ResultType.SINGLE | ResultType.MULTIVALUED:
                 return self.reading_definitions[0]
+            case ResultType.ORDERED:
+                return self.reading_definitions[position]
             case _:
                 print(f"no get_reading_definition for {self.result_type=}")
                 exit()
         return None
+
+    def reading_definition_count(self) -> int:
+        """ return the number of reading_definitions for this command_definition """
+        return 0 if self.reading_definitions is None else len(self.reading_definitions)

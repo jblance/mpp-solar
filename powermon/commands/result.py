@@ -34,13 +34,15 @@ class Result:
         return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, " + \
         ','.join(str(reading) for reading in self._readings)
 
-    def __init__(self, result_type: ResultType, command_definition, raw_response: bytes, responses: list | dict):
+    # def __init__(self, result_type: ResultType, command_definition, raw_response: bytes, responses: list | dict):
+    def __init__(self, command, raw_response: bytes, responses: list | dict):
         self.is_valid = True
         self.error = False
         self.error_messages = []
 
-        self.result_type = result_type
-        self.command_definition = command_definition
+        self.result_type = command.command_definition.result_type
+        self.command_definition = command.command_definition
+        self.command = command
 
         self.raw_response = raw_response
         self.readings: list[Reading] = responses
@@ -98,21 +100,28 @@ class Result:
         # Process response based on result type
         match self.result_type:
             case ResultType.ACK | ResultType.SINGLE | ResultType.MULTIVALUED:
-                # Get the reading definition (theres only one)
+                # Get the reading definition (there is only one)
                 reading_definition: ReadingDefinition = self.command_definition.get_reading_definition()
                 # Process the response using the reading_definition, into readings
                 readings = self.readings_from_response(responses, reading_definition)
                 all_readings.extend(readings)
             case ResultType.ORDERED:
-                # Response is splitable and order of each item determines decode logic
-                for i, _raw_response in enumerate(responses):
-                    log.debug("ResultType.ORDERED, i: %s, _raw_response: %s", i, _raw_response)
-                    readings = self.validate_and_translate_raw_value(_raw_response, index=i)
-                    all_readings.extend(readings)
-            case ResultType.MULTIVALUED:
-                # while response has multiple values, the all relate to a single result
-                readings = self.validate_and_translate_raw_value(responses, index=0)
-                all_readings.extend(readings)
+                # Have a list of reading_definitions and a list of responses that correspond to each other
+                # possibly additional INFO definitions (at end of definition list??)
+                definition_count = self.command_definition.reading_definition_count()
+                response_count = len(responses)
+                for position in range(definition_count):
+                    reading_definition: ReadingDefinition = self.command_definition.get_reading_definition(position=position)
+                    # print(reading_definition)
+                    if position < response_count:
+                        readings = self.readings_from_response(responses[position], reading_definition)
+                        all_readings.extend(readings)
+                    else:
+                        # More definitions than results, either INFO type definitions or too little data
+                        if reading_definition.response_type == ResponseType.INFO_FROM_COMMAND:
+                            # INFO is contained in supplied command eg QEY2023 -> 2023
+                            readings = self.readings_from_response(self.command.code, reading_definition)
+                            all_readings.extend(readings)
             case ResultType.ERROR:
                 readings = self.validate_and_translate_raw_value(responses, index=0)
                 all_readings.extend(readings)
@@ -122,7 +131,7 @@ class Result:
         log.debug("got readings: %s", ",".join(str(i) for i in all_readings))
         return all_readings
 
-    def readings_from_response(self, response, reading_definition) -> Reading:
+    def readings_from_response(self, response, reading_definition) -> list[Reading]:
         """ return readings from a raw_response using the supplied reading definition """
         try:
             return reading_definition.reading_from_raw_response(response)
