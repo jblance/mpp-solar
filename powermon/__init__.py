@@ -32,9 +32,9 @@ def read_yaml_file(yaml_file=None):
             with open(yaml_file, "r", encoding="utf-8") as stream:
                 _yaml = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
-            log.error("Error processing yaml file: %s", exc)
+            raise yaml.YAMLError(f"Error processing yaml file: {exc}") from exc
         except FileNotFoundError as exc:
-            log.error("Error opening yaml file: %s", exc)
+            raise FileNotFoundError(f"Error opening yaml file: {exc}") from exc
     return _yaml
 
 
