@@ -25,6 +25,7 @@ class ResponseType(LowercaseStrEnum):
     ENABLE_DISABLE_FLAGS = auto()
     FLAGS = auto()
     INFO = auto()
+    INFO_FROM_COMMAND = auto()
     TEMPLATE_BYTES = auto()
 
 
@@ -159,6 +160,13 @@ class ReadingDefinition():
                     res = eval(self.format_template)  # pylint: disable=W0123
                     return res
                 return r
+            case ResponseType.INFO_FROM_COMMAND:
+                cn = raw_value
+                if self.format_template:
+                    print(self.format_template)
+                    res = eval(self.format_template)  # pylint: disable=W0123
+                    return res
+                return cn
             case _:
                 return raw_value.decode('utf-8')
 
