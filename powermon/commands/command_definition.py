@@ -85,7 +85,7 @@ class CommandDefinition:
     #         return 0
     #     return len(self.reading_definitions)
 
-    def get_reading_definition(self, lookup=None):
+    def get_reading_definition(self, lookup=None) -> ReadingDefinition:
         """ return the reading definition that corresponds to lookup """
         log.debug("looking for reading definition with: %s, result_type is: %s", lookup, self.result_type)
         if self.reading_definitions is None:

@@ -110,7 +110,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             raise ValueError("Attempted to list commands with no protocol defined")
         return self.command_definitions
 
-    def get_full_command(self, command) -> bytes:
+    def get_full_command(self, command: str) -> bytes:
         """ generate the full command including crc and \n as needed """
         log.info("Using protocol: %s with %i commands", self._protocol_id, len(self.command_definitions))
         byte_cmd = bytes(command, "utf-8")
