@@ -8,6 +8,7 @@ from powermon.commands.result import Result, ResultType
 from powermon.commands.reading_definition import ReadingDefinition, ReadingType, ResponseType
 from powermon.commands.command_definition import CommandDefinition
 
+
 class test_formats_simple(unittest.TestCase):
     
     def test_simple_format_no_extra(self):
