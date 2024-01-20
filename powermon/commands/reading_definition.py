@@ -217,7 +217,7 @@ class ReadingDefinition():
         description = reading_definition_config.get("description")
         response_type = reading_definition_config.get("response_type")
         reading_type = reading_definition_config.get("reading_type")
-        device_class = reading_definition_config.get("device-class", None)  # TODO: fixme change to device_class
+        device_class = reading_definition_config.get("device_class", None)
         state_class = reading_definition_config.get("state_class", None)
         icon = reading_definition_config.get("icon", None)
 

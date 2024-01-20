@@ -15,7 +15,7 @@ class test_formats_simple(unittest.TestCase):
         simple_formatter = SimpleFormat({})
         
         device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
-        reading_definition = ReadingDefinition.from_config({"description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device-class": "energy", "state_class": "total"},0)
+        reading_definition = ReadingDefinition.from_config({"description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device_class": "energy", "state_class": "total"},0)
         command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
         command = Command.from_config({"command":"CODE"})
         command.command_definition = command_definition
@@ -32,7 +32,7 @@ class test_formats_simple(unittest.TestCase):
         simple_formatter = SimpleFormat({"extra_info": True})
         
         device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
-        reading_definition = ReadingDefinition.from_config({"description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "device-class": "energy"},0)
+        reading_definition = ReadingDefinition.from_config({"description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "device_class": "energy"},0)
         command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
         command = Command.from_config({"command":"CODE"})
         command.command_definition = command_definition
@@ -64,7 +64,7 @@ class test_formats_simple(unittest.TestCase):
         simple_formatter = SimpleFormat({"extra_info": True})
         
         device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
-        reading_definition = ReadingDefinition.from_config({"description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device-class": "energy", "state_class": "total"},0)
+        reading_definition = ReadingDefinition.from_config({"description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device_class": "energy", "state_class": "total"},0)
         command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
         command = Command.from_config({"command":"CODE"})
         command.command_definition = command_definition
@@ -81,8 +81,8 @@ class test_formats_simple(unittest.TestCase):
                     "test2=28.0°C"]
         simple_formatter = SimpleFormat({})
         
-        reading_definition = ReadingDefinition.from_config({"description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device-class": "energy", "state-class": "total"},0)
-        reading_definition2 = ReadingDefinition.from_config({"description":"test2", "reading_type":ReadingType.TEMPERATURE, "response_type":ResponseType.FLOAT, "icon": "mdi:solar-power", "device-class": "energy", "state-class": "total"},1)
+        reading_definition = ReadingDefinition.from_config({"description":"test", "reading_type":ReadingType.WATT_HOURS, "response_type":ResponseType.INT, "icon": "mdi:solar-power", "device_class": "energy", "state-class": "total"},0)
+        reading_definition2 = ReadingDefinition.from_config({"description":"test2", "reading_type":ReadingType.TEMPERATURE, "response_type":ResponseType.FLOAT, "icon": "mdi:solar-power", "device_class": "energy", "state-class": "total"},1)
         device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
         
         command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.ORDERED, reading_definitions=[reading_definition, reading_definition2])
