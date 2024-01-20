@@ -91,8 +91,8 @@ COMMANDS = {
     },
     "batteryCapacity": {
         "name": "batteryCapacity",
-        "description": "battery capacity",
-        "help": " -- display the battery capacity setting value",
+        "description": "Battery Capacity",
+        "help": " -- display the Battery Capacity",
         "type": "VEDGET",
         "command_code": "0010",  # or should be the more accurate 1000
         "response_type": "POSITIONAL",

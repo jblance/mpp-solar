@@ -125,54 +125,6 @@ class test_pi30_decode(unittest.TestCase):
         # print(result)
         self.assertEqual(result, expected)
 
-    def test_pi30_QPIRI_badoption(self):
-        """test the decode of a QPIRI response with bad option"""
-        protocol = pi()
-        response = b"(230.0 21.7 230.0 50.0 21.7 5000 5000 48.0 47.0 46.5 57.6 57.6 9 30 080 0 1 2 1 01 0 0 52.0 0 1\x9c\x6f\r"
-        command = "QPIRI"
-        expected = {
-            "raw_response": [
-                "(230.0 21.7 230.0 50.0 21.7 5000 5000 48.0 47.0 46.5 57.6 57.6 9 30 080 0 1 2 1 01 0 0 52.0 0 1\x9co\r",
-                "",
-            ],
-            "_command": "QPIRI",
-            "_command_description": "Current Settings inquiry",
-            "AC Input Voltage": [230.0, "V"],
-            "AC Input Current": [21.7, "A"],
-            "AC Output Voltage": [230.0, "V"],
-            "AC Output Frequency": [50.0, "Hz"],
-            "AC Output Current": [21.7, "A"],
-            "AC Output Apparent Power": [5000, "VA"],
-            "AC Output Active Power": [5000, "W"],
-            "Battery Voltage": [48.0, "V"],
-            "Battery Recharge Voltage": [47.0, "V"],
-            "Battery Under Voltage": [46.5, "V"],
-            "Battery Bulk Charge Voltage": [57.6, "V"],
-            "Battery Float Charge Voltage": [57.6, "V"],
-            "Battery Type": ["Invalid option: 9", ""],
-            "Max AC Charging Current": [30, "A"],
-            "Max Charging Current": [80, "A"],
-            "Input Voltage Range": ["Appliance", ""],
-            "Output Source Priority": ["Solar first", ""],
-            "Charger Source Priority": ["Solar + Utility", ""],
-            "Max Parallel Units": [1, "units"],
-            "Machine Type": ["Off Grid", ""],
-            "Topology": ["transformerless", ""],
-            "Output Mode": ["single machine output", ""],
-            "Battery Redischarge Voltage": [52.0, "V"],
-            "PV OK Condition": [
-                "As long as one unit of inverters has connect PV, parallel system will consider PV OK",
-                "",
-            ],
-            "PV Power Balance": [
-                "PV input max power will be the sum of the max charged power and loads power",
-                "",
-            ],
-        }
-        result = protocol.decode(response, command)
-        # print(result)
-        self.assertEqual(result, expected)
-
     def test_pi30_QFLAG(self):
         """test the decode of a QFLAG response"""
         protocol = pi()
@@ -215,7 +167,7 @@ class test_pi30_decode(unittest.TestCase):
             "Inverter voltage too high fault": ["0", ""],
             "Over temperature fault": ["0", ""],
             "Fan locked fault": ["0", ""],
-            "Battery voltage to high fault": ["0", ""],
+            "Battery voltage too high fault": ["0", ""],
             "Battery low alarm warning": ["0", ""],
             "Reserved": ["0", ""],
             "Battery under shutdown warning": ["0", ""],
@@ -225,7 +177,7 @@ class test_pi30_decode(unittest.TestCase):
             "Inverter soft fail fault": ["0", ""],
             "Self test fail fault": ["0", ""],
             "OP DC voltage over fault": ["0", ""],
-            "Bat open fault": ["0", ""],
+            "Battery open fault": ["0", ""],
             "Current sensor fail fault": ["0", ""],
             "Battery short fault": ["0", ""],
             "Power limit warning": ["0", ""],

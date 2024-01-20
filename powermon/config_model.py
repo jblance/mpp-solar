@@ -86,6 +86,7 @@ class CommandConfig(NoExtraBaseModel):
     """ model/allowed elements for command section of config """
     command: str
     type: None | Literal["basic"] | Literal["poll"] = Field(default="basic")
+    override: None | dict = Field(default=None)
     trigger: None | LoopsTriggerConfig | AtTriggerConfig | EveryTriggerConfig = Field(default=None)
     outputs: None | List[OutputConfig] | str = Field(default=None)
 
@@ -94,7 +95,7 @@ class SerialPortConfig(BaseModel):
     """ model/allowed elements for serial port config """
     type: Literal["serial"]
     path: str
-    baud: None | int
+    baud: None | int  = Field(default=None)
     protocol: None | str
 
 

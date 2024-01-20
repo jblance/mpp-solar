@@ -25,7 +25,7 @@ class Table(AbstractFormat):
     # def set_command_description(self, command_description):
     #     self.command_description = command_description
 
-    def format(self, result: Result, device_info) -> list[str]:
+    def format(self, command, result: Result, device_info) -> list[str]:
         log.info("Using output formatter: %s", self.name)
 
         _result = []
@@ -58,7 +58,7 @@ class Table(AbstractFormat):
         # Total line length
         line_length = width_p + width_v + width_u + 7
         # Check if command / description line is longer and extend line if needed
-        cmd_str = f"Command: {result.command_definition.code} - {result.command_definition.description}"
+        cmd_str = f"Command: {command.code} - {command.command_definition.description}"
         width_c = len(cmd_str)
         # log.debug(f"{width_c=}, {line_length=}, {width_p=}, {width_v=}, {width_u=}")
         if line_length < (width_c + 7):

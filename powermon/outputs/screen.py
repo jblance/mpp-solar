@@ -18,11 +18,11 @@ class Screen(AbstractOutput):
     def __str__(self):
         return "outputs.Screen: outputs the results to the screen as per the formatter supplied"
 
-    def process(self, result: Result, mqtt_broker=None, device_info=None):
+    def process(self, command=None, result: Result=None, mqtt_broker=None, device_info=None):
         log.info("Using output sender: screen")
         log.debug("formatter: %s, result: %s, mqtt_broker: %s, device_info: %s", self.formatter, result, mqtt_broker, device_info)
 
-        formatted_data = self.formatter.format(result, device_info)
+        formatted_data = self.formatter.format(command=command, result=result, device_info=device_info)
         if formatted_data is None:
             print("Nothing returned from data formatting")
             return

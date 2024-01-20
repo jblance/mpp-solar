@@ -59,7 +59,7 @@ class Trigger:
         return cls(trigger_type=trigger_type, value=value)
 
     @classmethod
-    def from_DTO(cls, dto: TriggerDTO) -> "Trigger":
+    def from_dto(cls, dto: TriggerDTO) -> "Trigger":
         return cls(trigger_type=dto.trigger_type, value=dto.value)    
 
     def touch(self):

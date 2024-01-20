@@ -5,7 +5,7 @@ from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.result import Result
 from powermon.commands.trigger import Trigger
 from powermon.dto.commandDTO import CommandDTO
-from powermon.errors import ConfigError
+from powermon.errors import ConfigError, InvalidResponse, InvalidCRC
 from powermon.outputs import OutputType, multiple_from_config
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.outputs.api_mqtt import ApiMqtt
@@ -16,6 +16,9 @@ log = logging.getLogger("Command")
 class Command():
     """
     Command object, holds the details of the command, including:
+    - command code
+    - command type
+    - command definition (inc overrides)
     - trigger
     - outputs
     """
@@ -31,7 +34,7 @@ class Command():
             _outs += str(output)
 
         return f"Command: {self.code=} {self.full_command=}, {self.type=}, \
-            [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {str(self.command_definition)}"
+            [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {str(self.command_definition)} {self.override=}"
 
     def __init__(self, code: str, commandtype: str, outputs: list[AbstractOutput], trigger: Trigger):
         self.code = code
@@ -42,7 +45,6 @@ class Command():
 
         self.full_command = None
 
-        log.debug(self)
 
     @classmethod
     def from_config(cls, config=None) -> "Command":
@@ -60,32 +62,45 @@ class Command():
             log.info("command must be defined")
             raise ConfigError("command must be defined in config")
         commandtype = config.get("type", "basic")
+        override = config.get("override")
+        # if override is not None:
+        #     print("override: %s" % override)
         outputs = multiple_from_config(config.get("outputs", ""))
         trigger = Trigger.from_config(config=config.get("trigger"))
-        return cls(code=code, commandtype=commandtype, outputs=outputs, trigger=trigger)
+        command_object = cls(code=code, commandtype=commandtype, outputs=outputs, trigger=trigger)
+        command_object.override = override
+        return command_object
 
     @classmethod
-    def from_DTO(cls, command_dto: CommandDTO) -> "Command":
+    def from_dto(cls, command_dto: CommandDTO) -> "Command":
         """ build object from data transfer object """
-        trigger = Trigger.from_DTO(command_dto.trigger)
+        trigger = Trigger.from_dto(command_dto.trigger)
         command = cls(code=command_dto.command_code, commandtype="basic", outputs=[], trigger=trigger)
         outputs = []
         for output_dto in command_dto.outputs:
             if output_dto.type == OutputType.API_MQTT:
-                outputs.append(ApiMqtt.from_DTO(output_dto))
+                outputs.append(ApiMqtt.from_dto(output_dto))
         command.outputs = outputs
         return command
 
     def build_result(self, raw_response=None, protocol=None) -> Result:
         """ build a result object from the raw_response """
         log.debug("build_result: for command with 'code: %s, command_definition: %s'", self.code, self.command_definition)
-        trimmed_response = protocol.check_response_and_trim(raw_response)
-        result = Result(
-            result_type=self.command_definition.result_type,
-            command_definition=self.command_definition,
-            raw_response=raw_response,
-            trimmed_response=trimmed_response
-        )
+        try:
+            # check response is valid
+            protocol.check_valid(raw_response)
+            # check crc is correct
+            protocol.check_crc(raw_response)
+        except (InvalidResponse, InvalidCRC) as e:
+            # TODO: complete / fix
+            print(e)
+
+        # trim response
+        trimmed_response = protocol.trim_response(raw_response)
+        # split response
+        responses = protocol.split_response(trimmed_response, self.command_definition)
+        # build the Result object
+        result = Result(command=self, raw_response=raw_response, responses=responses)
         return result
 
     @property
@@ -106,6 +121,7 @@ class Command():
     @command_definition.setter
     def command_definition(self, command_definition: CommandDefinition):
         """store the definition of the command"""
+        log.debug("Setting command_definition to: %s", command_definition)
         if command_definition is None:
             raise ValueError("CommandDefinition cannot be None")
 
@@ -113,6 +129,15 @@ class Command():
         if command_definition.is_command_code_valid(self.code) is False:
             raise ValueError(f"Command code {self.code} is not valid for command definition regex {command_definition.regex}")
         self._command_definition = command_definition
+
+    @property
+    def override(self):
+        """ dict of override options """
+        return self._override
+
+    @override.setter
+    def override(self, value):
+        self._override = value
 
     @property
     def outputs(self) -> list[AbstractOutput]:

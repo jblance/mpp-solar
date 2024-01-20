@@ -1,11 +1,11 @@
 mppsolar-tests: 
-	python3 -m unittest discover -s tests/mppsolar_tests -f 
+	python3 -m unittest discover -s tests/mpp -f 
 	
 powermon-unit-tests: 
-	python3 -m unittest discover -s tests/powermon_tests/unit -f -v
+	python3 -m unittest discover -s tests/pmon/unit -f -v
 
 powermon-integration-tests: 
-	python3 -m unittest discover -s tests/powermon_tests/integration -f -v
+	python3 -m unittest discover -s tests/pmon/integration -f -v
 
 test:
 	python3 -m unittest discover -s tests -f 
@@ -31,3 +31,6 @@ docker-up:
 
 docker-powermon-dev-up:
 	docker compose -f docker-compose.development.yaml up --build
+
+poetry-dev:
+	poetry install --no-root --with=dev --extras=powermon

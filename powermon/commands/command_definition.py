@@ -2,32 +2,35 @@
 import logging
 import re
 
-from powermon.commands.parameter import Parameter
-# from powermon.commands.reading import Reading
-from powermon.commands.reading_definition import ReadingDefinition
-from powermon.commands.result import ResultType
+from powermon.commands.reading_definition import ReadingDefinition, ReadingType
+from powermon.commands.result import ResponseType, ResultType
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
 
 log = logging.getLogger("CommandDefinition")
 
 
 class CommandDefinition:
-    """ object the contains the definition and other metadata about a command """
+    """ object the contains the definition and other metadata about a command, including: 
+    - code
+    - regex (opt)
+    - description
+    - result type
+    - reading definitions
+    - test responses
+    """
     def __str__(self):
         return f"CommandDefinition: {self.code=}, {self.description=}, {self.result_type=}"
 
-    def __init__(self, code, description, help_text: str, result_type : ResultType,
-                 reading_definitions, parameters, test_responses: list, regex: str):
+    def __init__(self, code, description, help_text: str, result_type : ResultType, reading_definitions, test_responses: list = None, regex: str = None):
+        """ init CommandDefinition class """
         if reading_definitions is None or len(reading_definitions) == 0:
             raise ValueError(f"reading definitions cannot be None for command_code: {code}")
-        # if test_responses is None or len(test_responses) == 0:
-        #     raise ValueError(f"test_responses cannot be None for command_code: {code}")
+
         self.code = code
         self.description = description
         self.help_text = help_text
         self.result_type : ResultType = result_type
-        self.reading_definitions : dict[int, ReadingDefinition] = reading_definitions
-        self.parameters : dict[str, Parameter] = parameters
+        self.reading_definitions : dict[int, ReadingDefinition] = reading_definitions  # TODO: this is incorrect, needs positional and str indexes as well
         self.test_responses : list[bytes] = test_responses
         self.regex : str | None = regex
 
@@ -39,21 +42,22 @@ class CommandDefinition:
         help_text = protocol_dictionary.get("help_text")
         test_responses = protocol_dictionary.get("test_responses")
         regex = protocol_dictionary.get("regex", None)
-        result_type = protocol_dictionary.get("result_type")  # QUESTION: this where ResultType.ACK logic could differ
+        result_type = protocol_dictionary.get("result_type")
         match result_type:
             case ResultType.ACK:
-                pass
+                # All ResultType.ACK are the same, so put config here instead of duplicating it in the protocol
+                log.debug("ResultType.ACK so defaulting reading_definitions")
+                reading_definitions : dict[int, ReadingDefinition] = \
+                    ReadingDefinition.multiple_from_config([{"description": description, "response_type": ResponseType.ACK, "reading_type": ReadingType.ACK}])
+                test_responses = [b"(NAK\x73\x73\r", b"(ACK\x39\x20\r",]
             case _:
                 reading_definitions : dict[int, ReadingDefinition] = \
                     ReadingDefinition.multiple_from_config(protocol_dictionary.get("reading_definitions"))
 
-        # FIXME: are parameters useful....
-        parameters : dict[str, Parameter] = Parameter.multiple_from_config(protocol_dictionary.get("parameters"))
-
         log.debug("code: %s description: %s reading_definitions: %s", code, description, reading_definitions)
         return cls(
             code=code, description=description, help_text=help_text, result_type=result_type,
-            reading_definitions=reading_definitions, parameters=parameters, test_responses=test_responses,
+            reading_definitions=reading_definitions, test_responses=test_responses,
             regex=regex
         )
 
@@ -75,24 +79,21 @@ class CommandDefinition:
             return self.code == command_code
         return re.match(self.regex, command_code) is not None
 
-    def get_type(self) -> ResultType:
-        """ return the command definition type """
-        return self.result_type
-
-    def get_response_definition_count(self) -> int:
-        """ return the number of reading definitions """
+    def get_reading_definition(self, lookup=None, position=0) -> ReadingDefinition:
+        """ return the reading definition that corresponds to lookup """
+        log.debug("looking for reading definition with: %s, result_type is: %s", lookup, self.result_type)
         if self.reading_definitions is None:
-            return 0
-        return len(self.reading_definitions)
+            return None
+        match self.result_type:
+            case ResultType.ACK | ResultType.SINGLE | ResultType.MULTIVALUED:
+                return self.reading_definitions[0]
+            case ResultType.ORDERED:
+                return self.reading_definitions[position]
+            case _:
+                print(f"no get_reading_definition for {self.result_type=}")
+                exit()
+        return None
 
-    def set_parameter_value(self, parameter_value: str):
-        """ sets the parameter value """
-        if self.parameters is None:
-            raise ValueError(f"Parameters not defined but parameter value set for command_code: {self.code}, \
-                Check the command definitions")
-
-        for parameter in self.parameters.values():
-            parameter.set_value(parameter_value)
-            return
-
-
+    def reading_definition_count(self) -> int:
+        """ return the number of reading_definitions for this command_definition """
+        return 0 if self.reading_definitions is None else len(self.reading_definitions)

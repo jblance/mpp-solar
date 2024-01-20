@@ -2,9 +2,9 @@
 import logging
 
 from powermon.commands.command import Command
-from powermon.commands.result import Result, ResultType
+from powermon.commands.result import Result
 from powermon.dto.deviceDTO import DeviceDTO
-from powermon.errors import ConfigError
+from powermon.errors import ConfigError, CommandDefinitionMissing
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.ports import from_config as port_from_config
 from powermon.ports.abstractport import AbstractPort
@@ -82,11 +82,14 @@ class Device:
 
     def add_command(self, command: Command) -> None:
         """add a command to the devices' list of commands"""
-        log.debug("Adding command: %s", command)
         if command is None:
             return
         # get command definition from protocol
-        command.command_definition = self.port.protocol.get_command_with_command_string(command.code)
+        try:
+            command.command_definition = self.port.protocol.get_command_definition(command.code)
+        except CommandDefinitionMissing as ex:
+            print(ex)
+            return
 
         # set the device_id in the command
         # command.set_device_id(self.device_id)
@@ -146,4 +149,4 @@ class Device:
                 output: AbstractOutput
                 for output in command.outputs:
                     log.debug("Using Output: %s", output)
-                    output.process(result=result, mqtt_broker=self.mqtt_broker, device_info=self.device_info)
+                    output.process(command=command, result=result, mqtt_broker=self.mqtt_broker, device_info=self.device_info)

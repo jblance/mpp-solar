@@ -11,14 +11,14 @@ from platform import python_version
 import yaml
 from pydantic import ValidationError
 
-from powermon.version import __version__  # noqa: F401
 from powermon.commands.command import Command
-from powermon.config.config_model import ConfigModel
+from powermon.config_model import ConfigModel
 from powermon.device import Device
 from powermon.libs.apicoordinator import ApiCoordinator
 from powermon.libs.daemon import Daemon
 from powermon.libs.mqttbroker import MqttBroker
 from powermon.protocols import list_protocols
+from powermon.version import __version__  # noqa: F401
 
 # Set-up logger
 log = logging.getLogger("")
@@ -32,9 +32,9 @@ def read_yaml_file(yaml_file=None):
             with open(yaml_file, "r", encoding="utf-8") as stream:
                 _yaml = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
-            log.error("Error processing yaml file: %s", exc)
+            raise yaml.YAMLError(f"Error processing yaml file: {exc}") from exc
         except FileNotFoundError as exc:
-            log.error("Error opening yaml file: %s", exc)
+            raise FileNotFoundError(f"Error opening yaml file: {exc}") from exc
     return _yaml
 
 
@@ -163,6 +163,7 @@ def main():
     log.debug(device)
     # add commands to device command list
     for command_config in config.get("commands"):
+        log.info("Adding command, config: %s", command_config)
         device.add_command(Command.from_config(command_config))
     log.info(device)
 

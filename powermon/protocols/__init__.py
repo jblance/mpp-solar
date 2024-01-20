@@ -31,8 +31,8 @@ def get_protocol_definition(protocol):
             from powermon.protocols.pi30 import PI30
             return PI30()
         case Protocol.PI30MAX:
-            from powermon.protocols.pi30max import pi30max
-            return pi30max()
+            from powermon.protocols.pi30max import PI30MAX
+            return PI30MAX()
         case Protocol.VED:
             from powermon.protocols.ved import VictronEnergyDirect
             return VictronEnergyDirect()

@@ -25,7 +25,7 @@ class MQTT(AbstractOutput):
     def get_topic(self) -> str:
         return self.results_topic
 
-    def process(self, result: Result, mqtt_broker=None, device_info=None):
+    def process(self, command=None, result: Result=None, mqtt_broker=None, device_info=None):
         log.info("Using output processor: MQTT")
         # exit if no data
         if result is None:

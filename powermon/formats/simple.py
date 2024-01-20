@@ -9,6 +9,7 @@ log = logging.getLogger("simple")
 
 
 class SimpleFormat(AbstractFormat):
+    """ simple format - {name}={value}{unit} format """
     def __init__(self, formatConfig):
         super().__init__(formatConfig)
         self.name = "simple"
@@ -30,31 +31,30 @@ class SimpleFormat(AbstractFormat):
         #        data[f"Error #{i}"] = [message, ""]
 
 
-        if len(result.get_responses()) == 0:
+        if len(result.readings) == 0:
             return _result
 
         display_data : list[Reading] = self.format_and_filter_data(result)
 
         # build data to display
-        for response in display_data:
-            name = response.get_data_name()
-            value = response.get_data_value()
-            unit = response.get_data_unit()
+        for reading in display_data:
+            name = reading.get_data_name()
+            value = reading.get_data_value()
+            unit = reading.get_data_unit()
             if self.extra_info:
                 extra = ""
-                if response.get_device_class() is not None:
-                    extra = " " + response.get_device_class()
-                if response.get_icon() is not None:
-                    extra += " " + response.get_icon()
-                if response.get_state_class() is not None:
-                    extra += " " + response.get_state_class()
-                
-                
+                if reading.get_device_class() is not None:
+                    extra = " " + reading.get_device_class()
+                if reading.get_icon() is not None:
+                    extra += " " + reading.get_icon()
+                if reading.get_state_class() is not None:
+                    extra += " " + reading.get_state_class()
                 _result.append(f"{name}={value}{unit}{extra}")
             else:
                 _result.append(f"{name}={value}{unit}")
         return _result
 
     @classmethod
-    def from_DTO(cls, dto: FormatDTO):
-        return cls(formatConfig={})
+    def from_dto(cls, dto: FormatDTO):
+        """ build class object from dto """
+        return cls(formatConfig=dto)
