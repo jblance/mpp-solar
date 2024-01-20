@@ -31,7 +31,7 @@ charger_source_priority=Utility first
 max_parallel_units=6
 machine_type=Off Grid
 topology=transformerless
-output_mode=single machine output
+output_mode=single machine
 battery_redischarge_voltage=54.0V
 pv_ok_condition=As long as one unit of inverters has connect PV, parallel system will consider PV OK
 pv_power_balance=PV input max power will be the sum of the max charged power and loads power\n""",
@@ -220,7 +220,7 @@ output_source_priority_21_hours=Solar + Utility
 output_source_priority_22_hours=Solar + Utility
 output_source_priority_23_hours=Solar + Utility
 device_output_source_priority=Solar + Utility
-selection_of_output_source_priority_order_1=undefined
+selection_of_output_source_priority_order_1=Utility
 selection_of_output_source_priority_order_2=Solar + Utility
 selection_of_output_source_priority_order_3=Solar first\n""",
     ),
@@ -251,9 +251,9 @@ charger_source_priority_21_hours=Only Solar
 charger_source_priority_22_hours=Only Solar
 charger_source_priority_23_hours=Only Solar
 device_charger_source_priority=Only Solar
-selection_of_charger_source_priority_order_1=undefined
-selection_of_charger_source_priority_order_2=undefined
-selection_of_charger_source_priority_order_3=undefined\n""",
+selection_of_charger_source_priority_order_1=Utility
+selection_of_charger_source_priority_order_2=Utility
+selection_of_charger_source_priority_order_3=Utility\n""",
     ),
     (
         "QT",

@@ -9,6 +9,25 @@ from powermon.protocols.abstractprotocol import AbstractProtocol
 
 log = logging.getLogger("pi30")
 
+OUTPUT_MODE_LIST = ["single machine output",
+                    "parallel output",
+                    "Phase 1 of 3 Phase output",
+                    "Phase 2 of 3 Phase output",
+                    "Phase 3 of 3 Phase output",
+                    "Phase 1 of 2 phase output",
+                    "Phase 2 of 2 phase output"]
+
+BATTERY_TYPE_LIST = ["AGM",
+                     "Flooded",
+                     "User",
+                     "Pylontech",
+                     "Shinheung",
+                     "WECO",
+                     "Soltaro",
+                     "TBD",
+                     "LIb-protocol compatible",
+                     "3rd party Lithium"]
+
 SETTER_COMMANDS = {
     "F": {
         "name": "F",
@@ -174,67 +193,46 @@ QUERY_COMMANDS = {
         "result_type": ResultType.ORDERED,
         "reading_definitions": [
             {"description": "AC Output Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
-            {"description": "AC Output Frequency",  "reading_type": ReadingType.FREQUENCY, "response_type": ResponseType.FLOAT},
+            {"description": "AC Output Frequency", "reading_type": ReadingType.FREQUENCY, "response_type": ResponseType.FLOAT},
             {"description": "Max AC Charging Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
             {"description": "Battery Under Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
             {"description": "Battery Float Charge Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
             {"description": "Battery Bulk Charge Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
             {"description": "Battery Recharge Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
             {"description": "Max Charging Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
-            {"description": "Input Voltage Range", "reading_type": ReadingType.MESSAGE,"response_type": ResponseType.LIST, "options": ["Appliance", "UPS"]},
+            {"description": "Input Voltage Range", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Appliance", "UPS"]},
             {"description": "Output Source Priority", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Utility first", "Solar first", "SBU first"]},
-            {
-                "description": "Charger Source Priority",
+            {"description": "Charger Source Priority",
                 "reading_type": ReadingType.MESSAGE,
                 "response_type": ResponseType.LIST,
-                "options": ["Utility first", "Solar first", "Solar + Utility", "Only solar charging permitted"],
-            },
-            {"description": "Battery Type", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["AGM", "Flooded", "User"]},
+                "options": ["Utility first", "Solar first", "Solar + Utility", "Only solar charging permitted"]},
+            {"description": "Battery Type", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": BATTERY_TYPE_LIST},
             {"description": "Buzzer", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["enabled", "disabled"]},
             {"description": "Power saving", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["disabled", "enabled"]},
             {"description": "Overload restart", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["disabled", "enabled"]},
             {"description": "Over temperature restart", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["disabled", "enabled"]},
-            {"description": "LCD Backlight", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options":["disabled", "enabled"]},
+            {"description": "LCD Backlight", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["disabled", "enabled"]},
             {"description": "Primary source interrupt alarm", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["disabled", "enabled"]},
             {"description": "Record fault code", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["disabled", "enabled"]},
             {"description": "Overload bypass", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["disabled", "enabled"]},
             {"description": "LCD reset to default", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["disabled", "enabled"]},
-            {
-                "description": "Output mode",
+            {"description": "Output mode",
                 "reading_type": ReadingType.MESSAGE,
                 "response_type": ResponseType.LIST,
-                "options": [
-                    "single machine output",
-                    "parallel output",
-                    "Phase 1 of 3 Phase output",
-                    "Phase 2 of 3 Phase output",
-                    "Phase 3 of 3 Phase output",
-                    "Phase 1 of 2 phase output",
-                    "Phase 2 of 2 phase output",
-                    "unknown output phase",
-                ],
-            },
+                "options": OUTPUT_MODE_LIST},
             {"description": "Battery Redischarge Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
-            {
-                "description": "PV OK condition",
+            {"description": "PV OK condition",
                 "reading_type": ReadingType.MESSAGE,
                 "response_type": ResponseType.LIST,
                 "options":
-                [
-                    "As long as one unit of inverters has connect PV, parallel system will consider PV OK",
-                    "Only All of inverters have connect PV, parallel system will consider PV OK",
-                ],
-            },
-            {
-                "description": "PV Power Balance",
+                ["As long as one unit of inverters has connect PV, parallel system will consider PV OK",
+                    "Only All of inverters have connect PV, parallel system will consider PV OK"]},
+            {"description": "PV Power Balance",
                 "reading_type": ReadingType.MESSAGE,
                 "response_type": ResponseType.LIST,
                 "options":
-                [
-                    "PV input max current will be the max charged current",
-                    "PV input max power will be the sum of the max charged power and loads power",
-                ],
-            },
+                ["PV input max current will be the max charged current",
+                    "PV input max power will be the sum of the max charged power and loads power"]},
             {"description": "Unknown Value", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.BYTES},
         ],
         "test_responses": [b"(230.0 50.0 0030 42.0 54.0 56.4 46.0 60 0 0 2 0 0 0 0 0 1 1 0 0 1 0 54.0 0 1 000\x9E\x60\r"],
@@ -282,21 +280,10 @@ QUERY_COMMANDS = {
         "help": " -- queries the output mode of the Inverter (e.g. single, parallel, phase 1 of 3 etc)",
         "result_type": ResultType.SINGLE,
         "reading_definitions": [
-            {
-                "description": "Output mode",
+            {"description": "Output mode",
                 "reading_type": ReadingType.MESSAGE,
                 "response_type": ResponseType.LIST,
-                "options": [
-                    "single machine output",
-                    "parallel output",
-                    "Phase 1 of 3 Phase output",
-                    "Phase 2 of 3 Phase output",
-                    "Phase 3 of 3 Phase output",
-                    "Phase 1 of 2 phase output",
-                    "Phase 2 of 2 phase output",
-                    "unknown output phase",
-                ],
-            }
+                "options": OUTPUT_MODE_LIST}
         ],
         "test_responses": [b"(0\xb9\x1c\r"],
     },
@@ -314,13 +301,11 @@ QUERY_COMMANDS = {
         "help": " -- queries the value of various metrics from the Inverter",
         "result_type": ResultType.ORDERED,
         "reading_definitions": [
-            {
-                "description": "AC Input Voltage",
+            {"description": "AC Input Voltage",
                 "reading_type": ReadingType.VOLTS,
                 "response_type": ResponseType.FLOAT,
                 "icon": "mdi:transmission-tower-export",
-                "device_class": "voltage"
-            },
+                "device_class": "voltage"},
             {"description": "AC Input Frequency", "reading_type": ReadingType.FREQUENCY, "response_type": ResponseType.FLOAT, "icon": "mdi:current-ac", "device_class": "frequency"},
             {"description": "AC Output Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:power-plug", "device_class": "voltage"},
             {"description": "AC Output Frequency", "reading_type": ReadingType.FREQUENCY, "response_type": ResponseType.FLOAT, "icon": "mdi:current-ac", "device_class": "frequency"},
@@ -336,8 +321,7 @@ QUERY_COMMANDS = {
             {"description": "PV Input Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:solar-power", "device_class": "voltage"},
             {"description": "Battery Voltage from SCC", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT, "icon": "mdi:battery-outline", "device_class": "voltage"},
             {"description": "Battery Discharge Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT, "icon": "mdi:battery-negative", "device_class": "current"},
-            {
-                "description": "Device Status",
+            {"description": "Device Status",
                 "reading_type": ReadingType.FLAGS,
                 "response_type": ResponseType.FLAGS,
                 "flags": [
@@ -349,8 +333,7 @@ QUERY_COMMANDS = {
                     "Is Charging On",
                     "Is SCC Charging On",
                     "Is AC Charging On",
-                ],
-            },
+                ]},
             {"description": "RSV1", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
             {"description": "RSV2", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
             {"description": "PV Input Power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.INT, "icon": "mdi:solar-power", "device_class": "power", "state_class": "measurement"},
@@ -378,23 +361,10 @@ QUERY_COMMANDS = {
             {"description": "Battery Under Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
             {"description": "Battery Bulk Charge Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
             {"description": "Battery Float Charge Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
-            {
-                "description": "Battery Type",
+            {"description": "Battery Type",
                 "reading_type": ReadingType.MESSAGE,
                 "response_type": ResponseType.LIST,
-                "options":  [
-                    "AGM",
-                    "Flooded",
-                    "User",
-                    "Pylontech",
-                    "Shinheung",
-                    "WECO",
-                    "Soltaro",
-                    "TBD",
-                    "LIb-protocol compatible",
-                    "3rd party Lithium",
-                ],
-            },
+                "options": BATTERY_TYPE_LIST},
             {"description": "Max AC Charging Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
             {"description": "Max Charging Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
             {"description": "Input Voltage Range", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Appliance", "UPS"]},
@@ -403,37 +373,18 @@ QUERY_COMMANDS = {
             {"description": "Max Parallel Units", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT, "default": "not set"},
             {"description": "Machine Type", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.OPTION, "options": {"00": "Grid tie", "01": "Off Grid", "10": "Hybrid"}},
             {"description": "Topology", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["transformerless", "transformer"]},
-            {
-                "description": "Output Mode",
+            {"description": "Output Mode",
                 "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST,
-                "options": [
-                    "single machine output",
-                    "parallel output",
-                    "Phase 1 of 3 Phase output",
-                    "Phase 2 of 3 Phase output",
-                    "Phase 3 of 3 Phase output",
-                    "Phase 1 of 2 phase output",
-                    "Phase 2 of 2 phase output",
-                    "unknown output",
-                ],
-            },
+                "options": OUTPUT_MODE_LIST},
             {"description": "Battery Redischarge Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
-            {
-                "description": "PV OK Condition",
+            {"description": "PV OK Condition",
                 "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST,
-                "options": [
-                    "As long as one unit of inverters has connect PV, parallel system will consider PV OK",
-                    "Only All of inverters have connect PV, parallel system will consider PV OK",
-                ],
-            },
-            {
-                "description": "PV Power Balance",
+                "options": ["As long as one unit of inverters has connect PV, parallel system will consider PV OK",
+                            "Only All of inverters have connect PV, parallel system will consider PV OK"]},
+            {"description": "PV Power Balance",
                 "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST,
-                "options": [
-                    "PV input max current will be the max charged current",
-                    "PV input max power will be the sum of the max charged power and loads power",
-                ],
-            },
+                "options": ["PV input max current will be the max charged current",
+                            "PV input max power will be the sum of the max charged power and loads power"]},
             {"description": "Max charging time for CV stage", "reading_type": ReadingType.TIME_MINUTES, "response_type": ResponseType.INT},
             {"description": "Operation Logic", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Automatic mode", "On-line mode", "ECO mode"]},
         ],
@@ -454,8 +405,7 @@ QUERY_COMMANDS = {
         "reading_definitions": [
             {"description": "Parallel instance number", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Not valid", "valid"]},
             {"description": "Serial number", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.BYTES},
-            {
-                "description": "Work mode",
+            {"description": "Work mode",
                 "reading_type": ReadingType.MESSAGE,
                 "response_type": ResponseType.OPTION,
                 "options": {
@@ -466,10 +416,8 @@ QUERY_COMMANDS = {
                     "F": "Fault Mode",
                     "H": "Power Saving Mode",
                     "Y": "Bypass",
-                },
-            },
-            {
-                "description": "Fault code",
+                }},
+            {"description": "Fault code",
                 "reading_type": ReadingType.MESSAGE,
                 "response_type": ResponseType.OPTION,
                 "options": {
@@ -502,8 +450,7 @@ QUERY_COMMANDS = {
                     "84": "Parallel Line voltage or frequency detect different",
                     "85": "Parallel Line input current unbalanced",
                     "86": "Parallel output setting different",
-                },
-            },
+                }},
             {"description": "Grid voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
             {"description": "Grid frequency", "reading_type": ReadingType.FREQUENCY, "response_type": ResponseType.FLOAT},
             {"description": "AC output voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.FLOAT},
@@ -519,8 +466,7 @@ QUERY_COMMANDS = {
             {"description": "Total AC output apparent power", "reading_type": ReadingType.APPARENT_POWER, "response_type": ResponseType.INT},
             {"description": "Total output active power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.INT},
             {"description": "Total AC output percentage", "reading_type": ReadingType.PERCENTAGE, "response_type": ResponseType.INT},
-            {
-                "description": "Inverter Status",
+            {"description": "Inverter Status",
                 "reading_type": ReadingType.FLAGS,
                 "response_type": ResponseType.FLAGS,
                 "flags": [
@@ -532,29 +478,15 @@ QUERY_COMMANDS = {
                     "Is Line Lost",
                     "Is Load On",
                     "Is Configuration Changed",
-                ],
-            },
-            {
-                "description": "Output mode",
+                ]},
+            {"description": "Output mode",
                 "reading_type": ReadingType.MESSAGE,
                 "response_type": ResponseType.LIST,
-                "options": [
-                    "single machine",
-                    "parallel output",
-                    "Phase 1 of 3 phase output",
-                    "Phase 2 of 3 phase output",
-                    "Phase 3 of 3 phase output",
-                    "Phase 1 of 2 phase output",
-                    "Phase 2 of 2 phase output",
-                    "Unknown Output Mode",
-                ],
-            },
-            {
-                "description": "Charger source priority",
+                "options": OUTPUT_MODE_LIST},
+            {"description": "Charger source priority",
                 "reading_type": ReadingType.MESSAGE,
                 "response_type": ResponseType.LIST,
-                "options": ["Utility first", "Solar first", "Solar + Utility", "Solar only"],
-            },
+                "options": ["Utility first", "Solar first", "Solar + Utility", "Solar only"]},
             {"description": "Max charger current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
             {"description": "Max charger range", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
             {"description": "Max AC charger current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.INT},
@@ -566,7 +498,7 @@ QUERY_COMMANDS = {
         "test_responses": [
             b"(1 92931701100510 B 00 000.0 00.00 230.6 50.00 0275 0141 005 51.4 001 100 083.3 002 00574 00312 003 10100110 1 2 060 120 10 04 000\xcc#\r",
             b"(1 92912102100033 B 00 000.0 00.00 120.1 59.99 0048 0000 000 53.1 000 059 000.0 000 00154 00016 000 00000110 7 1 060 120 030 00 000 000.0 00\xe7c\r",
-            #b"QPGS0?\xda\r",
+            # b"QPGS0?\xda\r",
         ],
         "regex": "QPGS(\\d+)$",
     },
@@ -634,16 +566,15 @@ QUERY_COMMANDS = {
                 "response_type": ResponseType.ENABLE_DISABLE_FLAGS,
                 "options": {
                     "a": "Buzzer",
-                    "b": "Overload Bypass", 
-                    "j": "Power Saving", 
+                    "b": "Overload Bypass",
+                    "j": "Power Saving",
                     "k": "LCD Reset to Default",
-                    "u": "Overload Restart", 
+                    "u": "Overload Restart",
                     "v": "Over Temperature Restart",
                     "x": "LCD Backlight",
                     "y": "Primary Source Interrupt Alarm",
                     "z": "Record Fault Code",
-                },
-            }
+                }}
         ],
         "test_responses": [b"(EakxyDbjuvz\x2F\x29\r"],
     },
@@ -655,8 +586,7 @@ QUERY_COMMANDS = {
         "reading_definitions": [
             {"description": "Device Mode", "reading_type": ReadingType.MESSAGE,
                 "response_type": ResponseType.OPTION,
-                "options": {"P": "Power on", "S": "Standby", "L": "Line", "B": "Battery", "F": "Fault", "H": "Power saving"},
-            }
+                "options": {"P": "Power on", "S": "Standby", "L": "Line", "B": "Battery", "F": "Fault", "H": "Power saving"}}
         ],
         "test_responses": [b"(S\xe5\xd9\r"],
     },
@@ -701,8 +631,7 @@ QUERY_COMMANDS = {
                     "Battery too low to charge warning",
                     "",
                     "",
-                ],
-            }
+                ]}
         ],
         "test_responses": [b"(00000100000000001000000000000000\x56\xA6\r"],
     },
@@ -724,7 +653,6 @@ class PI30(AbstractProtocol):
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
         self.ID_COMMANDS = ["QPI", "QGMN", "QMN"]
-        
 
     def check_crc(self, response: str):
         """ crc check, needs override in protocol """
