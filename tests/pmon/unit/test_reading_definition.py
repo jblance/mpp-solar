@@ -10,7 +10,7 @@ from powermon.device import DeviceInfo
 from powermon.formats.simple import SimpleFormat
 
 
-class test_reading_definitions(unittest.TestCase):
+class TestReadingDefinitions(unittest.TestCase):
     """ exercise different reading definition functionality """
 
     def test_option_invalid_key(self):

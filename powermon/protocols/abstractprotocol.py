@@ -14,7 +14,7 @@ log = logging.getLogger("AbstractProtocol")
 
 
 class AbstractProtocol(metaclass=abc.ABCMeta):
-    """ 
+    """
     base definition for all protocols
     protocol has:
     - protocol id
@@ -142,7 +142,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         response = response[1:-3]
         return response
 
-    def split_response(self, response: str, command_definition = None) -> list | dict:
+    def split_response(self, response: str, command_definition: CommandDefinition = None) -> list | dict:
         """ split response into individual items, return as ordered list or keyed dict """
         result_type = getattr(command_definition, "result_type", None)
         log.debug("splitting %s, result_type %s", response, result_type)

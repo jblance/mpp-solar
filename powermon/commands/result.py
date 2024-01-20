@@ -29,8 +29,7 @@ class Result:
     - list of Readings (processed results)
     """
     def __str__(self):
-        return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, " + \
-        ','.join(str(reading) for reading in self._readings)
+        return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, " + ','.join(str(reading) for reading in self._readings)
 
     # def __init__(self, result_type: ResultType, command_definition, raw_response: bytes, responses: list | dict):
     def __init__(self, command, raw_response: bytes, responses: list | dict):
@@ -38,9 +37,9 @@ class Result:
         self.error = False
         self.error_messages = []
 
-        self.result_type = command.command_definition.result_type
-        self.command_definition = command.command_definition
         self.command = command
+        self.result_type = command.command_definition.result_type
+        # self.command_definition = command.command_definition
 
         self.raw_response = raw_response
         self.readings: list[Reading] = responses
@@ -99,17 +98,17 @@ class Result:
         match self.result_type:
             case ResultType.ACK | ResultType.SINGLE | ResultType.MULTIVALUED:
                 # Get the reading definition (there is only one)
-                reading_definition: ReadingDefinition = self.command_definition.get_reading_definition()
+                reading_definition: ReadingDefinition = self.command.command_definition.get_reading_definition()
                 # Process the response using the reading_definition, into readings
                 readings = self.readings_from_response(responses, reading_definition)
                 all_readings.extend(readings)
             case ResultType.ORDERED:
                 # Have a list of reading_definitions and a list of responses that correspond to each other
                 # possibly additional INFO definitions (at end of definition list??)
-                definition_count = self.command_definition.reading_definition_count()
+                definition_count = self.command.command_definition.reading_definition_count()
                 response_count = len(responses)
                 for position in range(definition_count):
-                    reading_definition: ReadingDefinition = self.command_definition.get_reading_definition(position=position)
+                    reading_definition: ReadingDefinition = self.command.command_definition.get_reading_definition(position=position)
                     if position < response_count:
                         readings = self.readings_from_response(responses[position], reading_definition)
                         all_readings.extend(readings)
@@ -121,7 +120,7 @@ class Result:
                             all_readings.extend(readings)
             case ResultType.ERROR:
                 # Get the reading_definition - this may need fixing for errors
-                reading_definition: ReadingDefinition = self.command_definition.get_reading_definition()
+                reading_definition: ReadingDefinition = self.command.command_definition.get_reading_definition()
                 # Process the response using the reading_definition, into readings
                 readings = self.readings_from_response(responses, reading_definition)
                 all_readings.extend(readings)
@@ -129,12 +128,13 @@ class Result:
                 # unknown result type
                 raise ValueError(f"Unknown result type: {self.result_type}")
         log.debug("got readings: %s", ",".join(str(i) for i in all_readings))
+        # print(','.join(str(reading) for reading in all_readings))
         return all_readings
 
     def readings_from_response(self, response, reading_definition) -> list[Reading]:
         """ return readings from a raw_response using the supplied reading definition """
         try:
-            return reading_definition.reading_from_raw_response(response)
+            return reading_definition.reading_from_raw_response(response, override=self.command.override)
         except ValueError:
             error = Reading(data_name=reading_definition.get_description(),
                             data_value=reading_definition.get_invalid_message(response), data_unit="")

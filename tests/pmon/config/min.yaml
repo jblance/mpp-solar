@@ -11,13 +11,16 @@ device:
     protocol: PI30MAX
 
 commands:
-- command: QPIGS2
+- command: QPIGS
+  override:
+    temperature: F
   outputs:
   - type: screen
     format: 
-      type: simple
+      type: table
       draw_lines: True
       extra_info: True
+      filter: temperature
 # - command: QMCHGCR
 #   outputs:
 #   - type: screen
@@ -25,7 +28,7 @@ commands:
 #       type: table
 #       draw_lines: True
 #       extra_info: True
-# - command: F50
+# - command: QPIGS
 #   override:
 #     temperature: F
 #     pv1_charging_power:

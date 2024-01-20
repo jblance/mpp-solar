@@ -45,7 +45,6 @@ class Command():
 
         self.full_command = None
 
-
     @classmethod
     def from_config(cls, config=None) -> "Command":
         """build object from config dict"""
@@ -62,7 +61,7 @@ class Command():
             log.info("command must be defined")
             raise ConfigError("command must be defined in config")
         commandtype = config.get("type", "basic")
-        override = config.get("override")
+        override = config.get("override", None)
         # if override is not None:
         #     print("override: %s" % override)
         outputs = multiple_from_config(config.get("outputs", ""))
@@ -133,7 +132,8 @@ class Command():
     @property
     def override(self):
         """ dict of override options """
-        return self._override
+        # use getattr and return None if _override not set
+        return getattr(self, "_override", None)
 
     @override.setter
     def override(self, value):

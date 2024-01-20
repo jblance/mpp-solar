@@ -177,9 +177,9 @@ class ReadingDefinition():
             case _:
                 return raw_value.decode('utf-8')
 
-    def reading_from_raw_response(self, raw_value) -> list[Reading]:
+    def reading_from_raw_response(self, raw_value, override=None) -> list[Reading]:
         """ generate a reading object from a raw value """
-        log.debug("raw_value: %s", raw_value)
+        log.debug("raw_value: %s, override: %s", raw_value, override)
         value = self.translate_raw_response(raw_value)
         return [
             Reading(
@@ -357,7 +357,7 @@ class ReadingDefinitionACK(ReadingDefinition):
         self.success_code = "ACK"
         self.success_description = "Succeeded"
 
-    def reading_from_raw_response(self, raw_value) -> list[Reading]:
+    def reading_from_raw_response(self, raw_value, override=None) -> list[Reading]:
         value = raw_value.decode()
         if value == self.success_code:
             return [
@@ -378,11 +378,31 @@ class ReadingDefinitionMessage(ReadingDefinition):
 
 
 class ReadingDefinitionTemperature(ReadingDefinitionNumeric):
-    """ ReadingDefinition for temperature readings - will include translation eg celcius to fahrenheit """
+    """ ReadingDefinition for temperature readings that are stored in celcius - can be overriden to translate to fahrenheit """
     def __init__(self, index: int, description: str, response_type: ResponseType, device_class: str = None, state_class: str = None, icon: str = None):
         super().__init__(index, response_type, description, device_class, state_class, icon)
-        # TODO: find a way to make the unit configurable
         self.unit = "°C"
+
+    def reading_from_raw_response(self, raw_value, override=None) -> list[Reading]:
+        """ generate a reading object from a raw value """
+        log.debug("raw_value: %s, override: %s", raw_value, override)
+        value = self.translate_raw_response(raw_value)
+        _unit = self.unit
+        if override is not None and "temperature" in override:
+            temp_override = override.get('temperature')
+            if temp_override.startswith("F"):
+                value = (1.8 * value) + 32
+                _unit = "°F"
+        return [
+            Reading(
+                data_name=self.description,
+                data_value=value,
+                data_unit=_unit,
+                device_class=self.device_class,
+                state_class=self.state_class,
+                icon=self.icon,
+            )
+        ]
 
 
 class ReadingDefinitionENFlags(ReadingDefinition):
@@ -404,7 +424,7 @@ class ReadingDefinitionENFlags(ReadingDefinition):
                 return_values[_key] = status
         return return_values
 
-    def reading_from_raw_response(self, raw_value) -> list[Reading]:
+    def reading_from_raw_response(self, raw_value, override=None) -> list[Reading]:
         values: dict[str, str] = self.translate_raw_response(raw_value)
         responses = []
         for name, value in values.items():
@@ -428,7 +448,7 @@ class ReadingDefinitionFlags(ReadingDefinition):
                 return_value[self.flags[i]] = int(chr(flag))
         return return_value
 
-    def reading_from_raw_response(self, raw_value) -> list[Reading]:
+    def reading_from_raw_response(self, raw_value, override=None) -> list[Reading]:
         values: dict[str, int] = self.translate_raw_response(raw_value)
         responses = []
         for name, value in values.items():
