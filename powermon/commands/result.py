@@ -3,9 +3,7 @@ import logging
 from enum import Enum, auto
 
 from powermon.commands.reading import Reading
-from powermon.commands.reading_definition import (ReadingDefinition,
-                                                  ReadingDefinitionMessage,
-                                                  ResponseType)
+from powermon.commands.reading_definition import ReadingDefinition, ResponseType
 from powermon.dto.resultDTO import ResultDTO
 
 log = logging.getLogger("result")
@@ -112,7 +110,6 @@ class Result:
                 response_count = len(responses)
                 for position in range(definition_count):
                     reading_definition: ReadingDefinition = self.command_definition.get_reading_definition(position=position)
-                    # print(reading_definition)
                     if position < response_count:
                         readings = self.readings_from_response(responses[position], reading_definition)
                         all_readings.extend(readings)
@@ -123,7 +120,10 @@ class Result:
                             readings = self.readings_from_response(self.command.code, reading_definition)
                             all_readings.extend(readings)
             case ResultType.ERROR:
-                readings = self.validate_and_translate_raw_value(responses, index=0)
+                # Get the reading_definition - this may need fixing for errors
+                reading_definition: ReadingDefinition = self.command_definition.get_reading_definition()
+                # Process the response using the reading_definition, into readings
+                readings = self.readings_from_response(responses, reading_definition)
                 all_readings.extend(readings)
             case _:
                 # unknown result type
@@ -138,21 +138,6 @@ class Result:
         except ValueError:
             error = Reading(data_name=reading_definition.get_description(),
                             data_value=reading_definition.get_invalid_message(response), data_unit="")
-            error.is_valid = False
-            return [error]
-
-    def validate_and_translate_raw_value(self, raw_value: str, index: int) -> list[Reading]:
-        if len(self.command_definition.reading_definitions) <= index:
-            log.debug("Index %s is out of range for command %s", index, self.command_definition.command_code)
-            reading_definition: ReadingDefinition = ReadingDefinitionMessage(index=index, response_type=ResponseType.STRING , description=f"Unused response {index}")
-        else:
-            reading_definition: ReadingDefinition = self.command_definition.reading_definitions[index]
-        try:
-            return reading_definition.reading_from_raw_response(raw_value)
-        except ValueError:
-            error = Reading(
-                data_name=reading_definition.get_description(), data_value=reading_definition.get_invalid_message(raw_value), data_unit=""
-            )
             error.is_valid = False
             return [error]
 
