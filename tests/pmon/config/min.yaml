@@ -11,31 +11,31 @@ device:
     protocol: PI30MAX
 
 commands:
-- command: QMOD
+- command: QPIGS2
   outputs:
   - type: screen
     format: 
-      type: table
+      type: simple
       draw_lines: True
       extra_info: True
-- command: QMCHGCR
-  outputs:
-  - type: screen
-    format: 
-      type: table
-      draw_lines: True
-      extra_info: True
-- command: F50
-  override:
-    temperature: F
-    pv1_charging_power:
-      units: kW
-  trigger:
-    every: 5  # every 5 seconds
-  outputs:
-  - type: screen
-    format:
-      type: table
-      draw_lines: True
-      extra_info: True
+# - command: QMCHGCR
+#   outputs:
+#   - type: screen
+#     format: 
+#       type: table
+#       draw_lines: True
+#       extra_info: True
+# - command: F50
+#   override:
+#     temperature: F
+#     pv1_charging_power:
+#       units: kW
+#   trigger:
+#     every: 5  # every 5 seconds
+#   outputs:
+#   - type: screen
+#     format:
+#       type: table
+#       draw_lines: True
+#       extra_info: True
 loop: once

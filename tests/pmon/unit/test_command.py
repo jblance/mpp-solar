@@ -52,7 +52,7 @@ class test_command(unittest.TestCase):
             }
         }
         protocol.add_command_definitions(qed_command_definition_new)
-        qed_command_definition = protocol.get_command_with_command_string("QED20210901")
+        qed_command_definition = protocol.get_command_definition("QED20210901")
         command = Command(code="QED20210901", commandtype="GETTER", outputs=[], trigger=None)
         command.command_definition = qed_command_definition
         result = command.build_result(b"(00238800!J\r", protocol=protocol)

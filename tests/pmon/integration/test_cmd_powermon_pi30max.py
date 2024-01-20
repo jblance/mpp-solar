@@ -6,8 +6,8 @@ import unittest
 # from powermon.protocols.pi30max import SETTER_COMMANDS
 
 QUERY_COMMANDS = [
-    ("QVFW3", "remote_cpu_firmware_version=VERFW:00072.70\n"),
-    ("VERFW", "bluetooth_version=VERFW:00072.70\n"),
+    ("QVFW3", "remote_cpu_firmware_version=00072.70\n"),
+    ("VERFW", "bluetooth_firmware_version=00072.70\n"),
     (
         "QPIRI",
         """ac_input_voltage=230.0V
@@ -28,7 +28,7 @@ max_charging_current=10A
 input_voltage_range=UPS
 output_source_priority=Utility Solar Battery
 charger_source_priority=Utility first
-max_parallel_units=6units
+max_parallel_units=6
 machine_type=Off Grid
 topology=transformerless
 output_mode=single machine output
@@ -74,7 +74,7 @@ is_battery_voltage_to_steady_while_charging=0bool
 is_charging_on=1bool
 is_scc_charging_on=1bool
 is_ac_charging_on=0bool
-battery_voltage_offset_for_fans_on=010mV
+battery_voltage_offset_for_fans_on_(10mv)=0V
 eeprom_version=0
 pv1_charging_power=879W
 is_charging_to_float=0bool
@@ -263,14 +263,14 @@ selection_of_charger_source_priority_order_3=undefined\n""",
         "QBEQI",
         """equalization_enabled=Enabled
 equalization_time=30min
-equalization_period=30day
+equalization_period=30days
 equalization_max_current=80A
 reserved1=021
 equalization_voltage=55.4V
 reserved2=224
 equalization_over_time=30min
 equalization_active=Inactive
-equalization_elasped_time=234hour\n""",
+equalization_elasped_time=234hours\n""",
     ),
     ("QET", """total_pv_generated_energy=238800Wh\n""",),
     ("QEY2023", """pv_generated_energy_for_year=238800Wh\nyear=2023\n""",),
@@ -288,12 +288,12 @@ led_number_of_colors=3
 rgb=148000211255255255000255255\n""",),
 ]
 SETTER_COMMANDS = [
-    ("PLEDE0", """command_execution=Successful\n"""),
-    ("PLEDS1", """command_execution=Successful\n"""),
-    ("PLEDM2", """command_execution=Successful\n"""),
-    ("PLEDB4", """command_execution=Failed\n"""),
-    ("PLEDT3", """command_execution=Failed\n"""),
-    ("PLEDC2333444555", """command_execution=Failed\n"""),
+    ("PLEDE0", """enable-disable_led_function=Succeeded\n"""),
+    ("PLEDS1", """set_led_speed=Succeeded\n"""),
+    ("PLEDM2", """set_led_effect=Succeeded\n"""),
+    ("PLEDB4", """set_led_brightness=Succeeded\n"""),
+    ("PLEDT3", """set_led_total_number_of_colors=Succeeded\n"""),
+    ("PLEDC2333444555", """set_led_color=Succeeded\n"""),
 ]
 
 
@@ -336,7 +336,7 @@ class test_cmd_powermon_pi30max(unittest.TestCase):
 
     def test_powermon_QSID(self):
         try:
-            expected = "serial_number=1492932105105335005535\n"
+            expected = "serial_number=92932105105335\n"
             result = subprocess.run(
                 [
                     "powermon",

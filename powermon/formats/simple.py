@@ -18,18 +18,17 @@ class SimpleFormat(AbstractFormat):
     # def set_command_description(self, command_description):
     #     pass
 
-    def format(self, result: Result, device_info) -> list:
+    def format(self, command, result: Result, device_info) -> list:
 
         _result = []
 
         # check for error in result
-        #if result.error:
+        # if result.error:
         #    data = {}
         #    data["Error"] = [f"Command: {result.command_code} incurred an error or errors during execution or processing", ""]
         #    data["Error Count"] = [len(result.error_messages), ""]
         #    for i, message in enumerate(result.error_messages):
         #        data[f"Error #{i}"] = [message, ""]
-
 
         if len(result.readings) == 0:
             return _result

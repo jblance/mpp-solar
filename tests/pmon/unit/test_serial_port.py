@@ -3,7 +3,7 @@ from unittest import TestCase
 from unittest.mock import patch, Mock
 from powermon.ports.serialport import SerialPort
 from powermon.commands.command import Command
-from powermon.protocols.pi30max import pi30max
+from powermon.protocols.pi30max import PI30MAX
 
 
 class TestSerialPort(TestCase):
@@ -15,7 +15,7 @@ class TestSerialPort(TestCase):
 
     # Given
     def setUp(self):
-        self.port = SerialPort(path=None, baud=None, protocol=pi30max())
+        self.port = SerialPort(path=None, baud=None, protocol=PI30MAX())
 
     def test_is_connected_when_port_is_open(self):
         """

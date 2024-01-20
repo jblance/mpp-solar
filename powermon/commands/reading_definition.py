@@ -217,8 +217,8 @@ class ReadingDefinition():
         description = reading_definition_config.get("description")
         response_type = reading_definition_config.get("response_type")
         reading_type = reading_definition_config.get("reading_type")
-        device_class = reading_definition_config.get("device-class", None)
-        state_class = reading_definition_config.get("state-class", None)
+        device_class = reading_definition_config.get("device-class", None)  # TODO: fixme change to device_class
+        state_class = reading_definition_config.get("state_class", None)
         icon = reading_definition_config.get("icon", None)
 
         match reading_type:
@@ -250,7 +250,7 @@ class ReadingDefinition():
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
             case ReadingType.MULTI_ENABLE_DISABLE:
-                reading =  ReadingDefinitionENFlags(
+                reading = ReadingDefinitionENFlags(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
             case ReadingType.DATE_TIME:  # TODO: fix this to process date_time into locale based date time
@@ -270,52 +270,52 @@ class ReadingDefinition():
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
             case ReadingType.TIME_SECONDS:
-                reading =  ReadingDefinitionNumeric(
+                reading = ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
-                reading.unit = "s"
+                reading.unit = "sec"
             case ReadingType.TIME_MINUTES:
-                reading =  ReadingDefinitionNumeric(
+                reading = ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
                 reading.unit = "min"
             case ReadingType.TIME_HOURS:
-                reading =  ReadingDefinitionNumeric(
+                reading = ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
                 reading.unit = "hours"
             case ReadingType.TIME_DAYS:
-                reading =  ReadingDefinitionNumeric(
+                reading = ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
                 reading.unit = "days"
             case ReadingType.FLAGS:
                 flags = reading_definition_config.get("flags")
-                reading =  ReadingDefinitionFlags(
+                reading = ReadingDefinitionFlags(
                     index=index, response_type=response_type, description=description, flags=flags,
                     device_class=device_class, state_class=state_class, icon=icon)
             case ReadingType.CURRENT:
-                reading =  ReadingDefinitionNumeric(
+                reading = ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
                 reading.unit = "A"
             case ReadingType.VOLTS:
-                reading =  ReadingDefinitionNumeric(
+                reading = ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
                 reading.unit = "V"
             case ReadingType.PERCENTAGE:
-                reading =  ReadingDefinitionNumeric(
+                reading = ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
                 reading.unit = "%"
             case ReadingType.FREQUENCY:
-                reading =  ReadingDefinitionNumeric(
+                reading = ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
                 reading.unit = "Hz"
             case ReadingType.WATTS:
-                reading =  ReadingDefinitionNumeric(
+                reading = ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
                 reading.unit = "W"
@@ -338,16 +338,15 @@ class ReadingDefinition():
 
 class ReadingDefinitionNumeric(ReadingDefinition):
     """ A ReadingDefinition for readings that must be numeric """
-    def __init__(self, index: int, response_type: str, description: str,
-        device_class: str = None, state_class: str = None, icon: str = None):
+    def __init__(self, index: int, response_type: str, description: str, device_class: str = None, state_class: str = None, icon: str = None):
         super().__init__(index, response_type, description, device_class, state_class, icon)
         if response_type not in [ResponseType.INT, ResponseType.FLOAT]:
             raise TypeError(f"{type(self)} response must be of type int or float, ResponseType {response_type} is not valid")
 
+
 class ReadingDefinitionACK(ReadingDefinition):
     """ ReadingDefinition for ACK type readings """
-    def __init__(self, index: int, response_type: str, description: str,
-        device_class: str = None, state_class: str = None, icon: str = None, ):
+    def __init__(self, index: int, response_type: str, description: str, device_class: str = None, state_class: str = None, icon: str = None, ):
         super().__init__(index, response_type, description, device_class, state_class, icon)
 
         self.fail_code = "NAK"
@@ -360,35 +359,32 @@ class ReadingDefinitionACK(ReadingDefinition):
         if value == self.success_code:
             return [
                 Reading(data_name=self.description, data_value=self.success_description, data_unit=None,
-                    device_class=self.device_class, state_class=self.state_class, icon=self.icon)
+                        device_class=self.device_class, state_class=self.state_class, icon=self.icon)
             ]
         elif value == self.fail_code:
             return [
                 Reading(data_name=self.description, data_value=self.fail_description, data_unit=None,
-                    device_class=self.device_class, state_class=self.state_class, icon=self.icon)
+                        device_class=self.device_class, state_class=self.state_class, icon=self.icon)
             ]
 
 
 class ReadingDefinitionMessage(ReadingDefinition):
     """ ReadingDefinition for message (ie wordy) type readings """
-    def __init__(self, index: int, response_type: str, description: str,
-                device_class: str = None, state_class: str = None, icon: str = None):
+    def __init__(self, index: int, response_type: str, description: str, device_class: str = None, state_class: str = None, icon: str = None):
         super().__init__(index, response_type, description, device_class, state_class, icon)
 
 
 class ReadingDefinitionTemperature(ReadingDefinitionNumeric):
     """ ReadingDefinition for temperature readings - will include translation eg celcius to fahrenheit """
-    def __init__(self, index: int, description: str, response_type: ResponseType,
-                device_class: str = None, state_class: str = None, icon: str = None):
+    def __init__(self, index: int, description: str, response_type: ResponseType, device_class: str = None, state_class: str = None, icon: str = None):
         super().__init__(index, response_type, description, device_class, state_class, icon)
         # TODO: find a way to make the unit configurable
-        self.unit="°C"
+        self.unit = "°C"
 
 
 class ReadingDefinitionENFlags(ReadingDefinition):
     """ ReadingDefinition for specific Enable/Disable flag (eg: EakxyDbjuvz) type readings """
-    def __init__(self, index: int, description: str, response_type: ResponseType,
-                device_class: str = None, state_class: str = None, icon: str = None):
+    def __init__(self, index: int, description: str, response_type: ResponseType, device_class: str = None, state_class: str = None, icon: str = None):
         super().__init__(index, response_type, description, device_class, state_class, icon)
 
     def translate_raw_response(self, raw_value) -> dict[str, str]:
@@ -410,8 +406,7 @@ class ReadingDefinitionENFlags(ReadingDefinition):
         responses = []
         for name, value in values.items():
             responses.append(
-                Reading(data_name=name, data_value=value, data_unit="",
-                    device_class=self.device_class, state_class=self.state_class, icon=self.icon)
+                Reading(data_name=name, data_value=value, data_unit="", device_class=self.device_class, state_class=self.state_class, icon=self.icon)
             )
 
         return responses
@@ -419,8 +414,7 @@ class ReadingDefinitionENFlags(ReadingDefinition):
 
 class ReadingDefinitionFlags(ReadingDefinition):
     """ ReadingDefinition for flags (eg: 10100110) type readings """
-    def __init__(self, index: int, description: str, response_type: ResponseType, flags: list[str],
-                device_class: str = None, state_class: str = None, icon: str = None):
+    def __init__(self, index: int, description: str, response_type: ResponseType, flags: list[str], device_class: str = None, state_class: str = None, icon: str = None):
         super().__init__(index, response_type, description, device_class, state_class, icon)
         self.flags = flags
 

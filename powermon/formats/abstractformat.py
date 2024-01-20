@@ -56,7 +56,7 @@ class AbstractFormat(ABC):
     #     pass
 
     @abstractmethod
-    def format(self, result: Result, device_info) -> list:
+    def format(self, command, result: Result, device_info) -> list:
         pass
 
     def to_dto(self) -> FormatDTO:

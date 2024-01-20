@@ -1,35 +1,36 @@
+""" tests / pmon / integration / test_cmd_powermon_pi30.py """
 import subprocess
 import unittest
 
 
 SETTER_COMMANDS = [
-    ("F50", """command_execution=Successful\n"""),
-    ("MCHGC040", """command_execution=Successful\n"""),
-    ("MNCHGC1120", """command_execution=Failed\n"""),
-    ("MUCHGC130", """command_execution=Successful\n"""),
-    ("PBCV44.0", """command_execution=Successful\n"""),
-    ("PBDV48.0", """command_execution=Successful\n"""),
-    ("PBFT58.0", """command_execution=Successful\n"""),
-    ("PBT01", """command_execution=Successful\n"""),
-    ("PCP03", """command_execution=Successful\n"""),
-    ("PCVV48.0", """command_execution=Successful\n"""),
-    ("PEa", """command_execution=Successful\n"""),
-    ("PDb", """command_execution=Successful\n"""),
-    ("PF", """command_execution=Successful\n"""),
-    ("PGR01", """command_execution=Successful\n"""),
-    ("POP02", """command_execution=Successful\n"""),
-    ("POPLG00", """command_execution=Successful\n"""),
-    ("POPM10", """command_execution=Successful\n"""),
-    ("PPCP000", """command_execution=Successful\n"""),
-    ("PPVOKC1", """command_execution=Successful\n"""),
-    ("PSDV40.0", """command_execution=Successful\n"""),
-    ("PSPB0", """command_execution=Successful\n"""),
-    ("PBATCD010", """command_execution=Successful\n"""),
-    ("DAT20230115091533", """command_execution=Successful\n"""),
-    ("PBATMAXDISC150", """command_execution=Successful\n"""),
-    ("BTA-01", """command_execution=Successful\n"""),
-    ("BTA+09", """command_execution=Successful\n"""),
-    ("PSAVE", """command_execution=Successful\n"""),
+    ("F50", """set_device_output_frequency=Succeeded\n"""),
+    ("MCHGC040", """set_max_charging_current_(for_parallel_units)=Succeeded\n"""),
+    ("MNCHGC1120", """set_utility_max_charging_current_(more_than_100a)_(for_4000/5000)=Succeeded\n"""),
+    ("MUCHGC130", """set_utility_max_charging_current=Succeeded\n"""),
+    ("PBCV44.0", """set_battery_re-charge_voltage=Succeeded\n"""),
+    ("PBDV48.0", """set_battery_re-discharge_voltage=Succeeded\n"""),
+    ("PBFT58.0", """set_battery_float_charging_voltage=Succeeded\n"""),
+    ("PBT01", """set_battery_type=Succeeded\n"""),
+    ("PCP03", """set_device_charger_priority=Succeeded\n"""),
+    ("PCVV48.0", """set_battery_c.v._(constant_voltage)_charging_voltage=Succeeded\n"""),
+    ("PEa", """set_the_enabled_state_of_an_inverter_setting=Succeeded\n"""),
+    ("PDb", """set_the_disabled_state_of_an_inverter_setting=Succeeded\n"""),
+    ("PF", """set_control_parameters_to_default_values=Succeeded\n"""),
+    ("PGR01", """set_grid_working_range=Succeeded\n"""),
+    ("POP02", """set_device_output_source_priority=Succeeded\n"""),
+    ("POPLG00", """set_device_operation_logic=Succeeded\n"""),
+    ("POPM10", """set_device_output_mode_(for_4000/5000)=Succeeded\n"""),
+    ("PPCP000", """set_parallel_device_charger_priority_(for_4000/5000)=Succeeded\n"""),
+    ("PPVOKC1", """set_pv_ok_condition=Succeeded\n"""),
+    ("PSDV40.0", """set_battery_cut-off_voltage=Succeeded\n"""),
+    ("PSPB0", """set_solar_power_balance=Succeeded\n"""),
+    ("PBATCD010", """battery_charge/discharge_controlling_command=Succeeded\n"""),
+    ("DAT20230115091533", """set_date_time=Succeeded\n"""),
+    ("PBATMAXDISC150", """battery_max_discharge_current=Succeeded\n"""),
+    ("BTA-01", """calibrate_inverter_battery_voltage=Succeeded\n"""),
+    ("BTA+09", """calibrate_inverter_battery_voltage=Succeeded\n"""),
+    ("PSAVE", """save_eeprom_changes=Succeeded\n"""),
 ]
 
 
@@ -51,7 +52,7 @@ def do_test(self, command, expected, respno=0):
         # print(result.stdout)
         # print(result.stdout)
         # print(result.stderr)
-        
+
         self.assertEqual(f"CMD: {command}\n{result.stdout}", f"CMD: {command}\n{expected}")
         self.assertEqual(result.returncode, 0)
         # print("OK")
@@ -110,7 +111,7 @@ class test_command_line_powermon(unittest.TestCase):
 
     def test_run_powermon_qboot(self):
         try:
-            expected = "dsp_has_bootstrap=No\n"
+            expected = "dsp_has_bootstrap=False\n"
             result = subprocess.run(
                 [
                     "powermon",
@@ -187,7 +188,7 @@ output_mode=single machine output
 battery_redischarge_voltage=54.0V
 pv_ok_condition=As long as one unit of inverters has connect PV, parallel system will consider PV OK
 pv_power_balance=PV input max power will be the sum of the max charged power and loads power
-unknown_value=0\n"""
+unknown_value=000\n"""
             result = subprocess.run(
                 [
                     "powermon",
@@ -212,19 +213,19 @@ unknown_value=0\n"""
             expected = """time_until_the_end_of_absorb_charging=0sec
 time_until_the_end_of_float_charging=0sec
 scc_flag=SCC is powered and communicating
-allowscconflag=01
-chargeaveragecurrent=00
+allowscconflag=SCC allowed to charge
+chargeaveragecurrent=0A
 scc_pwm_temperature=59°C
 inverter_temperature=45°C
 battery_temperature=53°C
 transformer_temperature=68°C
-gpio13=0
+parallel_mode=New
 fan_lock_status=Not locked
 not_used=000
 fan_pwm_speed=40%
 scc_charge_power=580W
 parallel_warning=0000
-sync_frequency=50.0
+sync_frequency=50.0Hz
 inverter_charge_status=float
 """
             result = subprocess.run(
@@ -558,7 +559,7 @@ max_charging_current=60A
 input_voltage_range=UPS
 output_source_priority=SBU first
 charger_source_priority=Utility first
-max_parallel_units=9units
+max_parallel_units=9
 machine_type=Off Grid
 topology=transformerless
 output_mode=Phase 2 of 2 phase output
@@ -688,7 +689,7 @@ battery_too_low_to_charge_warning=0bool\n"""
 
     def test_run_powermon_QVFW(self):
         try:
-            expected = "main_cpu_firmware_version=VERFW:00072.70\n"
+            expected = "main_cpu_firmware_version=00072.70\n"
             result = subprocess.run(
                 [
                     "powermon",
@@ -710,7 +711,7 @@ battery_too_low_to_charge_warning=0bool\n"""
 
     def test_run_powermon_QVFW2(self):
         try:
-            expected = "secondary_cpu_firmware_version=VERFW:00072.70\n"
+            expected = "secondary_cpu_firmware_version=00072.70\n"
             result = subprocess.run(
                 [
                     "powermon",

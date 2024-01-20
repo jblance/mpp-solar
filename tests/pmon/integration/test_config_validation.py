@@ -5,12 +5,12 @@ FILES = [
     'docker/powermon.yaml',
     'docker/dev/config/powermon.yaml',
     'docker/dev/config/powermon-qpigs.yaml',
-    'powermon/config/min.yaml',
-    'powermon/config/min-api.yaml',
-    'powermon/config/format.yaml',
-    'powermon/config/powermon.yaml',
-    'powermon/config/powermon-hass.yaml',
-    'powermon/config/powermon-qed.yaml',
+    'tests/pmon/config/min.yaml',
+    'tests/pmon/config/min-api.yaml',
+    'tests/pmon/config/format.yaml',
+    'tests/pmon/config/powermon.yaml',
+    'tests/pmon/config/powermon-hass.yaml',
+    'tests/pmon/config/powermon-qed.yaml',
     'docker/powermon.yaml'
     ]
 
