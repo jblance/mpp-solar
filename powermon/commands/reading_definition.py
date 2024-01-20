@@ -149,7 +149,10 @@ class ReadingDefinition():
                 if not isinstance(self.options, dict):
                     raise TypeError(f"For Reading Defininition '{self.description}', options must be a dict if response_type is OPTION")
                 value = str(raw_value.decode('utf-8'))
-                return self.options[value]
+                try:
+                    return self.options[value]
+                except KeyError as e:
+                    raise KeyError(f"For Reading Defininition '{self.description}', keys: {self.options.keys()}, requested key: {value}") from e
             case ResponseType.LIST:
                 if not isinstance(self.options, list):
                     raise TypeError(f"For Reading Defininition '{self.description}', options must be a list if response_type is LIST")
