@@ -15,6 +15,7 @@ class ResultType(Enum):
     ACK = auto()  # ack / nak type result, normally from a setter command
     SINGLE = auto()  # single value in result
     ORDERED = auto()  # the order of the values determines what they are
+    SLICED = auto()  # the response needs to be sliced into separate values
 
     MULTIVALUED = auto()
     INDEXED = auto()
@@ -102,7 +103,7 @@ class Result:
                 # Process the response using the reading_definition, into readings
                 readings = self.readings_from_response(responses, reading_definition)
                 all_readings.extend(readings)
-            case ResultType.ORDERED:
+            case ResultType.ORDERED | ResultType.SLICED:
                 # Have a list of reading_definitions and a list of responses that correspond to each other
                 # possibly additional INFO definitions (at end of definition list??)
                 definition_count = self.command.command_definition.reading_definition_count()

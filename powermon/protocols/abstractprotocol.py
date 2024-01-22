@@ -8,7 +8,7 @@ from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.result import ResultType
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
 from powermon.dto.protocolDTO import ProtocolDTO
-from powermon.errors import CommandDefinitionMissing, InvalidResponse, PowermonProtocolError
+from powermon.errors import CommandDefinitionMissing, InvalidResponse, PowermonProtocolError, PowermonWIP
 
 log = logging.getLogger("AbstractProtocol")
 
@@ -112,7 +112,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
     def get_full_command(self, command: str) -> bytes:
         """ generate the full command including crc and \n as needed """
-        log.info("Using protocol: %s with %i commands", self._protocol_id, len(self.command_definitions))
+        log.info("Using protocol: %s with %i commands", self.protocol_id, len(self.command_definitions))
         byte_cmd = bytes(command, "utf-8")
         # calculate the CRC
         crc_high, crc_low = crc(byte_cmd)
@@ -121,12 +121,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.debug("full command: %s", full_command)
         return full_command
 
-    def check_crc(self, response: str):
-        """ crc check, needs override in protocol """
-        log.debug("no check crc for %s", response)
-        return True
-
-    def check_valid(self, response: str):
+    def check_valid(self, response: str) -> bool:
         """ check response is valid """
         if response is None:
             raise InvalidResponse("Response is None")
@@ -134,13 +129,15 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             raise InvalidResponse("Response is too short")
         return True
 
+    def check_crc(self, response: str) -> bool:
+        """ crc check, needs override in protocol """
+        log.debug("no check crc for %s", response)
+        return True
+
     def trim_response(self, response: str) -> str:
         """ Remove extra characters from response """
         log.debug("response: %s", response)
-        if not self.check_valid(response):
-            raise ValueError("Response was invalid")
-        response = response[1:-3]
-        return response
+        return response[1:-3]
 
     def split_response(self, response: str, command_definition: CommandDefinition = None) -> list | dict:
         """ split response into individual items, return as ordered list or keyed dict """
@@ -151,6 +148,12 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 return []
             case ResultType.ACK | ResultType.SINGLE | ResultType.MULTIVALUED:
                 return response
+            case ResultType.SLICED:
+                responses = []
+                for position in range(command_definition.reading_definition_count()):
+                    rd = command_definition.get_reading_definition(position=position)
+                    responses.append(response[rd.slice_array[0]:rd.slice_array[1]])
+                return responses
             case _:
                 responses = response.split()
                 log.debug("responses: '%s'", responses)
@@ -158,5 +161,5 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
     def to_dto(self) -> ProtocolDTO:
         """ convert protocol object to data transfer object """
-        dto = ProtocolDTO(protocol_id=self._protocol_id, commands=self.get_command_definition_dtos())
+        dto = ProtocolDTO(protocol_id=self.protocol_id, commands=self.get_command_definition_dtos())
         return dto
