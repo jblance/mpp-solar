@@ -8,7 +8,7 @@ from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.result import ResultType
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
 from powermon.dto.protocolDTO import ProtocolDTO
-from powermon.errors import CommandDefinitionMissing, InvalidResponse, PowermonProtocolError, PowermonWIP
+from powermon.errors import CommandDefinitionMissing, InvalidResponse, PowermonProtocolError
 
 log = logging.getLogger("AbstractProtocol")
 
@@ -145,19 +145,29 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.debug("splitting %s, result_type %s", response, result_type)
         match result_type:
             case None:
-                return []
+                responses = []
             case ResultType.ACK | ResultType.SINGLE | ResultType.MULTIVALUED:
-                return response
+                responses = response
             case ResultType.SLICED:
                 responses = []
                 for position in range(command_definition.reading_definition_count()):
                     rd = command_definition.get_reading_definition(position=position)
                     responses.append(response[rd.slice_array[0]:rd.slice_array[1]])
-                return responses
+            case ResultType.VED_INDEXED:
+                # build a list of (index,value) tuples
+                responses = []
+                for item in response.split(b'\r\n'):
+                    try:
+                        key, value = item.split(b'\t')
+                    except ValueError:
+                        continue
+                    if isinstance(key, bytes):
+                        key = key.decode()
+                    responses.append((key.strip(), value.strip()))
             case _:
                 responses = response.split()
-                log.debug("responses: '%s'", responses)
-                return responses
+        log.debug("responses: '%s'", responses)
+        return responses
 
     def to_dto(self) -> ProtocolDTO:
         """ convert protocol object to data transfer object """

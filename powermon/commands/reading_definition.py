@@ -18,6 +18,7 @@ class ResponseType(LowercaseStrEnum):
     ACK = auto()
     BOOL = auto()      # 0 is false, 1 is true
     INT = auto()
+    HEX_CHAR = auto()
     FLOAT = auto()
     STRING = auto()
     BYTES = auto()
@@ -29,6 +30,7 @@ class ResponseType(LowercaseStrEnum):
     INFO = auto()
     INFO_FROM_COMMAND = auto()  # process the supplied command using a template
     TEMPLATE_BYTES = auto()  # process the response value using a template
+    TEMPLATE_INT = auto()  # process the response int value using a template
 
 
 class ReadingType(LowercaseStrEnum):
@@ -40,9 +42,10 @@ class ReadingType(LowercaseStrEnum):
     ACK = auto()
     CURRENT = auto()
     APPARENT_POWER = auto()
-    BATTERY_CAPACITY = auto()
+    ENERGY = auto()
     WATTS = auto()
     WATT_HOURS = auto()
+    KILOWATT_HOURS = auto()
     VOLTS = auto()
     DATE_TIME = auto()
     YEAR = auto()
@@ -148,10 +151,22 @@ class ReadingDefinition():
         match self.response_type:
             case ResponseType.BOOL:
                 return bool(int(raw_value.decode('utf-8')))
+            case ResponseType.HEX_CHAR:
+                return ord(raw_value.decode('utf-8')[0])
             case ResponseType.INT:
                 try:
                     result = int(raw_value.decode('utf-8'))
                     return result
+                except ValueError as e:
+                    if self.default:
+                        return self.default
+                    raise ValueError(f"For Reading Defininition '{self.description}', expected an INT, got {raw_value}") from e
+            case ResponseType.TEMPLATE_INT:
+                try:
+                    r = int(raw_value.decode('utf-8'))
+                    if self.format_template:
+                        r = eval(self.format_template)  # pylint: disable=W0123
+                    return r
                 except ValueError as e:
                     if self.default:
                         return self.default
@@ -181,8 +196,7 @@ class ReadingDefinition():
             case ResponseType.TEMPLATE_BYTES:
                 r = raw_value.decode('utf-8')
                 if self.format_template:
-                    res = eval(self.format_template)  # pylint: disable=W0123
-                    return res
+                    r = eval(self.format_template)  # pylint: disable=W0123
                 return r
             case ResponseType.INFO_FROM_COMMAND:
                 cn = raw_value
@@ -218,13 +232,15 @@ class ReadingDefinition():
         return False
 
     @classmethod
-    def multiple_from_config(cls, reading_definition_configs: list[dict]) -> dict[int, "ReadingDefinition"]:
+    def multiple_from_config(cls, reading_definition_configs: list[dict]) -> dict[int | str, "ReadingDefinition"]:
         """ build list of reading definitions from config """
         if reading_definition_configs is None:
             return {}
         else:
             reading_definitions: dict[int, "ReadingDefinition"] = {}
             for i, reading_definition_config in enumerate(reading_definition_configs):
+                if "index" in reading_definition_config:
+                    i = reading_definition_config.get("index")
                 reading_definition = cls.from_config(reading_definition_config, i)
                 log.debug("reading definition: %s", reading_definition)
                 reading_definitions[reading_definition.index] = reading_definition
@@ -251,12 +267,17 @@ class ReadingDefinition():
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
                 reading.unit = "Wh"
+            case ReadingType.KILOWATT_HOURS:
+                reading = ReadingDefinitionNumeric(
+                    index=index, response_type=response_type, description=description,
+                    device_class=device_class, state_class=state_class, icon=icon)
+                reading.unit = "kWh"
             case ReadingType.APPARENT_POWER:
                 reading = ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
                 reading.unit = "VA"
-            case ReadingType.BATTERY_CAPACITY:
+            case ReadingType.ENERGY:
                 reading = ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
@@ -371,7 +392,7 @@ class ReadingDefinitionNumeric(ReadingDefinition):
     """ A ReadingDefinition for readings that must be numeric """
     def __init__(self, index: int, response_type: str, description: str, device_class: str = None, state_class: str = None, icon: str = None):
         super().__init__(index, response_type, description, device_class, state_class, icon)
-        if response_type not in [ResponseType.INT, ResponseType.FLOAT, ResponseType.LE_2B_S]:
+        if response_type not in [ResponseType.INT, ResponseType.TEMPLATE_INT, ResponseType.FLOAT, ResponseType.LE_2B_S, ResponseType.HEX_CHAR]:
             raise TypeError(f"{type(self)} response must be of type int or float, ResponseType {response_type} is not valid")
 
 

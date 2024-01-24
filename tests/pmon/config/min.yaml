@@ -11,7 +11,7 @@ device:
     protocol: VED
 
 commands:
-- command: batteryCapacity
+- command: vedtext
   outputs:
   - type: screen
     format: 

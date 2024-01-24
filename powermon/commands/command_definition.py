@@ -88,16 +88,23 @@ class CommandDefinition:
         """ return the reading definition that corresponds to lookup """
         log.debug("looking for reading definition with: %s, result_type is: %s", lookup, self.result_type)
         if self.reading_definitions is None:
-            return None
+            result = None
         match self.result_type:
             case ResultType.ACK | ResultType.SINGLE | ResultType.MULTIVALUED:
-                return self.reading_definitions[0]
+                result = self.reading_definitions[0]
             case ResultType.ORDERED | ResultType.SLICED:
-                return self.reading_definitions[position]
+                result = self.reading_definitions[position]
+            case ResultType.VED_INDEXED:
+                try:
+                    result = self.reading_definitions[lookup]
+                except KeyError:
+                    log.warning("no reading definition found for key: %s", lookup)
+                    result = None
             case _:
                 print(f"no get_reading_definition for {self.result_type=}")
                 exit()
-        return None
+        log.debug("found reading definition: %s", result)
+        return result
 
     def reading_definition_count(self) -> int:
         """ return the number of reading_definitions for this command_definition """

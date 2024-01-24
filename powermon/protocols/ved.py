@@ -8,16 +8,12 @@ from mppsolar.protocols.protocol_helpers import vedHexChecksum
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
+from powermon.errors import CommandError
 from powermon.protocols.abstractprotocol import AbstractProtocol
 
 # from .pi30 import COMMANDS
 
 log = logging.getLogger("ved")
-
-# (AAA BBB CCC DDD EEE
-# (000 001 002 003 004
-
-VED_COMMAND_TYPES = {"1": "Ping", "3": "Get Firmware Version", "4": "Get Product ID", "6": "Restart", "7": "Get", "8": "Set", "A": "Async"}
 
 
 class VictronCommandType(Enum):
@@ -29,6 +25,7 @@ class VictronCommandType(Enum):
     GET = 7
     SET = 8
     ASYNC = 'A'
+    LISTEN = 'L'
 
 
 COMMANDS = {
@@ -36,69 +33,123 @@ COMMANDS = {
         "name": "vedtext",
         "description": "VE Direct Text",
         "help": " -- the output of the VE Direct text protocol",
-        "type": "VEDTEXT",
-        "response_type": "KEYED",
-        "response": [
-            ["V", "Main or channel 1 battery voltage", "V", "float:r/1000"],
-            ["V2", "Channel 2 battery voltage", "V", "float:r/1000"],
-            ["V3", "Channel 3 battery voltage", "V", "float:r/1000"],
-            ["VS", "Auxiliary starter voltage", "V", "float:r/1000"],
-            ["VM", "Mid-point voltage of the battery bank", "V", "float:r/1000"],
-            ["DM", "Mid-point deviation of the battery bank", "‰", "float"],
-            ["VPV", "Panel voltage", "V", "float:r/1000"],
-            ["PPV", "Panel power", "W", "float"],
-            ["I", "Main or channel 1 battery current", "A", "float:r/1000"],
-            ["I2", "Channel 2 battery current", "A", "float:r/1000"],
-            ["I3", "Channel 3 battery current", "A", "float:r/1000"],
-            ["IL", "Load current", "A", "float:r/1000"],
-            ["LOAD", "Load output state ON/OFF", "", "bytes:r.decode()"],
-            ["T", "Battery temperature", "°C", "float"],
-            ["P", "Instantaneous power", "W", "float"],
-            ["CE", "Consumed Amp Hours", "Ah", "float:r/1000"],
-            ["SOC", "State-of-charge", "%", "float:r/10"],
-            ["TTG", "Time-to-go", "Minutes", "float"],
-            ["Alarm", "Alarm condition active", "", "bytes:r.decode()"],
-            ["Relay", "Relay state", "", "bytes:r.decode()"],
-            ["AR", "Alarm reason", "", "bytes:r.decode()"],
-            ["OR", "Off reason", "", "bytes:r.decode()"],
-            ["H1", "Depth of the deepest discharge", "Ah", "float:r/1000"],
-            ["H2", "Depth of the last discharge", "Ah", "float:r/1000"],
-            ["H3", "Depth of the average discharge", "Ah", "float:r/1000"],
-            ["H4", "Number of charge cycles", "", "bytes:r.decode()"],
-            ["H5", "Number of full discharges", "", "bytes:r.decode()"],
-            ["H6", "Cumulative Amp Hours drawn", "Ah", "float:r/1000"],
-            ["H7", "Minimum main battery voltage", "V", "float:r/1000"],
-            ["H8", "Maximum main battery voltage", "V", "float:r/1000"],
-            ["H9", "Number of seconds since last full charge", "Seconds", "float"],
-            ["H10", "Number of automatic synchronizations", "", "bytes:r.decode()"],
-            ["H11", "Number of low main voltage alarms", "", "bytes:r.decode()"],
-            ["H12", "Number of high main voltage alarms", "", "bytes:r.decode()"],
-            ["H13", "Number of low auxiliary voltage alarms", "", "bytes:r.decode()"],
-            ["H14", "Number of high auxiliary voltage alarms", "", "bytes:r.decode()"],
-            ["H15", "Minimum auxiliary battery voltage", "V", "float:r/1000"],
-            ["H16", "Maximum auxiliary battery voltage", "V", "float:r/1000"],
-            ["H17", "Amount of discharged energy", "kWh", "float:r/100"],
-            ["H18", "Amount of charged energy", "kWh", "float:r/100"],
-            ["H19", "Yield total - user resettable counter", "kWh", "float:r/100"],
-            ["H20", "Yield today", "kWh", "float:r/100"],
-            ["H21", "Maximum power today", "W", "float"],
-            ["H22", "Yield yesterday", "kWh", "float:r/100"],
-            ["H23", "Maximum power yesterday", "W", "float"],
-            ["ERR", "Error code", "", "bytes:r.decode()"],
-            ["CS", "State of operation", "", "bytes:r.decode()"],
-            ["BMV", "Model description", "", "bytes:r.decode()"],
-            ["FW", "Firmware version 16 bit", "", "bytes:r.decode()"],
-            ["FWE", "Firmware version 24 bit", "", "bytes:r.decode()"],
-            ["PID", "Product ID", "", "bytes:r.decode()"],
-            ["SER#", "Serial number", "", "bytes:r.decode()"],
-            ["HSDS", "Day sequence number 0..364", "", "bytes:r.decode()"],
-            ["MODE", "Device mode", "", "bytes:r.decode()"],
-            ["AC_OUT_V", "AC output voltage", "V", "float:r*100"],
-            ["AC_OUT_I", "AC output current", "0.1 A", "float"],
-            ["AC_OUT_S", "AC output apparent power", "VA", "float"],
-            ["WARN", "Warning reason", "", "bytes:r.decode()"],
-            ["MPPT", "Tracker operation mode", "", "bytes:r.decode()"],
-            ["Checksum", "Checksum", "", "exclude"],
+        "device_command_type": VictronCommandType.LISTEN,
+        "result_type": ResultType.VED_INDEXED,
+        "reading_definitions": [
+            {"index": "V", "description": "Main or channel 1 battery voltage",
+                "reading_type": ReadingType.VOLTS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "V2", "description": "Channel 2 battery voltage",
+                "reading_type": ReadingType.VOLTS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "V3", "description": "Channel 3 battery voltage",
+                "reading_type": ReadingType.VOLTS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "VS", "description": "Auxiliary starter voltage",
+                "reading_type": ReadingType.VOLTS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "VM", "description": "Mid-point voltage of the battery bank",
+                "reading_type": ReadingType.VOLTS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "DM", "description": "Mid-point deviation of the battery bank", "reading_type": ReadingType.PERCENTAGE, "response_type": ResponseType.FLOAT},
+            {"index": "VPV", "description": "Panel voltage",
+                "reading_type": ReadingType.VOLTS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "PPV", "description": "Panel power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.FLOAT},
+            {"index": "I", "description": "Main or channel 1 battery current",
+                "reading_type": ReadingType.CURRENT,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "I2", "description": "Channel 2 battery current",
+                "reading_type": ReadingType.CURRENT,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "I3", "description": "Channel 3 battery current",
+                "reading_type": ReadingType.CURRENT,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "IL", "description": "Load current",
+                "reading_type": ReadingType.CURRENT,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "LOAD", "description": "Load output state ON/OFF", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.BYTES},
+            {"index": "T", "description": "Battery temperature", "reading_type": ReadingType.TEMPERATURE, "response_type": ResponseType.FLOAT},
+            {"index": "P", "description": "Instantaneous power", "reading_type": ReadingType.WATTS, "response_type": ResponseType.FLOAT},
+            {"index": "CE", "description": "Consumed Amp Hours",
+                "reading_type": ReadingType.ENERGY,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "SOC", "description": "State-of-charge",
+                "reading_type": ReadingType.PERCENTAGE,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/10"},
+            {"index": "TTG", "description": "Time-to-go", "reading_type": ReadingType.TIME_MINUTES, "response_type": ResponseType.FLOAT},
+            {"index": "Alarm", "description": "Alarm condition active", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING},
+            {"index": "Relay", "description": "Relay state", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING},
+            {"index": "AR", "description": "Alarm reason", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING},
+            {"index": "OR", "description": "Off reason", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING},
+            {"index": "H1", "description": "Depth of the deepest discharge",
+                "reading_type": ReadingType.ENERGY,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "H2", "description": "Depth of the last discharge",
+                "reading_type": ReadingType.ENERGY,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "H3", "description": "Depth of the average discharge",
+                "reading_type": ReadingType.ENERGY,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "H4", "description": "Number of charge cycles", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
+            {"index": "H5", "description": "Number of full discharges", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
+            {"index": "H6", "description": "Cumulative Amp Hours drawn",
+                "reading_type": ReadingType.ENERGY,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "H7", "description": "Minimum main battery voltage",
+                "reading_type": ReadingType.VOLTS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "H8", "description": "Maximum main battery voltage",
+                "reading_type": ReadingType.VOLTS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "H9", "description": "Number of seconds since last full charge", "reading_type": ReadingType.TIME_SECONDS, "response_type": ResponseType.FLOAT},
+            {"index": "H10", "description": "Number of automatic synchronizations", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
+            {"index": "H11", "description": "Number of low main voltage alarms", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
+            {"index": "H12", "description": "Number of high main voltage alarms", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
+            {"index": "H13", "description": "Number of low auxiliary voltage alarms", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
+            {"index": "H14", "description": "Number of high auxiliary voltage alarms", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
+            {"index": "H15", "description": "Minimum auxiliary battery voltage",
+                "reading_type": ReadingType.VOLTS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "H16", "description": "Maximum auxiliary battery voltage",
+                "reading_type": ReadingType.VOLTS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
+            {"index": "H17", "description": "Amount of discharged energy",
+                "reading_type": ReadingType.KILOWATT_HOURS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/100"},
+            {"index": "H18", "description": "Amount of charged energy",
+                "reading_type": ReadingType.KILOWATT_HOURS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/100"},
+            {"index": "H19", "description": "Yield total - user resettable counter",
+                "reading_type": ReadingType.KILOWATT_HOURS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/100"},
+            {"index": "H20", "description": "Yield today",
+                "reading_type": ReadingType.KILOWATT_HOURS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/100"},
+            {"index": "H21", "description": "Maximum power today", "reading_type": ReadingType.WATTS, "response_type": ResponseType.FLOAT},
+            {"index": "H22", "description": "Yield yesterday",
+                "reading_type": ReadingType.KILOWATT_HOURS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/100"},
+            {"index": "H23", "description": "Maximum power yesterday", "reading_type": ReadingType.WATTS, "response_type": ResponseType.FLOAT},
+            {"index": "ERR", "description": "Error code", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING},
+            {"index": "CS", "description": "State of operation", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING},
+            {"index": "BMV", "description": "Model description", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING},
+            {"index": "FW", "description": "Firmware version 16 bit", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING},
+            {"index": "FWE", "description": "Firmware version 24 bit", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING},
+            {"index": "PID", "description": "Product ID", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING},
+            {"index": "SER#", "description": "Serial number", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING},
+            {"index": "HSDS", "description": "Day sequence number 0..364", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING},
+            {"index": "MODE", "description": "Device mode", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING},
+            {"index": "AC_OUT_V", "description": "AC output voltage",
+                "reading_type": ReadingType.VOLTS,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r*100"},
+            {"index": "AC_OUT_I", "description": "AC output current",
+                "reading_type": ReadingType.CURRENT,
+                "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/10"},
+            {"index": "AC_OUT_S", "description": "AC output apparent power", "reading_type": ReadingType.APPARENT_POWER, "response_type": ResponseType.FLOAT},
+            {"index": "WARN", "description": "Warning reason", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING},
+            {"index": "MPPT", "description": "Tracker operation mode", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.STRING},
+            {"index": "Checksum", "description": "Checksum", "reading_type": ReadingType.HEX_STR, "response_type": ResponseType.HEX_CHAR},
         ],
         "test_responses": [
             b"H1\t-32914\r\nH2\t0\r\nH3\t0\r\nH4\t0\r\nH5\t0\r\nH6\t-35652\r\nH7\t12041\r\nH8\t14282\r\nH9\t0\r\nH10\t0\r\nH11\t0\r\nH12\t0\r\nH15\t-22\r\nH16\t0\r\nH17\t46\r\nH18\t48\r\nChecksum\t\x1a\r\nPID\t0xA389\r\nV\t12865\r\nVS\t-14\r\nI\t0\r\nP\t0\r\nCE\t0\r\nSOC\t1000\r\nTTG\t-1\r\nAlarm\tOFF\r\nAR\t0\r\nBMV\tSmartShunt 500A/50mV\r\nFW\t0405\r\nChecksum\tL\r\n",
@@ -115,7 +166,7 @@ COMMANDS = {
         "result_type": ResultType.SLICED,
         "reading_definitions": [
             {"description": "Command type", "slice": [0, 1],
-                "reading_type": ReadingType.MESSAGE, 
+                "reading_type": ReadingType.MESSAGE,
                 "response_type": ResponseType.INT},
             {"description": "Command", "slice": [1, 5],
                 "reading_type": ReadingType.HEX_STR,
@@ -128,8 +179,8 @@ COMMANDS = {
                             "02": "Not supported",
                             "04": "Parameter Error"}},
             {"description": "Battery Capacity", "slice": [7, 11],
-                "reading_type": ReadingType.BATTERY_CAPACITY,
-                "response_type": ResponseType.LE_2B_S, "transform": "LittleHex2Short"},
+                "reading_type": ReadingType.ENERGY,
+                "response_type": ResponseType.LE_2B_S},
         ],
         "test_responses": [
             b":70010007800C6\n",
@@ -147,7 +198,7 @@ class VictronEnergyDirect(AbstractProtocol):
     def __str__(self):
         return "VED protocol handler for Victron direct SmartShunts"
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self) -> None:
         super().__init__()
         self.protocol_id = b"VED"
         self.add_command_definitions(COMMANDS)
@@ -159,7 +210,7 @@ class VictronEnergyDirect(AbstractProtocol):
         ]
         self.DEFAULT_COMMAND = "vedtext"
         # self._command_definition = None
-        self.check_definitions_count(expected=1)
+        self.check_definitions_count(expected=2)
 
     def get_full_command(self, command) -> bytes:
         """
@@ -202,8 +253,11 @@ class VictronEnergyDirect(AbstractProtocol):
                 cmd = f":{cmd}{checksum:02X}\n"
                 log.debug("full command: %s", cmd)
                 return cmd
-        log.warning("unable to generate full command - is the definition wrong?")
-        return None
+            case VictronCommandType.LISTEN:
+                # Just listen - dont need to send a command
+                log.debug("command is LISTENT type so returning %s", command_type)
+                return command_type
+        raise CommandError(f"unable to generate full command for {command}, type {command_type} - is the definition wrong or CommandType not implemented?")
 
     # def check_valid(self, response: str) -> bool: - not needed, use superclass
 
@@ -217,11 +271,11 @@ class VictronEnergyDirect(AbstractProtocol):
         log.debug("response: %s", response)
         if b":" in response:
             # HEX response, e.g. b":70010007800C6\n"
-            _ret = response.split(b":")[1][:-3].decode()
+            _ret = response.split(b":")[1][:-3]
         else:
             # VEDTEXT response, return the lot
             _ret = response
-        _ret = _ret.encode()
+        # _ret = _ret.encode()
         log.debug("trim_response: %s", _ret)
         return _ret
 
