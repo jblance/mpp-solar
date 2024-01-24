@@ -1,7 +1,6 @@
 """ protocols / ved.py """
 import logging
 from enum import Enum
-# from typing import Tuple
 from struct import unpack
 
 from mppsolar.protocols.protocol_helpers import vedHexChecksum
@@ -10,8 +9,6 @@ from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
 from powermon.errors import CommandError
 from powermon.protocols.abstractprotocol import AbstractProtocol
-
-# from .pi30 import COMMANDS
 
 log = logging.getLogger("ved")
 
@@ -148,7 +145,6 @@ class VictronEnergyDirect(AbstractProtocol):
             "",
         ]
         self.DEFAULT_COMMAND = "vedtext"
-        # self._command_definition = None
         self.check_definitions_count(expected=2)
 
     def get_full_command(self, command) -> bytes:
@@ -169,11 +165,6 @@ class VictronEnergyDirect(AbstractProtocol):
         # 00 cs
         # \n
         # eg b':70010003E\n' = get battery capacity id = 0x1000 = 0010 little endian
-
-        # if cmd_type == "VEDTEXT":
-        #     # Just listen - dont need to send a command
-        #     log.debug("command is VEDTEXT type so returning %s", cmd_type)
-        #     return cmd_type
 
         command_type = command_definition.device_command_type
         match command_type:
@@ -203,6 +194,30 @@ class VictronEnergyDirect(AbstractProtocol):
     def check_crc(self, response: str) -> bool:
         """ crc check, needs override in protocol """
         log.debug("no check crc for %s", response)
+        # if b":" in response:
+        #     # HEX protocol response
+        #     log.debug("checking validity of '%s'", response)
+        #     _r = response.split(b":")[1][:-1].decode()
+        #     # print(f"trimmed response {_r}")
+        #     _r = f"0{_r}"
+        #     # print(f"padded response {_r}")
+        #     _r = bytes.fromhex(_r)
+        #     # print(f"bytes response {_r}")
+        #     data = _r[:-1]
+        #     checksum = _r[-1:][0]
+        #     if vedHexChecksum(data) == checksum:
+        #         log.debug("VED Hex Checksum matches in response '%s' checksum:'%s'", response, checksum)
+        #         return True, {}
+        #     else:
+        #         # print("VED Hex Checksum does not match")
+        #         return False, {
+        #             "validity check": [
+        #                 f"Error: VED HEX checksum did not match for response {response}",
+        #                 "",
+        #             ]
+        #         }
+        # else:
+        #     return True, {}
         return True
 
     def trim_response(self, response: str) -> str:
@@ -223,32 +238,7 @@ class VictronEnergyDirect(AbstractProtocol):
     #     VED HEX protocol - sum of bytes should be 0x55
     #     VED Text protocol - no validity check
     #     """
-    #     if not response:
-    #         return False, {"validity check": ["Error: Response was empty", ""]}
-    #     if b":" in response:
-    #         # HEX protocol response
-    #         log.debug("checking validity of '%s'", response)
-    #         _r = response.split(b":")[1][:-1].decode()
-    #         # print(f"trimmed response {_r}")
-    #         _r = f"0{_r}"
-    #         # print(f"padded response {_r}")
-    #         _r = bytes.fromhex(_r)
-    #         # print(f"bytes response {_r}")
-    #         data = _r[:-1]
-    #         checksum = _r[-1:][0]
-    #         if vedHexChecksum(data) == checksum:
-    #             log.debug("VED Hex Checksum matches in response '%s' checksum:'%s'", response, checksum)
-    #             return True, {}
-    #         else:
-    #             # print("VED Hex Checksum does not match")
-    #             return False, {
-    #                 "validity check": [
-    #                     f"Error: VED HEX checksum did not match for response {response}",
-    #                     "",
-    #                 ]
-    #             }
-    #     else:
-    #         return True, {}
+
 
     # def get_responses(self, response):
     #     """
