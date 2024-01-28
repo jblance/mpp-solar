@@ -48,6 +48,7 @@ class SerialPort(AbstractPort):
         log.debug("usbserial port connecting. path:%s, baud:%s", self.path, self.baud)
         try:
             self.serial_port = serial.Serial(port=self.path, baudrate=self.baud, timeout=1, write_timeout=1)
+            log.debug(self.serial_port)
         except ValueError as e:
             log.error("Incorrect configuration for serial port: %s", e)
             self.error_message = str(e)
