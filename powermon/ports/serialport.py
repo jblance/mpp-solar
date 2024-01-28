@@ -40,7 +40,9 @@ class SerialPort(AbstractPort):
         return dto
 
     def is_connected(self):
-        return self.serial_port is not None and self.serial_port.is_open
+        value = self.serial_port is not None and self.serial_port.is_open
+        log.info(value)
+        return value
 
     def connect(self) -> int:
         log.debug("usbserial port connecting. path:%s, baud:%s", self.path, self.baud)
