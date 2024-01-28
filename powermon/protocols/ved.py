@@ -187,7 +187,7 @@ class VictronEnergyDirect(AbstractProtocol):
                 return cmd
             case VictronCommandType.LISTEN:
                 # Just listen - dont need to send a command
-                log.debug("command is LISTENT type so returning %s", command_type)
+                log.debug("command is LISTEN type so returning %s", command_type)
                 return command_type
         raise CommandError(f"unable to generate full command for {command}, type {command_type} - is the definition wrong or CommandType not implemented?")
 

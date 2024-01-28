@@ -40,9 +40,7 @@ class SerialPort(AbstractPort):
         return dto
 
     def is_connected(self):
-        value = self.serial_port is not None and self.serial_port.is_open
-        log.info(value)
-        return value
+        return self.serial_port is not None and self.serial_port.is_open
 
     def connect(self) -> int:
         log.debug("usbserial port connecting. path:%s, baud:%s", self.path, self.baud)
@@ -57,7 +55,7 @@ class SerialPort(AbstractPort):
             log.error("Error opening serial port: %s", e)
             self.error_message = str(e)
             self.serial_port = None
-        return 0
+        return self.is_connected()
 
     def disconnect(self) -> None:
         log.debug("usbserial port disconnecting")
@@ -68,8 +66,8 @@ class SerialPort(AbstractPort):
     def send_and_receive(self, command: Command) -> Result:
         full_command = command.full_command
         response_line = None
-        log.debug("port: %s", self.serial_port)
-        if self.serial_port is None:
+        log.debug("port: %s, full_command: %s", self.serial_port, full_command)
+        if not self.is_connected():
             raise RuntimeError("Serial port not open")
         try:
             log.debug("Executing command via usbserial...")
