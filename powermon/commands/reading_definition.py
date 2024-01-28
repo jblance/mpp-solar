@@ -152,7 +152,8 @@ class ReadingDefinition():
             case ResponseType.BOOL:
                 return bool(int(raw_value.decode('utf-8')))
             case ResponseType.HEX_CHAR:
-                return ord(raw_value.decode('utf-8')[0])
+                return raw_value[0]
+                # return ord(raw_value.decode('utf-8')[0])
             case ResponseType.INT:
                 try:
                     result = int(raw_value.decode('utf-8'))
