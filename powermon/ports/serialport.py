@@ -76,7 +76,7 @@ class SerialPort(AbstractPort):
             self.serial_port.reset_output_buffer()
             if full_command == VictronCommandType.LISTEN:
                 # this command type doesnt need to send a command, it just listens on the serial port
-                response_line = ""
+                response_line = b""
                 for _ in range(30):
                     _response = self.serial_port.read_until(b"\n")
                     response_line += _response
