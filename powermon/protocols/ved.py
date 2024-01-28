@@ -7,7 +7,7 @@ from mppsolar.protocols.protocol_helpers import vedHexChecksum
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
-from powermon.errors import CommandError
+from powermon.errors import CommandError, InvalidCRC
 from powermon.protocols.abstractprotocol import AbstractProtocol
 
 log = logging.getLogger("ved")
@@ -171,6 +171,8 @@ class VictronEnergyDirect(AbstractProtocol):
             case VictronCommandType.GET:
                 # command components
                 raw_command_code = command_definition.device_command_code  # eg 1000 for batteryCapacity
+                if raw_command_code is None:
+                    raise CommandError(f"device_command_code not found for {command=} - check protocol definition for this command")
                 command_code = f"{unpack('<h', bytes.fromhex(raw_command_code))[0]:04X}"
                 flags = "00"
 
@@ -193,31 +195,27 @@ class VictronEnergyDirect(AbstractProtocol):
 
     def check_crc(self, response: str) -> bool:
         """ crc check, needs override in protocol """
-        log.debug("no check crc for %s", response)
-        # if b":" in response:
-        #     # HEX protocol response
-        #     log.debug("checking validity of '%s'", response)
-        #     _r = response.split(b":")[1][:-1].decode()
-        #     # print(f"trimmed response {_r}")
-        #     _r = f"0{_r}"
-        #     # print(f"padded response {_r}")
-        #     _r = bytes.fromhex(_r)
-        #     # print(f"bytes response {_r}")
-        #     data = _r[:-1]
-        #     checksum = _r[-1:][0]
-        #     if vedHexChecksum(data) == checksum:
-        #         log.debug("VED Hex Checksum matches in response '%s' checksum:'%s'", response, checksum)
-        #         return True, {}
-        #     else:
-        #         # print("VED Hex Checksum does not match")
-        #         return False, {
-        #             "validity check": [
-        #                 f"Error: VED HEX checksum did not match for response {response}",
-        #                 "",
-        #             ]
-        #         }
-        # else:
-        #     return True, {}
+        log.debug("checking crc for %s", response)
+        if b":" in response:
+            # HEX protocol response
+            log.debug("checking validity of '%s'", response)
+            _r = response.split(b":")[1][:-1].decode()
+            # print(f"trimmed response {_r}")
+            _r = f"0{_r}"
+            # print(f"padded response {_r}")
+            _r = bytes.fromhex(_r)
+            # print(f"bytes response {_r}")
+            data = _r[:-1]
+            checksum = _r[-1:][0]
+            expected_checksum = vedHexChecksum(data)
+            if expected_checksum == checksum:
+                log.debug("VED Hex Checksum matches in response '%s' checksum:'%s'", response, checksum)
+                return True
+            else:
+                # print("VED Hex Checksum does not match")
+                raise InvalidCRC(f"response has invalid CRC - got '\\x{checksum:02x}', calculated '\\x{expected_checksum:02x}")
+        else:
+            return True
         return True
 
     def trim_response(self, response: str) -> str:
@@ -232,52 +230,3 @@ class VictronEnergyDirect(AbstractProtocol):
         # _ret = _ret.encode()
         log.debug("trim_response: %s", _ret)
         return _ret
-
-    # def check_response_and_trim(self, response) -> Tuple[bool, dict]:
-    #     """
-    #     VED HEX protocol - sum of bytes should be 0x55
-    #     VED Text protocol - no validity check
-    #     """
-
-
-    # def get_responses(self, response):
-    #     """
-    #     Override the default get_responses as its different for PI00
-    #     """
-    #     # remove \n
-    #     response = response.replace(b"\n", b"")
-    #     responses = []
-    #     # for hex protocol responses - these contain a :
-    #     if b":" in response:
-    #         # trim anything before ':'
-    #         _r = response.split(b":")[1].decode()
-    #         # pad command (which is single char)
-    #         _r = f"0{_r}"
-    #         _r = bytes.fromhex(_r)
-    #         if (
-    #             self._command_definition is not None
-    #             and self._command_definition.result_type == ResultType.POSITIONAL
-    #         ):
-    #             # Have a POSITIONAL type response, so need to break it up...
-    #             for defn in self._command_definition.reading_definitions:
-    #                 size = defn[1]
-    #                 item = _r[:size]
-    #                 responses.append(item)
-    #                 _r = _r[size:]
-    #             return responses
-    #         else:
-    #             return bytearray(response)
-    #             # convert string hex to bytes
-    #             # _r = bytes.fromhex(_r)
-    #             # return bytearray(_r)
-    #     else:
-    #         # for text protocol responses
-    #         _responses = response.split(b"\r")
-    #         for resp in _responses:
-    #             _resp = resp.split(b"\t")
-    #             responses.append(_resp)
-    #     # Trim leading '(' of first response
-    #     # 3responses[0] = responses[0][1:]
-    #     # Remove CRC and \r of last response
-    #     # responses[-1] = responses[-1][:-3]
-    #     return responses
