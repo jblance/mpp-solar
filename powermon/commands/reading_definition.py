@@ -25,6 +25,7 @@ class ResponseType(LowercaseStrEnum):
     LE_2B_S = auto()  # little endian 2 byte value (as string, eg 7800 = 0x0078 = 120)
     OPTION = auto()  # response identifies which option from a dict (called 'options') is the info
     LIST = auto()  # response identifies which option from a list (called 'options') is the info
+    BIT_ENCODED = auto()
     ENABLE_DISABLE_FLAGS = auto()
     FLAGS = auto()
     INFO = auto()
@@ -178,6 +179,18 @@ class ReadingDefinition():
                 result = raw_value.decode('utf-8')
                 result = unpack('<h', bytes.fromhex(result))[0]
                 return result
+            case ResponseType.BIT_ENCODED:
+                if not isinstance(self.options, dict):
+                    raise TypeError(f"For Reading Defininition '{self.description}', options must be a dict if response_type is BIT_ENCODED")
+                value = int(raw_value.decode('utf-8'))
+                if value == 0:
+                    return self.options[0]
+                # loop through options and check if applicable
+                results = []
+                for key in self.options.keys():
+                    if value & key:
+                        results.append(self.options[key])
+                return ",".join(results)
             case ResponseType.OPTION:
                 if not isinstance(self.options, dict):
                     raise TypeError(f"For Reading Defininition '{self.description}', options must be a dict if response_type is OPTION")

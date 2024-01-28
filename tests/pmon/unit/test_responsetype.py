@@ -130,5 +130,39 @@ class TestResponseTypes(unittest.TestCase):
         _result = Result(command=command, raw_response=b"(12345\x94\x0e\r", responses=b"12345")
 
         formatted_data = simple_formatter.format(command, _result, device_info)
-        print(formatted_data)
+        # print(formatted_data)
+        self.assertEqual(formatted_data, expected)
+
+    def test_bit_encoded(self):
+        """ test ResponseType.BIT_ENCODED """
+        reading_definition_config = {"index": "AR", "description": "Alarm reason", "reading_type": ReadingType.MESSAGE,
+                                     "response_type": ResponseType.BIT_ENCODED,
+                                     "options": {0: "No alarm",
+                                                 1: "Low Voltage",
+                                                 2: "High Voltage",
+                                                 4: "Low SOC",
+                                                 8: "Low Starter Voltage",
+                                                 16: "High Starter Voltage",
+                                                 32: "Low Temperature",
+                                                 64: "High Temperature",
+                                                 128: "Mid Voltage",
+                                                 256: "Overload",
+                                                 512: "DC-ripple",
+                                                 1024: "Low V AC out",
+                                                 2048: "High V AC out",
+                                                 4096: "Short Circuit",
+                                                 8192: "BMS Lockout"}}
+        expected = ['alarm_reason=High Voltage,Low Starter Voltage,High Starter Voltage,Low Temperature,High Temperature,Mid Voltage']
+
+        simple_formatter = SimpleFormat({})
+        device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
+        reading_definition = ReadingDefinition.from_config(reading_definition_config, 0)
+        command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
+        command = Command.from_config({"command": "CODE"})
+        command.command_definition = command_definition
+
+        _result = Result(command=command, raw_response=b"(12345\x94\x0e\r", responses=b"250")
+
+        formatted_data = simple_formatter.format(command, _result, device_info)
+        # print(formatted_data)
         self.assertEqual(formatted_data, expected)
