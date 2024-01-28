@@ -61,7 +61,7 @@ class USBPort(AbstractPort):
         response_line = bytes()
 
         # Send the command to the open usb connection
-        full_command = command.full_command()
+        full_command = command.full_command
         cmd_len = len(full_command)
         log.debug("length of to_send: %i", cmd_len)
         # for command of len < 8 it ok just to send
