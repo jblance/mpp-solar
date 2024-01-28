@@ -4,11 +4,12 @@ import time
 
 import serial
 
-from powermon.dto.portDTO import PortDTO
+from powermon.commands.command import Command
 from powermon.commands.result import Result
+from powermon.dto.portDTO import PortDTO
 from powermon.ports.abstractport import AbstractPort
 from powermon.protocols import get_protocol_definition
-from powermon.commands.command import Command
+from powermon.protocols.ved import VictronCommandType
 
 log = logging.getLogger("SerialPort")
 
@@ -73,11 +74,18 @@ class SerialPort(AbstractPort):
             log.debug("Executing command via usbserial...")
             self.serial_port.reset_input_buffer()
             self.serial_port.reset_output_buffer()
-            c = self.serial_port.write(full_command)
-            log.debug("Wrote %i bytes", c)
-            self.serial_port.flush()
-            time.sleep(0.1)  # give serial port time to receive the data
-            response_line = self.serial_port.read_until(b"\r")
+            if full_command == VictronCommandType.LISTEN:
+                # this command type doesnt need to send a command, it just listens on the serial port
+                response_line = ""
+                for _ in range(30):
+                    _response = self.serial_port.read_until(b"\n")
+                    response_line += _response
+            else:
+                c = self.serial_port.write(full_command)
+                log.debug("Wrote %i bytes", c)
+                self.serial_port.flush()
+                time.sleep(0.1)  # give serial port time to receive the data
+                response_line = self.serial_port.read_until(b"\r")
             log.debug("serial response was: %s", response_line)
             # response = self.get_protocol().check_response_and_trim(response_line)
             result = command.build_result(raw_response=response_line, protocol=self.protocol)
