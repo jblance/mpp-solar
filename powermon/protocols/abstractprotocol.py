@@ -121,22 +121,23 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.debug("full command: %s", full_command)
         return full_command
 
-    def check_valid(self, response: str) -> bool:
+    def check_valid(self, response: str, command_definition: CommandDefinition = None) -> bool:
         """ check response is valid """
+        log.debug("check valid for %s, definition: %s", response, command_definition)
         if response is None:
             raise InvalidResponse("Response is None")
         if len(response) <= 3:
             raise InvalidResponse("Response is too short")
         return True
 
-    def check_crc(self, response: str) -> bool:
+    def check_crc(self, response: str, command_definition: CommandDefinition = None) -> bool:
         """ crc check, needs override in protocol """
-        log.debug("no check crc for %s", response)
+        log.debug("no check crc for %s, definition: %s", response, command_definition)
         return True
 
-    def trim_response(self, response: str) -> str:
+    def trim_response(self, response: str, command_definition: CommandDefinition = None) -> str:
         """ Remove extra characters from response """
-        log.debug("response: %s", response)
+        log.debug("trim %s, definition: %s", response, command_definition)
         return response[1:-3]
 
     def split_response(self, response: str, command_definition: CommandDefinition = None) -> list | dict:

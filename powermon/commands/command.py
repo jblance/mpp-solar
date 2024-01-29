@@ -87,15 +87,15 @@ class Command():
         log.debug("build_result: for command with 'code: %s, command_definition: %s'", self.code, self.command_definition)
         try:
             # check response is valid
-            protocol.check_valid(raw_response)
+            protocol.check_valid(raw_response, self.command_definition)
             # check crc is correct
-            protocol.check_crc(raw_response)
+            protocol.check_crc(raw_response, self.command_definition)
         except (InvalidResponse, InvalidCRC) as e:
             # TODO: complete / fix
             print(e)
 
         # trim response
-        trimmed_response = protocol.trim_response(raw_response)
+        trimmed_response = protocol.trim_response(raw_response, self.command_definition)
         # split response
         responses = protocol.split_response(trimmed_response, self.command_definition)
         # build the Result object

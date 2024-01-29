@@ -221,7 +221,7 @@ class VictronEnergyDirect(AbstractProtocol):
                 checksum = vedHexChecksum(bytes.fromhex(f"0{cmd}"))
 
                 # build full command
-                cmd = f":{cmd}{checksum:02X}\n"
+                cmd = f":{cmd}{checksum:02X}\n".encode()
                 log.debug("full command: %s", cmd)
                 return cmd
             case VictronCommandType.LISTEN:
@@ -232,40 +232,44 @@ class VictronEnergyDirect(AbstractProtocol):
 
     # def check_valid(self, response: str) -> bool: - not needed, use superclass
 
-    def check_crc(self, response: str) -> bool:
+    def check_crc(self, response: str, command_definition: CommandDefinition = None) -> bool:
         """ crc check, needs override in protocol """
         log.debug("checking crc for %s", response)
-        if b":" in response:
-            # HEX protocol response
-            log.debug("checking validity of '%s'", response)
-            _r = response.split(b":")[1][:-1].decode()
-            # print(f"trimmed response {_r}")
-            _r = f"0{_r}"
-            # print(f"padded response {_r}")
-            _r = bytes.fromhex(_r)
-            # print(f"bytes response {_r}")
-            data = _r[:-1]
-            checksum = _r[-1:][0]
-            expected_checksum = vedHexChecksum(data)
-            if expected_checksum == checksum:
-                log.debug("VED Hex Checksum matches in response '%s' checksum:'%s'", response, checksum)
+        command_type = command_definition.device_command_type
+        match command_type:
+            case VictronCommandType.GET:
+                # HEX protocol response
+                log.debug("checking validity of '%s'", response)
+                _r = response.split(b":")[1][:-1].decode()
+                # print(f"trimmed response {_r}")
+                _r = f"0{_r}"
+                # print(f"padded response {_r}")
+                _r = bytes.fromhex(_r)
+                # print(f"bytes response {_r}")
+                data = _r[:-1]
+                checksum = _r[-1:][0]
+                expected_checksum = vedHexChecksum(data)
+                if expected_checksum == checksum:
+                    log.debug("VED Hex Checksum matches in response '%s' checksum:'%s'", response, checksum)
+                    return True
+                else:
+                    # print("VED Hex Checksum does not match")
+                    raise InvalidCRC(f"response has invalid CRC - got '\\x{checksum:02x}', calculated '\\x{expected_checksum:02x}")
+            case VictronCommandType.LISTEN:
                 return True
-            else:
-                # print("VED Hex Checksum does not match")
-                raise InvalidCRC(f"response has invalid CRC - got '\\x{checksum:02x}', calculated '\\x{expected_checksum:02x}")
-        else:
-            return True
         return True
 
-    def trim_response(self, response: str) -> str:
+    def trim_response(self, response: str, command_definition: CommandDefinition = None) -> str:
         """ Remove extra characters from response """
         log.debug("response: %s", response)
-        if b":" in response:
-            # HEX response, e.g. b":70010007800C6\n"
-            _ret = response.split(b":")[1][:-3]
-        else:
-            # VEDTEXT response, return the lot
-            _ret = response
-        # _ret = _ret.encode()
+        command_type = command_definition.device_command_type
+        _ret = None
+        match command_type:
+            case VictronCommandType.GET:
+                # HEX response, e.g. b":70010007800C6\n"
+                _ret = response.split(b":")[1][:-3]
+            case VictronCommandType.LISTEN:
+                # VEDTEXT response, return the lot
+                _ret = response
         log.debug("trim_response: %s", _ret)
         return _ret
