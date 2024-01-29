@@ -38,13 +38,13 @@ class USBPort(AbstractPort):
         if self.is_connected():
             log.debug("USBPort already connected")
             return True
-        
         log.debug("USBPort connecting. path:%s, protocol:%s", self.path, self.protocol)
         try:
             self.port = os.open(self.path, os.O_RDWR | os.O_NONBLOCK)
             log.debug("USBPort port number $%s", self.port)
         except Exception as e:
-            log.warning(f"Error openning usb port: {e}")
+            log.warning("Error openning usb port: %s", e)
+            self.port = None
             self.error_message = e
         return self.is_connected()
 
