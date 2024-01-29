@@ -154,3 +154,21 @@ class Result:
         for reading in self.readings:
             reading_dtos.append(reading.to_dto())
         return ResultDTO(device_identifier="self.device_id", command_code="self.command_code", data=reading_dtos)
+
+
+class ResultError(Result):
+    """ docstring todo """
+    def __init__(self, command, raw_response: bytes, responses: list | dict):
+        self.command = command
+        self.raw_response = raw_response
+        self.result_type = ResultType.ERROR
+
+        self.is_valid = False
+        self.error = True
+        self.error_messages = responses
+
+        # self.command_definition = command.command_definition
+
+        self.readings: list[Reading] = None
+
+        log.debug("Result: %s", self)

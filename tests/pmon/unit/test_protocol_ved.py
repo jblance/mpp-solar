@@ -1,34 +1,35 @@
 """ tests / pmon / unit / test_protocol_ved.py """
 import unittest
 
+from powermon.commands.command import Command
+from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
-from powermon.commands.command_definition import CommandDefinition
-from powermon.errors import CommandError, InvalidResponse, InvalidCRC
+from powermon.device import DeviceInfo
+from powermon.errors import CommandError, InvalidCRC, InvalidResponse
+from powermon.formats.simple import SimpleFormat
 from powermon.protocols.ved import VictronCommandType, VictronEnergyDirect
 
 command_definitions_config = {"name": "batteryCapacity",
-                                                  "description": "Battery Capacity",
-                                                  "help": " -- display the Battery Capacity",
-                                                  "device_command_type": VictronCommandType.GET,
-                                                  "device_command_code": "1000",  # or should be the more accurate 1000
-                                                  "result_type": ResultType.SLICED,
-                                                  "reading_definitions": [{"description": "Command type", "slice": [0, 1], "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
-                                                                          {"description": "Command", "slice": [1, 5], "reading_type": ReadingType.HEX_STR, "response_type": ResponseType.LE_2B_S},
-                                                                          {"description": "Command response flag", "slice": [5, 7], "reading_type": ReadingType.MESSAGE,
-                                                                           "response_type": ResponseType.OPTION,
-                                                                           "options": {"00": "OK",
-                                                                                       "01": "Unknown ID",
-                                                                                       "02": "Not supported",
-                                                                                       "04": "Parameter Error"}},
-                                                                         {"description": "Battery Capacity", "slice": [7, 11], "reading_type": ReadingType.ENERGY, "response_type": ResponseType.LE_2B_S},],}
+                              "description": "Battery Capacity",
+                              "help": " -- display the Battery Capacity",
+                              "device_command_type": VictronCommandType.GET,
+                              "device_command_code": "1000",  # or should be the more accurate 1000
+                              "result_type": ResultType.SLICED,
+                              "reading_definitions": [{"description": "Command type", "slice": [0, 1], "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
+                                                      {"description": "Command", "slice": [1, 5], "reading_type": ReadingType.HEX_STR, "response_type": ResponseType.LE_2B_S},
+                                                      {"description": "Command response flag", "slice": [5, 7], "reading_type": ReadingType.MESSAGE,
+                                                       "response_type": ResponseType.OPTION,
+                                                       "options": {"00": "OK",
+                                                                   "01": "Unknown ID",
+                                                                   "02": "Not supported",
+                                                                   "04": "Parameter Error"}},
+                                                      {"description": "Battery Capacity", "slice": [7, 11], "reading_type": ReadingType.ENERGY, "response_type": ResponseType.LE_2B_S},]}
 cd = CommandDefinition.from_config(command_definitions_config)
 
 
 class TestProtocolVed(unittest.TestCase):
     """ exercise different functions in ved protocol """
-
-
     def test_check_crc(self):
         """ test a for correct CRC validation """
         ved = VictronEnergyDirect()
@@ -89,7 +90,53 @@ class TestProtocolVed(unittest.TestCase):
         ved = VictronEnergyDirect()
 
         # print(_result)
-        self.assertRaises(InvalidResponse, ved.check_valid, response="12")
+        self.assertRaises(InvalidResponse, ved.check_valid, response=b"12")
+
+    def test_check_valid_missing(self):
+        """ test ved protocol returns false for a short response validation check """
+        ved = VictronEnergyDirect()
+        # _result = ved.check_valid(response=b"70010007800C6\n", command_definition=cd)
+
+        # print(_result)
+        self.assertRaises(InvalidResponse, ved.check_valid, response=b"70010007800C6\n", command_definition=cd)
+
+    def test_build_result(self):
+        """ test result build """
+        expected = ['command_type=7',
+                    'command=0x1000',
+                    'command_response_flag=OK',
+                    'battery_capacity=120Ah']
+        simple_formatter = SimpleFormat({"extra_info": True})
+
+        device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
+        command = Command.from_config({"command": "batteryCapacity"})
+        command.command_definition = cd
+        ved = VictronEnergyDirect()
+        raw_response = b":70010007800C6\n"
+
+        _result = command.build_result(raw_response=raw_response, protocol=ved)
+
+        formatted_data = simple_formatter.format(command, _result, device_info)
+        # print(formatted_data)
+        self.assertEqual(formatted_data, expected)
+
+    def test_build_result_missing(self):
+        """ test result build with invalid response"""
+        expected = ['Error Count: 1', "Error #0: Response incomplete - missing ':'"]
+        simple_formatter = SimpleFormat({"extra_info": True})
+
+        device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
+        command = Command.from_config({"command": "batteryCapacity"})
+        command.command_definition = cd
+        ved = VictronEnergyDirect()
+        raw_response = b"70010007800C6\n"
+
+        _result = command.build_result(raw_response=raw_response, protocol=ved)
+        # print(_result)
+
+        formatted_data = simple_formatter.format(command, _result, device_info)
+        # print(formatted_data)
+        self.assertEqual(formatted_data, expected)
 
     def test_full_command_missing_device_command_code(self):
         """ ensure an exception is raised if the device_command_code is missing in the protocol definition """

@@ -83,7 +83,7 @@ class TestResponseTypes(unittest.TestCase):
         _result = Result(command=command, raw_response=b"(7800\xcd\xcd\r", responses=b"7800")
 
         formatted_data = simple_formatter.format(command, _result, device_info)
-        print(formatted_data)
+        # print(formatted_data)
         self.assertEqual(formatted_data, expected)
 
     def test_le_2b_s_not_2b_short(self):

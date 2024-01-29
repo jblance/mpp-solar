@@ -7,12 +7,7 @@ class Reading:
     def __str__(self):
         return f"Reading: {self.data_name=}, {self.data_value=}, {self.data_unit=}, {self.is_valid=}"
 
-    def __init__(self, data_name: str,
-                 data_value: str,
-                 data_unit: str,
-                 device_class: str = None,
-                 state_class: str = None,
-                 icon: str = None) -> None:
+    def __init__(self, data_name: str, data_value: str, data_unit: str, device_class: str = None, state_class: str = None, icon: str = None) -> None:
         self.data_name = data_name
         self.data_value = data_value
         self.data_unit = data_unit

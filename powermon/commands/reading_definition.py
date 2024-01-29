@@ -2,8 +2,9 @@
 import calendar  # pylint: disable=w0611 # needed for INFO type evaluating templates
 import logging
 from enum import auto
-from strenum import LowercaseStrEnum
 from struct import unpack
+
+from strenum import LowercaseStrEnum
 
 from powermon.commands.reading import Reading
 

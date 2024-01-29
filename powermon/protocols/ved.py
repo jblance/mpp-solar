@@ -7,7 +7,7 @@ from mppsolar.protocols.protocol_helpers import vedHexChecksum
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
-from powermon.errors import CommandError, InvalidCRC
+from powermon.errors import CommandError, InvalidCRC, InvalidResponse
 from powermon.protocols.abstractprotocol import AbstractProtocol
 
 log = logging.getLogger("ved")
@@ -160,6 +160,7 @@ COMMANDS = {
         "test_responses": [
             b":70010007800C6\n",
             b"\x00\x1a:70010007800C6\n",
+            b"70010007800C6\n",  # this one will error
         ],
     },
 }
@@ -230,7 +231,19 @@ class VictronEnergyDirect(AbstractProtocol):
                 return command_type
         raise CommandError(f"unable to generate full command for {command}, type {command_type} - is the definition wrong or CommandType not implemented?")
 
-    # def check_valid(self, response: str) -> bool: - not needed, use superclass
+    def check_valid(self, response: str, command_definition: CommandDefinition = None) -> bool:
+        """ check response is valid """
+        log.debug("check valid for %s, definition: %s", response, command_definition)
+        if response is None:
+            raise InvalidResponse("Response is None")
+        if len(response) <= 3:
+            raise InvalidResponse("Response is too short")
+        command_type = command_definition.device_command_type
+        match command_type:
+            case VictronCommandType.GET:
+                if response.count(b':') != 1:
+                    raise InvalidResponse("Response incomplete - missing ':'")
+        return True
 
     def check_crc(self, response: str, command_definition: CommandDefinition = None) -> bool:
         """ crc check, needs override in protocol """

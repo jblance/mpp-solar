@@ -2,7 +2,7 @@
 import logging
 
 from powermon.commands.command_definition import CommandDefinition
-from powermon.commands.result import Result
+from powermon.commands.result import Result, ResultType, ResultError
 from powermon.commands.trigger import Trigger
 from powermon.dto.commandDTO import CommandDTO
 from powermon.errors import ConfigError, InvalidResponse, InvalidCRC
@@ -91,8 +91,10 @@ class Command():
             # check crc is correct
             protocol.check_crc(raw_response, self.command_definition)
         except (InvalidResponse, InvalidCRC) as e:
-            # TODO: complete / fix
-            print(e)
+            _result = ResultError(command=self, raw_response=e, responses=[e.__context__, str(e)])
+            _result.result_type = ResultType.ERROR
+            # print(_result)
+            return _result
 
         # trim response
         trimmed_response = protocol.trim_response(raw_response, self.command_definition)
