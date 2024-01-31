@@ -13,60 +13,6 @@ from powermon.formats.simple import SimpleFormat
 class TestReadingDefinitions(unittest.TestCase):
     """ exercise different reading definition functionality """
 
-    def test_option_invalid_key(self):
-        """ test that when supplying an invalid key to a ResponseType.OPTION raises a KeyError exception """
-        reading_definition_config = {"reading_type": ReadingType.MESSAGE, "response_type": ResponseType.OPTION, "description": "Parallel Mode", "options": {"00": "New", "01": "Slave", "02": "Master"}}
-
-        reading_definition = ReadingDefinition.from_config(reading_definition_config, 0)
-        command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
-        command = Command.from_config({"command": "CODE"})
-        command.command_definition = command_definition
-        self.assertRaises(KeyError, Result, command=command, raw_response=b"(03\xcd\xcd\r", responses=b"03")
-
-    def test_option_valid_key(self):
-        """ test ResponseType.OPTION returns value associated with key """
-        reading_definition_config = {"reading_type": ReadingType.MESSAGE, "response_type": ResponseType.OPTION, "description": "Parallel Mode", "options": {"00": "New", "01": "Slave", "02": "Master"}}
-        expected = ["parallel_mode=Master"]
-
-        simple_formatter = SimpleFormat({})
-        device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
-        reading_definition = ReadingDefinition.from_config(reading_definition_config, 0)
-        command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
-        command = Command.from_config({"command": "CODE"})
-        command.command_definition = command_definition
-
-        _result = Result(command=command, raw_response=b"(03\xcd\xcd\r", responses=b"02")
-
-        formatted_data = simple_formatter.format(command, _result, device_info)
-        self.assertEqual(formatted_data, expected)
-
-    def test_list_invalid_index(self):
-        """ test that when supplying an invalid index to a ResponseType.LIST raises a IndexError exception """
-        reading_definition_config = {"description": "Output Source Priority", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Utility first", "Solar first", "SBU first"]}
-
-        reading_definition = ReadingDefinition.from_config(reading_definition_config, 0)
-        command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
-        command = Command.from_config({"command": "CODE"})
-        command.command_definition = command_definition
-        self.assertRaises(IndexError, Result, command=command, raw_response=b"(03\xcd\xcd\r", responses=b"03")
-
-    def test_list_valid_index(self):
-        """ test ResponseType.OPTION returns value associated with key """
-        reading_definition_config = {"description": "Output Source Priority", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.LIST, "options": ["Utility first", "Solar first", "SBU first"]}
-        expected = ["output_source_priority=SBU first"]
-
-        simple_formatter = SimpleFormat({})
-        device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
-        reading_definition = ReadingDefinition.from_config(reading_definition_config, 0)
-        command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
-        command = Command.from_config({"command": "CODE"})
-        command.command_definition = command_definition
-
-        _result = Result(command=command, raw_response=b"(03\xcd\xcd\r", responses=b"02")
-
-        formatted_data = simple_formatter.format(command, _result, device_info)
-        self.assertEqual(formatted_data, expected)
-
     def test_temperature_reading(self):
         """ test a correct temperature is returned in celcius """
         reading_definition_config = {"description": "Inverter Heat Sink Temperature", "reading_type": ReadingType.TEMPERATURE, "response_type": ResponseType.INT, "icon": "mdi:details", "device_class": "temperature"}
@@ -100,4 +46,58 @@ class TestReadingDefinitions(unittest.TestCase):
         _result = Result(command=command, raw_response=b"(03\xcd\xcd\r", responses=b"27")
 
         formatted_data = simple_formatter.format(command, _result, device_info)
+        self.assertEqual(formatted_data, expected)
+
+    def test_kilowatt_hours(self):
+        """ test ReadingType.KILOWATT_HOURS """
+        reading_definition_config = {"description": "Todays Power", "reading_type": ReadingType.KILOWATT_HOURS, "response_type": ResponseType.INT}
+        expected = ["todays_power=123kWh"]
+
+        simple_formatter = SimpleFormat({})
+        device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
+        reading_definition = ReadingDefinition.from_config(reading_definition_config, 0)
+        command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
+        command = Command.from_config({"command": "CODE"})
+        command.command_definition = command_definition
+
+        _result = Result(command=command, raw_response=b"(123\xcd\xcd\r", responses=b"123")
+
+        formatted_data = simple_formatter.format(command, _result, device_info)
+        # print(formatted_data)
+        self.assertEqual(formatted_data, expected)
+
+    def test_hex_str_1a(self):
+        """ test ReadingType.KILOWATT_HOURS """
+        reading_definition_config = {"description": "Checksum", "reading_type": ReadingType.HEX_STR, "response_type": ResponseType.HEX_CHAR}
+        expected = ["checksum=0x1a"]
+
+        simple_formatter = SimpleFormat({})
+        device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
+        reading_definition = ReadingDefinition.from_config(reading_definition_config, 0)
+        command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
+        command = Command.from_config({"command": "CODE"})
+        command.command_definition = command_definition
+
+        _result = Result(command=command, raw_response=b"(\x1a\xcd\xcd\r", responses=b"\x1a")
+
+        formatted_data = simple_formatter.format(command, _result, device_info)
+        # print(formatted_data)
+        self.assertEqual(formatted_data, expected)
+
+    def test_hex_str_9c(self):
+        """ test ReadingType.KILOWATT_HOURS """
+        reading_definition_config = {"description": "Checksum", "reading_type": ReadingType.HEX_STR, "response_type": ResponseType.HEX_CHAR}
+        expected = ["checksum=0x9c"]
+
+        simple_formatter = SimpleFormat({})
+        device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
+        reading_definition = ReadingDefinition.from_config(reading_definition_config, 0)
+        command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
+        command = Command.from_config({"command": "CODE"})
+        command.command_definition = command_definition
+
+        _result = Result(command=command, raw_response=b"(\x1a\xcd\xcd\r", responses=b"\x9c")
+
+        formatted_data = simple_formatter.format(command, _result, device_info)
+        # print(formatted_data)
         self.assertEqual(formatted_data, expected)

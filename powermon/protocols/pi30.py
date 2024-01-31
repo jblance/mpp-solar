@@ -2,6 +2,7 @@
 import logging
 
 from mppsolar.protocols.protocol_helpers import crcPI as crc
+from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
 from powermon.errors import InvalidCRC
@@ -654,7 +655,7 @@ class PI30(AbstractProtocol):
         self.DEFAULT_COMMAND = "QPI"
         self.ID_COMMANDS = ["QPI", "QGMN", "QMN"]
 
-    def check_crc(self, response: str):
+    def check_crc(self, response: str, command_definition: CommandDefinition = None):
         """ crc check, needs override in protocol """
         log.debug("check crc for %s in pi30", response)
         # check crc matches the calculated one

@@ -8,19 +8,16 @@ device:
     type: test
     # path: /dev/ttyUSB0
     # response_number: 1
-    protocol: PI30MAX
+    protocol: VED
 
 commands:
-- command: QPIGS
-  override:
-    temperature: F
+- command: vedtext
   outputs:
   - type: screen
     format: 
       type: table
       draw_lines: True
       extra_info: True
-      filter: temperature
 # - command: QMCHGCR
 #   outputs:
 #   - type: screen

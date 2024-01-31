@@ -23,3 +23,7 @@ class InvalidCRC(Exception):
 
 class CommandDefinitionMissing(Exception):
     """ Exception for missing / not found command definition """
+
+
+class CommandError(Exception):
+    """ Exception for errors with commands """

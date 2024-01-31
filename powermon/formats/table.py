@@ -29,11 +29,18 @@ class Table(AbstractFormat):
         log.info("Using output formatter: %s", self.name)
 
         _result = []
+        filtered_responses: list[Reading] = []
+
+        # check for error in result
+        if result.error:
+            filtered_responses.append(Reading(data_name="Error Count", data_value=len(result.error_messages), data_unit=""))
+            for i, message in enumerate(result.error_messages):
+                filtered_responses.append(Reading(data_name=f"Error #{i}", data_value=f"{message}", data_unit=""))
 
         if len(result.readings) == 0:
-            return _result
+            filtered_responses.append(Reading(data_name="Error", data_value="No readings in result", data_unit=""))
 
-        filtered_responses: list[Reading] = self.format_and_filter_data(result)
+        filtered_responses.extend(self.format_and_filter_data(result))
         log.debug("displayData: %s", "\n".join((str(a) for a in filtered_responses)))
 
         # build header

@@ -47,7 +47,7 @@ QUERY_COMMANDS = {
         "reading_definitions": [
             {"description": "Remote CPU firmware version",
                 "reading_type": ReadingType.MESSAGE, "icon": "mdi:identifier",
-                "response_type": ResponseType.TEMPLATE_BYTES, "format_template" : "r.removeprefix('VERFW:')"}],
+                "response_type": ResponseType.TEMPLATE_BYTES, "format_template": "r.removeprefix('VERFW:')"}],
         "test_responses": [b"(VERFW:00072.70\x53\xA7\r", ],
     },
     "VERFW": {
@@ -57,7 +57,7 @@ QUERY_COMMANDS = {
         "reading_definitions": [
             {"description": "Bluetooth firmware version",
                 "reading_type": ReadingType.MESSAGE, "icon": "mdi:identifier",
-                "response_type": ResponseType.TEMPLATE_BYTES, "format_template" : "r.removeprefix('VERFW:')"}],
+                "response_type": ResponseType.TEMPLATE_BYTES, "format_template": "r.removeprefix('VERFW:')"}],
         "test_responses": [b"(VERFW:00072.70\x53\xA7\r", ],
     },
     "QFLAG": {

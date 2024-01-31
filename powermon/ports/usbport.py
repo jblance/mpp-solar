@@ -1,4 +1,4 @@
-""" usbport.py """
+""" powermon / ports / usbport.py """
 import logging
 import os
 import time
@@ -38,13 +38,13 @@ class USBPort(AbstractPort):
         if self.is_connected():
             log.debug("USBPort already connected")
             return True
-        
-        log.debug(f"USBPort connecting. path:{self.path}, protocol: {self.protocol}")
+        log.debug("USBPort connecting. path:%s, protocol:%s", self.path, self.protocol)
         try:
             self.port = os.open(self.path, os.O_RDWR | os.O_NONBLOCK)
-            log.debug(f"USBPort port number ${self.port}")
+            log.debug("USBPort port number $%s", self.port)
         except Exception as e:
-            log.warning(f"Error openning usb port: {e}")
+            log.warning("Error openning usb port: %s", e)
+            self.port = None
             self.error_message = e
         return self.is_connected()
 
@@ -57,11 +57,11 @@ class USBPort(AbstractPort):
     def send_and_receive(self, command: Command) -> Result:
         if not self.is_connected():
             log.warning("USBPort not connected")
-            return Result(command_code=command.code, result_type=ResultType.ERROR, raw_response=b"USBPort not connected")
+            return command.build_result(result_type=ResultType.ERROR, raw_response=b"USBPort not connected", protocol=self.protocol)
         response_line = bytes()
 
         # Send the command to the open usb connection
-        full_command = command.get_full_command()
+        full_command = command.full_command
         cmd_len = len(full_command)
         log.debug("length of to_send: %i", cmd_len)
         # for command of len < 8 it ok just to send
@@ -85,7 +85,7 @@ class USBPort(AbstractPort):
         time.sleep(0.25)
         # Read from the usb connection
         # try to a max of 100 times
-        for x in range(100):
+        for _ in range(100):
             # attempt to deal with resource busy and other failures to read
             try:
                 time.sleep(0.15)

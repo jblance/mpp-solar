@@ -15,10 +15,9 @@ class ResultType(Enum):
     ACK = auto()  # ack / nak type result, normally from a setter command
     SINGLE = auto()  # single value in result
     ORDERED = auto()  # the order of the values determines what they are
-
-    MULTIVALUED = auto()
-    INDEXED = auto()
-    POSITIONAL = auto()
+    SLICED = auto()  # the response needs to be sliced into separate values
+    MULTIVALUED = auto()  # the response has multiple values, but they all correspond to one result
+    VED_INDEXED = auto()  # the response has a key / value pair (separated by \t, each pair separated by \r\n), with the key used to find the definition
 
 
 class Result:
@@ -102,7 +101,7 @@ class Result:
                 # Process the response using the reading_definition, into readings
                 readings = self.readings_from_response(responses, reading_definition)
                 all_readings.extend(readings)
-            case ResultType.ORDERED:
+            case ResultType.ORDERED | ResultType.SLICED:
                 # Have a list of reading_definitions and a list of responses that correspond to each other
                 # possibly additional INFO definitions (at end of definition list??)
                 definition_count = self.command.command_definition.reading_definition_count()
@@ -118,6 +117,14 @@ class Result:
                             # INFO is contained in supplied command eg QEY2023 -> 2023
                             readings = self.readings_from_response(self.command.code, reading_definition)
                             all_readings.extend(readings)
+            case ResultType.VED_INDEXED:
+                # have a list of (index,value) tuples
+                for key, value in responses:
+                    reading_definition: ReadingDefinition = self.command.command_definition.get_reading_definition(lookup=key)
+                    if reading_definition is not None:
+                        # Process the response using the reading_definition, into readings
+                        readings = self.readings_from_response(value, reading_definition)
+                        all_readings.extend(readings)
             case ResultType.ERROR:
                 # Get the reading_definition - this may need fixing for errors
                 reading_definition: ReadingDefinition = self.command.command_definition.get_reading_definition()
@@ -136,7 +143,7 @@ class Result:
         try:
             return reading_definition.reading_from_raw_response(response, override=self.command.override)
         except ValueError:
-            error = Reading(data_name=reading_definition.get_description(),
+            error = Reading(data_name=reading_definition.description,
                             data_value=reading_definition.get_invalid_message(response), data_unit="")
             error.is_valid = False
             return [error]
@@ -147,3 +154,21 @@ class Result:
         for reading in self.readings:
             reading_dtos.append(reading.to_dto())
         return ResultDTO(device_identifier="self.device_id", command_code="self.command_code", data=reading_dtos)
+
+
+class ResultError(Result):
+    """ docstring todo """
+    def __init__(self, command, raw_response: bytes, responses: list | dict):
+        self.command = command
+        self.raw_response = raw_response
+        self.result_type = ResultType.ERROR
+
+        self.is_valid = False
+        self.error = True
+        self.error_messages = responses
+
+        # self.command_definition = command.command_definition
+
+        self.readings: list[Reading] = None
+
+        log.debug("Result: %s", self)

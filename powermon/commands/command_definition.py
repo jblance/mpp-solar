@@ -33,6 +33,8 @@ class CommandDefinition:
         self.reading_definitions : dict[int, ReadingDefinition] = reading_definitions  # TODO: this is incorrect, needs positional and str indexes as well
         self.test_responses : list[bytes] = test_responses
         self.regex : str | None = regex
+        self.device_command_type = None
+        self.device_command_code : str = None
 
     @classmethod
     def from_config(cls, protocol_dictionary : dict) -> "CommandDefinition":
@@ -55,11 +57,14 @@ class CommandDefinition:
                     ReadingDefinition.multiple_from_config(protocol_dictionary.get("reading_definitions"))
 
         log.debug("code: %s description: %s reading_definitions: %s", code, description, reading_definitions)
-        return cls(
+        _command_definition = cls(
             code=code, description=description, help_text=help_text, result_type=result_type,
             reading_definitions=reading_definitions, test_responses=test_responses,
             regex=regex
         )
+        _command_definition.device_command_type = protocol_dictionary.get("device_command_type")
+        _command_definition.device_command_code = protocol_dictionary.get("device_command_code")
+        return _command_definition
 
     def to_dto(self) -> CommandDefinitionDTO:
         """ convert command definition object to data transfer object """
@@ -83,16 +88,23 @@ class CommandDefinition:
         """ return the reading definition that corresponds to lookup """
         log.debug("looking for reading definition with: %s, result_type is: %s", lookup, self.result_type)
         if self.reading_definitions is None:
-            return None
+            result = None
         match self.result_type:
             case ResultType.ACK | ResultType.SINGLE | ResultType.MULTIVALUED:
-                return self.reading_definitions[0]
-            case ResultType.ORDERED:
-                return self.reading_definitions[position]
+                result = self.reading_definitions[0]
+            case ResultType.ORDERED | ResultType.SLICED:
+                result = self.reading_definitions[position]
+            case ResultType.VED_INDEXED:
+                try:
+                    result = self.reading_definitions[lookup]
+                except KeyError:
+                    log.warning("no reading definition found for key: %s", lookup)
+                    result = None
             case _:
                 print(f"no get_reading_definition for {self.result_type=}")
                 exit()
-        return None
+        log.debug("found reading definition: %s", result)
+        return result
 
     def reading_definition_count(self) -> int:
         """ return the number of reading_definitions for this command_definition """

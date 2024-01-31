@@ -23,12 +23,11 @@ class SimpleFormat(AbstractFormat):
         _result = []
 
         # check for error in result
-        # if result.error:
-        #    data = {}
-        #    data["Error"] = [f"Command: {result.command_code} incurred an error or errors during execution or processing", ""]
-        #    data["Error Count"] = [len(result.error_messages), ""]
-        #    for i, message in enumerate(result.error_messages):
-        #        data[f"Error #{i}"] = [message, ""]
+        if result.error:
+            _result.append(f"Error Count: {len(result.error_messages)}")
+            for i, message in enumerate(result.error_messages):
+                _result.append(f"Error #{i}: {message}")
+            # return _result
 
         if len(result.readings) == 0:
             return _result
