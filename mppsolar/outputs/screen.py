@@ -76,13 +76,16 @@ class screen(baseoutput):
         # maxV = getMaxLen(data.values())
         print(f"{pad('Parameter', maxP+1)}{'Value':<15}\tUnit")
         for key, values in displayData.items():
-            value = values[0]
-            unit = values[1]
-            if len(values) > 2 and values[2]:
-                extra = values[2]
-                print(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}\t{extra}")
-            else:
-                print(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}")
+            try:
+                value = values[0]
+                unit = values[1]
+                if len(values) > 2 and values[2]:
+                    extra = values[2]
+                    print(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}\t{extra}")
+                else:
+                    print(f"{pad(key,maxP+1)}{value:<15}\t{unit:<4}")
+            except TypeError:
+                log.info("unable to format for %s, %s, %s", key, value, unit)
 
         # print footer
         print("-" * 80)
