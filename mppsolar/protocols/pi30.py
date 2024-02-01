@@ -977,7 +977,7 @@ QUERY_COMMANDS = {
             ],
             ["int", "Battery bulk charging voltage from BMS", "0.1 V"],
             ["int", "Battery float charging voltage from BMS", "0.1 V"],
-            ["int", "Battery cut-off voltage from BMS", "0.1 V"],
+            ["int", "Battery cut off voltage from BMS", "0.1 V"],
             ["float", "Battery max charging current", "A"],
             ["float", "Battery max discharge current", "A"]],
          "test_responses": [
