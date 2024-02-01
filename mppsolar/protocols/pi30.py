@@ -981,7 +981,7 @@ QUERY_COMMANDS = {
             ["float", "Battery max charging current", "A"],
             ["float", "Battery max discharge current", "A"]],
          "test_responses": [
-            b"(0 100 0 0 1 532 532 450 0000 0030\x5E\n",
+            b"(0 100 0 0 1 532 532 450 0000 0030\x0e\x5E\n",
         ],
     },
 }
