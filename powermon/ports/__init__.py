@@ -4,29 +4,17 @@ from enum import auto
 
 from strenum import LowercaseStrEnum
 
+from powermon.errors import ConfigError
+from powermon.ports.porttype import PortType
 from powermon.ports.serialport import SerialPort
 from powermon.ports.testport import TestPort
 from powermon.ports.usbport import USBPort
-from powermon.errors import ConfigError
 
 # Set-up logger
 log = logging.getLogger("ports")
 
 
-class PortType(LowercaseStrEnum):
-    """ enumeration of supported / known port types """
-    UNKNOWN = auto()
-    TEST = auto()
-    SERIAL = auto()
-    USB = auto()
 
-    BLE = auto()
-
-    JKBLE = auto()
-    MQTT = auto()
-    VSERIAL = auto()
-    DALYSERIAL = auto()
-    ESP32 = auto()
 
 
 def from_config(port_config):

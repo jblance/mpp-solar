@@ -2,10 +2,10 @@
 import logging
 from abc import ABC, abstractmethod
 
-from powermon.commands.result import Result
-from powermon.protocols.abstractprotocol import AbstractProtocol
 from powermon.commands.command import Command
-
+from powermon.commands.result import Result
+from powermon.errors import PowermonProtocolError
+from powermon.protocols.abstractprotocol import AbstractProtocol
 
 log = logging.getLogger("Port")
 
@@ -24,6 +24,12 @@ class AbstractPort(ABC):
     def __init__(self, protocol: AbstractProtocol):
         self.protocol: AbstractProtocol = protocol
         self.error_message = None
+        self.port_type = None
+
+    def is_protocol_supported(self):
+        """ function to check if the protocol is supported by this port """
+        if self.port_type not in self.protocol.supported_ports:
+            raise PowermonProtocolError(f"Protocol {self.protocol.protocol_id.decode()} not supported by port type {self.port_type}")
 
     def connect(self) -> bool:
         """ default port connect function """

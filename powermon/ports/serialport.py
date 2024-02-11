@@ -8,6 +8,7 @@ from powermon.commands.command import Command
 from powermon.commands.result import Result
 from powermon.dto.portDTO import PortDTO
 from powermon.ports.abstractport import AbstractPort
+from powermon.ports.porttype import PortType
 from powermon.protocols import get_protocol_definition
 from powermon.protocols.ved import VictronCommandType
 
@@ -31,9 +32,11 @@ class SerialPort(AbstractPort):
 
     def __init__(self, path, baud, protocol) -> None:
         super().__init__(protocol=protocol)
+        self.port_type = PortType.SERIAL
         self.path = path
         self.baud = baud
         self.serial_port = None
+        self.is_protocol_supported()
         # self.error_message = None
 
     def to_dto(self) -> PortDTO:

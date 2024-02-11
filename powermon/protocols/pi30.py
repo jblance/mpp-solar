@@ -6,6 +6,7 @@ from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
 from powermon.errors import InvalidCRC
+from powermon.ports.porttype import PortType
 from powermon.protocols.abstractprotocol import AbstractProtocol
 
 log = logging.getLogger("pi30")
@@ -654,6 +655,7 @@ class PI30(AbstractProtocol):
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
         self.ID_COMMANDS = ["QPI", "QGMN", "QMN"]
+        self.supported_ports.extend([PortType.SERIAL, PortType.USB])
 
     def check_crc(self, response: str, command_definition: CommandDefinition = None):
         """ crc check, needs override in protocol """

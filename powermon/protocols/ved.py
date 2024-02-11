@@ -8,6 +8,7 @@ from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
 from powermon.errors import CommandError, InvalidCRC, InvalidResponse
+from powermon.ports.porttype import PortType
 from powermon.protocols.abstractprotocol import AbstractProtocol
 
 log = logging.getLogger("ved")
@@ -186,6 +187,7 @@ class VictronEnergyDirect(AbstractProtocol):
         ]
         self.DEFAULT_COMMAND = "vedtext"
         self.check_definitions_count(expected=2)
+        self.supported_ports.extend([PortType.SERIAL, PortType.USB])
 
     def get_full_command(self, command) -> bytes:
         """

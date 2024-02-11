@@ -3,11 +3,12 @@ import logging
 import os
 import time
 
-from powermon.dto.portDTO import PortDTO
-from powermon.commands.result import Result, ResultType
-from powermon.ports.abstractport import AbstractPort
-from powermon.protocols import get_protocol_definition
 from powermon.commands.command import Command
+from powermon.commands.result import Result, ResultType
+from powermon.dto.portDTO import PortDTO
+from powermon.ports.abstractport import AbstractPort
+from powermon.ports.porttype import PortType
+from powermon.protocols import get_protocol_definition
 
 log = logging.getLogger("USBPort")
 
@@ -24,8 +25,10 @@ class USBPort(AbstractPort):
 
     def __init__(self, path, protocol) -> None:
         super().__init__(protocol=protocol)
+        self.port_type = PortType.USB
         self.path = path
         self.port = None
+        self.is_protocol_supported()
 
     def to_dto(self):
         dto = PortDTO(type="usb", path=self.path, protocol=self.protocol.to_dto())

@@ -6,7 +6,7 @@ device:
   manufacturer: MPP-Solar
   port:
     type: test
-    # path: /dev/ttyUSB0
+    path: /dev/ttyUSB0
     # response_number: 1
     protocol: VED
 

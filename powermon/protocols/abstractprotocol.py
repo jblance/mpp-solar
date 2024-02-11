@@ -9,6 +9,7 @@ from powermon.commands.result import ResultType
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
 from powermon.dto.protocolDTO import ProtocolDTO
 from powermon.errors import CommandDefinitionMissing, InvalidResponse, PowermonProtocolError
+from powermon.ports.porttype import PortType
 
 log = logging.getLogger("AbstractProtocol")
 
@@ -30,6 +31,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         self.SETTINGS_COMMANDS = None
         self.DEFAULT_COMMAND = None
         self.ID_COMMANDS = None
+        self.supported_ports = [PortType.TEST,]
 
     @property
     def protocol_id(self) -> bytes:

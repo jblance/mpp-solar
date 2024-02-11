@@ -2,12 +2,13 @@
 import logging
 import random
 
-from powermon.dto.portDTO import PortDTO
-from powermon.commands.result import Result
-from powermon.ports.abstractport import AbstractPort
-from powermon.protocols import get_protocol_definition
 from powermon.commands.command import Command
 from powermon.commands.command_definition import CommandDefinition
+from powermon.commands.result import Result
+from powermon.dto.portDTO import PortDTO
+from powermon.ports.abstractport import AbstractPort
+from powermon.ports.porttype import PortType
+from powermon.protocols import get_protocol_definition
 
 log = logging.getLogger("test")
 
@@ -26,9 +27,11 @@ class TestPort(AbstractPort):
 
     def __init__(self, response_number, protocol):
         super().__init__(protocol=protocol)
+        self.port_type = PortType.TEST
         self.response_number = response_number
         self.connected = False
         self._test_data = None
+        self.is_protocol_supported()
 
     def __str__(self):
         return "Test port"
