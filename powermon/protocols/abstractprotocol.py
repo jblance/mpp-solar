@@ -42,6 +42,14 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
     def protocol_id(self, value):
         self._protocol_id = value
 
+    def add_supported_ports(self, port_types: list):
+        """ Add to the supported port types list """
+        self.supported_ports.extend(port_types)
+    
+    def clear_supported_ports(self):
+        """ Remove all supported port types except the TEST port type """
+        self.supported_ports = [PortType.TEST,]
+
     def add_command_definitions(self, command_definitions_config: dict, result_type: ResultType = None):
         """ Add command definitions from the configuration """
         for command_definition_key in command_definitions_config.keys():
