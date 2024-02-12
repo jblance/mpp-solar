@@ -15,6 +15,7 @@ class Protocol(LowercaseStrEnum):
     PI30 = auto()
     PI30MAX = auto()
     VED = auto()
+    JKSERIAL = auto()
 
 
 def get_protocol_definition(protocol):
@@ -36,6 +37,9 @@ def get_protocol_definition(protocol):
         case Protocol.VED:
             from powermon.protocols.ved import VictronEnergyDirect
             return VictronEnergyDirect()
+        case Protocol.JKSERIAL:
+            from powermon.protocols.jkserial import JkSerial
+            return JkSerial()
         case _:
             raise ConfigError(f"Invalid protocol_id, no protocol found for: '{protocol_id}'") 
     return None
