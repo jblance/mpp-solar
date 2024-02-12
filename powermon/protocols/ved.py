@@ -3,7 +3,7 @@ import logging
 from enum import Enum
 from struct import unpack
 
-from mppsolar.protocols.protocol_helpers import vedHexChecksum
+from powermon.protocols.helpers import victron_checksum
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
@@ -221,7 +221,7 @@ class VictronEnergyDirect(AbstractProtocol):
                 # build command
                 cmd = f"{command_type.value}{command_code}{flags}"
                 # pad cmd and convert to bytes and determine checksum
-                checksum = vedHexChecksum(bytes.fromhex(f"0{cmd}"))
+                checksum = victron_checksum(bytes.fromhex(f"0{cmd}"))
 
                 # build full command
                 cmd = f":{cmd}{checksum:02X}\n".encode()
@@ -263,7 +263,7 @@ class VictronEnergyDirect(AbstractProtocol):
                 # print(f"bytes response {_r}")
                 data = _r[:-1]
                 checksum = _r[-1:][0]
-                expected_checksum = vedHexChecksum(data)
+                expected_checksum = victron_checksum(data)
                 if expected_checksum == checksum:
                     log.debug("VED Hex Checksum matches in response '%s' checksum:'%s'", response, checksum)
                     return True

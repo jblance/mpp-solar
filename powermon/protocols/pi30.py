@@ -1,7 +1,7 @@
 """ pi30.py """
 import logging
 
-from mppsolar.protocols.protocol_helpers import crcPI as crc
+from powermon.protocols.helpers import crc_pi30 as crc
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
