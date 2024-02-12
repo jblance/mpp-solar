@@ -24,6 +24,7 @@ class ResponseType(LowercaseStrEnum):
     STRING = auto()
     BYTES = auto()
     LE_2B_S = auto()  # little endian 2 byte value (as string, eg 7800 = 0x0078 = 120)
+    BE_2B = auto()  # big endian 2 byte value
     OPTION = auto()  # response identifies which option from a dict (called 'options') is the info
     LIST = auto()  # response identifies which option from a list (called 'options') is the info
     BIT_ENCODED = auto()
@@ -33,6 +34,7 @@ class ResponseType(LowercaseStrEnum):
     INFO_FROM_COMMAND = auto()  # process the supplied command using a template
     TEMPLATE_BYTES = auto()  # process the response value using a template
     TEMPLATE_INT = auto()  # process the response int value using a template
+    TEMPLATE_ORD_INT = auto()  # process the response using ord(value) and a numeric template
 
 
 class ReadingType(LowercaseStrEnum):
@@ -41,7 +43,9 @@ class ReadingType(LowercaseStrEnum):
     - higher level type, like Wh etc
     - allows translations
     """
+    IGNORE = auto()
     ACK = auto()
+    NUMBER = auto()
     CURRENT = auto()
     APPARENT_POWER = auto()
     ENERGY = auto()
@@ -49,6 +53,7 @@ class ReadingType(LowercaseStrEnum):
     WATT_HOURS = auto()
     KILOWATT_HOURS = auto()
     VOLTS = auto()
+    MILLI_VOLTS = auto()
     DATE_TIME = auto()
     YEAR = auto()
     MONTH = auto()
@@ -66,6 +71,7 @@ class ReadingType(LowercaseStrEnum):
     PERCENTAGE = auto()
     FREQUENCY = auto()
     HEX_STR = auto()
+    HEX_CHARS = auto()
 
 
 class ReadingDefinition():
@@ -164,6 +170,16 @@ class ReadingDefinition():
                     if self.default:
                         return self.default
                     raise ValueError(f"For Reading Defininition '{self.description}', expected an INT, got {raw_value}") from e
+            case ResponseType.TEMPLATE_ORD_INT:
+                try:
+                    r = ord(raw_value)
+                    if self.format_template:
+                        r = eval(self.format_template)  # pylint: disable=W0123
+                    return r
+                except ValueError as e:
+                    if self.default:
+                        return self.default
+                    raise ValueError(f"For Reading Defininition '{self.description}', expected an INT, got {raw_value}") from e
             case ResponseType.TEMPLATE_INT:
                 try:
                     r = int(raw_value.decode('utf-8'))
@@ -176,6 +192,9 @@ class ReadingDefinition():
                     raise ValueError(f"For Reading Defininition '{self.description}', expected an INT, got {raw_value}") from e
             case ResponseType.FLOAT:
                 return float(raw_value.decode('utf-8'))
+            case ResponseType.BE_2B:
+                result = unpack('>h', raw_value)[0]
+                return result
             case ResponseType.LE_2B_S:
                 result = raw_value.decode('utf-8')
                 result = unpack('<h', bytes.fromhex(result))[0]
@@ -273,8 +292,16 @@ class ReadingDefinition():
         icon = reading_definition_config.get("icon", None)
 
         match reading_type:
+            case ReadingType.IGNORE:
+                reading = ReadingDefinitionNull(
+                    index=index, response_type=response_type, description=description,
+                    device_class=device_class, state_class=state_class, icon=icon)
             case ReadingType.ACK:
                 reading = ReadingDefinitionACK(
+                    index=index, response_type=response_type, description=description,
+                    device_class=device_class, state_class=state_class, icon=icon)
+            case ReadingType.NUMBER:
+                reading = ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
             case ReadingType.WATT_HOURS:
@@ -365,6 +392,11 @@ class ReadingDefinition():
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
                 reading.unit = "V"
+            case ReadingType.MILLI_VOLTS:
+                reading = ReadingDefinitionNumeric(
+                    index=index, response_type=response_type, description=description,
+                    device_class=device_class, state_class=state_class, icon=icon)
+                reading.unit = "mV"
             case ReadingType.PERCENTAGE:
                 reading = ReadingDefinitionNumeric(
                     index=index, response_type=response_type, description=description,
@@ -382,6 +414,10 @@ class ReadingDefinition():
                 reading.unit = "W"
             case ReadingType.HEX_STR:
                 reading = ReadingDefinitionHexStr(
+                    index=index, response_type=response_type, description=description,
+                    device_class=device_class, state_class=state_class, icon=icon)
+            case ReadingType.HEX_CHARS:
+                reading = ReadingDefinitionHexChars(
                     index=index, response_type=response_type, description=description,
                     device_class=device_class, state_class=state_class, icon=icon)
             case _:
@@ -407,9 +443,14 @@ class ReadingDefinitionNumeric(ReadingDefinition):
     """ A ReadingDefinition for readings that must be numeric """
     def __init__(self, index: int, response_type: str, description: str, device_class: str = None, state_class: str = None, icon: str = None):
         super().__init__(index, response_type, description, device_class, state_class, icon)
-        if response_type not in [ResponseType.INT, ResponseType.TEMPLATE_INT, ResponseType.FLOAT, ResponseType.LE_2B_S, ResponseType.HEX_CHAR]:
+        if response_type not in [ResponseType.INT, ResponseType.TEMPLATE_INT, ResponseType.FLOAT, ResponseType.LE_2B_S, ResponseType.BE_2B, ResponseType.HEX_CHAR, ResponseType.TEMPLATE_ORD_INT]:
             raise TypeError(f"{type(self)} response must be of type int or float, ResponseType {response_type} is not valid")
 
+
+class ReadingDefinitionNull(ReadingDefinition):
+    """ A ReadingDefinition for data to be ignored """
+    def reading_from_raw_response(self, raw_value, override=None) -> list[Reading]:
+        return []
 
 class ReadingDefinitionACK(ReadingDefinition):
     """ ReadingDefinition for ACK type readings """
@@ -452,6 +493,28 @@ class ReadingDefinitionHexStr(ReadingDefinitionNumeric):
             Reading(
                 data_name=self.description,
                 data_value=value,
+                data_unit=self.unit,
+                device_class=self.device_class,
+                state_class=self.state_class,
+                icon=self.icon,
+            )
+        ]
+
+
+class ReadingDefinitionHexChars(ReadingDefinition):
+    """ ReadingDefinition for multiple hex (displayed as a string) type readings """
+    def reading_from_raw_response(self, raw_value, override=None) -> list[Reading]:
+        """ generate a reading object from a raw value """
+        log.debug("raw_value: %s, override: %s", raw_value, override)
+        values = []
+        for i in raw_value:
+            # value = self.translate_raw_response(value)
+            # print(value)
+            values.append(f"{i:#04x}")
+        return [
+            Reading(
+                data_name=self.description,
+                data_value=" ".join(values),
                 data_unit=self.unit,
                 device_class=self.device_class,
                 state_class=self.state_class,
