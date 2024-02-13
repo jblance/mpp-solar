@@ -3,13 +3,16 @@ import abc
 import logging
 import re
 
-from mppsolar.protocols.protocol_helpers import crcPI as crc
+import construct as cs
+
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.result import ResultType
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
 from powermon.dto.protocolDTO import ProtocolDTO
-from powermon.errors import CommandDefinitionMissing, InvalidResponse, PowermonProtocolError
+from powermon.errors import (CommandDefinitionMissing, InvalidResponse,
+                             PowermonProtocolError)
 from powermon.ports.porttype import PortType
+from powermon.protocols.helpers import crc_pi30 as crc
 
 log = logging.getLogger("AbstractProtocol")
 
@@ -150,8 +153,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.debug("trim %s, definition: %s", response, command_definition)
         return response[1:-3]
 
-    def split_response(self, response: str, command_definition: CommandDefinition = None) -> list | dict:
-        """ split response into individual items, return as ordered list or keyed dict """
+    def split_response(self, response: str, command_definition: CommandDefinition = None) -> list:
+        """ split response into individual items, return as ordered list or list of tuples """
         result_type = getattr(command_definition, "result_type", None)
         log.debug("splitting %s, result_type %s", response, result_type)
         match result_type:
@@ -175,6 +178,28 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     if isinstance(key, bytes):
                         key = key.decode()
                     responses.append((key.strip(), value.strip()))
+            case ResultType.CONSTRUCT:
+                # build a list of (index, value) tuples, after parsing with a construct
+                responses = []
+                # parse with construct
+                result = command_definition.construct.parse(response)
+                # print(result)
+                for x in result:
+                    match type(result[x]):
+                        # case cs.ListContainer:
+                        #     print(f"{x}:listcontainer")
+                        case cs.Container:
+                            # print(f"{x}:")
+                            for y in result[x]:
+                                if y != "_io":
+                                    key = y
+                                    value = result[x][y]
+                                    responses.append((key, value))
+                        case _:
+                            if x != "_io":
+                                key = x
+                                value = result[x]
+                                responses.append((key, value))
             case _:
                 responses = response.split()
         log.debug("responses: '%s'", responses)

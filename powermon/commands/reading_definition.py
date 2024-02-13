@@ -163,6 +163,8 @@ class ReadingDefinition():
                 return raw_value[0]
                 # return ord(raw_value.decode('utf-8')[0])
             case ResponseType.INT:
+                if isinstance(raw_value, int):
+                    return raw_value
                 try:
                     result = int(raw_value.decode('utf-8'))
                     return result
@@ -182,7 +184,10 @@ class ReadingDefinition():
                     raise ValueError(f"For Reading Defininition '{self.description}', expected an INT, got {raw_value}") from e
             case ResponseType.TEMPLATE_INT:
                 try:
-                    r = int(raw_value.decode('utf-8'))
+                    if isinstance(raw_value, int):
+                        r = raw_value
+                    else:
+                        r = int(raw_value.decode('utf-8'))
                     if self.format_template:
                         r = eval(self.format_template)  # pylint: disable=W0123
                     return r
@@ -199,6 +204,8 @@ class ReadingDefinition():
                 result = raw_value.decode('utf-8')
                 result = unpack('<h', bytes.fromhex(result))[0]
                 return result
+            case ResponseType.STRING:
+                return raw_value
             case ResponseType.BIT_ENCODED:
                 if not isinstance(self.options, dict):
                     raise TypeError(f"For Reading Defininition '{self.description}', options must be a dict if response_type is BIT_ENCODED")
@@ -285,8 +292,8 @@ class ReadingDefinition():
         """ build a reading definition object from a config dict """
         index = i
         description = reading_definition_config.get("description")
-        response_type = reading_definition_config.get("response_type")
-        reading_type = reading_definition_config.get("reading_type")
+        response_type = reading_definition_config.get("response_type", ResponseType.INT)
+        reading_type = reading_definition_config.get("reading_type", ReadingType.MESSAGE)
         device_class = reading_definition_config.get("device_class", None)
         state_class = reading_definition_config.get("state_class", None)
         icon = reading_definition_config.get("icon", None)

@@ -16,6 +16,7 @@ class ResultType(Enum):
     SINGLE = auto()  # single value in result
     ORDERED = auto()  # the order of the values determines what they are
     SLICED = auto()  # the response needs to be sliced into separate values
+    CONSTRUCT = auto()  # the raw response is parsed by into construct container first, then the reading definitions are applied
     MULTIVALUED = auto()  # the response has multiple values, but they all correspond to one result
     VED_INDEXED = auto()  # the response has a key / value pair (separated by \t, each pair separated by \r\n), with the key used to find the definition
 
@@ -117,7 +118,7 @@ class Result:
                             # INFO is contained in supplied command eg QEY2023 -> 2023
                             readings = self.readings_from_response(self.command.code, reading_definition)
                             all_readings.extend(readings)
-            case ResultType.VED_INDEXED:
+            case ResultType.VED_INDEXED | ResultType.CONSTRUCT:
                 # have a list of (index,value) tuples
                 for key, value in responses:
                     reading_definition: ReadingDefinition = self.command.command_definition.get_reading_definition(lookup=key)
