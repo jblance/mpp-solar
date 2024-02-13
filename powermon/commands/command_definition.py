@@ -102,7 +102,8 @@ class CommandDefinition:
                 try:
                     result = self.reading_definitions[lookup]
                 except KeyError:
-                    log.warning("no reading definition found for key: %s", lookup)
+                    log.debug("no reading definition found for key: %s", lookup)
+                    # print(f"command_definition@106:no reading definition found for key: {lookup}")
                     result = None
             case _:
                 print(f"no get_reading_definition for {self.result_type=}")
