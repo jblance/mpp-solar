@@ -158,7 +158,12 @@ class ReadingDefinition():
         log.debug("translate_raw_response: %s from type: %s", raw_value, self.response_type)
         match self.response_type:
             case ResponseType.BOOL:
-                return bool(int(raw_value.decode('utf-8')))
+                # print(raw_value)
+                if isinstance(raw_value, bool):
+                    return raw_value
+                if isinstance(raw_value, bytes):
+                    raw_value = raw_value.decode('utf-8')
+                return bool(int(raw_value))
             case ResponseType.HEX_CHAR:
                 return raw_value[0]
                 # return ord(raw_value.decode('utf-8')[0])
