@@ -126,6 +126,7 @@ COMMANDS = {
         "help": " -- Get Balancer Data",
         # "type": "QUERY",
         "construct": balancer_data_response,
+        "device_command_type": "ReadAll",
         "result_type": ResultType.CONSTRUCT,
         "reading_definitions": [
             {"index": "cell_count", "description": "Cell Count"},
