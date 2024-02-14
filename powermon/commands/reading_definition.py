@@ -210,6 +210,8 @@ class ReadingDefinition():
                 result = unpack('<h', bytes.fromhex(result))[0]
                 return result
             case ResponseType.STRING:
+                if isinstance(raw_value, bytes):
+                    return raw_value.decode('utf-8')
                 return raw_value
             case ResponseType.BIT_ENCODED:
                 if not isinstance(self.options, dict):
