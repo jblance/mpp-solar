@@ -1,4 +1,4 @@
-""" serialport.py """
+""" powermon / ports / serialport.py """
 import logging
 import time
 
