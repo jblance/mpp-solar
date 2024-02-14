@@ -90,6 +90,7 @@ class SerialPort(AbstractPort):
                         response_line += _response
                 case "ReadAll":
                     # read until no more data
+                    log.debug("ReadAll s&r")
                     response_line = b""
                     while True:
                         time.sleep(0.2)  # give serial port time to receive the data
