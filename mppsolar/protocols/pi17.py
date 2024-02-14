@@ -371,7 +371,7 @@ QUERY_COMMANDS = {
         "response": [
             [
                 "int",
-                "Generated energy",
+                "Total Generated Energy",
                 "kWh",
                 {"icon": "mdi:counter", "device-class": "energy", "state_class": "total"},
             ],
@@ -466,7 +466,7 @@ QUERY_COMMANDS = {
         "help": " -- queries generated energy for the year YYYY from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated energy", "Wh"],
+            ["int", "Yearly Generated Energy", "Wh"],
         ],
         "test_responses": [
             b"^D01100006591\xba\x10\r",
@@ -480,7 +480,7 @@ QUERY_COMMANDS = {
         "help": " -- queries generated energy for the month YYYYMM from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated energy", "Wh"],
+            ["int", "Monthly Generated Energy", "Wh"],
         ],
         "test_responses": [
             b"^D01000006591\xba\x10\r",
@@ -494,7 +494,7 @@ QUERY_COMMANDS = {
         "help": " -- queries generated energy for the day YYYYMMDD from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated energy", "Wh"],
+            ["int", "Daily Generated Energy", "Wh"],
         ],
         "test_responses": [
             b"^D009000091\xba\x10\r",
@@ -508,7 +508,7 @@ QUERY_COMMANDS = {
         "help": " -- queries generated energy for the hour YYYYMMDDHH from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated energy", "Wh"],
+            ["int", "Hourly Generated Energy", "Wh"],
         ],
         "test_responses": [
             b"^D008000001\xba\x10\r",
