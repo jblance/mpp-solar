@@ -42,7 +42,7 @@ pymodbus = { version = "^3.6.4", optional = true }
 [tool.poetry.extras]
 api = ["fastapi", "fastapi-mqtt", "sqlalchemy", "uvicorn"]
 ble = ["bleak", "bluepy"]
-dev = ["twine"]
+dev = ["twine", "bleak", "PyYAML", "strenum", "construct", "pymodbus"]
 # mqtt = ["paho-mqtt"]
 mongo = ["pymongo"]
 pgsql = ["psycopg2-binary"]
