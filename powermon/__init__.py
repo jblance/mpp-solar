@@ -22,6 +22,8 @@ from powermon.version import __version__  # noqa: F401
 
 # Set-up logger
 log = logging.getLogger("")
+FORMAT = "%(asctime)-15s:%(levelname)s:%(module)s:%(funcName)s@%(lineno)d: %(message)s"
+logging.basicConfig(format=FORMAT)
 
 
 def read_yaml_file(yaml_file=None):

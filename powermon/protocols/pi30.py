@@ -655,7 +655,7 @@ class PI30(AbstractProtocol):
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
         self.DEFAULT_COMMAND = "QPI"
         self.ID_COMMANDS = ["QPI", "QGMN", "QMN"]
-        self.supported_ports.extend([PortType.SERIAL, PortType.USB])
+        self.add_supported_ports([PortType.SERIAL, PortType.USB])
 
     def check_crc(self, response: str, command_definition: CommandDefinition = None):
         """ crc check, needs override in protocol """

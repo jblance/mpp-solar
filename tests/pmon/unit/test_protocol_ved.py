@@ -30,6 +30,7 @@ cd = CommandDefinition.from_config(command_definitions_config)
 
 class TestProtocolVed(unittest.TestCase):
     """ exercise different functions in ved protocol """
+
     def test_check_crc(self):
         """ test a for correct CRC validation """
         ved = VictronEnergyDirect()

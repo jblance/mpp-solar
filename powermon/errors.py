@@ -25,5 +25,9 @@ class CommandDefinitionMissing(Exception):
     """ Exception for missing / not found command definition """
 
 
+class CommandDefinitionIncorrect(Exception):
+    """ Exception for errors in command definition """
+
+
 class CommandError(Exception):
     """ Exception for errors with commands """

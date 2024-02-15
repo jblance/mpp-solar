@@ -2,6 +2,8 @@
 import logging
 import re
 
+import construct as cs
+
 from powermon.commands.reading_definition import ReadingDefinition, ReadingType
 from powermon.commands.result import ResponseType, ResultType
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
@@ -35,6 +37,7 @@ class CommandDefinition:
         self.regex : str | None = regex
         self.device_command_type = None
         self.device_command_code : str = None
+        self.construct: cs.Construct = None
 
     @classmethod
     def from_config(cls, protocol_dictionary : dict) -> "CommandDefinition":
@@ -64,6 +67,7 @@ class CommandDefinition:
         )
         _command_definition.device_command_type = protocol_dictionary.get("device_command_type")
         _command_definition.device_command_code = protocol_dictionary.get("device_command_code")
+        _command_definition.construct = protocol_dictionary.get("construct")
         return _command_definition
 
     def to_dto(self) -> CommandDefinitionDTO:
@@ -94,11 +98,12 @@ class CommandDefinition:
                 result = self.reading_definitions[0]
             case ResultType.ORDERED | ResultType.SLICED:
                 result = self.reading_definitions[position]
-            case ResultType.VED_INDEXED:
+            case ResultType.VED_INDEXED | ResultType.CONSTRUCT:
                 try:
                     result = self.reading_definitions[lookup]
                 except KeyError:
-                    log.warning("no reading definition found for key: %s", lookup)
+                    log.debug("no reading definition found for key: %s", lookup)
+                    # print(f"command_definition@106:no reading definition found for key: {lookup}")
                     result = None
             case _:
                 print(f"no get_reading_definition for {self.result_type=}")

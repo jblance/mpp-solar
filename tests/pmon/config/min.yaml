@@ -8,10 +8,10 @@ device:
     type: test
     path: /dev/ttyUSB0
     # response_number: 1
-    protocol: VED
+    protocol: JKSERIAL
 
 commands:
-- command: vedtext
+- command: getBalancerData
   outputs:
   - type: screen
     format: 

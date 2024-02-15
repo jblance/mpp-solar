@@ -1,4 +1,4 @@
-""" serialport.py """
+""" powermon / ports / serialport.py """
 import logging
 import time
 
@@ -88,6 +88,18 @@ class SerialPort(AbstractPort):
                     for _ in range(_lines):
                         _response = self.serial_port.read_until(b"\n")
                         response_line += _response
+                case "ReadAll":
+                    # read until no more data
+                    log.debug("ReadAll s&r")
+                    response_line = b""
+                    while True:
+                        time.sleep(0.2)  # give serial port time to receive the data
+                        to_read = self.serial_port.in_waiting
+                        log.debug("bytes waiting: %s", to_read)
+                        if to_read == 0:
+                            break
+                        # got some data to read
+                        response_line += self.serial_port.read(to_read)
                 case _:
                     # default processing
                     c = self.serial_port.write(full_command)

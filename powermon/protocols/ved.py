@@ -145,7 +145,7 @@ COMMANDS = {
         "description": "Battery Capacity",
         "help": " -- display the Battery Capacity",
         "device_command_type": VictronCommandType.GET,
-        "device_command_code": "1000",  # or should be the more accurate 1000
+        "device_command_code": "1000",
         "result_type": ResultType.SLICED,
         "reading_definitions": [
             {"description": "Command type", "slice": [0, 1], "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
@@ -179,6 +179,7 @@ class VictronEnergyDirect(AbstractProtocol):
         super().__init__()
         self.protocol_id = b"VED"
         self.add_command_definitions(COMMANDS)
+        self.add_supported_ports([PortType.SERIAL, PortType.USB])
         self.STATUS_COMMANDS = [
             "vedtext",
         ]
@@ -187,7 +188,6 @@ class VictronEnergyDirect(AbstractProtocol):
         ]
         self.DEFAULT_COMMAND = "vedtext"
         self.check_definitions_count(expected=2)
-        self.supported_ports.extend([PortType.SERIAL, PortType.USB])
 
     def get_full_command(self, command) -> bytes:
         """

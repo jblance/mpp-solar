@@ -3,13 +3,15 @@ import abc
 import logging
 import re
 
-from mppsolar.protocols.protocol_helpers import crcPI as crc
+import construct as cs
+
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.result import ResultType
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
 from powermon.dto.protocolDTO import ProtocolDTO
-from powermon.errors import CommandDefinitionMissing, InvalidResponse, PowermonProtocolError
+from powermon.errors import (CommandDefinitionIncorrect, CommandDefinitionMissing, InvalidResponse, PowermonProtocolError)
 from powermon.ports.porttype import PortType
+from powermon.protocols.helpers import crc_pi30 as crc
 
 log = logging.getLogger("AbstractProtocol")
 
@@ -41,6 +43,14 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
     @protocol_id.setter
     def protocol_id(self, value):
         self._protocol_id = value
+
+    def add_supported_ports(self, port_types: list):
+        """ Add to the supported port types list """
+        self.supported_ports.extend(port_types)
+    
+    def clear_supported_ports(self):
+        """ Remove all supported port types except the TEST port type """
+        self.supported_ports = [PortType.TEST,]
 
     def add_command_definitions(self, command_definitions_config: dict, result_type: ResultType = None):
         """ Add command definitions from the configuration """
@@ -142,8 +152,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         log.debug("trim %s, definition: %s", response, command_definition)
         return response[1:-3]
 
-    def split_response(self, response: str, command_definition: CommandDefinition = None) -> list | dict:
-        """ split response into individual items, return as ordered list or keyed dict """
+    def split_response(self, response: str, command_definition: CommandDefinition = None) -> list:
+        """ split response into individual items, return as ordered list or list of tuples """
         result_type = getattr(command_definition, "result_type", None)
         log.debug("splitting %s, result_type %s", response, result_type)
         match result_type:
@@ -167,6 +177,31 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     if isinstance(key, bytes):
                         key = key.decode()
                     responses.append((key.strip(), value.strip()))
+            case ResultType.CONSTRUCT:
+                # build a list of (index, value) tuples, after parsing with a construct
+                responses = []
+                # check for construct
+                if command_definition.construct is None:
+                    raise CommandDefinitionIncorrect("No construct found in command_definition")
+                # parse with construct
+                result = command_definition.construct.parse(response)
+                # print(result)
+                for x in result:
+                    match type(result[x]):
+                        # case cs.ListContainer:
+                        #     print(f"{x}:listcontainer")
+                        case cs.Container:
+                            # print(f"{x}:")
+                            for y in result[x]:
+                                if y != "_io":
+                                    key = y
+                                    value = result[x][y]
+                                    responses.append((key, value))
+                        case _:
+                            if x != "_io":
+                                key = x
+                                value = result[x]
+                                responses.append((key, value))
             case _:
                 responses = response.split()
         log.debug("responses: '%s'", responses)
