@@ -1,67 +1,44 @@
+""" test_config_validation.py """
 import unittest
 from powermon.config_model import ConfigModel
 from powermon import read_yaml_file
 
 
-class test_config_model(unittest.TestCase):
+class TestonfigModel(unittest.TestCase):
     """Test that all the configuration files in the powermon/config directory can be validated by the ConfigModel class"""
-    
+
     def test_config_model_min(self):
-        
+        """ test min.yaml config """
         config = read_yaml_file("./tests/pmon/config/min.yaml")
+        config_model = ConfigModel(config=config)
+        self.assertTrue(config_model is not None)
 
-        try:
-            config_model = ConfigModel(config=config)
-            self.assertTrue(config_model is not None)
-        except Exception as e:
-            self.fail(e)
-        
     def test_config_model_min_api(self):
-        
-        config = read_yaml_file("./tests/pmon/config/min-api.yaml")
-
-        try:
-            config_model = ConfigModel(config=config)
-            self.assertTrue(config_model is not None)
-        except Exception as e:
-            self.fail(e)
+        """ test api.yaml config """
+        config = read_yaml_file("./tests/pmon/config/api.yaml")
+        config_model = ConfigModel(config=config)
+        self.assertTrue(config_model is not None)
 
     def test_config_model_format(self):
-        
+        """ test format.yaml config """
         config = read_yaml_file("./tests/pmon/config/format.yaml")
+        config_model = ConfigModel(config=config)
+        self.assertTrue(config_model is not None)
 
-        try:
-            config_model = ConfigModel(config=config)
-            self.assertTrue(config_model is not None)
-        except Exception as e:
-            self.fail(e)
-            
     def test_config_model_powermon_hass(self):
-        
-        config = read_yaml_file("./tests/pmon/config/powermon-hass.yaml")
+        """ test hass.yaml config """
+        config = read_yaml_file("./tests/pmon/config/hass.yaml")
+        config_model = ConfigModel(config=config)
+        self.assertTrue(config_model is not None)
 
-        try:
-            config_model = ConfigModel(config=config)
-            self.assertTrue(config_model is not None)
-        except Exception as e:
-            self.fail(e)
-            
     def test_config_model_powermon_qed(self):
-        
-        config = read_yaml_file("./tests/pmon/config/powermon-qed.yaml")
+        """ test qed.yaml config """
+        config = read_yaml_file("./tests/pmon/config/qed.yaml")
+        config_model = ConfigModel(config=config)
+        self.assertTrue(config_model is not None)
 
-        try:
-            config_model = ConfigModel(config=config)
-            self.assertTrue(config_model is not None)
-        except Exception as e:
-            self.fail(e)
-            
     def test_config_model_powermon(self):
-        
+        """ test powermon.yaml config """
         config = read_yaml_file("./tests/pmon/config/powermon.yaml")
-
-        try:
-            config_model = ConfigModel(config=config)
-            self.assertTrue(config_model is not None)
-        except Exception as e:
-            self.fail(e)
+        config_model = ConfigModel(config=config)
+        self.assertTrue(config_model is not None)
