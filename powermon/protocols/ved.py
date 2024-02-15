@@ -1,29 +1,17 @@
 """ protocols / ved.py """
 import logging
-from enum import Enum
 from struct import unpack
 
-from powermon.protocols.helpers import victron_checksum
+from powermon.commands.command import CommandType
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
 from powermon.errors import CommandError, InvalidCRC, InvalidResponse
 from powermon.ports.porttype import PortType
 from powermon.protocols.abstractprotocol import AbstractProtocol
+from powermon.protocols.helpers import victron_checksum
 
 log = logging.getLogger("ved")
-
-
-class VictronCommandType(Enum):
-    """ enum of valid types of Results """
-    PING = 1
-    GET_FW = 3
-    GET_ID = 4
-    RESTART = 6
-    GET = 7
-    SET = 8
-    ASYNC = 'A'
-    LISTEN = 'L'
 
 
 COMMANDS = {
@@ -31,7 +19,7 @@ COMMANDS = {
         "name": "vedtext",
         "description": "VE Direct Text",
         "help": " -- the output of the VE Direct text protocol",
-        "device_command_type": VictronCommandType.LISTEN,
+        "command_type": CommandType.VICTRON_LISTEN,
         "result_type": ResultType.VED_INDEXED,
         "reading_definitions": [
             {"index": "V", "description": "Main or channel 1 battery voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/1000"},
@@ -144,8 +132,8 @@ COMMANDS = {
         "name": "batteryCapacity",
         "description": "Battery Capacity",
         "help": " -- display the Battery Capacity",
-        "device_command_type": VictronCommandType.GET,
-        "device_command_code": "1000",
+        "command_type": CommandType.VICTRON_GET,
+        "command_code": "1000",
         "result_type": ResultType.SLICED,
         "reading_definitions": [
             {"description": "Command type", "slice": [0, 1], "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
@@ -201,13 +189,13 @@ class VictronEnergyDirect(AbstractProtocol):
         # \n
         # eg b':70010003E\n' = get battery capacity id = 0x1000 = 0010 little endian
 
-        command_type = command_definition.device_command_type
+        command_type = command_definition.command_type
         match command_type:
-            case VictronCommandType.GET:
+            case CommandType.VICTRON_GET:
                 # command components
-                raw_command_code = command_definition.device_command_code  # eg 1000 for batteryCapacity
+                raw_command_code = command_definition.command_code  # eg 1000 for batteryCapacity
                 if raw_command_code is None:
-                    raise CommandError(f"device_command_code not found for {command=} - check protocol definition for this command")
+                    raise CommandError(f"command_code not found for {command=} - check protocol definition for this command")
                 command_code = f"{unpack('<h', bytes.fromhex(raw_command_code))[0]:04X}"
                 flags = "00"
 
@@ -220,7 +208,7 @@ class VictronEnergyDirect(AbstractProtocol):
                 cmd = f":{cmd}{checksum:02X}\n".encode()
                 log.debug("full command: %s", cmd)
                 return cmd
-            case VictronCommandType.LISTEN:
+            case CommandType.VICTRON_LISTEN:
                 # Just listen - dont need to send a command
                 log.debug("command is LISTEN type so returning %s", command_type)
                 return command_type
@@ -233,9 +221,9 @@ class VictronEnergyDirect(AbstractProtocol):
             raise InvalidResponse("Response is None")
         if len(response) <= 3:
             raise InvalidResponse("Response is too short")
-        command_type = command_definition.device_command_type
+        command_type = command_definition.command_type
         match command_type:
-            case VictronCommandType.GET:
+            case CommandType.VICTRON_GET:
                 if response.count(b':') != 1:
                     raise InvalidResponse("Response incomplete - missing ':'")
         return True
@@ -243,9 +231,9 @@ class VictronEnergyDirect(AbstractProtocol):
     def check_crc(self, response: str, command_definition: CommandDefinition = None) -> bool:
         """ crc check, needs override in protocol """
         log.debug("checking crc for %s", response)
-        command_type = command_definition.device_command_type
+        command_type = command_definition.command_type
         match command_type:
-            case VictronCommandType.GET:
+            case CommandType.VICTRON_GET:
                 # HEX protocol response
                 log.debug("checking validity of '%s'", response)
                 _r = response.split(b":")[1][:-1].decode()
@@ -263,20 +251,20 @@ class VictronEnergyDirect(AbstractProtocol):
                 else:
                     # print("VED Hex Checksum does not match")
                     raise InvalidCRC(f"response has invalid CRC - got '\\x{checksum:02x}', calculated '\\x{expected_checksum:02x}")
-            case VictronCommandType.LISTEN:
+            case CommandType.VICTRON_LISTEN:
                 return True
         return True
 
     def trim_response(self, response: str, command_definition: CommandDefinition = None) -> str:
         """ Remove extra characters from response """
         log.debug("response: %s", response)
-        command_type = command_definition.device_command_type
+        command_type = command_definition.command_type
         _ret = None
         match command_type:
-            case VictronCommandType.GET:
+            case CommandType.VICTRON_GET:
                 # HEX response, e.g. b":70010007800C6\n"
                 _ret = response.split(b":")[1][:-3]
-            case VictronCommandType.LISTEN:
+            case CommandType.VICTRON_LISTEN:
                 # VEDTEXT response, return the lot
                 _ret = response
         log.debug("trim_response: %s", _ret)

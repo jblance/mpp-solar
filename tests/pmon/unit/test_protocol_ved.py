@@ -1,20 +1,20 @@
 """ tests / pmon / unit / test_protocol_ved.py """
 import unittest
 
-from powermon.commands.command import Command
+from powermon.commands.command import Command, CommandType
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
 from powermon.device import DeviceInfo
 from powermon.errors import CommandError, InvalidCRC, InvalidResponse
 from powermon.formats.simple import SimpleFormat
-from powermon.protocols.ved import VictronCommandType, VictronEnergyDirect
+from powermon.protocols.ved import VictronEnergyDirect
 
 command_definitions_config = {"name": "batteryCapacity",
                               "description": "Battery Capacity",
                               "help": " -- display the Battery Capacity",
-                              "device_command_type": VictronCommandType.GET,
-                              "device_command_code": "1000",  # or should be the more accurate 1000
+                              "command_type": CommandType.VICTRON_GET,
+                              "command_code": "1000",  # or should be the more accurate 1000
                               "result_type": ResultType.SLICED,
                               "reading_definitions": [{"description": "Command type", "slice": [0, 1], "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
                                                       {"description": "Command", "slice": [1, 5], "reading_type": ReadingType.HEX_STR, "response_type": ResponseType.LE_2B_S},
@@ -56,7 +56,7 @@ class TestProtocolVed(unittest.TestCase):
         """ test a for correct build of full command - vedtext """
         ved = VictronEnergyDirect()
         _result = ved.get_full_command(command="vedtext")
-        expected = VictronCommandType.LISTEN
+        expected = CommandType.VICTRON_LISTEN
 
         # print(_result)
         self.assertEqual(_result, expected)
@@ -139,12 +139,12 @@ class TestProtocolVed(unittest.TestCase):
         # print(formatted_data)
         self.assertEqual(formatted_data, expected)
 
-    def test_full_command_missing_device_command_code(self):
-        """ ensure an exception is raised if the device_command_code is missing in the protocol definition """
+    def test_full_command_missing_command_code(self):
+        """ ensure an exception is raised if the command_code is missing in the protocol definition """
         command_definition_config = {"batCap": {"name": "batCap",
                                                 "description": "Battery Capacity",
                                                 "help": " -- display the Battery Capacity",
-                                                "device_command_type": VictronCommandType.GET,
+                                                "command_type": CommandType.VICTRON_GET,
                                                 "result_type": ResultType.SINGLE,
                                                 "reading_definitions": [{"description": "Command type", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT}]}}
         ved = VictronEnergyDirect()

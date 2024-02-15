@@ -1,16 +1,35 @@
 """ commands / command.py """
 import logging
+from enum import Enum, auto
 
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.result import Result, ResultType, ResultError
 from powermon.commands.trigger import Trigger
 from powermon.dto.commandDTO import CommandDTO
-from powermon.errors import ConfigError, InvalidResponse, InvalidCRC
+from powermon.errors import ConfigError, InvalidResponse, InvalidCRC, CommandExecutionFailed
 from powermon.outputs import OutputType, multiple_from_config
 from powermon.outputs.abstractoutput import AbstractOutput
 from powermon.outputs.api_mqtt import ApiMqtt
 
 log = logging.getLogger("Command")
+
+
+class CommandType(Enum):
+    """ enum of valid types of Results """
+    VICTRON_PING = 1
+    VICTRON_GET_FW = 3
+    VICTRON_GET_ID = 4
+    VICTRON_RESTART = 6
+    VICTRON_GET = 7
+    VICTRON_SET = 8
+    VICTRON_ASYNC = 'A'
+    VICTRON_LISTEN = 'L'
+    SERIAL_READONLY = auto()
+    PI18_QUERY = auto()
+    PI18_SETTER = auto()
+    JKSERIAL_SETTER = auto()
+    JKSERIAL_READ = auto()
+    JKSERIAL_ACTIVATION = auto()
 
 
 class Command():
@@ -90,18 +109,15 @@ class Command():
             protocol.check_valid(raw_response, self.command_definition)
             # check crc is correct
             protocol.check_crc(raw_response, self.command_definition)
-        except (InvalidResponse, InvalidCRC) as e:
-            _result = ResultError(command=self, raw_response=e, responses=[e.__context__, str(e)])
-            _result.result_type = ResultType.ERROR
-            # print(_result)
-            return _result
-
-        # trim response
-        trimmed_response = protocol.trim_response(raw_response, self.command_definition)
-        # split response
-        responses = protocol.split_response(trimmed_response, self.command_definition)
-        # build the Result object
-        result = Result(command=self, raw_response=raw_response, responses=responses)
+            # trim response
+            trimmed_response = protocol.trim_response(raw_response, self.command_definition)
+            # split response
+            responses = protocol.split_response(trimmed_response, self.command_definition)
+            # build the Result object
+            result = Result(command=self, raw_response=raw_response, responses=responses)
+        except (InvalidResponse, InvalidCRC, CommandExecutionFailed) as e:
+            result = ResultError(command=self, raw_response=e, responses=[e.__context__, str(e)])
+            result.result_type = ResultType.ERROR
         return result
 
     @property

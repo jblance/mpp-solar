@@ -4,13 +4,12 @@ import time
 
 import serial
 
-from powermon.commands.command import Command
+from powermon.commands.command import Command, CommandType
 from powermon.commands.result import Result
 from powermon.dto.portDTO import PortDTO
 from powermon.ports.abstractport import AbstractPort
 from powermon.ports.porttype import PortType
 from powermon.protocols import get_protocol_definition
-from powermon.protocols.ved import VictronCommandType
 
 log = logging.getLogger("SerialPort")
 
@@ -79,8 +78,8 @@ class SerialPort(AbstractPort):
             self.serial_port.reset_output_buffer()
             # Process i/o differently depending on command type
             command_defn = command.command_definition
-            match command_defn.device_command_type:
-                case VictronCommandType.LISTEN:
+            match command_defn.command_type:
+                case CommandType.VICTRON_LISTEN:
                     # this command type doesnt need to send a command, it just listens on the serial port
                     _lines = 30
                     log.debug("VictronCommandType.LISTEN s&r, listening for %i lines", _lines)
@@ -88,7 +87,7 @@ class SerialPort(AbstractPort):
                     for _ in range(_lines):
                         _response = self.serial_port.read_until(b"\n")
                         response_line += _response
-                case "ReadAll":
+                case CommandType.SERIAL_READONLY:
                     # read until no more data
                     log.debug("ReadAll s&r")
                     response_line = b""

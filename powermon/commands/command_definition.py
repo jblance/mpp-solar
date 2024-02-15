@@ -12,7 +12,7 @@ log = logging.getLogger("CommandDefinition")
 
 
 class CommandDefinition:
-    """ object the contains the definition and other metadata about a command, including: 
+    """ object the contains the definition and other metadata about a command, including:
     - code
     - regex (opt)
     - description
@@ -35,8 +35,8 @@ class CommandDefinition:
         self.reading_definitions : dict[int, ReadingDefinition] = reading_definitions  # TODO: this is incorrect, needs positional and str indexes as well
         self.test_responses : list[bytes] = test_responses
         self.regex : str | None = regex
-        self.device_command_type = None
-        self.device_command_code : str = None
+        self.command_type = None
+        self.command_code : str = None
         self.construct: cs.Construct = None
 
     @classmethod
@@ -65,8 +65,8 @@ class CommandDefinition:
             reading_definitions=reading_definitions, test_responses=test_responses,
             regex=regex
         )
-        _command_definition.device_command_type = protocol_dictionary.get("device_command_type")
-        _command_definition.device_command_code = protocol_dictionary.get("device_command_code")
+        _command_definition.command_type = protocol_dictionary.get("command_type")
+        _command_definition.command_code = protocol_dictionary.get("command_code")
         _command_definition.construct = protocol_dictionary.get("construct")
         return _command_definition
 
