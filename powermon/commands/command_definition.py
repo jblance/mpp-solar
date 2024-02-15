@@ -96,7 +96,7 @@ class CommandDefinition:
         match self.result_type:
             case ResultType.ACK | ResultType.SINGLE | ResultType.MULTIVALUED:
                 result = self.reading_definitions[0]
-            case ResultType.ORDERED | ResultType.SLICED:
+            case ResultType.ORDERED | ResultType.SLICED | ResultType.COMMA_DELIMITED:
                 result = self.reading_definitions[position]
             case ResultType.VED_INDEXED | ResultType.CONSTRUCT:
                 try:
@@ -106,7 +106,7 @@ class CommandDefinition:
                     # print(f"command_definition@106:no reading definition found for key: {lookup}")
                     result = None
             case _:
-                print(f"no get_reading_definition for {self.result_type=}")
+                print(f"command_definition@109: no get_reading_definition for {self.result_type=}")
                 exit()
         log.debug("found reading definition: %s", result)
         return result

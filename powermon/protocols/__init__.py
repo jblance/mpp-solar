@@ -12,6 +12,7 @@ log = logging.getLogger("protocols")
 
 class Protocol(LowercaseStrEnum):
     """ enumerate available protocols """
+    PI18 = auto()  # WIP
     PI30 = auto()
     PI30MAX = auto()
     VED = auto()
@@ -28,6 +29,9 @@ def get_protocol_definition(protocol):
     protocol_id = protocol.lower()
 
     match protocol_id:
+        case Protocol.PI18:
+            from powermon.protocols.pi18 import PI18
+            return PI18()
         case Protocol.PI30:
             from powermon.protocols.pi30 import PI30
             return PI30()
@@ -41,7 +45,7 @@ def get_protocol_definition(protocol):
             from powermon.protocols.jkserial import JkSerial
             return JkSerial()
         case _:
-            raise ConfigError(f"Invalid protocol_id, no protocol found for: '{protocol_id}'") 
+            raise ConfigError(f"Invalid protocol_id, no protocol found for: '{protocol_id}'")
     return None
 
 

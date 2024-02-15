@@ -29,10 +29,6 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
 
     def __init__(self) -> None:
         self.command_definitions: dict[str, CommandDefinition] = {}
-        self.STATUS_COMMANDS = None
-        self.SETTINGS_COMMANDS = None
-        self.DEFAULT_COMMAND = None
-        self.ID_COMMANDS = None
         self.supported_ports = [PortType.TEST,]
 
     @property
@@ -47,7 +43,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
     def add_supported_ports(self, port_types: list):
         """ Add to the supported port types list """
         self.supported_ports.extend(port_types)
-    
+
     def clear_supported_ports(self):
         """ Remove all supported port types except the TEST port type """
         self.supported_ports = [PortType.TEST,]
@@ -161,6 +157,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 responses = []
             case ResultType.ACK | ResultType.SINGLE | ResultType.MULTIVALUED:
                 responses = response
+            case ResultType.COMMA_DELIMITED:
+                responses = response.split(b",")
             case ResultType.SLICED:
                 responses = []
                 for position in range(command_definition.reading_definition_count()):

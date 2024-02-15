@@ -651,10 +651,6 @@ class PI30(AbstractProtocol):
         self.add_command_definitions(QUERY_COMMANDS)
         self.add_command_definitions(SETTER_COMMANDS, result_type=ResultType.ACK)
         self.check_definitions_count(expected=44)
-        self.STATUS_COMMANDS = ["QPIGS", "Q1"]
-        self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
-        self.DEFAULT_COMMAND = "QPI"
-        self.ID_COMMANDS = ["QPI", "QGMN", "QMN"]
         self.add_supported_ports([PortType.SERIAL, PortType.USB])
 
     def check_crc(self, response: str, command_definition: CommandDefinition = None):

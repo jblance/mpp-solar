@@ -864,13 +864,9 @@ class PI30MAX(PI30):
     def __init__(self) -> None:
         super().__init__()
         self.protocol_id = b"PI30MAX"
-        # Add pi30max specific commands to pi30 commands
         self.add_command_definitions(QUERY_COMMANDS)
-        # Add pi30max specific setter commands
         self.add_command_definitions(SETTER_COMMANDS, result_type=ResultType.ACK)
-        # remove and unwanted pi30 commands
         self.remove_command_definitions(COMMANDS_TO_REMOVE)
-        # check for valid load of definitions
         self.check_definitions_count(expected=66)
 
         self.STATUS_COMMANDS = ["QPIGS", "QPIGS2"]

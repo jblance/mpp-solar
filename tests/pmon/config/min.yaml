@@ -8,10 +8,10 @@ device:
     type: test
     path: /dev/ttyUSB0
     # response_number: 1
-    protocol: JKSERIAL
+    protocol: PI18
 
 commands:
-- command: getBalancerData
+- command: PIRI
   outputs:
   - type: screen
     format: 

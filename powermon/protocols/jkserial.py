@@ -66,7 +66,8 @@ balancer_data_response = cs.Struct(
         'mos_tube_over_temperature_alarm' / cs.Flag,
         'low_capacity_alarm' / cs.Flag),
     "_id" / cs.Const(b"\x8c"),
-    "status_info" / cs.BitStruct(cs.Padding(12),
+    "status_info" / cs.BitStruct(
+        cs.Padding(12),
         'battery_down' / cs.Flag,
         'equalization_switching_state' / cs.Flag,
         'discharge_mos_on' / cs.Flag,
@@ -106,7 +107,7 @@ balancer_data_response = cs.Struct(
     "_id" / cs.Const(b"\xb7"),
     "software_id" / cs.Bytes(15),
     "_id" / cs.Const(b"\xb8"),
-    "start_calibration" /  cs.Enum(cs.Byte, StartCalibration=1, CloseCalibration=0),
+    "start_calibration" / cs.Enum(cs.Byte, StartCalibration=1, CloseCalibration=0),
     "_id" / cs.Const(b"\xb9"),
     "battery_capacity_Ah" / cs.Int32ub,
     "_id" / cs.Const(b"\xba"),
@@ -146,9 +147,9 @@ COMMANDS = {
             {"index": "cell_15_voltage", "description": "Cell 15 Voltage", "reading_type": ReadingType.MILLI_VOLTS},
             {"index": "cell_16_voltage", "description": "Cell 16 Voltage", "reading_type": ReadingType.MILLI_VOLTS},
 
-            {"index": "power_tube_temperature", "description": "MOS Temperature","reading_type": ReadingType.TEMPERATURE},
-            {"index": "battery_box_temperature", "description": "Battery Box Temperature","reading_type": ReadingType.TEMPERATURE},
-            {"index": "battery_temperature", "description": "Battery Temperature","reading_type": ReadingType.TEMPERATURE},
+            {"index": "power_tube_temperature", "description": "MOS Temperature", "reading_type": ReadingType.TEMPERATURE},
+            {"index": "battery_box_temperature", "description": "Battery Box Temperature", "reading_type": ReadingType.TEMPERATURE},
+            {"index": "battery_temperature", "description": "Battery Temperature", "reading_type": ReadingType.TEMPERATURE},
             {"index": "number_of_temp_sensors", "description": "Number of Temperature Sensors"},
 
             {"index": "battery_voltage_10mV", "description": "Battery Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/100"},
@@ -221,7 +222,6 @@ COMMANDS = {
 
         ],
         "test_responses": [
-            #bytes.fromhex("4e 57 01 1b 00 00 00 00 03 00 01 79 2a 01 0f 91 02 0f 94 03 0f 99 04 0f 92 05 0f 94 06 0f 94 07 0f 94 08 0f 91 09 0f 96 0a 0f 91 0b 0f 92 0c 0f 93 0d"),
             b'NW\x01\x1b\x00\x00\x00\x00\x03\x00\x01y*\x01\x0f\x90\x02\x0f\x91\x03\x0f\x94\x04\x0f\x8e\x05\x0f\x92\x06\x0f\x91\x07\x0f\x91\x08\x0f\x91\t\x0f\x93\n\x0f\x8e\x0b\x0f\x91\x0c\x0f\x90\r\x0f\x90\x0e\x0f\x8d\x80\x00!\x81\x00\x1c\x82\x00\x1e\x83\x15\xca\x84\x81\xc5\x85d\x86\x02\x87\x00\x19\x89\x00\x00\x16\xda\x8a\x00\x0e\x8b\x00\x00\x8c\x00\x03\x8e\x16\xb2\x8f\x10\xf4\x90\x106\x91\x10\x04\x92\x00\x05\x93\x0c\x1c\x94\x0c\x80\x95\x00\x05\x96\x01,\x97\x00n\x98\x01,\x99\x00U\x9a\x00\x1e\x9b\x0b\xb8\x9c\x002\x9d\x01\x9e\x00Z\x9f\x00F\xa0\x00d\xa1\x00d\xa2\x00\x14\xa3\x00<\xa4\x00<\xa5\x00\x01\xa6\x00\x03\xa7\xff\xec\xa8\xff\xf6\xa9\x0e\xaa\x00\x00\x00\xea\xab\x01\xac\x01\xad\x047\xae\x01\xaf\x01\xb0\x00\n\xb1\x14\xb2123456\x00\x00\x00\x00\xb3\x00\xb4Input Us\xb52306\xb6\x00\x01\x82\xe3\xb711.XW_S11.261__\xb8\x00\xb9\x00\x00\x00\xea\xbaInput UserdaJK_B1A20S15P\xc0\x01\x00\x00\x00\x00h\x00\x00Q\xd6',
             bytes.fromhex("4e 57 00 fd 00 00 00 00 06 00 01 79 0c 01 0d 06 02 0d 06 03 0d 07 04 0d 07 80 00 10 81 00 0e 82 00 0d 83 05 35 84 00 00 85 62 86 02 87 00 00 89 00 00 00 05 8a 00 04 8b 00 03 8c 00 03 8e 05 a0 8f 04 10 90 0e 10 91 0d de 92 00 05 93 0a 28 94 0a 5a 95 00 05 96 01 2c 97 00 78 98 00 1e 99 00 3c 9a 00 1e 9b 0d 48 9c 00 05 9d 01 9e 00 50 9f 00 41 a0 00 64 a1 00 64 a2 00 14 a3 00 32 a4 00 37 a5 00 03 a6 00 08 a7 ff ec a8 ff f6 a9 04 aa 00 00 01 31 ab 01 ac 01 ad 03 7e ae 01 af 00 b0 00 0a b1 14 b2 35 33 31 34 00 00 00 00 00 00 b3 00 b4 49 6e 70 75 74 20 55 73 b5 32 33 31 32 b6 00 00 36 a6 b7 31 31 2e 58 57 5f 53 31 31 2e 32 31 48 5f 5f b8 00 b9 00 00 01 31 ba 49 6e 70 75 74 20 55 73 65 72 64 61 45 64 64 69 65 42 6c 75 65 42 4d 53 c0 01 00 00 00 00 68 00 00 44 6f"),
         ],
@@ -239,9 +239,6 @@ class JkSerial(AbstractProtocol):
         self._protocol_id = b"JKSERIAL"
         self.add_command_definitions(COMMANDS)
         self.add_supported_ports([PortType.SERIAL])
-        self.STATUS_COMMANDS = ["getBalancerData",]
-        self.SETTINGS_COMMANDS = []
-        self.DEFAULT_COMMAND = "getBalancerData"
         self.check_definitions_count(expected=1)
 
     def check_valid(self, response: str, command_definition: CommandDefinition = None) -> bool:
@@ -269,16 +266,16 @@ class JkSerial(AbstractProtocol):
         Override the default get_full_command as its different
         """
         log.info("Using protocol: %s with %i commands", self.protocol_id, len(self.command_definitions))
-        self._command_defn = self.get_command_definition(command)
+        _command_defn = self.get_command_definition(command)
         # End of required variables setting
-        if self._command_defn is None:
+        if _command_defn is None:
             # Maybe return a default here?
             return None
 
         # Read basic information and status
         # full command is 21 bytes long
         cmd = bytearray(21)
-        command_code = int(self._command_defn.device_command_code, 16)
+        command_code = int(_command_defn.device_command_code, 16)
 
         # start bit  0x4E
         cmd[0] = 0x4E                         # start sequence
@@ -289,7 +286,7 @@ class JkSerial(AbstractProtocol):
         cmd[5] = 0x00                         # bms terminal number
         cmd[6] = 0x00                         # bms terminal number
         cmd[7] = 0x00                         # bms terminal number
-        # if self._command_defn["type"] == "SETTER":
+        # if _command_defn["type"] == "SETTER":
         if False:
             cmd[8] = 0x02                     # command word: 0x01 (activation), 0x02 (write), 0x03 (read), 0x05 (password), 0x06 (read all)
         else:
@@ -331,7 +328,6 @@ class JkSerial(AbstractProtocol):
                             key = f"cell_{_container['no']}_voltage"
                             value = _container['voltage_mV']
                             responses.append((key, value))
-                    #print(f"{x}:listcontainer")
                 case cs.Container:
                     for y in result[x]:
                         if y != "_io":

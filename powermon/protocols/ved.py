@@ -180,13 +180,6 @@ class VictronEnergyDirect(AbstractProtocol):
         self.protocol_id = b"VED"
         self.add_command_definitions(COMMANDS)
         self.add_supported_ports([PortType.SERIAL, PortType.USB])
-        self.STATUS_COMMANDS = [
-            "vedtext",
-        ]
-        self.SETTINGS_COMMANDS = [
-            "",
-        ]
-        self.DEFAULT_COMMAND = "vedtext"
         self.check_definitions_count(expected=2)
 
     def get_full_command(self, command) -> bytes:
