@@ -1,5 +1,5 @@
-""" reading_definition.py """
-import calendar  # pylint: disable=w0611 # needed for INFO type evaluating templates
+""" powermon / commands / reading_definition.py """
+import calendar  # pylint: disable=w0611 # noqa: F401
 import logging
 from enum import auto
 from struct import unpack
@@ -468,6 +468,7 @@ class ReadingDefinitionNull(ReadingDefinition):
     """ A ReadingDefinition for data to be ignored """
     def reading_from_raw_response(self, raw_value, override=None) -> list[Reading]:
         return []
+
 
 class ReadingDefinitionACK(ReadingDefinition):
     """ ReadingDefinition for ACK type readings """

@@ -2,13 +2,7 @@
 import struct
 import unittest
 
-from powermon.commands.command import Command
-from powermon.commands.command_definition import CommandDefinition
-from powermon.commands.reading_definition import (ReadingDefinition,
-                                                  ReadingType, ResponseType)
-from powermon.commands.result import Result, ResultType
-from powermon.device import DeviceInfo
-from powermon.formats.simple import SimpleFormat
+from powermon.commands.reading_definition import ReadingDefinition, ReadingType, ResponseType
 
 
 class TestResponseTypes(unittest.TestCase):
@@ -55,7 +49,6 @@ class TestResponseTypes(unittest.TestCase):
         reading_definition_config = {"response_type": ResponseType.LE_2B_S}
         reading_definition = ReadingDefinition.from_config(reading_definition_config, 0)
         self.assertRaises(struct.error, reading_definition.translate_raw_response, b"78")
-
 
     def test_template_bytes(self):
         """ test ResponseType.TEMPLATE_BYTES """

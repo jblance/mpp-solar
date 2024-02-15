@@ -96,7 +96,7 @@ mute_buzzer_beep_only_on_battery_discharged_status=Enabled
 generator_as_ac_input=Disabled
 wide_ac_input_range=Enabled\n"""),
     ("T", """datetime=20210521234743(YYYYMMDDHHMMSS)\n"""),
-    ("ET", """generated_energy=6591(kWh)\n"""),
+    ("ET", """total_generated_energy=6591(kWh)\n"""),
     ("BATS", """battery_maximum_charge_current=2000(0.1A)
 battery_constant_charge_voltage(c.v.)=584(0.1V)
 battery_floating_charge_voltage=576(0.1V)
@@ -121,10 +121,10 @@ battery_discharge_to_loads_when_solar_input_normal=disabled
 battery_discharge_to_loads_when_solar_input_loss=disabled
 battery_discharge_to_feed_grid_when_solar_input_normal=disabled
 battery_discharge_to_feed_grid_when_solar_input_loss=disabled\n"""),
-    ("EY2023", """generated_energy=6591(Wh)\n"""),
-    ("EM202301", """generated_energy=6591(Wh)\n"""),
-    ("ED20230213", """generated_energy=91(Wh)\n"""),
-    ("EH2023021323", """generated_energy=1(Wh)\n"""),
+    ("EY2023", """yearly_generated_energy=6591(Wh)\n"""),
+    ("EM202301", """monthly_generated_energy=6591(Wh)\n"""),
+    ("ED20230213", """daily_generated_energy=91(Wh)\n"""),
+    ("EH2023021323", """hourly_generated_energy=1(Wh)\n"""),
 ]
 # ("", """\n"""),
 # ("DI", """\n"""),
@@ -134,6 +134,7 @@ battery_discharge_to_feed_grid_when_solar_input_loss=disabled\n"""),
 def do_test(self, command, expected, respno=0):
     try:
         # print(command, end=" ")
+        respno += 1
         result = subprocess.run(
             [
                 "mppsolar",
@@ -163,7 +164,7 @@ def do_test(self, command, expected, respno=0):
         raise error
 
 
-class test_pi17_decode(unittest.TestCase):
+class TestPi17(unittest.TestCase):
     maxDiff = None
 
     def test_pi17_query_commands(self):
