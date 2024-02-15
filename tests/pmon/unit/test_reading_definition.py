@@ -3,8 +3,7 @@ import unittest
 
 from powermon.commands.command import Command
 from powermon.commands.command_definition import CommandDefinition
-from powermon.commands.reading_definition import (ReadingDefinition,
-                                                  ReadingType, ResponseType)
+from powermon.commands.reading_definition import (ReadingDefinition, ReadingType, ResponseType)
 from powermon.commands.result import Result, ResultType
 from powermon.device import DeviceInfo
 from powermon.formats.simple import SimpleFormat
@@ -85,7 +84,7 @@ class TestReadingDefinitions(unittest.TestCase):
         self.assertEqual(formatted_data, expected)
 
     def test_hex_str_9c(self):
-        """ test ReadingType.KILOWATT_HOURS """
+        """ test ReadingType.HEX_STR """
         reading_definition_config = {"description": "Checksum", "reading_type": ReadingType.HEX_STR, "response_type": ResponseType.HEX_CHAR}
         expected = ["checksum=0x9c"]
 
@@ -97,6 +96,24 @@ class TestReadingDefinitions(unittest.TestCase):
         command.command_definition = command_definition
 
         _result = Result(command=command, raw_response=b"(\x1a\xcd\xcd\r", responses=b"\x9c")
+
+        formatted_data = simple_formatter.format(command, _result, device_info)
+        # print(formatted_data)
+        self.assertEqual(formatted_data, expected)
+
+    def test_ignore(self):
+        """ test ReadingType.IGNORE """
+        reading_definition_config = {"description": "Checksum", "reading_type": ReadingType.IGNORE, "response_type": ResponseType.HEX_CHAR}
+        expected = []
+
+        simple_formatter = SimpleFormat({})
+        device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
+        reading_definition = ReadingDefinition.from_config(reading_definition_config, 0)
+        command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.SINGLE, reading_definitions=[reading_definition])
+        command = Command.from_config({"command": "CODE"})
+        command.command_definition = command_definition
+
+        _result = Result(command=command, raw_response=b"(\x1a\xcd\xcd\r", responses=b"ignoreme")
 
         formatted_data = simple_formatter.format(command, _result, device_info)
         # print(formatted_data)
