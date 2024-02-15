@@ -5,6 +5,7 @@ from enum import Enum, auto
 from powermon.commands.reading import Reading
 from powermon.commands.reading_definition import ReadingDefinition, ResponseType
 from powermon.dto.resultDTO import ResultDTO
+from powermon.errors import CommandExecutionFailed
 
 log = logging.getLogger("result")
 
@@ -108,6 +109,8 @@ class Result:
                 # possibly additional INFO definitions (at end of definition list??)
                 definition_count = self.command.command_definition.reading_definition_count()
                 response_count = len(responses)
+                if response_count == 1 and responses[0] == b'NAK':
+                    raise CommandExecutionFailed("Received a NAK response to the command")
                 for position in range(definition_count):
                     reading_definition: ReadingDefinition = self.command.command_definition.get_reading_definition(position=position)
                     if position < response_count:

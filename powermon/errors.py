@@ -31,3 +31,7 @@ class CommandDefinitionIncorrect(Exception):
 
 class CommandError(Exception):
     """ Exception for errors with commands """
+
+
+class CommandExecutionFailed(Exception):
+    """ Exception for errors with execution of commands """
