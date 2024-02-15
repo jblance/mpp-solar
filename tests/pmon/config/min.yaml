@@ -7,11 +7,11 @@ device:
   port:
     type: test
     path: /dev/ttyUSB0
-    # response_number: 1
-    protocol: PI18
+    response_number: 0
+    protocol: PI30
 
 commands:
-- command: PIRI
+- command: QPIRI
   outputs:
   - type: screen
     format: 
