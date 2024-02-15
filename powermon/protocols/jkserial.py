@@ -101,7 +101,7 @@ balancer_data_response = cs.Struct(
     "_id" / cs.Const(b"\x9b"),
     "equalization_starting_voltage_mV" / cs.Int16ub,
 
-    "rest" / cs.Bytes(93),
+    "rest" / cs.Bytes(93),  # TODO: add rest of packet
 
     "_id" / cs.Const(b"\xb7"),
     "software_id" / cs.Bytes(15),
@@ -121,12 +121,11 @@ balancer_data_response = cs.Struct(
 COMMANDS = {
     "getBalancerData": {
         "name": "getBalancerData",
-        # "command_code": "00",
         "description": "Get Balancer Data",
         "help": " -- Get Balancer Data",
-        # "type": "QUERY",
         "construct": balancer_data_response,
         "device_command_type": "ReadAll",
+        "device_command_code": "00",
         "result_type": ResultType.CONSTRUCT,
         "reading_definitions": [
             {"index": "cell_count", "description": "Cell Count"},
@@ -270,8 +269,6 @@ class JkSerial(AbstractProtocol):
         Override the default get_full_command as its different
         """
         log.info("Using protocol: %s with %i commands", self.protocol_id, len(self.command_definitions))
-        # These need to be set to allow other functions to work`
-        self._command = command
         self._command_defn = self.get_command_definition(command)
         # End of required variables setting
         if self._command_defn is None:
@@ -281,8 +278,7 @@ class JkSerial(AbstractProtocol):
         # Read basic information and status
         # full command is 21 bytes long
         cmd = bytearray(21)
-        # command_code = int(self._command_defn["command_code"], 16)
-        command_code = int("00")
+        command_code = int(self._command_defn.device_command_code, 16)
 
         # start bit  0x4E
         cmd[0] = 0x4E                         # start sequence

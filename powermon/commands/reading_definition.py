@@ -3,6 +3,7 @@ import calendar  # pylint: disable=w0611 # needed for INFO type evaluating templ
 import logging
 from enum import auto
 from struct import unpack
+from ast import literal_eval
 
 from strenum import LowercaseStrEnum
 
@@ -24,7 +25,6 @@ class ResponseType(LowercaseStrEnum):
     STRING = auto()
     BYTES = auto()
     LE_2B_S = auto()  # little endian 2 byte value (as string, eg 7800 = 0x0078 = 120)
-    BE_2B = auto()  # big endian 2 byte value
     OPTION = auto()  # response identifies which option from a dict (called 'options') is the info
     LIST = auto()  # response identifies which option from a list (called 'options') is the info
     BIT_ENCODED = auto()
@@ -163,7 +163,13 @@ class ReadingDefinition():
                     return raw_value
                 if isinstance(raw_value, bytes):
                     raw_value = raw_value.decode('utf-8')
-                return bool(int(raw_value))
+                try:
+                    return bool(int(raw_value))
+                except ValueError:
+                    try:
+                        return bool(literal_eval(raw_value))
+                    except ValueError as e:
+                        raise ValueError(f"For Reading Defininition '{self.description}', expected an BOOL, got {raw_value}") from e
             case ResponseType.HEX_CHAR:
                 return raw_value[0]
                 # return ord(raw_value.decode('utf-8')[0])
@@ -202,9 +208,6 @@ class ReadingDefinition():
                     raise ValueError(f"For Reading Defininition '{self.description}', expected an INT, got {raw_value}") from e
             case ResponseType.FLOAT:
                 return float(raw_value.decode('utf-8'))
-            case ResponseType.BE_2B:
-                result = unpack('>h', raw_value)[0]
-                return result
             case ResponseType.LE_2B_S:
                 result = raw_value.decode('utf-8')
                 result = unpack('<h', bytes.fromhex(result))[0]
@@ -298,7 +301,7 @@ class ReadingDefinition():
     def from_config(cls, reading_definition_config: dict, i) -> "ReadingDefinition":
         """ build a reading definition object from a config dict """
         index = i
-        description = reading_definition_config.get("description")
+        description = reading_definition_config.get("description", f"No description {i}")
         response_type = reading_definition_config.get("response_type", ResponseType.INT)
         reading_type = reading_definition_config.get("reading_type", ReadingType.MESSAGE)
         device_class = reading_definition_config.get("device_class", None)
@@ -457,7 +460,7 @@ class ReadingDefinitionNumeric(ReadingDefinition):
     """ A ReadingDefinition for readings that must be numeric """
     def __init__(self, index: int, response_type: str, description: str, device_class: str = None, state_class: str = None, icon: str = None):
         super().__init__(index, response_type, description, device_class, state_class, icon)
-        if response_type not in [ResponseType.INT, ResponseType.TEMPLATE_INT, ResponseType.FLOAT, ResponseType.LE_2B_S, ResponseType.BE_2B, ResponseType.HEX_CHAR, ResponseType.TEMPLATE_ORD_INT]:
+        if response_type not in [ResponseType.INT, ResponseType.TEMPLATE_INT, ResponseType.FLOAT, ResponseType.LE_2B_S, ResponseType.HEX_CHAR, ResponseType.TEMPLATE_ORD_INT]:
             raise TypeError(f"{type(self)} response must be of type int or float, ResponseType {response_type} is not valid")
 
 

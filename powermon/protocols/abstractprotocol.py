@@ -9,8 +9,7 @@ from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.result import ResultType
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
 from powermon.dto.protocolDTO import ProtocolDTO
-from powermon.errors import (CommandDefinitionMissing, InvalidResponse,
-                             PowermonProtocolError)
+from powermon.errors import (CommandDefinitionIncorrect, CommandDefinitionMissing, InvalidResponse, PowermonProtocolError)
 from powermon.ports.porttype import PortType
 from powermon.protocols.helpers import crc_pi30 as crc
 
@@ -181,6 +180,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             case ResultType.CONSTRUCT:
                 # build a list of (index, value) tuples, after parsing with a construct
                 responses = []
+                # check for construct
+                if command_definition.construct is None:
+                    raise CommandDefinitionIncorrect("No construct found in command_definition")
                 # parse with construct
                 result = command_definition.construct.parse(response)
                 # print(result)
