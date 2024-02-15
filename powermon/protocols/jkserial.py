@@ -6,7 +6,8 @@ import construct as cs
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
-from powermon.errors import InvalidResponse
+from powermon.commands.command import CommandType
+from powermon.errors import InvalidResponse, CommandDefinitionMissing
 from powermon.ports.porttype import PortType
 from powermon.protocols.abstractprotocol import AbstractProtocol
 from powermon.protocols.helpers import crc_jk232 as crc
@@ -16,7 +17,7 @@ log = logging.getLogger("jk232")
 
 # construct 'structures' to cover decoding of response packet
 cell_details = cs.Struct("no" / cs.Byte, "voltage_mV" / cs.Int16ub)
-balancer_data_response = cs.Struct(
+all_data_response = cs.Struct(
     "stx" / cs.Const(b"NW"),
     "packet_length" / cs.Int16ub,
     "terminal_no" / cs.Bytes(4),
@@ -120,13 +121,13 @@ balancer_data_response = cs.Struct(
 )
 
 COMMANDS = {
-    "getBalancerData": {
-        "name": "getBalancerData",
-        "description": "Get Balancer Data",
-        "help": " -- Get Balancer Data",
-        "construct": balancer_data_response,
-        "device_command_type": "ReadAll",
-        "device_command_code": "00",
+    "all_data": {
+        "name": "all_data",
+        "description": "Get All BMS Data",
+        "help": " -- Get All BMS Data",
+        "construct": all_data_response,
+        "command_type": CommandType.SERIAL_READONLY,
+        "command_code": "00",
         "result_type": ResultType.CONSTRUCT,
         "reading_definitions": [
             {"index": "cell_count", "description": "Cell Count"},
@@ -226,6 +227,16 @@ COMMANDS = {
             bytes.fromhex("4e 57 00 fd 00 00 00 00 06 00 01 79 0c 01 0d 06 02 0d 06 03 0d 07 04 0d 07 80 00 10 81 00 0e 82 00 0d 83 05 35 84 00 00 85 62 86 02 87 00 00 89 00 00 00 05 8a 00 04 8b 00 03 8c 00 03 8e 05 a0 8f 04 10 90 0e 10 91 0d de 92 00 05 93 0a 28 94 0a 5a 95 00 05 96 01 2c 97 00 78 98 00 1e 99 00 3c 9a 00 1e 9b 0d 48 9c 00 05 9d 01 9e 00 50 9f 00 41 a0 00 64 a1 00 64 a2 00 14 a3 00 32 a4 00 37 a5 00 03 a6 00 08 a7 ff ec a8 ff f6 a9 04 aa 00 00 01 31 ab 01 ac 01 ad 03 7e ae 01 af 00 b0 00 0a b1 14 b2 35 33 31 34 00 00 00 00 00 00 b3 00 b4 49 6e 70 75 74 20 55 73 b5 32 33 31 32 b6 00 00 36 a6 b7 31 31 2e 58 57 5f 53 31 31 2e 32 31 48 5f 5f b8 00 b9 00 00 01 31 ba 49 6e 70 75 74 20 55 73 65 72 64 61 45 64 64 69 65 42 6c 75 65 42 4d 53 c0 01 00 00 00 00 68 00 00 44 6f"),
         ],
     },
+    "battery_voltage": {
+        "name": "battery_voltage",
+        "description": "Get the battery voltage",
+        "help": " -- Get the battery voltage",
+        # "construct": balancer_data_response,
+        "command_type": CommandType.JKSERIAL_READ,
+        "command_code": "83",
+        "result_type": ResultType.SINGLE,
+        "reading_definitions": [{"description": "Battery Voltage"}],
+        "test_responses": []}
 }
 
 
@@ -239,7 +250,7 @@ class JkSerial(AbstractProtocol):
         self._protocol_id = b"JKSERIAL"
         self.add_command_definitions(COMMANDS)
         self.add_supported_ports([PortType.SERIAL])
-        self.check_definitions_count(expected=1)
+        self.check_definitions_count(expected=2)
 
     def check_valid(self, response: str, command_definition: CommandDefinition = None) -> bool:
         """ check response is valid """
@@ -266,16 +277,26 @@ class JkSerial(AbstractProtocol):
         Override the default get_full_command as its different
         """
         log.info("Using protocol: %s with %i commands", self.protocol_id, len(self.command_definitions))
-        _command_defn = self.get_command_definition(command)
-        # End of required variables setting
-        if _command_defn is None:
-            # Maybe return a default here?
-            return None
+        command_defn = self.get_command_definition(command)
+        # raise error is no command_defn found
+        if command_defn is None:
+            raise CommandDefinitionMissing(f"No definition found in JKSERIAL for {command}")
+
+        # command byte: 0x01 (activation), 0x02 (write), 0x03 (read), 0x05 (password), 0x06 (read all)
+        match command_defn.command_type:
+            case CommandType.SERIAL_READONLY:
+                command_byte = 0x06
+            case CommandType.JKSERIAL_ACTIVATION:
+                command_byte = 0x01
+            case CommandType.JKSERIAL_SETTER:
+                command_byte = 0x02
+            case _:
+                command_byte = 0x03
 
         # Read basic information and status
         # full command is 21 bytes long
         cmd = bytearray(21)
-        command_code = int(_command_defn.device_command_code, 16)
+        command_code = int(command_defn.command_code, 16)
 
         # start bit  0x4E
         cmd[0] = 0x4E                         # start sequence
@@ -286,11 +307,7 @@ class JkSerial(AbstractProtocol):
         cmd[5] = 0x00                         # bms terminal number
         cmd[6] = 0x00                         # bms terminal number
         cmd[7] = 0x00                         # bms terminal number
-        # if _command_defn["type"] == "SETTER":
-        if False:
-            cmd[8] = 0x02                     # command word: 0x01 (activation), 0x02 (write), 0x03 (read), 0x05 (password), 0x06 (read all)
-        else:
-            cmd[8] = 0x03
+        cmd[8] = command_byte
         cmd[9] = 0x03                         # frame source: 0x00 (bms), 0x01 (bluetooth), 0x02 (gps), 0x03 (computer)
         cmd[10] = 0x00                        # frame type: 0x00 (read data), 0x01 (reply frame), 0x02 (BMS active upload)
         cmd[11] = command_code                # register: 0x00 (read all registers), 0x8E...0xBF (holding registers)
@@ -305,7 +322,7 @@ class JkSerial(AbstractProtocol):
         cmd[19] = crc_high
         cmd[20] = crc_low
 
-        log.debug(f"cmd with crc: {cmd}")
+        log.debug("cmd with crc: %s", cmd)
         return cmd
 
     def split_response(self, response: str, command_definition: CommandDefinition = None) -> list:

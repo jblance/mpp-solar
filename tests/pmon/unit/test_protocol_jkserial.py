@@ -49,13 +49,6 @@ class TestProtocolJKSerial(unittest.TestCase):
         response = b'NY\x01\x1b'
         self.assertRaises(InvalidResponse, protocol.check_valid, response=response, command_definition=cd)
 
-    def test_full_command_balancer_data(self):
-        """ test for full command generation for getBalancerData"""
-        result = protocol.get_full_command(command="getBalancerData")
-        expected = bytearray(b'NW\x00\x13\x00\x00\x00\x00\x03\x03\x00\x00\x00\x00\x00\x00h\x00\x00\x01&')
-        # print(result)
-        self.assertEqual(expected, result)
-
     def test_port_supported_serial(self):
         """ test that jkserial protocol is supported on SerialPort"""
         _port = SerialPort("path", 9600, protocol)
@@ -70,3 +63,19 @@ class TestProtocolJKSerial(unittest.TestCase):
         """ test that jkserial protocol is supported on TestPort"""
         _port = TestPort("path", protocol)
         self.assertIsInstance(_port, AbstractPort)
+
+    def test_full_command_all_data(self):
+        """ test for full command generation for all data"""
+        result = protocol.get_full_command(command="all_data")
+        expected = bytearray(b'NW\x00\x13\x00\x00\x00\x00\x06\x03\x00\x00\x00\x00\x00\x00h\x00\x00\x01)')
+        # print(result)
+        # print(expected)
+        self.assertEqual(expected, result)
+
+    def test_get_full_command_battery_voltage(self):
+        """ test full command generation for battery voltage command """
+        result = protocol.get_full_command(command="battery_voltage")
+        expected = bytearray(b'NW\x00\x13\x00\x00\x00\x00\x03\x03\x00\x83\x00\x00\x00\x00h\x00\x00\x01\xa9')
+        # print(result)
+        # print(expected)
+        self.assertEqual(expected, result)
