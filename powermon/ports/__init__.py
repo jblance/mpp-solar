@@ -1,8 +1,5 @@
-""" ports/__init__.py """
+""" powermon / ports / __init__.py """
 import logging
-from enum import auto
-
-from strenum import LowercaseStrEnum
 
 from powermon.errors import ConfigError
 from powermon.ports.porttype import PortType
@@ -14,17 +11,13 @@ from powermon.ports.usbport import USBPort
 log = logging.getLogger("ports")
 
 
-
-
-
 def from_config(port_config):
     """ get a port object from config data """
     log.debug("port_config: %s", port_config)
 
     port_object = None
     if not port_config:
-        log.info("no port config supplied, defaulting to test port")  # QUESTION: does this make sense, maybe should return None
-        port_config = {"type": "test", "protocol": "PI30"}
+        raise ConfigError("no port config supplied")
 
     # port type is mandatory
     port_type = port_config.get("type")
