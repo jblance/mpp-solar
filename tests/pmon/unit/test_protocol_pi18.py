@@ -50,6 +50,6 @@ class TestProtocolPI18(unittest.TestCase):
     def test_get_full_command_pi(self):
         """ test full command generation for PI command """
         fc = protocol.get_full_command('PI')
-        print(fc)
+        # print(fc)
         expected = b'^P005PIq\x8b\r'
         self.assertEqual(expected, fc)

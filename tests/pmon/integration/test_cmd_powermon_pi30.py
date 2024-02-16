@@ -573,7 +573,7 @@ operation_logic=Automatic mode\n"""
                     "powermon",
                     "--once",
                     "--config",
-                    '{"device": {"port":{"type":"test", "response_number": 1}}, "commands": [{"command": "QPIRI", "outputs": [{"type": "screen", "format": "simple"}]}]}',
+                    '{"device": {"port":{"type":"test", "response_number": 2}}, "commands": [{"command": "QPIRI", "outputs": [{"type": "screen", "format": "simple"}]}]}',
                 ],
                 check=True,
                 capture_output=True,
