@@ -87,9 +87,10 @@ NEW_COMMANDS = {
             ["LittleHex2Short:r/1000", 2, "Resistance_Cell30", "Ohm"],
             ["LittleHex2Short:r/1000", 2, "Resistance_Cell31", "Ohm"],
             ["LittleHex2Short:r/1000", 2, "Resistance_Cell32", "Ohm"],
-            ["discard", 6, "discard2", ""],
+            ["LittleHex2Short:r/10", 2, "Battery_T1??", "°C"],
+            ["discard", 4, "discard2", ""],
             ["LittleHex2UInt:r/1000", 4, "Battery_Voltage", "V"],
-            ["LittleHex2UInt", 4, "Battery_Power", "W"],
+            ["LittleHex2UInt:r/1000", 4, "Battery_Power", "W"],
             ["LittleHex2Int:r/1000", 4, "Balance_Current", "A"],  # signed int32
             # ["discard", 8, "discard3", ""],
             ["LittleHex2Short:r/10", 2, "Battery_T1", "°C"],
