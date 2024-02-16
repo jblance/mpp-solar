@@ -32,7 +32,7 @@ class CommandDefinition:
         self.description = description
         self.help_text = help_text
         self.result_type : ResultType = result_type
-        self.reading_definitions : dict[int, ReadingDefinition] = reading_definitions  # TODO: this is incorrect, needs positional and str indexes as well
+        self.reading_definitions : dict[int | str, ReadingDefinition] = reading_definitions
         self.test_responses : list[bytes] = test_responses
         self.regex : str | None = regex
         self.command_type = None
