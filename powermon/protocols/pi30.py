@@ -188,6 +188,26 @@ SETTER_COMMANDS = {
 }
 
 QUERY_COMMANDS = {
+    "QBMS": {
+        "name": "QBMS",
+        "description": "Read lithium battery information",
+        "help": " -- queries the value of various metrics from the battery",
+        "result_type": ResultType.ORDERED,
+        "reading_definitions": [
+            {"description": "Battery is connected", "response_type": ResponseType.INV_BOOL},
+            {"description": "Battery capacity from BMS", "reading_type": ReadingType.PERCENTAGE},
+            {"description": "Battery charging is forced", "response_type": ResponseType.BOOL},
+            {"description": "Battery discharge is enabled", "response_type": ResponseType.INV_BOOL},
+            {"description": "Battery charge is enabled", "response_type": ResponseType.INV_BOOL},
+            {"description": "Battery bulk charging voltage from BMS", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/10"},
+            {"description": "Battery float charging voltage from BMS", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/10"},
+            {"description": "Battery cut-off voltage from BMS", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/10"},
+            {"description": "Battery max charging current", "reading_type": ReadingType.CURRENT},
+            {"description": "Battery max discharge current", "reading_type": ReadingType.CURRENT}],
+        "test_responses": [
+            b"(0 100 0 0 1 532 532 450 0000 0030\x0e\x5E\n",
+        ],
+    },
     "QDI": {
         "name": "QDI",
         "description": "Default Settings inquiry",
@@ -651,7 +671,7 @@ class PI30(AbstractProtocol):
         self.protocol_id = b"PI30"
         self.add_command_definitions(QUERY_COMMANDS)
         self.add_command_definitions(SETTER_COMMANDS, result_type=ResultType.ACK)
-        self.check_definitions_count(expected=44)
+        self.check_definitions_count(expected=45)
         self.add_supported_ports([PortType.SERIAL, PortType.USB])
 
     def check_crc(self, response: str, command_definition: CommandDefinition = None):
