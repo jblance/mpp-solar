@@ -19,6 +19,7 @@ class ResponseType(LowercaseStrEnum):
     """
     ACK = auto()
     BOOL = auto()      # 0 is false, 1 is true
+    INV_BOOL = auto()      # 1 is false, 0 is true
     INT = auto()
     HEX_CHAR = auto()
     FLOAT = auto()
@@ -165,6 +166,19 @@ class ReadingDefinition():
                     raw_value = raw_value.decode('utf-8')
                 try:
                     return bool(int(raw_value))
+                except ValueError:
+                    try:
+                        return bool(literal_eval(raw_value))
+                    except ValueError as e:
+                        raise ValueError(f"For Reading Defininition '{self.description}', expected an BOOL, got {raw_value}") from e
+            case ResponseType.INV_BOOL:
+                # print(raw_value)
+                if isinstance(raw_value, bool):
+                    return not raw_value
+                if isinstance(raw_value, bytes):
+                    raw_value = raw_value.decode('utf-8')
+                try:
+                    return not bool(int(raw_value))
                 except ValueError:
                     try:
                         return bool(literal_eval(raw_value))
