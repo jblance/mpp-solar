@@ -31,12 +31,12 @@ class AbstractPort(ABC):
         if self.port_type not in self.protocol.supported_ports:
             raise PowermonProtocolError(f"Protocol {self.protocol.protocol_id.decode()} not supported by port type {self.port_type}")
 
-    def connect(self) -> bool:
+    async def connect(self) -> bool:
         """ default port connect function """
         log.debug("Port connect not implemented")
         return False
 
-    def disconnect(self) -> None:
+    async def disconnect(self) -> None:
         """ default port disconnect function """
         log.debug("Port disconnect not implemented")
 

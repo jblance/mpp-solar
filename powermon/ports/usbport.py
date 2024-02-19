@@ -37,7 +37,7 @@ class USBPort(AbstractPort):
     def is_connected(self) -> bool:
         return self.port is not None
 
-    def connect(self) -> bool:
+    async def connect(self) -> bool:
         if self.is_connected():
             log.debug("USBPort already connected")
             return True
@@ -51,13 +51,13 @@ class USBPort(AbstractPort):
             self.error_message = e
         return self.is_connected()
 
-    def disconnect(self) -> None:
+    async def disconnect(self) -> None:
         log.debug("USBPort disconnecting: %i", self.port)
         if self.port is not None:
             os.close(self.port)
         self.port = None
 
-    def send_and_receive(self, command: Command) -> Result:
+    async def send_and_receive(self, command: Command) -> Result:
         if not self.is_connected():
             log.warning("USBPort not connected")
             return command.build_result(result_type=ResultType.ERROR, raw_response=b"USBPort not connected", protocol=self.protocol)

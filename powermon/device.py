@@ -110,15 +110,15 @@ class Device:
                         commands=commands)
         return dto
 
-    def initialize(self):
+    async def initialize(self):
         """Device initialization activities"""
         log.info("initializing device")
 
-    def finalize(self):
+    async def finalize(self):
         """Device finalization activities"""
         log.info("finalizing device")
         # close connection on port
-        self.port.disconnect()
+        await self.port.disconnect()
 
     async def run(self, force=False):
         """checks for commands to run and runs them"""

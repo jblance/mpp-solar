@@ -58,10 +58,10 @@ class BlePort(AbstractPort):
         
         return self.is_connected()
 
-    def disconnect(self) -> None:
+    async def disconnect(self) -> None:
         log.debug("usbserial port disconnecting")
         if self.client is not None:
-            self.client.disconnect()
+            await self.client.disconnect()
         self.client = None
 
     async def send_and_receive(self, command: Command) -> Result:
