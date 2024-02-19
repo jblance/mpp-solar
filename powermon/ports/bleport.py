@@ -41,7 +41,7 @@ class BlePort(AbstractPort):
         dto = PortDTO(type="ble", mac=self.mac, protocol=self.protocol.to_dto())
         return dto
 
-     def _notification_callback(self, handle, data):
+    def _notification_callback(self, handle, data):
         log.debug("%s %s %s" % (handle, repr(data), len(data)))
         print(f"callback - {handle=}, {data=}")
 
