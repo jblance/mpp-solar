@@ -2,6 +2,8 @@
 import logging
 from struct import unpack
 
+import construct as cs
+
 from powermon.commands.command import CommandType
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
@@ -10,7 +12,6 @@ from powermon.errors import CommandError, InvalidCRC, InvalidResponse
 from powermon.ports.porttype import PortType
 from powermon.protocols.abstractprotocol import AbstractProtocol
 from powermon.protocols.helpers import victron_checksum
-import construct as cs
 
 log = logging.getLogger("daly")
 
@@ -76,18 +77,26 @@ class Daly(AbstractProtocol):
         log.info("Using protocol %s with %i commands", self.protocol_id, len(self.command_definitions))
 
         command_definition : CommandDefinition = self.get_command_definition(command)
-        return "as"
         if command_definition is None:
             return None
 
-        # VEDHEX
-        # : start of command
-        # 7 Get
-        # 0000 id of the value to get
-        # 00 flags
-        # 00 cs
-        # \n
-        # eg b':70010003E\n' = get battery capacity id = 0x1000 = 0010 little endian
+        # DALY commands
+        #
+        #
+        # 95 -> a58095080000000000000000c2
+        #       a58090080000000000000000bd
+        source = 0x80  # 4 = USB, 8 = Bluetooth
+        command = command_definition.command_code
+        data_length = 8
+        full_command = bytearray()
+        full_command.append(0xa5)  # start flag
+        full_command.append(source)
+        full_command.append(bytes.fromhex(command_definition.command_code)[0])
+        full_command += bytearray(data_length)
+        full_command.append(sum(full_command) & 0xFF)
+        print(full_command)
+        log.debug("w %s", full_command.hex())
+        return full_command
 
         command_type = command_definition.command_type
         match command_type:
