@@ -12,7 +12,7 @@ from powermon.ports.porttype import PortType
 from powermon.protocols.abstractprotocol import AbstractProtocol
 from powermon.protocols.helpers import crc_jk232 as crc
 
-log = logging.getLogger("jk232")
+log = logging.getLogger("jkserial")
 
 
 # construct 'structures' to cover decoding of response packet
