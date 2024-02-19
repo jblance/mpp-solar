@@ -100,12 +100,12 @@ class BlePort(AbstractPort):
             log.debug("Executing command via ble...")
             await self.client.write_gatt_char(15, full_command)
             log.debug("Waiting...")
-            try:
-                response_line = await asyncio.wait_for(self.response_cache[command]["future"], 5)
-            except asyncio.TimeoutError:
-                log.warning("Timeout while waiting for %s response" % command)
-                return False
-            log.debug("got %s" % response_line)
+            # try:
+            response_line = await asyncio.wait_for(self.response_cache[command]["future"], 5)
+            # except asyncio.TimeoutError:
+                # log.warning("Timeout while waiting for %s response" % command)
+                # return False
+            print("got %s" % response_line)
             #return result
             # self.serial_port.reset_input_buffer()
             # self.serial_port.reset_output_buffer()
