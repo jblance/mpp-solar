@@ -46,6 +46,7 @@ class BlePort(AbstractPort):
         log.debug("%s %s %s" % (handle, repr(data), len(data)))
         print(f"callback - {handle=}, {data=}")
         responses = []
+        command_code=90
         if len(data) == 13:
             responses.append(data)
         elif len(data) == 26:
@@ -56,14 +57,14 @@ class BlePort(AbstractPort):
             pass
 
         for response_bytes in responses:
-            command = response_bytes[2:3].hex()
-            if self.response_cache[command]["done"] is True:
+            #command = response_bytes[2:3].hex()
+            if self.response_cache[command_code]["done"] is True:
                 # self.logger.debug("skipping response for %s, done" % command)
                 return
-            self.response_cache[command]["queue"].append(response_bytes[4:-1])
-            if len(self.response_cache[command]["queue"]) == self.response_cache[command]["max_responses"]:
-                self.response_cache[command]["done"] = True
-                self.response_cache[command]["future"].set_result(self.response_cache[command]["queue"])
+            self.response_cache[command_code]["queue"].append(response_bytes[4:-1])
+            if len(self.response_cache[command_code]["queue"]) == self.response_cache[command_code]["max_responses"]:
+                self.response_cache[command_code]["done"] = True
+                self.response_cache[command_code]["future"].set_result(self.response_cache[command_code]["queue"])
 
     def is_connected(self):
         return self.client is not None and self.client.is_connected
@@ -101,7 +102,7 @@ class BlePort(AbstractPort):
             await self.client.write_gatt_char(15, full_command)
             log.debug("Waiting...")
             # try:
-            response_line = await asyncio.wait_for(self.response_cache[command]["future"], 5)
+            response_line = await asyncio.wait_for(self.response_cache[command_code]["future"], 5)
             # except asyncio.TimeoutError:
                 # log.warning("Timeout while waiting for %s response" % command)
                 # return False
