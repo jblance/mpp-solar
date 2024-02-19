@@ -47,7 +47,7 @@ class BlePort(AbstractPort):
         log.debug("%s %s %s" % (handle, repr(data), len(data)))
         print(f"callback - {handle=}, {data=}")
         responses = []
-        command_code=90
+        command_code =90
         if len(data) == 13:
             responses.append(data)
         elif len(data) == 26:
@@ -96,6 +96,10 @@ class BlePort(AbstractPort):
     async def send_and_receive(self, command: Command) -> Result:
         full_command = command.full_command
         command_code = 90
+        self.response_cache[command_code] = {"queue": [],
+                                        "future": asyncio.Future(),
+                                        "max_responses": 1,
+                                        "done": False}
         response_line = None
         log.debug("port: %s, full_command: %s", self.client, full_command)
         if not self.is_connected():
