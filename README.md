@@ -25,7 +25,7 @@ Currently has support for:
 - `pip install mppsolar[ble]` (for Bluetooth support aka jkbms), or
 - `pip install mppsolar[mongo]` (for MongoDB output), or
 - `pip install mppsolar[pgsql]` (for PostgreSQL output), or
-- `pip install mppsolar[push]` (for Pometheus PushGateway output), or
+- `pip install mppsolar[push]` (for Prometheus PushGateway output), or
 - `pip install mppsolar[systemd]` (for `--daemon` on Linux), or
 - `docker pull jblance/mppsolar:latest` (docker install)
 
