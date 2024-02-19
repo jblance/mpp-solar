@@ -1,6 +1,6 @@
 # !/usr/bin/python3
 """main powermon code"""
-
+import asyncio
 import json
 import logging
 import time
@@ -197,7 +197,7 @@ def main():
             daemon.watchdog()
 
             # run device loop (ie run any needed commands)
-            device.run(args.force)
+            asyncio.run(device.run(args.force))
 
             # run api coordinator ...
             api_coordinator.run()

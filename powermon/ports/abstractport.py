@@ -46,7 +46,7 @@ class AbstractPort(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def send_and_receive(self, command: Command) -> Result:
+    async def send_and_receive(self, command: Command) -> Result:
         """ main worker function for port objects, specific to each port type """
         raise NotImplementedError
 
@@ -65,13 +65,13 @@ class AbstractPort(ABC):
         log.debug("Setting protocol to: %s", value)
         self._protocol = value
 
-    def run_command(self, command: Command) -> Result:
+    async def run_command(self, command: Command) -> Result:
         """ run_command takes a command object, runs the command and returns a result object (replaces process_command) """
         log.debug("Command %s", command)
 
         # open port if it is closed
         if not self.is_connected():
-            if not self.connect():
+            if not await self.connect():
                 raise ConnectionError(f"Unable to connect to port: {self.error_message}")
         # FIXME: what if still not connected....
         # should, log an error and wait to try to reconnect (increasing backoff times)
@@ -83,6 +83,6 @@ class AbstractPort(ABC):
         command.full_command = self.protocol.get_full_command(command.code)
 
         # run the command via the 'send_and_receive port function
-        result = self.send_and_receive(command)
+        result = await self.send_and_receive(command)
         log.debug("after send_and_receive: %s", result)
         return result
