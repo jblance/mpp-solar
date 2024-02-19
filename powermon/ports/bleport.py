@@ -93,6 +93,7 @@ class BlePort(AbstractPort):
 
     async def send_and_receive(self, command: Command) -> Result:
         full_command = command.full_command
+        command_code=90
         response_line = None
         log.debug("port: %s, full_command: %s", self.client, full_command)
         if not self.is_connected():
