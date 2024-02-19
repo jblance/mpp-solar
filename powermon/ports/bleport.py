@@ -1,8 +1,8 @@
 """ powermon / ports / serialport.py """
-import logging
-# import time
-
 # import serial
+import asyncio
+import logging
+
 from bleak import BleakClient
 
 from powermon.commands.command import Command, CommandType
@@ -36,6 +36,7 @@ class BlePort(AbstractPort):
         self.client = None
         self.is_protocol_supported()
         # self.error_message = None
+        self.response_cache = {}
 
     def to_dto(self) -> PortDTO:
         dto = PortDTO(type="ble", mac=self.mac, protocol=self.protocol.to_dto())
@@ -44,6 +45,25 @@ class BlePort(AbstractPort):
     def _notification_callback(self, handle, data):
         log.debug("%s %s %s" % (handle, repr(data), len(data)))
         print(f"callback - {handle=}, {data=}")
+        responses = []
+        if len(data) == 13:
+            responses.append(data)
+        elif len(data) == 26:
+            responses.append(data[0:13])
+            responses.append(data[13:])
+        else:
+            # self.logger.error(len(data), "bytes received, not 13 or 26, not implemented")
+            pass
+
+        for response_bytes in responses:
+            command = response_bytes[2:3].hex()
+            if self.response_cache[command]["done"] is True:
+                # self.logger.debug("skipping response for %s, done" % command)
+                return
+            self.response_cache[command]["queue"].append(response_bytes[4:-1])
+            if len(self.response_cache[command]["queue"]) == self.response_cache[command]["max_responses"]:
+                self.response_cache[command]["done"] = True
+                self.response_cache[command]["future"].set_result(self.response_cache[command]["queue"])
 
     def is_connected(self):
         return self.client is not None and self.client.is_connected
@@ -79,6 +99,14 @@ class BlePort(AbstractPort):
         try:
             log.debug("Executing command via ble...")
             await self.client.write_gatt_char(15, full_command)
+            log.debug("Waiting...")
+            try:
+                response_line = await asyncio.wait_for(self.response_cache[command]["future"], 5)
+            except asyncio.TimeoutError:
+                log.warning("Timeout while waiting for %s response" % command)
+                return False
+            log.debug("got %s" % response_line)
+            #return result
             # self.serial_port.reset_input_buffer()
             # self.serial_port.reset_output_buffer()
             # # Process i/o differently depending on command type
