@@ -41,6 +41,10 @@ class BlePort(AbstractPort):
         dto = PortDTO(type="ble", mac=self.mac, protocol=self.protocol.to_dto())
         return dto
 
+     def _notification_callback(self, handle, data):
+        log.debug("%s %s %s" % (handle, repr(data), len(data)))
+        print(f"callback - {handle=}, {data=}")
+
     def is_connected(self):
         return self.client is not None and self.client.is_connected
 
@@ -49,6 +53,8 @@ class BlePort(AbstractPort):
         try:
             self.client = BleakClient(self.mac)
             await self.client.connect()
+            await self.client.start_notify(17, self._notification_callback)
+            await self.client.write_gatt_char(48, bytearray(b""))
             log.debug(self.client)
         except Exception as e:
             # log.error("Incorrect configuration for serial port: %s", e)
@@ -71,7 +77,8 @@ class BlePort(AbstractPort):
         if not self.is_connected():
             raise RuntimeError("Ble port not open")
         try:
-            log.debug("Executing command via usbserial...")
+            log.debug("Executing command via ble...")
+            await self.client.write_gatt_char(15, full_command)
             # self.serial_port.reset_input_buffer()
             # self.serial_port.reset_output_buffer()
             # # Process i/o differently depending on command type
