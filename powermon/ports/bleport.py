@@ -109,7 +109,7 @@ class BlePort(AbstractPort):
         await self.client.write_gatt_char(15, full_command)
         log.debug("Waiting...")
         # try:
-        response_line = await asyncio.wait_for(self.response_cache[command_code]["future"], 5)
+        response_line = await asyncio.wait_for(self.response_cache[command_code]["future"], 30)
         # except asyncio.TimeoutError:
             # log.warning("Timeout while waiting for %s response" % command)
             # return False
