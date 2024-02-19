@@ -91,11 +91,19 @@ class CommandConfig(NoExtraBaseModel):
     outputs: None | List[OutputConfig] | str = Field(default=None)
 
 
+class BlePortConfig(BaseModel):
+    """ model/allowed elements for serial port config """
+    type: Literal["ble"]
+    mac: str
+    #baud: None | int  = Field(default=None)
+    protocol: None | str
+
+
 class SerialPortConfig(BaseModel):
     """ model/allowed elements for serial port config """
     type: Literal["serial"]
     path: str
-    baud: None | int  = Field(default=None)
+    baud: None | int = Field(default=None)
     protocol: None | str
 
 
@@ -119,7 +127,7 @@ class DeviceConfig(NoExtraBaseModel):
     id: None | str | int = Field(default=None)
     model: None | str = Field(default=None)
     manufacturer: None | str = Field(default=None)
-    port: TestPortConfig | SerialPortConfig | UsbPortConfig
+    port: TestPortConfig | SerialPortConfig | UsbPortConfig | BlePortConfig
 
 
 class BaseConfig(NoExtraBaseModel):
