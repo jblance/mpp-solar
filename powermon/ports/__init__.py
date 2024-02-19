@@ -35,13 +35,11 @@ def from_config(port_config):
             port_object = SerialPort.from_config(config=port_config)
         case PortType.USB:
             port_object = USBPort.from_config(config=port_config)
-
         # Pattern for port types that cause problems when imported
-        # case PortType.BLE:
-        #     log.debug("port_type BLE found")
-        #     from powermon.ports.bleport import BlePort
-        #     port_object = BlePort.fromConfig(config=port_config)
-
+        case PortType.BLE:
+            log.debug("port_type BLE found")
+            from powermon.ports.bleport import BlePort
+            port_object = BlePort.from_config(config=port_config)
         case _:
             log.info("port type object not found for %s", port_type)
             raise ConfigError(f"Invalid port type: '{port_type}'")

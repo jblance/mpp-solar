@@ -9,7 +9,6 @@ class PortType(LowercaseStrEnum):
     TEST = auto()
     SERIAL = auto()
     USB = auto()
-
     BLE = auto()
 
     JKBLE = auto()
