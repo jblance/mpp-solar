@@ -59,13 +59,13 @@ class BlePort(AbstractPort):
 
         for response_bytes in responses:
             #command = response_bytes[2:3].hex()
-            if self.response_cache[command_code]["done"] is True:
+            if self.response_cache["done"] is True:
                 # self.logger.debug("skipping response for %s, done" % command)
                 return
-            self.response_cache[command_code]["queue"].append(response_bytes[4:-1])
-            if len(self.response_cache[command_code]["queue"]) == self.response_cache[command_code]["max_responses"]:
-                self.response_cache[command_code]["done"] = True
-                self.response_cache[command_code]["future"].set_result(self.response_cache[command_code]["queue"])
+            self.response_cache["queue"].append(response_bytes[4:-1])
+            if len(self.response_cache["queue"]) == self.response_cache["max_responses"]:
+                self.response_cache["done"] = True
+                self.response_cache["future"].set_result(self.response_cache["queue"])
 
     def is_connected(self):
         return self.client is not None and self.client.is_connected
@@ -96,9 +96,9 @@ class BlePort(AbstractPort):
     async def send_and_receive(self, command: Command) -> Result:
         full_command = command.full_command
         command_code = 90
-        self.response_cache[command_code] = {"queue": [],
+        self.response_cache = {"queue": [],
                                         "future": asyncio.Future(),
-                                        "max_responses": 1,
+                                        "max_responses": 3,
                                         "done": False}
         response_line = None
         log.debug("port: %s, full_command: %s", self.client, full_command)
@@ -108,11 +108,12 @@ class BlePort(AbstractPort):
         log.debug("Executing command via ble...")
         await self.client.write_gatt_char(15, full_command)
         log.debug("Waiting...")
-        # try:
-        response_line = await asyncio.wait_for(self.response_cache[command_code]["future"], 30)
-        # except asyncio.TimeoutError:
-            # log.warning("Timeout while waiting for %s response" % command)
-            # return False
+        try:
+            response_line = await asyncio.wait_for(self.response_cache["future"], 30)
+        except asyncio.TimeoutError:
+            log.warning("Timeout while waiting for %s response" % command)
+            exit(1)
+            return False
         print("got %s" % response_line)
         #return result
         # self.serial_port.reset_input_buffer()
