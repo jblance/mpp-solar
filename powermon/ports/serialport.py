@@ -80,6 +80,7 @@ class SerialPort(AbstractPort):
             # Process i/o differently depending on command type
             command_defn = command.command_definition
             command_type = command_defn.command_type
+            print(command_defn)
             print(command_type)
             match command_type:
                 case CommandType.VICTRON_LISTEN:
