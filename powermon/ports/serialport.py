@@ -82,7 +82,7 @@ class SerialPort(AbstractPort):
                 case CommandType.VICTRON_LISTEN:
                     # this command type doesnt need to send a command, it just listens on the serial port
                     _lines = 30
-                    log.debug("VictronCommandType.LISTEN s&r, listening for %i lines", _lines)
+                    log.debug("case: CommandType.VICTRON_LISTEN, listening for %i lines", _lines)
                     response_line = b""
                     for _ in range(_lines):
                         _response = self.serial_port.read_until(b"\n")
@@ -95,6 +95,23 @@ class SerialPort(AbstractPort):
                         time.sleep(0.2)  # give serial port time to receive the data
                         to_read = self.serial_port.in_waiting
                         log.debug("bytes waiting: %s", to_read)
+                        if to_read == 0:
+                            break
+                        # got some data to read
+                        response_line += self.serial_port.read(to_read)
+                case CommandType.SERIAL_READ_UNTIL_DONE:
+                    # this case reads until no more to read or timeout
+                    log.debug("case: ")
+                    self.serial_port.timeout = 0.5
+                    self.serial_port.write_timeout = 1
+                    self.serial_port.reset_input_buffer()
+                    self.serial_port.reset_output_buffer()
+                    self.serial_port.write(full_command)
+                    # read until no more data
+                    while True:
+                        time.sleep(0.5)  # give serial port time to receive the data
+                        to_read = self.serial_port.in_waiting
+                        log.debug(f"bytes waiting {to_read}")
                         if to_read == 0:
                             break
                         # got some data to read

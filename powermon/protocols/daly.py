@@ -33,6 +33,7 @@ COMMANDS = {
         "description": "State of Charge",
         "help": " -- display the battery state of charge",
         "type": "DALY",
+        "command_type": CommandType.SERIAL_READ_UNTIL_DONE,
         "command_code": "90",
         "result_type": ResultType.CONSTRUCT,
         "construct": soc_construct,
@@ -94,7 +95,8 @@ class Daly(AbstractProtocol):
         full_command.append(bytes.fromhex(command_definition.command_code)[0])
         full_command += bytearray(data_length)
         full_command.append(sum(full_command) & 0xFF)
-        print(full_command)
+        full_command.append(10)
+        # print(full_command)
         log.debug("w %s", full_command.hex())
         return full_command
 

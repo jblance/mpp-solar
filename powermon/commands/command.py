@@ -25,6 +25,7 @@ class CommandType(Enum):
     VICTRON_ASYNC = 'A'
     VICTRON_LISTEN = 'L'
     SERIAL_READONLY = auto()
+    SERIAL_READ_UNTIL_DONE = auto()
     PI18_QUERY = auto()
     PI18_SETTER = auto()
     JKSERIAL_SETTER = auto()
