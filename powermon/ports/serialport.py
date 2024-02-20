@@ -3,6 +3,7 @@ import logging
 import time
 
 import serial
+import asyncio
 
 from powermon.commands.command import Command, CommandType
 from powermon.commands.result import Result
@@ -69,7 +70,7 @@ class SerialPort(AbstractPort):
     async def send_and_receive(self, command: Command) -> Result:
         full_command = command.full_command
         response_line = None
-        log.debug("port: %s, full_command: %s", self.serial_port, full_command)
+        log.info("port: %s, full_command: %s", self.serial_port, full_command)
         if not self.is_connected():
             raise RuntimeError("Serial port not open")
         try:
@@ -92,7 +93,7 @@ class SerialPort(AbstractPort):
                     log.debug("ReadAll s&r")
                     response_line = b""
                     while True:
-                        time.sleep(0.2)  # give serial port time to receive the data
+                        await asyncio.sleep(0.2)  # give serial port time to receive the data
                         to_read = self.serial_port.in_waiting
                         log.debug("bytes waiting: %s", to_read)
                         if to_read == 0:
@@ -109,7 +110,7 @@ class SerialPort(AbstractPort):
                     self.serial_port.write(full_command)
                     # read until no more data
                     while True:
-                        time.sleep(0.5)  # give serial port time to receive the data
+                        await asyncio.sleep(0.5)  # give serial port time to receive the data
                         to_read = self.serial_port.in_waiting
                         log.debug(f"bytes waiting {to_read}")
                         if to_read == 0:
