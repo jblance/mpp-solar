@@ -1,6 +1,6 @@
 """ commands / command.py """
 import logging
-from enum import Enum, auto
+from enum import Enum
 
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.result import Result, ResultType, ResultError

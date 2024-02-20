@@ -80,7 +80,6 @@ class Daly(AbstractProtocol):
         command_definition : CommandDefinition = self.get_command_definition(command)
         if command_definition is None:
             return None
-        print(command_definition)
 
         # DALY commands
         #

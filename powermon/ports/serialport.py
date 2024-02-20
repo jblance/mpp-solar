@@ -109,7 +109,7 @@ class SerialPort(AbstractPort):
                     self.serial_port.reset_input_buffer()
                     self.serial_port.reset_output_buffer()
                     c = self.serial_port.write(full_command)
-                    print(f"wrote {c}")
+                    log.debug("wrote %s bytes", c)
                     self.serial_port.flush()
                     # read until no more data
                     while True:
