@@ -79,10 +79,7 @@ class SerialPort(AbstractPort):
             self.serial_port.reset_output_buffer()
             # Process i/o differently depending on command type
             command_defn = command.command_definition
-            command_type = command_defn.command_type
-            print(command_defn)
-            print(command_type)
-            match command_type:
+            match command_defn.command_type:
                 case CommandType.VICTRON_LISTEN:
                     # this command type doesnt need to send a command, it just listens on the serial port
                     _lines = 30
@@ -93,7 +90,7 @@ class SerialPort(AbstractPort):
                         response_line += _response
                 case CommandType.SERIAL_READONLY:
                     # read until no more data
-                    log.debug("ReadAll s&r")
+                    log.debug("CommandType.SERIAL_READONLY")
                     response_line = b""
                     while True:
                         await asyncio.sleep(0.2)  # give serial port time to receive the data
@@ -105,18 +102,19 @@ class SerialPort(AbstractPort):
                         response_line += self.serial_port.read(to_read)
                 case CommandType.SERIAL_READ_UNTIL_DONE:
                     # this case reads until no more to read or timeout
-                    log.debug("case: ")
+                    log.debug("case: CommandType.SERIAL_READ_UNTIL_DONE")
                     self.serial_port.timeout = 0.5
                     self.serial_port.write_timeout = 1
                     self.serial_port.reset_input_buffer()
                     self.serial_port.reset_output_buffer()
                     self.serial_port.write(full_command)
+                    self.serial_port.flush()
                     # read until no more data
                     while True:
-                        await asyncio.sleep(0.5)  # give serial port time to receive the data
+                        # await asyncio.sleep(0.5)  # give serial port time to receive the data
                         time.sleep(0.5)
                         to_read = self.serial_port.in_waiting
-                        log.debug(f"bytes waiting {to_read}")
+                        log.debug("bytes waiting %s", to_read)
                         if to_read == 0:
                             break
                         # got some data to read
