@@ -97,8 +97,8 @@ class Daly(AbstractProtocol):
         full_command += bytearray(data_length)
         full_command.append(sum(full_command) & 0xFF)
         full_command.append(10)
-        # print(full_command)
-        log.debug("w %s", full_command.hex())
+        full_command = bytes(full_command)
+        log.debug("full_command: %s", full_command)
         return full_command
 
         command_type = command_definition.command_type
