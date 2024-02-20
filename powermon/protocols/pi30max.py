@@ -867,7 +867,7 @@ class PI30MAX(PI30):
         self.add_command_definitions(QUERY_COMMANDS)
         self.add_command_definitions(SETTER_COMMANDS, result_type=ResultType.ACK)
         self.remove_command_definitions(COMMANDS_TO_REMOVE)
-        self.check_definitions_count(expected=66)
+        self.check_definitions_count(expected=67)
 
         self.STATUS_COMMANDS = ["QPIGS", "QPIGS2"]
         self.SETTINGS_COMMANDS = ["QPIRI", "QFLAG"]
