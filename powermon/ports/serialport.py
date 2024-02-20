@@ -103,6 +103,7 @@ class SerialPort(AbstractPort):
                 case CommandType.SERIAL_READ_UNTIL_DONE:
                     # this case reads until no more to read or timeout
                     log.debug("case: CommandType.SERIAL_READ_UNTIL_DONE")
+                    response_line = b""
                     self.serial_port.timeout = 0.5
                     self.serial_port.write_timeout = 1
                     self.serial_port.reset_input_buffer()
