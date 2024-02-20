@@ -111,6 +111,7 @@ class SerialPort(AbstractPort):
                     # read until no more data
                     while True:
                         await asyncio.sleep(0.5)  # give serial port time to receive the data
+                        time.sleep(0.5)
                         to_read = self.serial_port.in_waiting
                         log.debug(f"bytes waiting {to_read}")
                         if to_read == 0:
