@@ -124,7 +124,7 @@ class SerialPort(AbstractPort):
                     self.serial_port.flush()
                     time.sleep(0.1)  # give serial port time to receive the data
                     response_line = self.serial_port.read_until(b"\r")
-            log.debug("serial response was: %s", response_line)
+            log.info("serial response was: %s", response_line)
             # response = self.get_protocol().check_response_and_trim(response_line)
             result = command.build_result(raw_response=response_line, protocol=self.protocol)
             return result
