@@ -94,6 +94,7 @@ class Daly(AbstractProtocol):
         full_command.append(0xa5)  # start flag
         full_command.append(source)
         full_command.append(bytes.fromhex(command_definition.command_code)[0])
+        full_command.append(data_length)
         full_command += bytearray(data_length)
         full_command.append(sum(full_command) & 0xFF)
         full_command.append(10)
