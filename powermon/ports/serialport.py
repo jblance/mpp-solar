@@ -79,7 +79,9 @@ class SerialPort(AbstractPort):
             self.serial_port.reset_output_buffer()
             # Process i/o differently depending on command type
             command_defn = command.command_definition
-            match command_defn.command_type:
+            command_type = command_defn.command_type
+            print(command_type)
+            match command_type:
                 case CommandType.VICTRON_LISTEN:
                     # this command type doesnt need to send a command, it just listens on the serial port
                     _lines = 30
