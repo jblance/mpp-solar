@@ -32,7 +32,7 @@ COMMANDS = {
         "name": "SOC",
         "description": "State of Charge",
         "help": " -- display the battery state of charge",
-        "type": "DALY",
+        # "type": "DALY",
         "command_type": CommandType.SERIAL_READ_UNTIL_DONE,
         "command_code": "90",
         "result_type": ResultType.CONSTRUCT,

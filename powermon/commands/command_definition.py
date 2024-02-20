@@ -42,6 +42,7 @@ class CommandDefinition:
     @classmethod
     def from_config(cls, protocol_dictionary : dict) -> "CommandDefinition":
         """ build command definition object from config dict """
+        log.debug("command definition: %s", protocol_dictionary)
         code = protocol_dictionary.get("name")
         description = protocol_dictionary.get("description")
         help_text = protocol_dictionary.get("help_text")
