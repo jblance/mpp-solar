@@ -8,7 +8,7 @@ powermon-integration-tests:
 	python3 -m unittest discover -s tests/pmon/integration -f -v
 
 test:
-	python3 -m unittest discover -s tests -f 
+	python3 -m unittest discover -s tests -f
 
 tests: powermon-unit-tests powermon-integration-tests mppsolar-tests
 

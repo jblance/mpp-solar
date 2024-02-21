@@ -1,9 +1,11 @@
+import asyncio
 from unittest import TestCase
 from unittest.mock import Mock
+
 from powermon import Device
-from powermon.ports import SerialPort
 from powermon.commands.command import Command
 from powermon.outputs.abstractoutput import AbstractOutput
+from powermon.ports import SerialPort
 from powermon.protocols.pi30 import PI30
 
 
@@ -28,5 +30,5 @@ class DeviceTest(TestCase):
 
         # Run main device loop. Expecting positive result
         # self.assertTrue(self.device.run())
-        self.device.run()
+        asyncio.run(self.device.run())
         output.process.assert_called()
