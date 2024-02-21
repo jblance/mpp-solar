@@ -20,7 +20,7 @@ COMMANDS = {
             ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
         ],
         "test_responses": [
-            b"(NAK\x73\x73\r",
+            b"(NAK\x03\r",
             b"(ACK\x39\x20\r",
         ],
         "regex": "PSET(\d+ \d+[.]\d+ \d+[.]\d+ \d+[.]\d+ \d+[.]\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+.*)$",  # pylint: disable=W1401 # noqa: W605
@@ -448,8 +448,8 @@ class pi30revo(AbstractProtocol):
             return False, {"validity check": ["Error: Response to short", ""]}
 
         # This protocol responses can either have a CRC or a Checksum...
-        if b"(NAK" in response:
-            return False, {"validity check": ["Error: NAK", ""]}
+        # if b"(NAK" in response:
+        #     return False, {"validity check": ["Error: NAK", ""]}
 
         if self.is_CHK_valid(response) or self.is_CRC_valid(response):
             return True, {}
