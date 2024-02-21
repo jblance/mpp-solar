@@ -1,3 +1,4 @@
+""" mppsolar / protocols / pi30revo.py """
 import logging
 
 from .abstractprotocol import AbstractProtocol
@@ -7,6 +8,23 @@ from .protocol_helpers import crc8P1 as chk
 log = logging.getLogger("pi30revo")
 
 COMMANDS = {
+    "PSET": {
+        # 'PSET011103 56.0 56.7 47.0 47.0 030 000 2024 02 20 07 22 00'
+        #      000100 56.0 54.0 44.0 42.0 030 010 2018 06 01 20 00 00 00
+        "name": "PSET",
+        "description": "Set current machine configuration information",
+        "help": " -- sets various metrics from the Inverter",
+        "type": "SETTER",
+        "crctype": "chk",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"(NAK\x73\x73\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "PSET(\d+ \d+[.]\d+ \d+[.]\d+ \d+[.]\d+ \d+[.]\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+.*)$",  # pylint: disable=W1401 # noqa: W605
+    },
     "PQSE": {
         "name": "PQSE",
         "description": "Read current machine configuration information",
@@ -419,7 +437,7 @@ class pi30revo(AbstractProtocol):
             return response[1:-2].split(b" ")
         # Just use the default approach then
         # Trim leading '(' + trailing CRC and \r of response, then split
-        if type(response) is str:
+        if isinstance(response, str):
             return response[1:-3].split(" ")
         return response[1:-3].split(b" ")
 
@@ -442,9 +460,7 @@ class pi30revo(AbstractProtocol):
         """
         Override the default get_full_command as its different for PI30REVO
         """
-        log.info(
-            f"sing protocol {self._protocol_id} with {len(self.COMMANDS)} commands"
-        )
+        log.info("Using protocol: %s with %s commands", self._protocol_id, len(self.COMMANDS))
         # These need to be set to allow other functions to work`
         self._command = command
         self._command_defn = self.get_command_defn(command)
