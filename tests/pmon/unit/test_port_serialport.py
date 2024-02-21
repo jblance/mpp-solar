@@ -1,8 +1,10 @@
 """ test_serial_port.py """
+import asyncio
 from unittest import TestCase
-from unittest.mock import patch, Mock
-from powermon.ports.serialport import SerialPort
+from unittest.mock import Mock, patch
+
 from powermon.commands.command import Command
+from powermon.ports.serialport import SerialPort
 from powermon.protocols.pi30max import PI30MAX
 
 
@@ -82,5 +84,5 @@ class TestSerialPort(TestCase):
         with patch.object(self.port, 'serial_port', Mock(is_open=True)):
             # Then: connect() called in run_command()
             with patch.object(self.port, 'connect') as connect_mock:
-                self.port.run_command(self.command)
+                asyncio.run(self.port.run_command(self.command))
                 connect_mock.assert_not_called()

@@ -110,17 +110,17 @@ class Device:
                         commands=commands)
         return dto
 
-    def initialize(self):
+    async def initialize(self):
         """Device initialization activities"""
         log.info("initializing device")
 
-    def finalize(self):
+    async def finalize(self):
         """Device finalization activities"""
         log.info("finalizing device")
         # close connection on port
-        self.port.disconnect()
+        await self.port.disconnect()
 
-    def run(self, force=False):
+    async def run(self, force=False):
         """checks for commands to run and runs them"""
         if self.commands is None or len(self.commands) == 0:
             log.info("no commands in queue")
@@ -131,7 +131,7 @@ class Device:
                 log.info("Running command: %s", command)
                 try:
                     # run command
-                    result: Result = self.port.run_command(command)
+                    result: Result = await self.port.run_command(command)
                     log.info("Got result: %s", result)
                 except Exception as exception:  # pylint: disable=W0718
                     # specific errors need to incorporated into Result as part of the processing

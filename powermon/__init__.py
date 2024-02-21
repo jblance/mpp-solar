@@ -1,6 +1,6 @@
 # !/usr/bin/python3
 """main powermon code"""
-
+import asyncio
 import json
 import logging
 import time
@@ -187,7 +187,7 @@ def main():
     api_coordinator.announce(daemon)
 
     # initialize device
-    device.initialize()
+    asyncio.run(device.initialize())
     api_coordinator.announce(device)
 
     # Main working loop
@@ -197,7 +197,7 @@ def main():
             daemon.watchdog()
 
             # run device loop (ie run any needed commands)
-            device.run(args.force)
+            asyncio.run(device.run(args.force))
 
             # run api coordinator ...
             api_coordinator.run()
@@ -213,7 +213,7 @@ def main():
         print("KeyboardInterrupt - stopping")
     finally:
         # disconnect device
-        device.finalize()
+        asyncio.run(device.finalize())
 
         # disconnect mqtt
         mqtt_broker.stop()

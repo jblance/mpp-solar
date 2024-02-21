@@ -6,12 +6,13 @@ device:
   manufacturer: MPP-Solar
   port:
     type: test
-    path: /dev/ttyUSB0
-    response_number: 0
-    protocol: PI30
+    # path: /dev/ttyUSB0
+    # response_number: 0
+    mac: 66:66:18:01:09:18
+    protocol: DALY
 
 commands:
-- command: QPIRI
+- command: SOC
   outputs:
   - type: screen
     format: 

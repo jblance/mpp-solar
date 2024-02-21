@@ -1,6 +1,6 @@
 """ commands / command.py """
 import logging
-from enum import Enum, auto
+from enum import Enum
 
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.result import Result, ResultType, ResultError
@@ -24,12 +24,13 @@ class CommandType(Enum):
     VICTRON_SET = 8
     VICTRON_ASYNC = 'A'
     VICTRON_LISTEN = 'L'
-    SERIAL_READONLY = auto()
-    PI18_QUERY = auto()
-    PI18_SETTER = auto()
-    JKSERIAL_SETTER = auto()
-    JKSERIAL_READ = auto()
-    JKSERIAL_ACTIVATION = auto()
+    SERIAL_READONLY = 'serial_readonly'
+    SERIAL_READ_UNTIL_DONE = 'serial_read_util_done'
+    PI18_QUERY = 'pi18_query'
+    PI18_SETTER = 'pi18_setter'
+    JKSERIAL_SETTER = 'jkserial_setter'
+    JKSERIAL_READ = 'jkserial_read'
+    JKSERIAL_ACTIVATION = 'jkserial_activation'
 
 
 class Command():

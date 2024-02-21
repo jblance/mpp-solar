@@ -15,6 +15,7 @@ class Protocol(LowercaseStrEnum):
     PI18 = auto()  # WIP
     PI30 = auto()
     PI30MAX = auto()
+    DALY = auto()
     VED = auto()
     JKSERIAL = auto()
 
@@ -29,6 +30,9 @@ def get_protocol_definition(protocol):
     protocol_id = protocol.lower()
 
     match protocol_id:
+        case Protocol.DALY:
+            from powermon.protocols.daly import Daly
+            return Daly()
         case Protocol.PI18:
             from powermon.protocols.pi18 import PI18
             return PI18()

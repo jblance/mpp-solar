@@ -44,16 +44,16 @@ class TestPort(AbstractPort):
         log.debug("Test port is connected")
         return True
 
-    def connect(self) -> int:
+    async def connect(self) -> int:
         log.debug("Test port connected")
         self.connected = True
         return 1
 
-    def disconnect(self) -> None:
+    async def disconnect(self) -> None:
         log.debug("Test port disconnected")
         self.connected = False
 
-    def send_and_receive(self, command: Command) -> Result:
+    async def send_and_receive(self, command: Command) -> Result:
         command_defn : CommandDefinition = command.command_definition
 
         if command_defn is not None:

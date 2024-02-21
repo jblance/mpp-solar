@@ -21,7 +21,7 @@ class CommandDefinition:
     - test responses
     """
     def __str__(self):
-        return f"CommandDefinition: {self.code=}, {self.description=}, {self.result_type=}"
+        return f"CommandDefinition: {self.code=}, {self.description=}, {self.result_type=}, reading_definition count: {self.reading_definition_count()}, {self.command_code=}, {self.command_type=}"
 
     def __init__(self, code, description, help_text: str, result_type : ResultType, reading_definitions, test_responses: list = None, regex: str = None):
         """ init CommandDefinition class """
@@ -42,6 +42,7 @@ class CommandDefinition:
     @classmethod
     def from_config(cls, protocol_dictionary : dict) -> "CommandDefinition":
         """ build command definition object from config dict """
+        log.debug("command definition: %s", protocol_dictionary)
         code = protocol_dictionary.get("name")
         description = protocol_dictionary.get("description")
         help_text = protocol_dictionary.get("help_text")

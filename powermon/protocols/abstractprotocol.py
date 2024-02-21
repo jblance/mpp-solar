@@ -76,7 +76,9 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         # Handle the commands that don't have a regex
         if command in self.command_definitions and self.command_definitions[command].regex is None:
             log.debug("Found command %s in protocol %s", command, self._protocol_id)
-            return self.command_definitions[command]
+            command_definition = self.command_definitions[command]
+            log.debug(command_definition)
+            return command_definition
 
         # Try the regex commands
         for command_code, command_definition in self.command_definitions.items():
@@ -86,6 +88,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 match = _re.match(command)
                 if match:
                     log.debug("Matched: %s to: %s value: %s", command, command_definition.code, match.group(1))
+                    log.debug(command_definition)
                     return command_definition
         log.info("No command_defn found for %s", command)
         raise CommandDefinitionMissing(f"No command definition found for command: {command}")

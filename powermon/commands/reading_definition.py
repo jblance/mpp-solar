@@ -539,10 +539,13 @@ class ReadingDefinitionHexChars(ReadingDefinition):
         """ generate a reading object from a raw value """
         log.debug("raw_value: %s, override: %s", raw_value, override)
         values = []
-        for i in raw_value:
-            # value = self.translate_raw_response(value)
-            # print(value)
-            values.append(f"{i:#04x}")
+        if isinstance(raw_value, int) or isinstance(raw_value, bytes):
+            values.append(f"{raw_value:#04x}")
+        else:
+            for i in raw_value:
+                # value = self.translate_raw_response(value)
+                # print(value)
+                values.append(f"{i:#04x}")
         return [
             Reading(
                 data_name=self.description,
