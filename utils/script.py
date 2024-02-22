@@ -13,26 +13,8 @@ except ImportError:
     print("    python -m pip install 'construct'")
 
 def process_text(text):
-    index = text.find("1016") 
-    index2 = text.find("ce00d5009")
-    index3 = text.find("cf00d6009")
-    index4 = text.find("00000000000000000000000000000000000005")
-
-    index5 = text.find("c700c8008d03efb72")
-    index6 = text.find("c700c8008d031ab82")
-    index7 = text.find("00000000000000000000000000000100000005")
-    index8 = text.find("c800c8008d03")
-    index9 = text.find("d000d6009a03")
-    index10= text.find("c900c8008d03")
-    index11= text.find("d000d7009a03")
-    index12= text.find("d100d7009a03")
-    index13= text.find("c900c9008d03")
-    index14= text.find("d200d7009a03")
-    index15= text.find("ca00c9008d03")
-    index16= text.find("d300d7009a03")
-    index17= text.find("d300d8009a03")
-    index18= text.find("cb00c9008d03")
-    if index != 2 and index2!=0 and index3!=0 and index4!=0 and index5!=0 and index6!=0 and index7!=0 and index8!=0 and index9!=0 and index10!=0 and index11!=0 and index12!=0 and index13!=0 and index14!=0 and index15!=0 and index16!=0 and index17!=0 and index18!=0:
+    index = text.find("55aaeb")
+    if index == 0:
         result = jk02_32_definition.parse(bytes.fromhex(text))
 #        print('uptime:' + str(result['uptime']))
 #        print('discard1:' + str(result['discard1']))
@@ -40,10 +22,30 @@ def process_text(text):
 #        print('discard8:' + str(result['discard8']))
 #        print('discard9:' + str(result['discard9']))
 #        print('rest:    ' + str(result['rest']))
-        print('Record Type:' + str(result['Record_Type']))
-        print('Cell Voltage Array:' + str(result['cell_voltage_array']))
 
-#        print(result)
+        show=0
+        if (config['filter_record_type']!=None):
+          if (config['filter_record_type']=="all"):
+             show=-1
+          else:
+             if (config['filter_record_type']==str(result['Record_Type'])):
+                show=1
+             else:
+                show=0
+        else:
+          show=-1
+
+        if (show==-1):
+           print(result)
+        else:
+           if (show==1):
+              print("---------------------------------------------------------------------------------------------------------------")
+              if (config['short_print']):
+                 print (text)
+                 print('Record Type:' + str(result['Record_Type']))
+                 print('Record Counter:' + str(result['Record_Counter']))
+              else:
+                 print(result)
 
 def read_serial_port(serial_port, baud_rate):
     with serial.Serial(serial_port, baud_rate, timeout=0) as ser:
@@ -158,6 +160,10 @@ jk02_32_definition = cs.Struct(
     "Record_Counter" / cs.Byte,
     "cell_voltage_array" / cs.Array(32, cs.Int16ul),
     "discard1" / cs.Bytes(4),
+    #"discard11" / cs.Byte,
+    #"discard12" / cs.Byte,
+    #"discard13" / cs.Byte,
+    #"discard14" / cs.Byte,
     "Average_Cell_Voltage" / cs.Int16ul,
     "Delta_Cell_Voltage" / cs.Int16ul,
     "Current_Balancer" / cs.Int16ul,
@@ -204,6 +210,8 @@ if __name__ == "__main__":
     parser.add_argument("--ignore-existing", action="store_true", help="skip files that exist")
     parser.add_argument("--exclude", help="files to exclude")
     parser.add_argument("--input-file", help="Source location")
+    parser.add_argument("--filter-record-type", help="Record Type all|1|2")
+    parser.add_argument("--short-print", action="store_true", help="Short Print")
     parser.add_argument("--dest", help="Destination location")
     args = parser.parse_args()
     config = vars(args)
