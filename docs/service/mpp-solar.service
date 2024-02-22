@@ -5,7 +5,8 @@
 [Unit]
 # Human readable name of the unit
 Description=MPP Solar Service
-
+After=network.target
+StartLimitIntervalSec=0
 
 [Service]
 # Command to execute when the service is started
@@ -18,6 +19,7 @@ Environment=PYTHONUNBUFFERED=1
 # Automatically restart the service if it crashes
 Restart=always
 WatchdogSec=60
+RestartSec=60
 
 # Our service will notify systemd once it is up and running
 Type=notify
