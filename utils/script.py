@@ -12,7 +12,7 @@ except ImportError:
     print("To install use:")
     print("    python -m pip install 'construct'")
 
-def process_text(text):
+def process_text(text,address):
     index = text.find("55aaeb")
     if index == 0:
         result = jk02_32_definition.parse(bytes.fromhex(text))
@@ -35,15 +35,31 @@ def process_text(text):
         else:
           show=-1
 
+        if (config['filter_address']!=None):
+#          print (config['filter_address'])
+#          print (str(address))
+          if (config['filter_address']!=str(address)):
+              show=0
+
         if (show==-1):
            print(result)
         else:
            if (show==1):
               print("---------------------------------------------------------------------------------------------------------------")
               if (config['short_print']):
-                 print (text)
+                 #print (text)
                  print('Record Type:' + str(result['Record_Type']))
                  print('Record Counter:' + str(result['Record_Counter']))
+                 print('First Array 28:' + str(result['cell_voltage_array'][28]))
+                 print('First Array 29:' + str(result['cell_voltage_array'][29]))
+                 print('Delta_Cell_Voltage:' + str(result['Delta_Cell_Voltage']))
+                 print('Second Array 17:' + str(result['cell_resistance_array'][17]))
+                 print('Second Array 19:' + str(result['cell_resistance_array'][19]))
+                 print('Second Array 21:' + str(result['cell_resistance_array'][23]))
+                 print('Second Array 23:' + str(result['cell_resistance_array'][23]))
+                 print('Second Array 25:' + str(result['cell_resistance_array'][25]))
+                 print('Second Array 26:' + str(result['cell_resistance_array'][26]))
+                 print('Second Array 31:' + str(result['cell_resistance_array'][31]))
               else:
                  print(result)
 
@@ -58,11 +74,15 @@ def read_serial_port(serial_port, baud_rate):
             # If there is data, process and display in hexadecimal format
             if data:
                 hex_data = data.hex()
-                print(hex_data, end='\n')
+####                print(hex_data, end='\n')
                 file.write(hex_data)
                 file.write('\n')
                 sys.stdout.flush()
-                process_text(hex_data)
+                bytes_data = bytes.fromhex(hex_data)
+                first_byte = bytes_data[0]
+                if first_byte <= 0x0f:
+                     address=first_byte
+                process_text(hex_data,address)
 
         # If there is no more data, exit the loop
         sys.stdout.flush()
@@ -211,6 +231,7 @@ if __name__ == "__main__":
     parser.add_argument("--exclude", help="files to exclude")
     parser.add_argument("--input-file", help="Source location")
     parser.add_argument("--filter-record-type", help="Record Type all|1|2")
+    parser.add_argument("--filter-address", help="Address in decimal 1 to 15")
     parser.add_argument("--short-print", action="store_true", help="Short Print")
     parser.add_argument("--dest", help="Destination location")
     args = parser.parse_args()
