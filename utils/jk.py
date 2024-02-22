@@ -13,10 +13,55 @@ response4 = b'U\xaa\xeb\x90\x02&\xf5\x0c\xfa\x0c\xf9\x0c\x01\r\xf9\x0c\xff\x0c\x
 response5 = bytes.fromhex('55aaeb900200130d120d120d120d120d120d120d110d110d120d110d110d110d120d120d110d0000000000000000000000000000000000000000000000000000000000000000ffff0000120d02000008530050004f004a004d004b004d004d0053004e004d004a004c004d00520051000000000000000000000000000000000000000000000000000000000000000000ea00000000001dd100000000000000000000d100d80000000000000000632d92040080a30400000000003019000064000000a022410001010000000000000000000000000000ff00010000009a030000000060543f4000000000e914000000010101000600006570470100000000ea00d200d7009a030fbf20007f0000008051010000000000000000000000000000feff7fdd2f0101b00700000093001016200001059a')
 response6 = bytes.fromhex('55aaeb900200130d120d120d120d120d120d120d120d110d110d110d120d120d110d110d110d0000000000000000000000000000000000000000000000000000000000000000ffff0000120d02000007530050004f004a004d004b004d004d0053004e004d004a004c004d00520051000000000000000000000000000000000000000000000000000000000000000000ea00000000001fd100000000000000000000d000d80000000000000000632d92040080a30400000000003019000064000000a722410001010000000000000000000000000000ff00010000009a030000000060543f4000000000e91400000001010100060000ad70470100000000ea00d200d7009a0316bf20007f0000008051010000000000000000000000000000feff7fdd2f0101b007000000e9001016200001059a')
 response_type01 = bytes.fromhex('55aaeb900100ac0d0000280a00005a0a0000240e0000780d000005000000790d0000500a00007a0d0000160d0000c409000050c30000030000003c000000102700002c0100003c00000005000000d0070000bc02000058020000bc0200005802000038ffffff9cffffffe8030000200300001000000001000000010000000100000080a30400dc0500007a0d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000500000060e3160010023c3218feffffffbfe9010200000000f50010161e00016456')
-response = response4
+response = response_type01
 print(len(response))
 
-record_02_definition = cs.Struct(
+record_01 = cs.Struct(
+    "Record_Counter" / cs.Byte,
+    "voltage_smart_sleep" / cs.Int32ul,
+    "cell_under_voltage_protection" / cs.Int32ul,
+    "cell_under_voltage_protection_recovery" / cs.Int32ul,
+    "cell_over_voltage_protection" / cs.Int32ul,
+    "cell_over_voltage_protection_recovery" / cs.Int32ul,
+    "balance_trigger_voltage" / cs.Int32ul,
+    "soc_100%_voltage" / cs.Int32ul,
+    "soc_0%_voltage" / cs.Int32ul,
+    "cell_request_charge_voltage" / cs.Int32ul,
+    "cell_request_float_voltage" / cs.Int32ul,
+    "power_off_cell_voltage" / cs.Int32ul,
+    "continued_charge_current" / cs.Int32ul,
+    "charge_ocp_delay_sec" / cs.Int32ul,
+    "charge_ocpr_time_sec" / cs.Int32ul,
+    "unknown2" / cs.Int32ul,
+    "discharge_ocp_delay_sec" / cs.Int32ul,
+    "discharge_ocpr_time_sec" / cs.Int32ul,
+    "scpr_time_sec" / cs.Int32ul,
+    "max_balance_current" / cs.Int32ul,
+    "charge_otp_c" / cs.Int32ul,
+    "charge_otpr_c" / cs.Int32ul,
+    "discharge_otp_c" / cs.Int32ul,
+    "discharge_otpr_c" / cs.Int32ul,
+    "charge_utp_c" / cs.Int32sl,
+    "charge_utpr_c" / cs.Int32sl,
+    "mos_otp_c" / cs.Int32ul,
+    "mos_otpr_c" / cs.Int32ul,
+    "cell_count" / cs.Int32ul,
+    "unknown7" / cs.Bytes(4),
+    "unknown8" / cs.Bytes(4),
+    "unknown9" / cs.Bytes(4),
+    "unknown10" / cs.Int32ul,
+    "scp_delay_us" / cs.Int32ul,
+    "start_balance_voltage" / cs.Int32ul,
+    "unknown11" / cs.Bytes(8),
+    "unknown12" / cs.Bytes(8),
+    "unknown13" / cs.Bytes(8),
+    "unknown14" / cs.Bytes(8),
+    "unknown15" / cs.Bytes(8),
+
+    "rest" / cs.GreedyBytes,
+)
+
+record_02 = cs.Struct(
     "Record_Counter" / cs.Byte,
     "cell_voltage_array" / cs.Array(32, cs.Int16ul),
     "discard1" / cs.Bytes(4),
@@ -58,8 +103,8 @@ record_02_definition = cs.Struct(
 )
 jk02_32_definition = cs.Struct(
     "header" / cs.Bytes(4),
-    "Record_Type" / cs.Byte,
-     record_02_definition,
+    "record_type" / cs.Byte,
+    "record_decode" / cs.Switch(cs.this.record_type, {1: record_01, 2: record_02, 3: cs.GreedyBytes}),
 )
 
 # result = jk02_32_definition.parse(response)
