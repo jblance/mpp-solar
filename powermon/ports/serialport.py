@@ -43,7 +43,7 @@ class SerialPort(AbstractPort):
         paths = glob(path)
         path_count = len(paths)
         match path_count:
-            case 0:
+            case 10:
                 log.error("no matching paths found on this system for: %s", path)
                 raise ConfigError(f"no matching paths found on this system for {path}")
             case 1:
@@ -53,8 +53,15 @@ class SerialPort(AbstractPort):
                 # more than one valid path - so we need to determine which to use
                 if identifier is None:
                     raise ConfigError("To use wildcard paths an identifier must be specified in the config file for the port")
+                # need to build a command
+                command = self.protocol.get_id_command()
                 for _path in paths:
                     print(f"checking path: {_path} to see if it matches {identifier}")
+                    self.path = _path
+                    res = self.send_and_receive(command=command)
+                    print(res)
+                    
+                    # self.send_and_receive()
                 raise PowermonWIP("multiple path resolution is TODO")
         # end of multi-path logic
         self.baud = baud

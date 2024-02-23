@@ -3,11 +3,13 @@ import logging
 from struct import unpack
 import construct as cs
 
-from powermon.commands.command import CommandType
+from powermon.commands.command import Command, CommandType
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
+from powermon.commands.trigger import Trigger
 from powermon.errors import CommandError, InvalidCRC, InvalidResponse
+from powermon.outputs import multiple_from_config
 from powermon.ports.porttype import PortType
 from powermon.protocols.abstractprotocol import AbstractProtocol
 from powermon.protocols.helpers import victron_checksum
@@ -212,6 +214,18 @@ class VictronEnergyDirect(AbstractProtocol):
         self.add_command_definitions(COMMANDS)
         self.add_supported_ports([PortType.SERIAL, PortType.USB])
         self.check_definitions_count(expected=3)
+
+    def get_id_command(self) -> Command:
+        """ return the command that generates a unique id for this type of device """
+        command_code = "serial_number"
+        cd = self.get_command_definition(command_code)
+        outputs = multiple_from_config({"type": "screen", "format": "raw"})
+        trigger = Trigger.from_config(None)
+        command = Command(code=command_code, commandtype=cd.command_type, outputs=outputs, trigger=trigger)
+        command.command_definition = cd
+        command.full_command = self.get_full_command(command_code)
+        log.debug(command)
+        return command
 
     def get_full_command(self, command) -> bytes:
         """
