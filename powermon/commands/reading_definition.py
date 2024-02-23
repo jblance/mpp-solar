@@ -25,6 +25,7 @@ class ResponseType(LowercaseStrEnum):
     FLOAT = auto()
     STRING = auto()
     BYTES = auto()
+    BYTES_STRIP_NULLS = auto()
     LE_2B_S = auto()  # little endian 2 byte value (as string, eg 7800 = 0x0078 = 120)
     OPTION = auto()  # response identifies which option from a dict (called 'options') is the info
     LIST = auto()  # response identifies which option from a list (called 'options') is the info
@@ -245,7 +246,10 @@ class ReadingDefinition():
             case ResponseType.OPTION:
                 if not isinstance(self.options, dict):
                     raise TypeError(f"For Reading Defininition '{self.description}', options must be a dict if response_type is OPTION")
-                value = str(raw_value.decode('utf-8'))
+                if isinstance(raw_value, int):
+                    value = raw_value
+                else:
+                    value = str(raw_value.decode('utf-8'))
                 try:
                     return self.options[value]
                 except KeyError as e:
@@ -258,6 +262,9 @@ class ReadingDefinition():
                     return self.options[value]
                 except IndexError as e:
                     raise IndexError(f"For Reading Defininition '{self.description}', len: {len(self.options)}, got index: {value}") from e
+            case ResponseType.BYTES_STRIP_NULLS:
+                r = raw_value.strip(b'\00')
+                return r.decode('utf-8')
             case ResponseType.TEMPLATE_BYTES:
                 r = raw_value.decode('utf-8')
                 if self.format_template:

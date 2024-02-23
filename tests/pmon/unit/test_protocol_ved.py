@@ -1,6 +1,8 @@
 """ tests / pmon / unit / test_protocol_ved.py """
 import unittest
 
+import construct as cs
+
 from powermon.commands.command import Command, CommandType
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
@@ -10,21 +12,33 @@ from powermon.errors import CommandError, InvalidCRC, InvalidResponse
 from powermon.formats.simple import SimpleFormat
 from powermon.protocols.ved import VictronEnergyDirect
 
-command_definitions_config = {"name": "batteryCapacity",
-                              "description": "Battery Capacity",
-                              "help": " -- display the Battery Capacity",
-                              "command_type": CommandType.VICTRON_GET,
-                              "command_code": "1000",  # or should be the more accurate 1000
-                              "result_type": ResultType.SLICED,
-                              "reading_definitions": [{"description": "Command type", "slice": [0, 1], "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
-                                                      {"description": "Command", "slice": [1, 5], "reading_type": ReadingType.HEX_STR, "response_type": ResponseType.LE_2B_S},
-                                                      {"description": "Command response flag", "slice": [5, 7], "reading_type": ReadingType.MESSAGE,
-                                                       "response_type": ResponseType.OPTION,
-                                                       "options": {"00": "OK",
-                                                                   "01": "Unknown ID",
-                                                                   "02": "Not supported",
-                                                                   "04": "Parameter Error"}},
-                                                      {"description": "Battery Capacity", "slice": [7, 11], "reading_type": ReadingType.ENERGY, "response_type": ResponseType.LE_2B_S},]}
+battery_capacity_defn = cs.Struct(
+    "command_type" / cs.Byte,
+    "command" / cs.Int16ul,
+    "command_response_flag" / cs.Int8ul,
+    "battery_capacity" / cs.Int16ul,
+    "rest" / cs.GreedyBytes,
+)
+
+command_definitions_config = {
+    "name": "battery_capacity",
+    "description": "Battery Capacity",
+    "help": " -- display the Battery Capacity",
+    "command_type": CommandType.VICTRON_GET,
+    "command_code": "1000",
+    "result_type": ResultType.CONSTRUCT,
+    "construct": battery_capacity_defn,
+    "reading_definitions": [
+        {"index": "command_type", "description": "command type", "reading_type": ReadingType.IGNORE},
+        {"index": "command", "description": "command", "reading_type": ReadingType.IGNORE},
+        {"index": "command_response_flag", "description": "command response flag",
+            "reading_type": ReadingType.IGNORE,
+            "response_type": ResponseType.OPTION,
+            "options": {0: "OK",
+                        1: "Unknown ID",
+                        2: "Not supported",
+                        4: "Parameter Error"}},
+        {"index": "battery_capacity", "description": "Battery Capacity", "reading_type": ReadingType.ENERGY}]}
 cd = CommandDefinition.from_config(command_definitions_config)
 
 
@@ -44,10 +58,19 @@ class TestProtocolVed(unittest.TestCase):
         self.assertRaises(InvalidCRC, ved.check_crc, response=b":70010007800C7\n", command_definition=cd)
 
     def test_full_command_battery_capacity(self):
-        """ test a for correct build of full command - batteryCapacity """
+        """ test a for correct build of full command - battery_capacity """
         ved = VictronEnergyDirect()
-        _result = ved.get_full_command(command="batteryCapacity")
+        _result = ved.get_full_command(command="battery_capacity")
         expected = b':70010003E\n'
+
+        # print(_result)
+        self.assertEqual(_result, expected)
+
+    def test_full_command_serial_number(self):
+        """ test a for correct build of full command - serial_number """
+        ved = VictronEnergyDirect()
+        _result = ved.get_full_command(command="serial_number")
+        expected = b':70A010043\n'
 
         # print(_result)
         self.assertEqual(_result, expected)
@@ -65,7 +88,7 @@ class TestProtocolVed(unittest.TestCase):
         """ test ved protocol does a correct trim operation """
         ved = VictronEnergyDirect()
         _result = ved.trim_response(response=b":70010007800C6\n", command_definition=cd)
-        expected = b'70010007800'
+        expected = b'\x07\x00\x10\x00x\x00'
 
         # print(_result)
         self.assertEqual(_result, expected)
@@ -101,16 +124,13 @@ class TestProtocolVed(unittest.TestCase):
         # print(_result)
         self.assertRaises(InvalidResponse, ved.check_valid, response=b"70010007800C6\n", command_definition=cd)
 
-    def test_build_result(self):
-        """ test result build """
-        expected = ['command_type=7',
-                    'command=0x1000',
-                    'command_response_flag=OK',
-                    'battery_capacity=120Ah']
+    def test_build_result_battery_capacity(self):
+        """ test result build for battery capacity"""
+        expected = ['battery_capacity=120Ah']
         simple_formatter = SimpleFormat({"extra_info": True})
 
         device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
-        command = Command.from_config({"command": "batteryCapacity"})
+        command = Command.from_config({"command": "battery_capacity"})
         command.command_definition = cd
         ved = VictronEnergyDirect()
         raw_response = b":70010007800C6\n"
@@ -127,7 +147,7 @@ class TestProtocolVed(unittest.TestCase):
         simple_formatter = SimpleFormat({"extra_info": True})
 
         device_info = DeviceInfo(name="name", device_id="device_id", model="model", manufacturer="manufacturer")
-        command = Command.from_config({"command": "batteryCapacity"})
+        command = Command.from_config({"command": "battery_capacity"})
         command.command_definition = cd
         ved = VictronEnergyDirect()
         raw_response = b"70010007800C6\n"

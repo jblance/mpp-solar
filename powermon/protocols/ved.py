@@ -1,6 +1,7 @@
 """ protocols / ved.py """
 import logging
 from struct import unpack
+import construct as cs
 
 from powermon.commands.command import CommandType
 from powermon.commands.command_definition import CommandDefinition
@@ -12,6 +13,21 @@ from powermon.protocols.abstractprotocol import AbstractProtocol
 from powermon.protocols.helpers import victron_checksum
 
 log = logging.getLogger("ved")
+
+battery_capacity_defn = cs.Struct(
+    "command_type" / cs.Byte,
+    "command" / cs.Int16ul,
+    "command_response_flag" / cs.Int8ul,
+    "battery_capacity" / cs.Int16ul,
+    "rest" / cs.GreedyBytes,
+)
+
+serial_number_defn = cs.Struct(
+    "command_type" / cs.Byte,
+    "command" / cs.Int16ul,
+    "command_response_flag" / cs.Int8ul,
+    "serial_number" / cs.GreedyBytes,
+)
 
 
 COMMANDS = {
@@ -134,22 +150,24 @@ COMMANDS = {
         "help": " -- display the Battery Capacity",
         "command_type": CommandType.VICTRON_GET,
         "command_code": "1000",
-        "result_type": ResultType.SLICED,
+        "result_type": ResultType.CONSTRUCT,
+        "construct": battery_capacity_defn,
         "reading_definitions": [
-            {"description": "Command type", "slice": [0, 1], "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
-            {"description": "Command", "slice": [1, 5], "reading_type": ReadingType.HEX_STR, "response_type": ResponseType.LE_2B_S},
-            {"description": "Command response flag", "slice": [5, 7], "reading_type": ReadingType.MESSAGE,
+            {"index": "command_type", "description": "command type", "reading_type": ReadingType.IGNORE},
+            {"index": "command", "description": "command", "reading_type": ReadingType.IGNORE},
+            {"index": "command_response_flag", "description": "command response flag",
+                "reading_type": ReadingType.IGNORE,
                 "response_type": ResponseType.OPTION,
-                "options": {"00": "OK",
-                            "01": "Unknown ID",
-                            "02": "Not supported",
-                            "04": "Parameter Error"}},
-            {"description": "Battery Capacity", "slice": [7, 11], "reading_type": ReadingType.ENERGY, "response_type": ResponseType.LE_2B_S},
+                "options": {0: "OK",
+                            1: "Unknown ID",
+                            2: "Not supported",
+                            4: "Parameter Error"}},
+            {"index": "battery_capacity", "description": "Battery Capacity", "reading_type": ReadingType.ENERGY},
         ],
         "test_responses": [
             b":70010007800C6\n",
             b"\x00\x1a:70010007800C6\n",
-            b"70010007800C6\n",  # this one will error
+            # b"70010007800C6\n",  # this one will error
         ],
     },
     "serial_number": {
@@ -158,15 +176,23 @@ COMMANDS = {
         "help": " -- display the Serial Number",
         "command_type": CommandType.VICTRON_GET,
         "command_code": "010A",
-        "result_type": ResultType.SINGLE,
+        "result_type": ResultType.CONSTRUCT,
+        "construct": serial_number_defn,
         "reading_definitions": [
-            {"description": "Command type", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
-            
+            {"index": "command_type", "description": "command type", "reading_type": ReadingType.IGNORE},
+            {"index": "command", "description": "command", "reading_type": ReadingType.IGNORE},
+            {"index": "command_response_flag", "description": "command response flag",
+                "reading_type": ReadingType.IGNORE,
+                "response_type": ResponseType.OPTION,
+                "options": {0: "OK",
+                            1: "Unknown ID",
+                            2: "Not supported",
+                            4: "Parameter Error"}},
+            {"index": "serial_number", "description": "serial number", "response_type": ResponseType.BYTES_STRIP_NULLS},
+            {"index": "rest", "description": "rest"},
         ],
         "test_responses": [
-            b":70010007800C6\n",
-            b"\x00\x1a:70010007800C6\n",
-            #b"70010007800C6\n",  # this one will error
+            b'\x00\xa0:70A010048513232313241505446550000000000000000000000000063\n',
         ],
     },
 }
@@ -281,6 +307,10 @@ class VictronEnergyDirect(AbstractProtocol):
             case CommandType.VICTRON_GET:
                 # HEX response, e.g. b":70010007800C6\n"
                 _ret = response.split(b":")[1][:-3]
+                _ret = _ret.decode()
+                _ret = f'0{_ret}'
+                log.debug(f"bytes.fromhex: {_ret}")
+                _ret = bytes.fromhex(_ret)
             case CommandType.VICTRON_LISTEN:
                 # VEDTEXT response, return the lot
                 _ret = response

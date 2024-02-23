@@ -12,7 +12,7 @@ device:
     protocol: VED
 
 commands:
-- command: serial_number
+- command: battery_capacity
   outputs:
   - type: screen
     format: 
