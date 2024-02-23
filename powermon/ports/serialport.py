@@ -45,7 +45,7 @@ class SerialPort(AbstractPort):
         paths = glob(path)
         path_count = len(paths)
         match path_count:
-            case 10:
+            case 0:
                 log.error("no matching paths found on this system for: %s", path)
                 raise ConfigError(f"no matching paths found on this system for {path}")
             case 1:
@@ -62,14 +62,15 @@ class SerialPort(AbstractPort):
                     self.path = _path
                     asyncio.run(self.connect())
                     res = asyncio.run(self.send_and_receive(command=command))
-                    print(res)
-                    if res.is_valid:
-                        print(res.readings[0])
-                        print(res.readings[0].data_value)
-                        print(res.readings[0].data_value == identifier)
-                        if res.readings[0].data_value == identifier:
-                            log.info("path: %s matches for identifier: %s", _path, identifier)
-                            break
+                    if not res.is_valid:
+                        log.info("path: %s does not match for identifier: %s", _path, identifier)
+                        continue
+                    # print(res.readings[0])
+                    # print(res.readings[0].data_value)
+                    # print(res.readings[0].data_value == identifier)
+                    if res.readings[0].data_value == identifier:
+                        log.info("SUCCESS: path: %s matches for identifier: %s", _path, identifier)
+                        return
                 raise ConfigError(f"none of {paths} match {identifier}")
         # end of multi-path logic
         
