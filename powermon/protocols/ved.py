@@ -128,8 +128,8 @@ COMMANDS = {
             b"\nH1\t-32914\r\nH2\t0\r\nH3\t0\r\nMON\t0\r\nH4\t0\r\nH5\t0\r\nH6\t-35652\r\nH7\t12041\r\nH8\t14282\r\nH9\t0\r\nH10\t0\r\nH11\t0\r\nH12\t0\r\nH15\t-22\r\nH16\t0\r\nH17\t46\r\nH18\t48\r\nChecksum\t\x1a\r\nPID\t0xA389\r\nV\t12868\r\nVS\t-13\r\nI\t0\r\nP\t0\r\nCE\t0\r\nSOC\t1000\r\nTTG\t-1\r\nAlarm\tOFF\r\nAR\t0\r\nBMV\tSmartShunt 500A/50mV\r\nFW\t0405\r\nChecksum\tJ\r",
         ],
     },
-    "batteryCapacity": {
-        "name": "batteryCapacity",
+    "battery_capacity": {
+        "name": "battery_capacity",
         "description": "Battery Capacity",
         "help": " -- display the Battery Capacity",
         "command_type": CommandType.VICTRON_GET,
@@ -152,6 +152,23 @@ COMMANDS = {
             b"70010007800C6\n",  # this one will error
         ],
     },
+    "serial_number": {
+        "name": "serial_number",
+        "description": "Serial Number",
+        "help": " -- display the Serial Number",
+        "command_type": CommandType.VICTRON_GET,
+        "command_code": "010A",
+        "result_type": ResultType.SINGLE,
+        "reading_definitions": [
+            {"description": "Command type", "reading_type": ReadingType.MESSAGE, "response_type": ResponseType.INT},
+            
+        ],
+        "test_responses": [
+            b":70010007800C6\n",
+            b"\x00\x1a:70010007800C6\n",
+            #b"70010007800C6\n",  # this one will error
+        ],
+    },
 }
 
 
@@ -168,7 +185,7 @@ class VictronEnergyDirect(AbstractProtocol):
         self.protocol_id = b"VED"
         self.add_command_definitions(COMMANDS)
         self.add_supported_ports([PortType.SERIAL, PortType.USB])
-        self.check_definitions_count(expected=2)
+        self.check_definitions_count(expected=3)
 
     def get_full_command(self, command) -> bytes:
         """
