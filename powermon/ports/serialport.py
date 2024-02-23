@@ -38,6 +38,8 @@ class SerialPort(AbstractPort):
         self.port_type = PortType.SERIAL
         self.is_protocol_supported()
         self.path = None
+        self.baud = baud
+        self.serial_port = None
         # self.identifier = identifier
         # using glob to determine path(s)
         paths = glob(path)
@@ -65,8 +67,7 @@ class SerialPort(AbstractPort):
                     # self.send_and_receive()
                 raise PowermonWIP("multiple path resolution is TODO")
         # end of multi-path logic
-        self.baud = baud
-        self.serial_port = None
+        
         # self.error_message = None
 
     def to_dto(self) -> PortDTO:
