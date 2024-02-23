@@ -65,7 +65,7 @@ class SerialPort(AbstractPort):
                     print(res)
                     if res.is_valid:
                         print(res.readings[0])
-                        print(res.readings.data_value[0])
+                        print(res.readings[0].data_value)
                         print(res.readings[0].data_value == identifier)
                         if res.readings[0].data_value == identifier:
                             log.info("path: %s matches for identifier: %s", _path, identifier)
