@@ -123,6 +123,7 @@ class SerialPort(AbstractPort):
                         response_line += self.serial_port.read(to_read)
                 case _:
                     # default processing
+                    self.serial_port.reset_output_buffer()
                     c = self.serial_port.write(full_command)
                     log.debug("Default serial s&r. Wrote %i bytes", c)
                     self.serial_port.flush()
