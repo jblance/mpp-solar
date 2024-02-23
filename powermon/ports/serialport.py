@@ -65,8 +65,10 @@ class SerialPort(AbstractPort):
                     print(res)
                     if res.is_valid:
                         print(res.readings[0])
+                        print(res.readings.data_value[0])
+                        print(res.readings[0].data_value == identifier)
                         if res.readings[0].data_value == identifier:
-                            log.info("path: %s matchs for identifier: %s", _path, identifier)
+                            log.info("path: %s matches for identifier: %s", _path, identifier)
                             break
                 raise ConfigError(f"none of {paths} match {identifier}")
         # end of multi-path logic
@@ -162,7 +164,7 @@ class SerialPort(AbstractPort):
                     c = self.serial_port.write(full_command)
                     log.debug("Default serial s&r. Wrote %i bytes", c)
                     self.serial_port.flush()
-                    time.sleep(0.1)  # give serial port time to receive the data
+                    time.sleep(0.3)  # give serial port time to receive the data
                     response_line = self.serial_port.read_until(b"\r")
             log.info("serial response was: %s", response_line)
             # response = self.get_protocol().check_response_and_trim(response_line)
