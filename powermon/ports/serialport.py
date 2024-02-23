@@ -1,13 +1,15 @@
 """ powermon / ports / serialport.py """
+import asyncio
 import logging
 import time
+from glob import glob
 
 import serial
-import asyncio
 
 from powermon.commands.command import Command, CommandType
 from powermon.commands.result import Result
 from powermon.dto.portDTO import PortDTO
+from powermon.errors import ConfigError, PowermonWIP
 from powermon.ports.abstractport import AbstractPort
 from powermon.ports.porttype import PortType
 from powermon.protocols import get_protocol_definition
@@ -26,17 +28,37 @@ class SerialPort(AbstractPort):
         log.debug("building serial port. config:%s", config)
         path = config.get("path", "/dev/ttyUSB0")
         baud = config.get("baud", 2400)
+        identifier = config.get("identifier")
         # get protocol handler, default to PI30 if not supplied
         protocol = get_protocol_definition(protocol=config.get("protocol", "PI30"))
-        return cls(path=path, baud=baud, protocol=protocol)
+        return cls(path=path, baud=baud, protocol=protocol, identifier=identifier)
 
-    def __init__(self, path, baud, protocol) -> None:
+    def __init__(self, path, baud, protocol, identifier) -> None:
         super().__init__(protocol=protocol)
         self.port_type = PortType.SERIAL
-        self.path = path
+        self.is_protocol_supported()
+        self.path = None
+        # self.identifier = identifier
+        # using glob to determine path(s)
+        paths = glob(path)
+        path_count = len(paths)
+        match path_count:
+            case 0:
+                log.error("no matching paths found on this system for: %s", path)
+                raise ConfigError(f"no matching paths found on this system for {path}")
+            case 1:
+                # only one valid result on this system
+                self.path = paths[0]
+            case _:
+                # more than one valid path - so we need to determine which to use
+                if identifier is None:
+                    raise ConfigError("To use wildcard paths an identifier must be specified in the config file for the port")
+                for _path in paths:
+                    print(f"checking path: {_path} to see if it matches {identifier}")
+                raise PowermonWIP("multiple path resolution is TODO")
+        # end of multi-path logic
         self.baud = baud
         self.serial_port = None
-        self.is_protocol_supported()
         # self.error_message = None
 
     def to_dto(self) -> PortDTO:
