@@ -62,10 +62,10 @@ class SerialPort(AbstractPort):
                     self.path = _path
                     asyncio.run(self.connect())
                     res = asyncio.run(self.send_and_receive(command=command))
-                    print(res)
-                    
-                    # self.send_and_receive()
-                raise PowermonWIP("multiple path resolution is TODO")
+                    if res and res.data_value == identifier:
+                        log.info("path: %s matchs for identifier: %s", _path, identifier)
+                        break
+                raise ConfigError(f"none of {paths} match {identifier}")
         # end of multi-path logic
         
         # self.error_message = None
