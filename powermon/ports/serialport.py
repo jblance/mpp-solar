@@ -69,7 +69,7 @@ class SerialPort(AbstractPort):
                     # print(res.readings[0].data_value)
                     # print(res.readings[0].data_value == identifier)
                     if res.readings[0].data_value == identifier:
-                        log.debug("SUCCESS: path: %s matches for identifier: %s", _path, identifier)
+                        log.info("SUCCESS: path: %s matches for identifier: %s", _path, identifier)
                         return
                 raise ConfigError(f"Multiple paths - none of {paths} match {identifier}")
         # end of multi-path logic
