@@ -58,6 +58,7 @@ class SerialPort(AbstractPort):
                 for _path in paths:
                     print(f"checking path: {_path} to see if it matches {identifier}")
                     self.path = _path
+                    asyncio.run(self.connect())
                     res = asyncio.run(self.send_and_receive(command=command))
                     print(res)
                     
