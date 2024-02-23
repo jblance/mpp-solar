@@ -9,7 +9,7 @@ import serial
 from powermon.commands.command import Command, CommandType
 from powermon.commands.result import Result
 from powermon.dto.portDTO import PortDTO
-from powermon.errors import ConfigError, PowermonWIP
+from powermon.errors import ConfigError
 from powermon.ports.abstractport import AbstractPort
 from powermon.ports.porttype import PortType
 from powermon.protocols import get_protocol_definition
@@ -58,23 +58,21 @@ class SerialPort(AbstractPort):
                 # need to build a command
                 command = self.protocol.get_id_command()
                 for _path in paths:
-                    print(f"checking path: {_path} to see if it matches {identifier}")
+                    log.debug("Multiple paths - checking path: %s to see if it matches %s", _path, identifier)
                     self.path = _path
                     asyncio.run(self.connect())
                     res = asyncio.run(self.send_and_receive(command=command))
                     if not res.is_valid:
-                        log.info("path: %s does not match for identifier: %s", _path, identifier)
+                        log.debug("path: %s does not match for identifier: %s", _path, identifier)
                         continue
                     # print(res.readings[0])
                     # print(res.readings[0].data_value)
                     # print(res.readings[0].data_value == identifier)
                     if res.readings[0].data_value == identifier:
-                        log.info("SUCCESS: path: %s matches for identifier: %s", _path, identifier)
+                        log.debug("SUCCESS: path: %s matches for identifier: %s", _path, identifier)
                         return
-                raise ConfigError(f"none of {paths} match {identifier}")
+                raise ConfigError(f"Multiple paths - none of {paths} match {identifier}")
         # end of multi-path logic
-        
-        # self.error_message = None
 
     def to_dto(self) -> PortDTO:
         dto = PortDTO(type="serial", path=self.path, baud=self.baud, protocol=self.protocol.to_dto())
