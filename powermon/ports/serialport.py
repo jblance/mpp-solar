@@ -63,9 +63,11 @@ class SerialPort(AbstractPort):
                     asyncio.run(self.connect())
                     res = asyncio.run(self.send_and_receive(command=command))
                     print(res)
-                    if res.is_valid and res.readings[0].data_value == identifier:
-                        log.info("path: %s matchs for identifier: %s", _path, identifier)
-                        break
+                    if res.is_valid:
+                        print(res.readings[0])
+                        if res.readings[0].data_value == identifier:
+                            log.info("path: %s matchs for identifier: %s", _path, identifier)
+                            break
                 raise ConfigError(f"none of {paths} match {identifier}")
         # end of multi-path logic
         
