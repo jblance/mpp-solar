@@ -1,11 +1,14 @@
 """ powermon / ports / usbport.py """
+import asyncio
 import logging
 import os
 import time
+from glob import glob
 
 from powermon.commands.command import Command
 from powermon.commands.result import Result, ResultType
 from powermon.dto.portDTO import PortDTO
+from powermon.errors import ConfigError
 from powermon.ports.abstractport import AbstractPort
 from powermon.ports.porttype import PortType
 from powermon.protocols import get_protocol_definition
@@ -19,16 +22,46 @@ class USBPort(AbstractPort):
     def from_config(cls, config=None):
         log.debug("building usb port. config:%s", config)
         path = config.get("path", "/dev/hidraw0")
+        identifier = config.get("identifier")
         # get protocol handler, default to PI30 if not supplied
         protocol = get_protocol_definition(protocol=config.get("protocol", "PI30"))
-        return cls(path=path, protocol=protocol)
+        return cls(path=path, protocol=protocol, identifier=identifier)
 
-    def __init__(self, path, protocol) -> None:
+    def __init__(self, path, protocol, identifier) -> None:
         super().__init__(protocol=protocol)
         self.port_type = PortType.USB
-        self.path = path
+        self.path = None
         self.port = None
         self.is_protocol_supported()
+        # using glob to determine path(s)
+        paths = glob(path)
+        path_count = len(paths)
+        match path_count:
+            case 0:
+                log.error("no matching paths found on this system for: %s", path)
+                raise ConfigError(f"no matching paths found on this system for {path}")
+            case 1:
+                # only one valid result on this system
+                self.path = paths[0]
+            case _:
+                # more than one valid path - so we need to determine which to use
+                if identifier is None:
+                    raise ConfigError("To use wildcard paths an identifier must be specified in the config file for the port")
+                # need to build a command
+                command = self.protocol.get_id_command()
+                for _path in paths:
+                    log.debug("Multiple paths - checking path: %s to see if it matches %s", _path, identifier)
+                    self.path = _path
+                    asyncio.run(self.connect())
+                    res = asyncio.run(self.send_and_receive(command=command))
+                    if not res.is_valid:
+                        log.debug("path: %s does not match for identifier: %s", _path, identifier)
+                        continue
+                    if res.readings[0].data_value == identifier:
+                        log.info("SUCCESS: path: %s matches for identifier: %s", _path, identifier)
+                        return
+                raise ConfigError(f"Multiple paths - none of {paths} match {identifier}")
+        # end of multi-path logic
 
     def to_dto(self):
         dto = PortDTO(type="usb", path=self.path, protocol=self.protocol.to_dto())
