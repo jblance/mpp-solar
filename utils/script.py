@@ -12,17 +12,17 @@ except ImportError:
     print("To install use:")
     print("    python -m pip install 'construct'")
 
+def get_bit_value(number, position):
+    # Shift the bit we're interested in to the lowest position
+    shifted_bit = number >> position
+    # Apply a mask to get only the bit we're interested in
+    bit_value = shifted_bit & 1
+    return bit_value
+
 def process_text(text,address):
     index = text.find("55aaeb")
     if index == 0:
         result = jk02_32_definition.parse(bytes.fromhex(text))
-#        print('uptime:' + str(result['uptime']))
-#        print('discard1:' + str(result['discard1']))
-#        print('discard3:' + str(result['discard3']))
-#        print('discard8:' + str(result['discard8']))
-#        print('discard9:' + str(result['discard9']))
-#        print('rest:    ' + str(result['rest']))
-
         show=0
         if (config['filter_record_type']!=None):
           if (config['filter_record_type']=="all"):
@@ -47,34 +47,108 @@ def process_text(text,address):
            if (show==1):
               print("---------------------------------------------------------------------------------------------------------------")
               if (config['short_print']):
-                 #print (text)
+                 print (text)
                  print('Record Type:' + str(result['Record_Type']))
                  print('Record Counter:' + str(result['Record_Counter']))
+                 ## CONFIG (RECORD TYPE=1)
+                 print('RS485 ADDRESS:' + str(result['rest'][49]))
+                 print('CHARGE_SWITCH_ENABLED:' + str(result['cell_resistance_array'][19]))
+                 print('DISCHARGE_SWITCH_ENABLED:' + str(result['cell_resistance_array'][21]))
+                 print('BALANCE_SWITCH_ENABLED:' + str(result['cell_resistance_array'][23]))
+                 print('rest 61:' + str(result['rest'][61]))
+                 print('HEATING_SWITCH_ENABLED:' + str(get_bit_value(result['rest'][61],0)))
+                 print('DISABLE_TEMP_SENSOR_SWITCH_ENABLED:' + str(get_bit_value(result['rest'][61],1)))
+                 print('DISPLAY_ALWAYS_ON_SWITCH_ENABLED:' + str(get_bit_value(result['rest'][61],4)))
+                 print('SMART_SLEEP_ON_SWITCH_ENABLED:' + str(get_bit_value(result['rest'][61],6)))
+                 print('DISABLE_PCL_MODULE_SWITCH_ENABLED:' + str(get_bit_value(result['rest'][61],7)))
+                 print('rest 62:' + str(result['rest'][62]))
+                 print('TIMED_STORED_DATA_SWITCH_ENABLED:' + str(get_bit_value(result['rest'][62],0)))
+                 print('CHARGING_FLOAT_MODE_SWITCH_ENABLED:' + str(get_bit_value(result['rest'][62],1)))
+
+
                  print('First Array 28:' + str(result['cell_voltage_array'][28]))
                  print('First Array 29:' + str(result['cell_voltage_array'][29]))
                  print('Delta_Cell_Voltage:' + str(result['Delta_Cell_Voltage']))
                  print('Second Array 17:' + str(result['cell_resistance_array'][17]))
-                 print('Second Array 19:' + str(result['cell_resistance_array'][19]))
-                 print('Second Array 21:' + str(result['cell_resistance_array'][23]))
-                 print('Second Array 23:' + str(result['cell_resistance_array'][23]))
                  print('Second Array 25:' + str(result['cell_resistance_array'][25]))
                  print('Second Array 26:' + str(result['cell_resistance_array'][26]))
+                 print('Second Array 27:' + str(result['cell_resistance_array'][27]))
+                 print('Second Array 28:' + str(result['cell_resistance_array'][28]))
+                 print('Second Array 29:' + str(result['cell_resistance_array'][29]))
+                 print('Second Array 30:' + str(result['cell_resistance_array'][30]))
                  print('Second Array 31:' + str(result['cell_resistance_array'][31]))
+
+                 ## STATUS (RECORD TYPE=2)
+                 print("CHARGE WORKING:" + str((result['discard8'][1])))
+                 print("DISCHARGE WORKING:" + str((result['discard8'][2])))
+                 print("PREDISCHARGE WORKING:" + str((result['discard8'][3])))
+                 print("BALANCE WORKING:" + str((result['discard8'][4])))
+
+                 print('discard8:' + str(result['discard8']))
+                 print('rest:' + str(result['rest']))
+
+                 print('rest 50:' + str(result['rest'][50]))
+                 print('rest 51:' + str(result['rest'][51]))
+                 print('rest 52:' + str(result['rest'][52]))
+                 print('rest 53:' + str(result['rest'][53]))
+                 print('rest 54:' + str(result['rest'][54]))
+                 print('rest 55:' + str(result['rest'][55]))
+                 print('rest 56:' + str(result['rest'][56]))
+                 print('rest 57:' + str(result['rest'][57]))
+                 print('rest 58:' + str(result['rest'][58]))
+                 print('rest 59:' + str(result['rest'][59]))
+                 print('rest 60:' + str(result['rest'][60]))
+                 print('rest 63:' + str(result['rest'][63]))
+                 print('rest 64:' + str(result['rest'][64]))
+                 print('rest 65:' + str(result['rest'][65]))
+                 print('rest 66:' + str(result['rest'][66]))
+                 print('rest 67:' + str(result['rest'][67]))
+                 print('rest 68:' + str(result['rest'][68]))
+                 print('rest 69:' + str(result['rest'][69]))
+                 print('rest 70:' + str(result['rest'][70]))
+                 print('rest 71:' + str(result['rest'][71]))
+                 print('rest 72:' + str(result['rest'][72]))
+                 print('rest 73:' + str(result['rest'][73]))
+                 print('rest 74:' + str(result['rest'][74]))
+                 print('rest 75:' + str(result['rest'][75]))
+                 print('rest 76:' + str(result['rest'][76]))
+                 print('rest 77:' + str(result['rest'][77]))
+
               else:
-                 print(result)
+                 if (not config['silent_print']):
+                     print(result)
+                 else:
+                     print(text)
 
 def read_serial_port(serial_port, baud_rate):
-    with serial.Serial(serial_port, baud_rate, timeout=0) as ser:
+    with serial.Serial(serial_port, baud_rate, timeout=10) as ser:
         timestr = time.strftime("%Y%m%d_%H%M%S")
         file = codecs.open(timestr+".log", "w", "utf-8")
-        while True:
-            # Read all available bytes from the serial port
-            data = ser.read_all()
+        data=""
+        buffer_full=0
 
-            # If there is data, process and display in hexadecimal format
-            if data:
-                hex_data = data.hex()
-####                print(hex_data, end='\n')
+        while True:
+            if buffer_full==0:
+               data=""
+            # Read all available bytes from the serial port
+            partial_data = ser.read_all()
+            while partial_data:
+                 longitud_datos = len(partial_data)
+                 if longitud_datos>=256:
+                     buffer_full=1
+                 else:
+                     buffer_full=0
+                 # Hacer algo con los datos parciales
+                 # ...
+                 data = data + partial_data.hex()
+                 partial_data = ser.read_all()
+
+#            print ("DATA:"+data)
+#            print ("BUFF:"+str(buffer_full))
+
+            if data and buffer_full==0:
+                hex_data = data   #.hex()
+#                print(hex_data, end='\n')
                 file.write(hex_data)
                 file.write('\n')
                 sys.stdout.flush()
@@ -233,6 +307,7 @@ if __name__ == "__main__":
     parser.add_argument("--filter-record-type", help="Record Type all|1|2")
     parser.add_argument("--filter-address", help="Address in decimal 1 to 15")
     parser.add_argument("--short-print", action="store_true", help="Short Print")
+    parser.add_argument("--silent-print", action="store_true", help="Silent Print")
     parser.add_argument("--dest", help="Destination location")
     args = parser.parse_args()
     config = vars(args)
@@ -252,4 +327,10 @@ if __name__ == "__main__":
            count += 1
            text=line.strip()
            ##print("Line{}: {}".format(count, text))
-           process_text(text)
+
+           bytes_data = bytes.fromhex(text)
+           first_byte = bytes_data[0]
+           if first_byte <= 0x0f:
+                address=first_byte
+           process_text(text,address)
+
