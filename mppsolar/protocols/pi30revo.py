@@ -486,8 +486,8 @@ class pi30revo(AbstractProtocol):
     def get_chk(self, byte_cmd):
         """ generate the CHK bytes """
         if byte_cmd.startswith(b'PSET'):
-            checksum = chk(byte_cmd)
-            log.debug("checksum+0: %s", hex(checksum))
+            checksum = chk(byte_cmd) + 1
+            log.debug("checksum+1: %s", hex(checksum))
         else:
             checksum = chk(byte_cmd) + 1
             log.debug("checksum+1: %s", hex(checksum))
