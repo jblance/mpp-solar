@@ -1,6 +1,5 @@
 """ protocols / ved.py """
 import logging
-from struct import unpack
 
 import construct as cs
 
@@ -8,10 +7,9 @@ from powermon.commands.command import CommandType
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
-from powermon.errors import CommandError, InvalidCRC, InvalidResponse
+# from powermon.errors import CommandError, InvalidCRC, InvalidResponse
 from powermon.ports.porttype import PortType
 from powermon.protocols.abstractprotocol import AbstractProtocol
-from powermon.protocols.helpers import victron_checksum
 
 log = logging.getLogger("daly")
 
@@ -37,13 +35,14 @@ COMMANDS = {
         "command_code": "90",
         "result_type": ResultType.CONSTRUCT,
         "construct": soc_construct,
+        "construct_min_response": 13,
         "reading_definitions": [
             {"index": "start_flag", "description": "start flag", "reading_type": ReadingType.IGNORE, "response_type": ResponseType.HEX_CHAR},
             {"index": "module_address", "description": "module address", "reading_type": ReadingType.IGNORE, "response_type": ResponseType.HEX_CHAR},
             {"index": "command_id", "description": "command id", "reading_type": ReadingType.IGNORE, "response_type": ResponseType.HEX_CHAR},
             {"index": "data_length", "description": "data length", "reading_type": ReadingType.IGNORE},
             {"index": "battery_voltage", "description": "Battery Bank Voltage", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/10"},
-            {"index": "acquistion_voltage", "description": "acquistion", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/10"},  
+            {"index": "acquistion_voltage", "description": "acquistion", "reading_type": ReadingType.VOLTS, "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/10"},
             {"index": "current", "description": "Current", "reading_type": ReadingType.CURRENT, "response_type": ResponseType.TEMPLATE_INT, "format_template": "(r-30000)/10"},
             {"index": "soc", "description": "SOC", "reading_type": ReadingType.PERCENTAGE, "response_type": ResponseType.TEMPLATE_INT, "format_template": "r/10"},
             {"index": "checksum", "description": "checksum", "reading_type": ReadingType.IGNORE, "response_type": ResponseType.HEX_CHAR}],
@@ -51,6 +50,7 @@ COMMANDS = {
             b"\xa5\x01\x90\x08\x02\x10\x00\x00uo\x03\xbc\xf3",
             b"\xa5\x01\x90\x08\x02\x14\x00\x00uE\x03x\x89",
             b"\xa5\x01\x90\x08\x01\t\x00\x00u\xcf\x03\n\x99",
+            b"",
         ],
     },
 }
@@ -101,30 +101,30 @@ class Daly(AbstractProtocol):
         log.debug("full_command: %s", full_command)
         return full_command
 
-        command_type = command_definition.command_type
-        match command_type:
-            case CommandType.VICTRON_GET:
-                # command components
-                raw_command_code = command_definition.command_code  # eg 1000 for batteryCapacity
-                if raw_command_code is None:
-                    raise CommandError(f"command_code not found for {command=} - check protocol definition for this command")
-                command_code = f"{unpack('<h', bytes.fromhex(raw_command_code))[0]:04X}"
-                flags = "00"
+        # command_type = command_definition.command_type
+        # match command_type:
+        #     case CommandType.VICTRON_GET:
+        #         # command components
+        #         raw_command_code = command_definition.command_code  # eg 1000 for batteryCapacity
+        #         if raw_command_code is None:
+        #             raise CommandError(f"command_code not found for {command=} - check protocol definition for this command")
+        #         command_code = f"{unpack('<h', bytes.fromhex(raw_command_code))[0]:04X}"
+        #         flags = "00"
 
-                # build command
-                cmd = f"{command_type.value}{command_code}{flags}"
-                # pad cmd and convert to bytes and determine checksum
-                checksum = victron_checksum(bytes.fromhex(f"0{cmd}"))
+        #         # build command
+        #         cmd = f"{command_type.value}{command_code}{flags}"
+        #         # pad cmd and convert to bytes and determine checksum
+        #         checksum = victron_checksum(bytes.fromhex(f"0{cmd}"))
 
-                # build full command
-                cmd = f":{cmd}{checksum:02X}\n".encode()
-                log.debug("full command: %s", cmd)
-                return cmd
-            case CommandType.VICTRON_LISTEN:
-                # Just listen - dont need to send a command
-                log.debug("command is LISTEN type so returning %s", command_type)
-                return command_type
-        raise CommandError(f"unable to generate full command for {command}, type {command_type} - is the definition wrong or CommandType not implemented?")
+        #         # build full command
+        #         cmd = f":{cmd}{checksum:02X}\n".encode()
+        #         log.debug("full command: %s", cmd)
+        #         return cmd
+        #     case CommandType.VICTRON_LISTEN:
+        #         # Just listen - dont need to send a command
+        #         log.debug("command is LISTEN type so returning %s", command_type)
+        #         return command_type
+        # raise CommandError(f"unable to generate full command for {command}, type {command_type} - is the definition wrong or CommandType not implemented?")
 
     def check_valid(self, response: str, command_definition: CommandDefinition = None) -> bool:
         """ check response is valid """

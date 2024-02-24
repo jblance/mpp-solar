@@ -5,11 +5,16 @@ import re
 
 import construct as cs
 
+from powermon.commands.command import Command
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.result import ResultType
+from powermon.commands.trigger import Trigger
 from powermon.dto.command_definition_dto import CommandDefinitionDTO
 from powermon.dto.protocolDTO import ProtocolDTO
-from powermon.errors import (CommandDefinitionIncorrect, CommandDefinitionMissing, InvalidResponse, PowermonProtocolError)
+from powermon.errors import (CommandDefinitionIncorrect,
+                             CommandDefinitionMissing, InvalidResponse,
+                             PowermonProtocolError)
+from powermon.outputs import multiple_from_config
 from powermon.ports.porttype import PortType
 from powermon.protocols.helpers import crc_pi30 as crc
 
@@ -30,6 +35,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
     def __init__(self) -> None:
         self.command_definitions: dict[str, CommandDefinition] = {}
         self.supported_ports = [PortType.TEST,]
+        self.id_command = None
 
     @property
     def protocol_id(self) -> bytes:
@@ -184,6 +190,10 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 # check for construct
                 if command_definition.construct is None:
                     raise CommandDefinitionIncorrect("No construct found in command_definition")
+                if command_definition.construct_min_response is None:
+                    raise CommandDefinitionIncorrect("No construct_min_response found in command_definition")
+                if len(response) < command_definition.construct_min_response:
+                    raise InvalidResponse(f"response:{response}, len:{len(response)} too short for parsing (expecting {command_definition.construct_min_response:})")
                 # parse with construct
                 result = command_definition.construct.parse(response)
                 # print(result)
@@ -212,3 +222,16 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         """ convert protocol object to data transfer object """
         dto = ProtocolDTO(protocol_id=self.protocol_id, commands=self.get_command_definition_dtos())
         return dto
+
+    def get_id_command(self) -> Command:
+        """ return the command that generates a unique id for this type of device """
+        if self.id_command is None:
+            raise PowermonProtocolError(f"self.id_command must be defined in protocol {self.protocol_id}")
+        cd = self.get_command_definition(self.id_command)
+        outputs = multiple_from_config({"type": "screen", "format": "raw"})
+        trigger = Trigger.from_config(None)
+        command = Command(code=self.id_command, commandtype=cd.command_type, outputs=outputs, trigger=trigger)
+        command.command_definition = cd
+        command.full_command = self.get_full_command(self.id_command)
+        log.debug(command)
+        return command

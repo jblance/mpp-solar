@@ -1,6 +1,7 @@
 """ protocols / ved.py """
 import logging
 from struct import unpack
+
 import construct as cs
 
 from powermon.commands.command import CommandType
@@ -152,6 +153,7 @@ COMMANDS = {
         "command_code": "1000",
         "result_type": ResultType.CONSTRUCT,
         "construct": battery_capacity_defn,
+        "construct_min_response": 6,
         "reading_definitions": [
             {"index": "command_type", "description": "command type", "reading_type": ReadingType.IGNORE},
             {"index": "command", "description": "command", "reading_type": ReadingType.IGNORE},
@@ -178,6 +180,7 @@ COMMANDS = {
         "command_code": "010A",
         "result_type": ResultType.CONSTRUCT,
         "construct": serial_number_defn,
+        "construct_min_response": 20,
         "reading_definitions": [
             {"index": "command_type", "description": "command type", "reading_type": ReadingType.IGNORE},
             {"index": "command", "description": "command", "reading_type": ReadingType.IGNORE},
@@ -212,6 +215,7 @@ class VictronEnergyDirect(AbstractProtocol):
         self.add_command_definitions(COMMANDS)
         self.add_supported_ports([PortType.SERIAL, PortType.USB])
         self.check_definitions_count(expected=3)
+        self.id_command = "serial_number"
 
     def get_full_command(self, command) -> bytes:
         """
@@ -309,7 +313,7 @@ class VictronEnergyDirect(AbstractProtocol):
                 _ret = response.split(b":")[1][:-3]
                 _ret = _ret.decode()
                 _ret = f'0{_ret}'
-                log.debug(f"bytes.fromhex: {_ret}")
+                log.debug("bytes.fromhex: %s", _ret)
                 _ret = bytes.fromhex(_ret)
             case CommandType.VICTRON_LISTEN:
                 # VEDTEXT response, return the lot

@@ -5,8 +5,9 @@ device:
   model: 8048MAX
   manufacturer: MPP-Solar
   port:
-    type: test
-    # path: /dev/ttyUSB0
+    type: serial
+    path: /dev/ttyUSB*
+    identifier: A123456789
     # response_number: 0
     # mac: 66:66:18:01:09:18
     protocol: VED

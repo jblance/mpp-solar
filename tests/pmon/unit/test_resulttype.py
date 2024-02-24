@@ -1,14 +1,15 @@
 """ tests / pmon / unit / test_resulttype.py """
-import struct
+# import struct
 import unittest
 
 import construct as cs
 
-from powermon.commands.result import Result, ResultType
+from powermon.commands.result import ResultType
 from powermon.protocols.abstractprotocol import AbstractProtocol
-from powermon.commands.reading_definition import (ReadingDefinition, ReadingType, ResponseType)
+from powermon.commands.reading_definition import ReadingDefinition, ResponseType
 from powermon.commands.command_definition import CommandDefinition
 from powermon.errors import CommandDefinitionIncorrect
+
 
 class TestResultTypes(unittest.TestCase):
     """ test different result types """
@@ -19,6 +20,7 @@ class TestResultTypes(unittest.TestCase):
         reading_definition = ReadingDefinition.from_config(reading_definition_config, 0)
         command_definition = CommandDefinition(code="CODE", description="description", help_text="", result_type=ResultType.CONSTRUCT, reading_definitions=[reading_definition])
         command_definition.construct = construct
+        command_definition.construct_min_response = 1
         result = AbstractProtocol.split_response(self, response=b"\x0f\x90", command_definition=command_definition)
         expected = [('voltage', 3984)]
         self.assertEqual(result, expected)

@@ -28,6 +28,7 @@ command_definitions_config = {
     "command_code": "1000",
     "result_type": ResultType.CONSTRUCT,
     "construct": battery_capacity_defn,
+    "construct_min_response": 6,
     "reading_definitions": [
         {"index": "command_type", "description": "command type", "reading_type": ReadingType.IGNORE},
         {"index": "command", "description": "command", "reading_type": ReadingType.IGNORE},

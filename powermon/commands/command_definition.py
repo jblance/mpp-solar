@@ -38,6 +38,7 @@ class CommandDefinition:
         self.command_type = None
         self.command_code : str = None
         self.construct: cs.Construct = None
+        self.construct_min_response = None
 
     @classmethod
     def from_config(cls, protocol_dictionary : dict) -> "CommandDefinition":
@@ -69,6 +70,7 @@ class CommandDefinition:
         _command_definition.command_type = protocol_dictionary.get("command_type")
         _command_definition.command_code = protocol_dictionary.get("command_code")
         _command_definition.construct = protocol_dictionary.get("construct")
+        _command_definition.construct_min_response = protocol_dictionary.get("construct_min_response")
         return _command_definition
 
     def to_dto(self) -> CommandDefinitionDTO:

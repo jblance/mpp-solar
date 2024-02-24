@@ -9,6 +9,7 @@ from powermon.commands.result import ResultType
 from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.parameter import ParameterType, ParameterFormat
 
+
 class test_command(unittest.TestCase):
     def test_command_definition_none(self):
         command = Command(code="test", commandtype="test", outputs=[], trigger=None)
@@ -60,5 +61,3 @@ class test_command(unittest.TestCase):
         self.assertEqual(reading.data_unit, "Wh")
         self.assertEqual(reading.data_value, 238800)
         self.assertEqual(reading.data_name, "PV Generated Energy for Day")
-        
-        

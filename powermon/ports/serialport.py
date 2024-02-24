@@ -9,7 +9,7 @@ import serial
 from powermon.commands.command import Command, CommandType
 from powermon.commands.result import Result
 from powermon.dto.portDTO import PortDTO
-from powermon.errors import ConfigError, PowermonWIP
+from powermon.errors import ConfigError
 from powermon.ports.abstractport import AbstractPort
 from powermon.ports.porttype import PortType
 from powermon.protocols import get_protocol_definition
@@ -38,6 +38,8 @@ class SerialPort(AbstractPort):
         self.port_type = PortType.SERIAL
         self.is_protocol_supported()
         self.path = None
+        self.baud = baud
+        self.serial_port = None
         # self.identifier = identifier
         # using glob to determine path(s)
         paths = glob(path)
@@ -53,13 +55,24 @@ class SerialPort(AbstractPort):
                 # more than one valid path - so we need to determine which to use
                 if identifier is None:
                     raise ConfigError("To use wildcard paths an identifier must be specified in the config file for the port")
+                # need to build a command
+                command = self.protocol.get_id_command()
                 for _path in paths:
-                    print(f"checking path: {_path} to see if it matches {identifier}")
-                raise PowermonWIP("multiple path resolution is TODO")
+                    log.debug("Multiple paths - checking path: %s to see if it matches %s", _path, identifier)
+                    self.path = _path
+                    asyncio.run(self.connect())
+                    res = asyncio.run(self.send_and_receive(command=command))
+                    if not res.is_valid:
+                        log.debug("path: %s does not match for identifier: %s", _path, identifier)
+                        continue
+                    # print(res.readings[0])
+                    # print(res.readings[0].data_value)
+                    # print(res.readings[0].data_value == identifier)
+                    if res.readings[0].data_value == identifier:
+                        log.info("SUCCESS: path: %s matches for identifier: %s", _path, identifier)
+                        return
+                raise ConfigError(f"Multiple paths - none of {paths} match {identifier}")
         # end of multi-path logic
-        self.baud = baud
-        self.serial_port = None
-        # self.error_message = None
 
     def to_dto(self) -> PortDTO:
         dto = PortDTO(type="serial", path=self.path, baud=self.baud, protocol=self.protocol.to_dto())
@@ -150,7 +163,7 @@ class SerialPort(AbstractPort):
                     c = self.serial_port.write(full_command)
                     log.debug("Default serial s&r. Wrote %i bytes", c)
                     self.serial_port.flush()
-                    time.sleep(0.1)  # give serial port time to receive the data
+                    time.sleep(0.3)  # give serial port time to receive the data
                     response_line = self.serial_port.read_until(b"\r")
             log.info("serial response was: %s", response_line)
             # response = self.get_protocol().check_response_and_trim(response_line)
