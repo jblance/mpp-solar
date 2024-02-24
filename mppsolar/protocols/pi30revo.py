@@ -456,7 +456,12 @@ class pi30revo(AbstractProtocol):
         # This protocol responses can either have a CRC or a Checksum..
         # If there is a valid checksum, assume it is using the checksum approach
         if self.is_chk_valid(response):
-            return response[1:-2].split(b" ")
+            if response.startswith(b"("):
+                # Trim leading '(' + trailing CHK and \r of response, then split
+                return response[1:-2].split(b" ")
+            else:
+                # Trim trailing CHK and \r of response, then split
+                return response[:-2].split(b" ")
         # Just use the default approach then
         # Trim leading '(' + trailing CRC and \r of response, then split
         if isinstance(response, str):
@@ -482,7 +487,7 @@ class pi30revo(AbstractProtocol):
         """ generate the CHK bytes """
         if byte_cmd.startswith(b'PSET'):
             checksum = chk(byte_cmd)
-            log.debug("checksum: %s", hex(checksum))
+            log.debug("checksum+0: %s", hex(checksum))
         else:
             checksum = chk(byte_cmd) + 1
             log.debug("checksum+1: %s", hex(checksum))
@@ -510,7 +515,7 @@ class pi30revo(AbstractProtocol):
             checksum = self.get_chk(byte_cmd)
             full_command = byte_cmd + bytes([checksum])
         elif self._command_defn and self._command_defn.get("crctype") == "chk":
-            log.debug("Using CHK+1 checksum approach for command: %s", self._command)
+            log.debug("Using CHK checksum approach for command: %s", self._command)
             checksum = self.get_chk(byte_cmd)
             full_command = byte_cmd + bytes([checksum]) + bytes([13])
         else:
