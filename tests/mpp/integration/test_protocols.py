@@ -2,8 +2,8 @@ import importlib
 import unittest
 from pathlib import Path
 
-HERE = Path( __file__).parent
-PROTOCOLS_DIR = HERE.parent.parent / "mppsolar" / "protocols"
+HERE = Path(__file__).parent
+PROTOCOLS_DIR = HERE.parent.parent.parent / "mppsolar" / "protocols"
 PROTOCOLS = sorted(
     file.stem for file in PROTOCOLS_DIR.glob("*.py")
     if "init" not in file.stem
@@ -15,6 +15,7 @@ PROTOCOLS = sorted(
 class testProtocols(unittest.TestCase):
 
     def test_protocols_count(self):
+        # print(len(PROTOCOLS))
         assert len(PROTOCOLS) == 24, len(PROTOCOLS)
 
     def test_protocols_init(self):

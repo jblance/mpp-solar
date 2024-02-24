@@ -1,5 +1,8 @@
-mppsolar-tests: 
-	python3 -m unittest discover -s tests/mpp -f 
+mppsolar-integration-tests: 
+	python3 -m unittest discover -s tests/mpp/integration -f -v
+
+mppsolar-unit-tests: 
+	python3 -m unittest discover -s tests/mpp/unit -f -v
 	
 powermon-unit-tests: 
 	python3 -m unittest discover -s tests/pmon/unit -f -v
@@ -10,7 +13,7 @@ powermon-integration-tests:
 test:
 	python3 -m unittest discover -s tests -f
 
-tests: powermon-unit-tests powermon-integration-tests mppsolar-tests
+tests: powermon-unit-tests powermon-integration-tests mppsolar-unit-tests mppsolar-integration-tests
 
 pypi:
 	rm -rf dist/*
