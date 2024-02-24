@@ -3,7 +3,7 @@ import logging
 
 from .abstractprotocol import AbstractProtocol
 from .protocol_helpers import crcPI as crc
-from .protocol_helpers import crc8P1 as chk
+from .protocol_helpers import crc8 as chk
 
 log = logging.getLogger("pi30revo")
 
@@ -24,6 +24,23 @@ COMMANDS = {
             b"(ACK\x39\x20\r",
         ],
         "regex": "PSET(\d+ \d+[.]\d+ \d+[.]\d+ \d+[.]\d+ \d+[.]\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+.*)$",  # pylint: disable=W1401 # noqa: W605
+    },
+    "_PSET": {
+        # 'PSET011103 56.0 56.7 47.0 47.0 030 000 2024 02 20 07 22 00'
+        #      000100 56.0 54.0 44.0 42.0 030 010 2018 06 01 20 00 00 00
+        "name": "PSET",
+        "description": "Set current machine configuration information",
+        "help": " -- sets various metrics from the Inverter",
+        "type": "SETTER",
+        "crctype": "chk",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"(NAK\x03\r",
+            b"(ACK\x39\x20\r",
+        ],
+        "regex": "_PSET(\d+ \d+[.]\d+ \d+[.]\d+ \d+[.]\d+ \d+[.]\d+ \d+ \d+ \d+ \d+ \d+ \d+ \d+.*)$",  # pylint: disable=W1401 # noqa: W605
     },
     "PQSE": {
         "name": "PQSE",
@@ -171,7 +188,7 @@ COMMANDS = {
             ],
         ],
         "test_responses": [
-            b"(000 00.0 000 00.0 0000 000 00.0 000 000 000 000 00.0 0000 000000 000000 S 00 00\x04\n",
+            b"(000 00.0 000 00.0 0000 000 00.0 000 000 000 000 00.0 0000 000000 000000 S 00 00\x03\n",
         ],
     },
     "QMOD": {
@@ -394,6 +411,7 @@ COMMANDS = {
 
 
 class pi30revo(AbstractProtocol):
+    "PI30 protocol handler for REVO and similar inverters"
     def __str__(self):
         return "PI30 protocol handler for REVO and similar inverters"
 
@@ -405,8 +423,9 @@ class pi30revo(AbstractProtocol):
         self.SETTINGS_COMMANDS = ["QPIRI"]
         self.DEFAULT_COMMAND = "QPI"
         # log.info(f'Using protocol {self._protocol_id} with {len(self.COMMANDS)} commands')
+        self._command_defn = None
 
-    def is_CRC_valid(self, response):
+    def is_crc_valid(self, response):
         """
         Test response using CRC approach
         """
@@ -416,11 +435,14 @@ class pi30revo(AbstractProtocol):
             return True
         return False
 
-    def is_CHK_valid(self, response):
+    def is_chk_valid(self, response):
         """
         Test response using CHK approach
         """
-        checksum = chk(response[:-2])
+        if isinstance(response, str):
+            response = response.encode()
+        checksum = self.get_chk(response[:-2])
+        log.debug("response chk: %s", hex(checksum))
         if response[-2:-1] == bytes([checksum]):
             log.debug("Checksums match")
             return True
@@ -433,7 +455,7 @@ class pi30revo(AbstractProtocol):
         """
         # This protocol responses can either have a CRC or a Checksum..
         # If there is a valid checksum, assume it is using the checksum approach
-        if self.is_CHK_valid(response):
+        if self.is_chk_valid(response):
             return response[1:-2].split(b" ")
         # Just use the default approach then
         # Trim leading '(' + trailing CRC and \r of response, then split
@@ -451,10 +473,20 @@ class pi30revo(AbstractProtocol):
         # if b"(NAK" in response:
         #     return False, {"validity check": ["Error: NAK", ""]}
 
-        if self.is_CHK_valid(response) or self.is_CRC_valid(response):
+        if self.is_chk_valid(response) or self.is_crc_valid(response):
             return True, {}
         else:
             return False, {"validity check": ["Error: Invalid response CRCs", ""]}
+
+    def get_chk(self, byte_cmd):
+        """ generate the CHK bytes """
+        if byte_cmd.startswith(b'PSET'):
+            checksum = chk(byte_cmd)
+            log.debug("checksum: %s", hex(checksum))
+        else:
+            checksum = chk(byte_cmd) + 1
+            log.debug("checksum+1: %s", hex(checksum))
+        return checksum
 
     def get_full_command(self, command) -> bytes:
         """
@@ -463,24 +495,30 @@ class pi30revo(AbstractProtocol):
         log.info("Using protocol: %s with %s commands", self._protocol_id, len(self.COMMANDS))
         # These need to be set to allow other functions to work`
         self._command = command
-        self._command_defn = self.get_command_defn(command)
+        if command.startswith('_PSET'):
+            self._command_defn = self.get_command_defn(command[1:])
+        else:
+            self._command_defn = self.get_command_defn(command)
         # End of required variables setting
-
         byte_cmd = bytes(command, "utf-8")
-        if (
-            self._command_defn
-            and self._command_defn.get("crctype") == "chk"
-        ):
-            log.debug(f"Using CHK checksum approach for command {self._command}")
-            checksum = chk(byte_cmd)
-            log.debug(f"checksum {checksum}")
+        if command.startswith('_PSET'):
+            log.debug("Using CHK checksum approach for _PSET command")
+            # remove _
+            command = command[1:]
+            byte_cmd = bytes(command, "utf-8")
+            self._command = command
+            checksum = self.get_chk(byte_cmd)
+            full_command = byte_cmd + bytes([checksum])
+        elif self._command_defn and self._command_defn.get("crctype") == "chk":
+            log.debug("Using CHK+1 checksum approach for command: %s", self._command)
+            checksum = self.get_chk(byte_cmd)
             full_command = byte_cmd + bytes([checksum]) + bytes([13])
         else:
-            log.debug(f"Using PI30 CRC checksum approach for command {self._command}")
+            log.debug("Using PI30 CRC checksum approach for command: %s", self._command)
             # calculate the CRC
             crc_high, crc_low = crc(byte_cmd)
             # combine byte_cmd, CRC , return
             full_command = byte_cmd + bytes([crc_high, crc_low, 13])
 
-        log.debug(f"full command: {full_command}")
+        log.debug("full command: %s", full_command)
         return full_command
