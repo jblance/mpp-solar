@@ -55,7 +55,7 @@ class USBPort(AbstractPort):
                     asyncio.run(self.connect())
                     res = asyncio.run(self.send_and_receive(command=command))
                     if not res.is_valid:
-                        log.debug("path: %s does not match for identifier: %s", _path, identifier)
+                        log.info("path: %s does not match for identifier: %s", _path, identifier)
                         continue
                     if res.readings[0].data_value == identifier:
                         log.info("SUCCESS: path: %s matches for identifier: %s", _path, identifier)
