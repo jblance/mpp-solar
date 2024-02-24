@@ -56,11 +56,11 @@ class USBPort(AbstractPort):
                     res = asyncio.run(self.send_and_receive(command=command))
                     if not res.is_valid:
                         log.info("path: %s does not match for identifier: %s", _path, identifier)
+                        asyncio.run(self.disconnect())
                         continue
                     if res.readings[0].data_value == identifier:
                         log.info("SUCCESS: path: %s matches for identifier: %s", _path, identifier)
                         return
-                    asyncio.run(self.disconnect())
                 raise ConfigError(f"Multiple paths - none of {paths} match {identifier}")
         # end of multi-path logic
 
