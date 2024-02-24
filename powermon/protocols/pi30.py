@@ -673,6 +673,7 @@ class PI30(AbstractProtocol):
         self.add_command_definitions(SETTER_COMMANDS, result_type=ResultType.ACK)
         self.check_definitions_count(expected=45)
         self.add_supported_ports([PortType.SERIAL, PortType.USB])
+        self.id_command = "QID"
 
     def check_crc(self, response: str, command_definition: CommandDefinition = None):
         """ crc check, needs override in protocol """
