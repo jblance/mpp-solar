@@ -61,6 +61,8 @@ class USBPort(AbstractPort):
                     if res.readings[0].data_value == identifier:
                         log.info("SUCCESS: path: %s matches for identifier: %s", _path, identifier)
                         return
+                    else:
+                        print(res.readings[0].data_value == identifier, res.readings[0].data_value, identifier)
                 raise ConfigError(f"Multiple paths - none of {paths} match {identifier}")
         # end of multi-path logic
 
