@@ -102,38 +102,39 @@ class USBPort(AbstractPort):
         log.debug("length of to_send: %i", cmd_len)
         # for command of len < 8 it ok just to send
         # otherwise need to pack to a multiple of 8 bytes and send 8 at a time
-        if cmd_len <= 8:
-            # Send all at once
-            log.debug("sending full_command in on shot")
-            time.sleep(0.05)
-            os.write(self.port, full_command)
-        else:
-            log.debug("multiple chunk send")
-            chunks = [full_command[i:i + 8] for i in range(0, cmd_len, 8)]
-            for chunk in chunks:
-                # pad chunk to 8 bytes
-                if len(chunk) < 8:
-                    padding = 8 - len(chunk)
-                    chunk += b'\x00' * padding
-                log.debug("sending chunk: %s", chunk)
+        try:
+            if cmd_len <= 8:
+                # Send all at once
+                log.debug("sending full_command in on shot")
                 time.sleep(0.05)
-                os.write(self.port, chunk)
-        time.sleep(0.25)
-        # Read from the usb connection
-        # try to a max of 100 times
-        for _ in range(100):
-            # attempt to deal with resource busy and other failures to read
-            try:
+                os.write(self.port, full_command)
+            else:
+                log.debug("multiple chunk send")
+                chunks = [full_command[i:i + 8] for i in range(0, cmd_len, 8)]
+                for chunk in chunks:
+                    # pad chunk to 8 bytes
+                    if len(chunk) < 8:
+                        padding = 8 - len(chunk)
+                        chunk += b'\x00' * padding
+                    log.debug("sending chunk: %s", chunk)
+                    time.sleep(0.05)
+                    os.write(self.port, chunk)
+            time.sleep(0.25)
+            # Read from the usb connection
+            # try to a max of 100 times
+            for _ in range(100):
+                # attempt to deal with resource busy and other failures to read
                 time.sleep(0.15)
                 r = os.read(self.port, 256)
                 response_line += r
-            except Exception as e:
-                log.debug("USB read error: %s", e)
-            # Finished is \r is in byte_response
-            if bytes([13]) in response_line:
-                # remove anything after the \r
-                response_line = response_line[: response_line.find(bytes([13])) + 1]
-                break
+                    
+                # Finished is \r is in byte_response
+                if bytes([13]) in response_line:
+                    # remove anything after the \r
+                    response_line = response_line[: response_line.find(bytes([13])) + 1]
+                    break
+        except BrokenPipeError as e:
+            log.debug("USB read error: %s", e)
         log.debug("usb response was: %s", response_line)
         # response = self.get_protocol().check_response_and_trim(response_line)
         result = command.build_result(raw_response=response_line, protocol=self.protocol)
