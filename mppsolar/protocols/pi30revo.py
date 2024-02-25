@@ -485,12 +485,8 @@ class pi30revo(AbstractProtocol):
 
     def get_chk(self, byte_cmd):
         """ generate the CHK bytes """
-        if byte_cmd.startswith(b'PSET'):
-            checksum = chk(byte_cmd) + 1
-            log.debug("checksum+1: %s", hex(checksum))
-        else:
-            checksum = chk(byte_cmd) + 1
-            log.debug("checksum+1: %s", hex(checksum))
+        checksum = chk(byte_cmd) + 1
+        log.debug("checksum+1: %s", hex(checksum))
         return checksum
 
     def get_full_command(self, command) -> bytes:
@@ -500,18 +496,10 @@ class pi30revo(AbstractProtocol):
         log.info("Using protocol: %s with %s commands", self._protocol_id, len(self.COMMANDS))
         # These need to be set to allow other functions to work`
         self._command = command
-        if command.startswith('_PSET'):
-            self._command_defn = self.get_command_defn(command[1:])
-        else:
-            self._command_defn = self.get_command_defn(command)
         # End of required variables setting
         byte_cmd = bytes(command, "utf-8")
-        if command.startswith('_PSET'):
-            log.debug("Using CHK checksum approach for _PSET command")
-            # remove _
-            command = command[1:]
-            byte_cmd = bytes(command, "utf-8")
-            self._command = command
+        if command.startswith('PSET'):
+            log.debug("Using CHK checksum approach for PSET command")
             checksum = self.get_chk(byte_cmd)
             full_command = byte_cmd + bytes([checksum])
         elif self._command_defn and self._command_defn.get("crctype") == "chk":
