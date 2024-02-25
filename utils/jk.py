@@ -49,7 +49,7 @@ record_01 = cs.Struct(
     "unknown7" / cs.Bytes(4),
     "unknown8" / cs.Bytes(4),
     "unknown9" / cs.Bytes(4),
-    "unknown10" / cs.Int32ul,
+    "nominal_battery_capacity" / cs.Int32ul,
     "scp_delay_us" / cs.Int32ul,
     "start_balance_voltage" / cs.Int32ul,
     "unknown11" / cs.Bytes(8),
