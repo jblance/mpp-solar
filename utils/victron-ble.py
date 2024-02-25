@@ -12,7 +12,7 @@ async def main():
         print(client)
 
         print('writing to keepalive')
-        res = await client.write_gatt_char('6597ffff-4bda-4c1e-af4b-551c4cf74769', 0x30ff)
+        res = await client.write_gatt_char(42, bytearray(b'0\xff'))
         print(f"{res=}")
 
         print('reading soc')
