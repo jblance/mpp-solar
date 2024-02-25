@@ -10,6 +10,8 @@ async def main():
         if (not client.is_connected):
             raise Exception("client not connected")
 
+        await client.write_gatt_char('6597ffff-4bda-4c1e-af4b-551c4cf74769', 0x30)
+
         char = await client.read_gatt_char('65970fff-4bda-4c1e-af4b-551c4cf74769')
         print(char)
 
