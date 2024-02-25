@@ -9,6 +9,7 @@ async def main():
     async with BleakClient(address) as client:
         if (not client.is_connected):
             raise Exception("client not connected")
+        print(client)
 
         print('writing to keepalive')
         res = await client.write_gatt_char('6597ffff-4bda-4c1e-af4b-551c4cf74769', 0x30ff)
