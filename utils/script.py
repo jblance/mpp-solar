@@ -84,35 +84,13 @@ def process_text(text,address):
                  print("PREDISCHARGE WORKING:" + str((result['discard8'][3])))
                  print("BALANCE WORKING:" + str((result['discard8'][4])))
 
-                 print('discard8:' + str(result['discard8']))
-                 print('rest:' + str(result['rest']))
+#                 print('discard8:' + str(result['discard8']))
+#                 print('rest:' + str(result['rest']))
 
-                 print('rest 50:' + str(result['rest'][50]))
-                 print('rest 51:' + str(result['rest'][51]))
-                 print('rest 52:' + str(result['rest'][52]))
-                 print('rest 53:' + str(result['rest'][53]))
-                 print('rest 54:' + str(result['rest'][54]))
-                 print('rest 55:' + str(result['rest'][55]))
-                 print('rest 56:' + str(result['rest'][56]))
-                 print('rest 57:' + str(result['rest'][57]))
-                 print('rest 58:' + str(result['rest'][58]))
-                 print('rest 59:' + str(result['rest'][59]))
-                 print('rest 60:' + str(result['rest'][60]))
-                 print('rest 63:' + str(result['rest'][63]))
-                 print('rest 64:' + str(result['rest'][64]))
-                 print('rest 65:' + str(result['rest'][65]))
-                 print('rest 66:' + str(result['rest'][66]))
-                 print('rest 67:' + str(result['rest'][67]))
-                 print('rest 68:' + str(result['rest'][68]))
-                 print('rest 69:' + str(result['rest'][69]))
-                 print('rest 70:' + str(result['rest'][70]))
-                 print('rest 71:' + str(result['rest'][71]))
-                 print('rest 72:' + str(result['rest'][72]))
-                 print('rest 73:' + str(result['rest'][73]))
-                 print('rest 74:' + str(result['rest'][74]))
-                 print('rest 75:' + str(result['rest'][75]))
-                 print('rest 76:' + str(result['rest'][76]))
-                 print('rest 77:' + str(result['rest'][77]))
+                 for cont in range(len(result['rest'])):
+                    print('rest '+str(cont)+':'+hex(result['rest'][cont])+" "+ str(result['rest'][cont]))
+                 for cont in range(len(result['discard8'])):
+                    print('discard '+str(cont)+':' +hex(result['discard8'][cont])+" "+  str(result['discard8'][cont]))
 
               else:
                  if (not config['silent_print']):
