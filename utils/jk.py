@@ -13,7 +13,7 @@ response4 = b'U\xaa\xeb\x90\x02&\xf5\x0c\xfa\x0c\xf9\x0c\x01\r\xf9\x0c\xff\x0c\x
 response5 = bytes.fromhex('55aaeb900200130d120d120d120d120d120d120d110d110d120d110d110d110d120d120d110d0000000000000000000000000000000000000000000000000000000000000000ffff0000120d02000008530050004f004a004d004b004d004d0053004e004d004a004c004d00520051000000000000000000000000000000000000000000000000000000000000000000ea00000000001dd100000000000000000000d100d80000000000000000632d92040080a30400000000003019000064000000a022410001010000000000000000000000000000ff00010000009a030000000060543f4000000000e914000000010101000600006570470100000000ea00d200d7009a030fbf20007f0000008051010000000000000000000000000000feff7fdd2f0101b00700000093001016200001059a')
 response6 = bytes.fromhex('55aaeb900200130d120d120d120d120d120d120d120d110d110d110d120d120d110d110d110d0000000000000000000000000000000000000000000000000000000000000000ffff0000120d02000007530050004f004a004d004b004d004d0053004e004d004a004c004d00520051000000000000000000000000000000000000000000000000000000000000000000ea00000000001fd100000000000000000000d000d80000000000000000632d92040080a30400000000003019000064000000a722410001010000000000000000000000000000ff00010000009a030000000060543f4000000000e91400000001010100060000ad70470100000000ea00d200d7009a0316bf20007f0000008051010000000000000000000000000000feff7fdd2f0101b007000000e9001016200001059a')
 response_type01 = bytes.fromhex('55aaeb900100ac0d0000280a00005a0a0000240e0000780d000005000000790d0000500a00007a0d0000160d0000c409000050c30000030000003c000000102700002c0100003c00000005000000d0070000bc02000058020000bc0200005802000038ffffff9cffffffe8030000200300001000000001000000010000000100000080a30400dc0500007a0d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000500000060e3160010023c3218feffffffbfe9010200000000f50010161e00016456')
-response = response_type01
+response = response1
 print(len(response))
 
 record_01 = cs.Struct(
@@ -64,10 +64,11 @@ record_01 = cs.Struct(
 record_02 = cs.Struct(
     "Record_Counter" / cs.Byte,
     "cell_voltage_array" / cs.Array(32, cs.Int16ul),
-    "discard1" / cs.Bytes(4),
+    "cell_presence" / cs.BitStruct("cells" / cs.Array(32, cs.Enum(cs.Bit, not_present=0, present=1))),
     "Average_Cell_Voltage" / cs.Int16ul,
     "Delta_Cell_Voltage" / cs.Int16ul,
-    "discard2" / cs.Bytes(2),
+    "cell_highest_voltage" / cs.Byte,
+    "cell_lowest_voltage" / cs.Byte,
     "cell_resistance_array" / cs.Array(32, cs.Int16ul),
     "mos_temp" / cs.Int16ul,
     "discard3" / cs.Bytes(4),
@@ -111,22 +112,24 @@ jk02_32_definition = cs.Struct(
 # print(result)
 result = jk02_32_definition.parse(response)
 print(result)
+#print(bin(result[0].discard1))
 # result = jk02_32_definition.parse(response5)
 # result2 = jk02_32_definition.parse(response6)
-
-# for x in result:
-#     match type(result[x]):
-#         # case cs.ListContainer:
-#         #     print(f"{x}:listcontainer")
-#         case cs.Container:
-#             pass
-#             print(f"{x}:")
-#             for y in result[x]:
-#                 if y.startswith("discard"):
-#                     print(f"\t{y}: {result[x][y]}")    
-#         case _:
-#             if not x.startswith("_discard"):
-#                 if result[x] == result2[x]:
-#                     print(f"{x}: {result[x]} matches")
-#                 else:
-#                     print(f"{x}: {result[x]}\t{result2[x]}")
+exit()
+for x in result:
+    match type(result[x]):
+        # case cs.ListContainer:
+        #     print(f"{x}:listcontainer")
+        case cs.Container:
+            pass
+            print(f"{x}:")
+            for y in result[x]:
+                if y.startswith("discard1"):
+                    print(f"\t{y}: {bin(result[x][y])}")    
+        case _:
+            if x == "discard1":
+                #if result[x] == result2[x]:
+                #    print(f"{x}: {result[x]} matches")
+                print(f"{x}bin: {bin(result[x])}")
+            else:
+                print(f"{x}: {result[x]}")
