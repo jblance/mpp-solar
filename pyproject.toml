@@ -38,18 +38,19 @@ twine = { version = "^4.0.2", optional = true }
 construct = { version = "^2.10.70", optional = true }
 pymodbus = { version = "^3.6.4", optional = true }
 pycryptodome = { version = "^3.20.0", optional = true }
+pyaml-env = { version = "^1.2.1", optional = true }
 
 
 
 [tool.poetry.extras]
 api = ["fastapi", "fastapi-mqtt", "sqlalchemy", "uvicorn"]
 ble = ["bleak", "bluepy", "pycryptodome"]
-dev = ["twine", "bleak", "bluepy", "PyYAML", "strenum", "construct", "pymodbus", "pycryptodome"]
+dev = ["twine", "bleak", "bluepy", "PyYAML", "strenum", "construct", "pymodbus", "pycryptodome", "pyaml-env"]
 # mqtt = ["paho-mqtt"]
 mongo = ["pymongo"]
 pgsql = ["psycopg2-binary"]
-powermon = ["PyYAML", "strenum", "construct"]
-powermon-ble = ["bleak", "bluepy", "PyYAML", "strenum", "construct"]
+powermon = ["PyYAML", "strenum", "construct", "pyaml-env"]
+powermon-ble = ["bleak", "bluepy", "PyYAML", "strenum", "construct", "pyaml-env"]
 push = ["requests"]
 systemd = ["cysystemd"]
 modbus = ["pymodbus"]

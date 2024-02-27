@@ -9,6 +9,7 @@ from datetime import date, timedelta  # noqa: F401
 from platform import python_version
 
 import yaml
+from pyaml_env import parse_config
 from pydantic import ValidationError
 
 from powermon.commands.command import Command
@@ -31,8 +32,9 @@ def read_yaml_file(yaml_file=None):
     _yaml = {}
     if yaml_file is not None:
         try:
-            with open(yaml_file, "r", encoding="utf-8") as stream:
-                _yaml = yaml.safe_load(stream)
+            # with open(yaml_file, "r", encoding="utf-8") as stream:
+            #     _yaml = yaml.safe_load(stream)
+            _yaml = parse_config(yaml_file)
         except yaml.YAMLError as exc:
             raise yaml.YAMLError(f"Error processing yaml file: {exc}") from exc
         except FileNotFoundError as exc:

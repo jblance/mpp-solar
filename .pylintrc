@@ -1,5 +1,5 @@
 [MASTER]
 extension-pkg-whitelist=pydantic
-ignored-modules=pydantic,paho,strenum,serial,construct
+ignored-modules=pydantic,paho,strenum,serial,construct,pyaml_env
 max-line-length=180
 disable=C0415,C0301
