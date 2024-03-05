@@ -22,8 +22,34 @@ SETTER_COMMANDS = {
         ],
         "regex": "ACCT((2[0-3]|[01]?[0-9])([0-5]?[0-9]),(2[0-3]|[01]?[0-9])([0-5]?[0-9]),(2[0-3]|[01]?[0-9])([0-5]?[0-9]),(2[0-3]|[01]?[0-9])([0-5]?[0-9]))$",
     },
+    "PEA": {
+        "name": "PEA",
+        "description": "Enable 'mute buzzer beep",
+        "help": " -- enable the 'mute buzzer beep'",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+    },
+    "PDA": {
+        "name": "PDA",
+        "description": "Disable 'mute buzzer beep",
+        "help": " -- disable the 'mute buzzer beep'",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+    },
 }
-COMMANDS_TO_REMOVE = []
+COMMANDS_TO_REMOVE = ["PA", "PB"]
 
 
 class pi17infini(pi17):
