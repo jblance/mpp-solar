@@ -364,7 +364,7 @@ COMMANDS = {
         "description": "Read lithium battery information",
         "help": " -- queries the value of various metrics from the battery",
         "type": "QUERY",
-        "crctype": "chk",
+        "crctype": "crc",
         "response": [
             ["float", "Battery voltage from BMS", "V"],
             ["float", "Battery charging current from BMS", "A"],
@@ -404,7 +404,8 @@ COMMANDS = {
             ],
         ],
         "test_responses": [
-            b"(048.8 000.0 000.9 250 024 000 052.5 010.0 053.5 004.4 0 2\xFC\n",
+            b"(048.8 000.0 000.9 250 024 000 052.5 010.0 053.5 004.4 0 2\xFCb\n",
+            b'(052.5 000.0 000.0 032 036 000 070.0 007.0 057.0 004.6 0 5\x82\xe0\r',
         ],
     },
 }

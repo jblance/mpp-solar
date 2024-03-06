@@ -37,3 +37,10 @@ class test_pi30revo(unittest.TestCase):
         # print(hex(result))
         # print(expected)
         self.assertEqual(expected, result)
+
+    def test_check_response_valid_qlith0(self):
+        """ test for correctly validating valid qlith0 response """
+        response = b'(052.5 000.0 000.0 032 036 000 070.0 007.0 057.0 004.6 0 5\x82\xe0\r'
+        result = protocol.check_response_valid(response)[0]
+        # print(result)
+        self.assertTrue(result)
