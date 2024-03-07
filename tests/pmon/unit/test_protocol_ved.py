@@ -9,7 +9,7 @@ from powermon.commands.reading_definition import ReadingType, ResponseType
 from powermon.commands.result import ResultType
 from powermon.device import DeviceInfo
 from powermon.errors import CommandError, InvalidCRC, InvalidResponse
-from powermon.formats.simple import SimpleFormat
+from powermon.outputformats.simple import SimpleFormat
 from powermon.protocols.ved import VictronEnergyDirect
 
 battery_capacity_defn = cs.Struct(
