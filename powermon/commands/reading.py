@@ -23,7 +23,7 @@ class Reading:
     @property
     def raw_value(self):
         """ the raw reading returned from the device - as returned """
-        return self._raw_value
+        return getattr(self, "_raw_value", None)
 
     @raw_value.setter
     def raw_value(self, value):
@@ -32,7 +32,7 @@ class Reading:
     @property
     def processed_value(self):
         """ the reading after processing and conversion - the reading we want to see """
-        return self._processed_value
+        return getattr(self, "_processed_value", None)
 
     @processed_value.setter
     def processed_value(self, value):
@@ -42,7 +42,7 @@ class Reading:
     @property
     def reading_definition(self):
         """ the reading definition associated with this reading """
-        return self._reading_definition
+        return getattr(self, "_reading_definition", None)
 
     @reading_definition.setter
     def reading_definition(self, value):

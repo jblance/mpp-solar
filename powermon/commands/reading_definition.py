@@ -120,7 +120,7 @@ class ReadingDefinition():
     @property
     def options(self) -> dict:
         """ options dict for decoding """
-        return self._options
+        return getattr(self, "_options", None)
 
     @options.setter
     def options(self, value):
@@ -138,7 +138,7 @@ class ReadingDefinition():
     @property
     def default(self):
         """ default value for error situations """
-        return self._default
+        return getattr(self, "_default", None)
 
     @default.setter
     def default(self, value):

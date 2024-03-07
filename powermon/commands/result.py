@@ -31,7 +31,7 @@ class Result:
     - list of Readings (processed results)
     """
     def __str__(self):
-        return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, " + ','.join(str(reading) for reading in self._readings)
+        return f"Result: {self.command.command_definition.description=}: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, " + ','.join(str(reading) for reading in self._readings)
 
     # def __init__(self, result_type: ResultType, command_definition, raw_response: bytes, responses: list | dict):
     def __init__(self, command, raw_response: bytes, responses: list | dict):

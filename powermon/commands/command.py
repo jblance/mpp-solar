@@ -46,8 +46,12 @@ class Command():
         if self.code is None:
             return "empty command object"
 
-        last_run = self.trigger.get_last_run()
-        next_run = self.trigger.get_next_run()
+        if isinstance(self.trigger, Trigger):
+            last_run = self.trigger.get_last_run()
+            next_run = self.trigger.get_next_run()
+        else:
+            last_run = ""
+            next_run = ""
 
         _outs = ""
         for output in self.outputs:
@@ -102,6 +106,11 @@ class Command():
         command.outputs = outputs
         return command
 
+    @classmethod
+    def from_code(cls, command_code) -> "Command":
+        """ build object from just a code """
+        return cls(code=command_code, commandtype="basic", outputs=[], trigger=None)
+
     def build_result(self, raw_response=None, protocol=None) -> Result:
         """ build a result object from the raw_response """
         log.debug("build_result: for command with 'code: %s, command_definition: %s'", self.code, self.command_definition)
@@ -134,7 +143,7 @@ class Command():
     @property
     def command_definition(self) -> CommandDefinition:
         """ the definition of this command """
-        return self._command_definition
+        return getattr(self, "_command_definition", None)
 
     @command_definition.setter
     def command_definition(self, command_definition: CommandDefinition):
@@ -169,18 +178,22 @@ class Command():
 
     def is_due(self):
         """ is this command due to run? """
-        return self.trigger.is_due()
+        if isinstance(self.trigger, Trigger):
+            return self.trigger.is_due()
+        # no trigger, so always run?
+        return True
 
     def touch(self):
         """ update trigger run time """
-        self.trigger.touch()
+        if isinstance(self.trigger, Trigger):
+            self.trigger.touch()
 
     def to_dto(self):
         """ return the command data transfer object """
         return CommandDTO(
             command_code=self.code,
             device_id="not set",
-            result_topic=self.outputs[0].get_topic(),
+            result_topic=self.outputs[0].topic,
             trigger=self.trigger.to_dto(),
             outputs=[output.to_dto() for output in self.outputs],
         )
