@@ -32,20 +32,6 @@ class AbstractOutput(ABC):
         """ entry point of any output class """
         raise NotImplementedError("need to implement process function")
 
-    # def set_command(self, command_name):
-    #     """ set the command_code """
-    #     self.command_code = command_name
-
-    # def set_device_id(self, device_id):
-    #     """ store the device_id """
-    #     self.device_id = device_id
-
-    # def set_topic(self, topic):
-    #     self.topic = topic
-
-    # def get_topic(self):
-    #     return self.topic
-
     def to_dto(self) -> OutputDTO:
         """ convert output object to a data transfer object """
         if self.formatter is None:

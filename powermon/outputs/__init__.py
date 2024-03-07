@@ -4,7 +4,8 @@ from enum import auto
 
 from strenum import LowercaseStrEnum
 
-from powermon.outputformats import DEFAULT_FORMAT, getFormatfromConfig
+from powermon.outputformats import DEFAULT_FORMAT
+from powermon.outputformats import from_config as format_from_config
 
 # Set-up logger
 log = logging.getLogger("outputs")
@@ -70,7 +71,7 @@ def parse_output_config(output_config):
     log.debug("parse_output_config, config: %s", output_config)
     output_type = output_config.get("type", DEFAULT_OUTPUT)
     format_config = output_config.get("format", DEFAULT_FORMAT)
-    _format = getFormatfromConfig(format_config)
+    _format = format_from_config(format_config)
     log.debug("got format: %s", (_format))
     _output = get_output_class(output_type, formatter=_format, output_config=output_config)
     log.debug("got output: %s", _output)
