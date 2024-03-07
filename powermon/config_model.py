@@ -25,6 +25,8 @@ class MQTTConfig(NoExtraBaseModel):
     port: None | int = Field(default=None)
     username: None | str = Field(default=None)
     password: None | str = Field(default=None)
+    adhoc_topic: None | str = Field(default=None)
+    adhoc_result_topic: None | str = Field(default=None)
 
 
 class APIConfig(NoExtraBaseModel):
@@ -78,7 +80,8 @@ class EveryTriggerConfig(NoExtraBaseModel):
 
 class OutputConfig(NoExtraBaseModel):
     """ model/allowed elements for output config """
-    type: Literal['screen'] | Literal['mqtt'] | Literal['api_mqtt'] | Literal['table']
+    type: Literal['screen'] | Literal['mqtt'] | Literal['api_mqtt']
+    topic: None | str = Field(default=None)
     format: None | str | BaseFormatConfig | HassFormatConfig | MqttFormatConfig = Field(default=None)
 
 
@@ -95,7 +98,6 @@ class BlePortConfig(BaseModel):
     """ model/allowed elements for serial port config """
     type: Literal["ble"]
     mac: str
-    #baud: None | int  = Field(default=None)
     protocol: None | str
 
 
