@@ -1,5 +1,5 @@
 import logging
-from powermon.formats.abstractformat import AbstractFormat
+from powermon.outputformats.abstractformat import AbstractFormat
 from powermon.commands.result import Result
 
 log = logging.getLogger("raw")

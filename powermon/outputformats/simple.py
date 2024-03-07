@@ -1,6 +1,6 @@
 """ formats / simple.py """
 import logging
-from powermon.formats.abstractformat import AbstractFormat
+from powermon.outputformats.abstractformat import AbstractFormat
 from powermon.dto.formatDTO import FormatDTO
 from powermon.commands.result import Result
 from powermon.commands.reading import Reading

@@ -1,6 +1,6 @@
 import unittest
 
-from powermon.formats.table import Table
+from powermon.outputformats.table import Table
 from powermon.commands.result import Result, ResultType
 from powermon.commands.reading import Reading
 from powermon.device import DeviceInfo

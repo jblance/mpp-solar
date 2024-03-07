@@ -2,7 +2,7 @@
 import json as js
 import logging
 from datetime import datetime
-from powermon.formats.abstractformat import AbstractFormat
+from powermon.outputformats.abstractformat import AbstractFormat
 from powermon.commands.result import Result
 from powermon.commands.reading import Reading
 

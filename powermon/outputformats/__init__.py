@@ -4,7 +4,7 @@ from enum import auto
 
 from strenum import LowercaseStrEnum
 
-from powermon.formats.abstractformat import AbstractFormat
+from powermon.outputformats.abstractformat import AbstractFormat
 
 log = logging.getLogger("formats")
 
@@ -43,22 +43,22 @@ def getFormatfromConfig(formatConfig) -> AbstractFormat:
     # TODO: should we replace this config processing with from_config methods on each type to remain consistent?
     match formatType:
         case FormatterType.HTMLTABLE:
-            from powermon.formats.htmltable import htmltable
+            from powermon.outputformats.htmltable import htmltable
             formatter = htmltable(formatConfig)
         case FormatterType.HASS:
-            from powermon.formats.hass import Hass
+            from powermon.outputformats.hass import Hass
             formatter = Hass(formatConfig)
         # case FormatterType.TOPICS:
-        #     from powermon.formats.topics import Topics
+        #     from powermon.outputformats.topics import Topics
         #     formatter = Topics(formatConfig)
         case FormatterType.SIMPLE:
-            from powermon.formats.simple import SimpleFormat
+            from powermon.outputformats.simple import SimpleFormat
             formatter = SimpleFormat(formatConfig)
         case FormatterType.TABLE:
-            from powermon.formats.table import Table
+            from powermon.outputformats.table import Table
             formatter = Table(formatConfig)
         case FormatterType.RAW:
-            from powermon.formats.raw import raw
+            from powermon.outputformats.raw import raw
             formatter = raw(formatConfig)
         case _:
             log.warning("No formatter found for: %s", formatType)

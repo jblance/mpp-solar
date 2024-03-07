@@ -3,7 +3,7 @@ import logging
 
 from powermon.commands.reading import Reading
 from powermon.commands.result import Result
-from powermon.formats.abstractformat import (AbstractFormat,
+from powermon.outputformats.abstractformat import (AbstractFormat,
                                              get_max_response_lengths, pad)
 
 log = logging.getLogger("Table")
