@@ -1,9 +1,10 @@
 """ powermon / commands / reading_definition.py """
 import calendar  # pylint: disable=w0611 # noqa: F401
 import logging
+from ast import literal_eval
+from copy import deepcopy
 from enum import auto
 from struct import unpack
-from ast import literal_eval
 
 from strenum import LowercaseStrEnum
 
@@ -284,16 +285,7 @@ class ReadingDefinition():
         """ generate a reading object from a raw value """
         log.debug("raw_value: %s, override: %s", raw_value, override)
         value = self.translate_raw_response(raw_value)
-        return [
-            Reading(
-                data_name=self.description,
-                data_value=value,
-                data_unit=self.unit,
-                device_class=self.device_class,
-                state_class=self.state_class,
-                icon=self.icon,
-            )
-        ]
+        return [Reading(raw_value=raw_value, processed_value=value, definition=self)]
 
     def get_invalid_message(self, raw_value) -> str:
         """ message for invalid state """
@@ -319,7 +311,7 @@ class ReadingDefinition():
             return reading_definitions
 
     @classmethod
-    def from_config(cls, reading_definition_config: dict, i) -> "ReadingDefinition":
+    def from_config(cls, reading_definition_config: dict, i=0) -> "ReadingDefinition":
         """ build a reading definition object from a config dict """
         index = i
         description = reading_definition_config.get("description", f"No description {i}")
@@ -504,15 +496,9 @@ class ReadingDefinitionACK(ReadingDefinition):
     def reading_from_raw_response(self, raw_value, override=None) -> list[Reading]:
         value = raw_value.decode()
         if value == self.success_code:
-            return [
-                Reading(data_name=self.description, data_value=self.success_description, data_unit=None,
-                        device_class=self.device_class, state_class=self.state_class, icon=self.icon)
-            ]
+            return [Reading(raw_value=raw_value, processed_value=self.success_description, definition=self)]
         elif value == self.fail_code:
-            return [
-                Reading(data_name=self.description, data_value=self.fail_description, data_unit=None,
-                        device_class=self.device_class, state_class=self.state_class, icon=self.icon)
-            ]
+            return [Reading(raw_value=raw_value, processed_value=self.fail_description, definition=self)]
 
 
 class ReadingDefinitionMessage(ReadingDefinition):
@@ -528,16 +514,7 @@ class ReadingDefinitionHexStr(ReadingDefinitionNumeric):
         log.debug("raw_value: %s, override: %s", raw_value, override)
         value = self.translate_raw_response(raw_value)
         value = hex(value)
-        return [
-            Reading(
-                data_name=self.description,
-                data_value=value,
-                data_unit=self.unit,
-                device_class=self.device_class,
-                state_class=self.state_class,
-                icon=self.icon,
-            )
-        ]
+        return [Reading(raw_value=raw_value, processed_value=value, definition=self)]
 
 
 class ReadingDefinitionHexChars(ReadingDefinition):
@@ -553,16 +530,7 @@ class ReadingDefinitionHexChars(ReadingDefinition):
                 # value = self.translate_raw_response(value)
                 # print(value)
                 values.append(f"{i:#04x}")
-        return [
-            Reading(
-                data_name=self.description,
-                data_value=" ".join(values),
-                data_unit=self.unit,
-                device_class=self.device_class,
-                state_class=self.state_class,
-                icon=self.icon,
-            )
-        ]
+        return [Reading(raw_value=raw_value, processed_value=" ".join(values), definition=self)]
 
 
 class ReadingDefinitionTemperature(ReadingDefinitionNumeric):
@@ -581,16 +549,9 @@ class ReadingDefinitionTemperature(ReadingDefinitionNumeric):
             if temp_override.startswith("F"):
                 value = (1.8 * value) + 32
                 _unit = "°F"
-        return [
-            Reading(
-                data_name=self.description,
-                data_value=value,
-                data_unit=_unit,
-                device_class=self.device_class,
-                state_class=self.state_class,
-                icon=self.icon,
-            )
-        ]
+        reading = Reading(raw_value=raw_value, processed_value=value, definition=self)
+        reading.definition.unit = _unit
+        return [reading]
 
 
 class ReadingDefinitionENFlags(ReadingDefinition):
@@ -616,10 +577,9 @@ class ReadingDefinitionENFlags(ReadingDefinition):
         values: dict[str, str] = self.translate_raw_response(raw_value)
         responses = []
         for name, value in values.items():
-            responses.append(
-                Reading(data_name=name, data_value=value, data_unit="", device_class=self.device_class, state_class=self.state_class, icon=self.icon)
-            )
-
+            definition = deepcopy(self)
+            definition.description = name
+            responses.append(Reading(raw_value=raw_value, processed_value=value, definition=definition))
         return responses
 
 
@@ -640,9 +600,7 @@ class ReadingDefinitionFlags(ReadingDefinition):
         values: dict[str, int] = self.translate_raw_response(raw_value)
         responses = []
         for name, value in values.items():
-            responses.append(
-                Reading(
-                    data_name=name, data_value=value, data_unit="bool", device_class=self.device_class, state_class=self.state_class, icon=self.icon
-                )
-            )
+            definition = deepcopy(self)
+            definition.description = name
+            responses.append(Reading(raw_value=raw_value, processed_value=value, definition=definition))
         return responses

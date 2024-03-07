@@ -1,40 +1,26 @@
-""" formats / hass.py """
+""" powermon / outputformats / hass.py """
 import json as js
 import logging
 from datetime import datetime
-from powermon.outputformats.abstractformat import AbstractFormat
-from powermon.commands.result import Result
+
+from powermon.commands.command import Command
 from powermon.commands.reading import Reading
+from powermon.commands.result import Result
+from powermon.outputformats.abstractformat import AbstractFormat
 
 log = logging.getLogger("hass")
 
 
 class Hass(AbstractFormat):
     """ formatter to generate home assistant auto config mqtt messages """
-    def __init__(self, formatConfig):
-        super().__init__(formatConfig)
+    def __init__(self, config):
+        super().__init__(config)
         self.name = "hass"
-        self.extra_info = formatConfig.get("extra_info", False)
-        self.discovery_prefix = formatConfig.get("discovery_prefix", "homeassistant")
-        self.entity_id_prefix = formatConfig.get("entity_id_prefix", "mpp")
-        # if device is None:
-        #     self.device_name = "MPP Solar"
-        #     self.device_id = "mpp-solar"
-        #     self.device_model = "MPP Solar"
-        #     self.device_manufacturer = "MPP Solar"
-        # else:
-        #     self.device_name = device.name
-        #     self.device_id = device.device_id
-        #     self.device_model = device.model
-        #     self.device_manufacturer = device.manufacturer
+        self.extra_info = config.get("extra_info", False)
+        self.discovery_prefix = config.get("discovery_prefix", "homeassistant")
+        self.entity_id_prefix = config.get("entity_id_prefix", None)
 
-    def sendsMultipleMessages(self) -> bool:
-        return True
-
-    # def set_command_description(self, command_description):
-    #     pass
-
-    def format(self, result: Result, device_info) -> list:
+    def format(self, command: Command, result: Result, device_info) -> list:
         log.info("Using output formatter: %s", self.name)
 
         config_msgs = []
@@ -49,12 +35,12 @@ class Hass(AbstractFormat):
         # build data to display
         for response in display_data:
             # Get key data
-            data_name = response.get_data_name()
-            value = response.get_data_value()
-            unit = response.get_data_unit()
-            icon = response.get_icon()
-            device_class = response.get_device_class()
-            state_class = response.get_state_class()
+            data_name = self.format_key(response.data_name)
+            value = response.data_value
+            unit = response.data_unit
+            icon = response.icon
+            device_class = response.device_class
+            state_class = response.state_class
 
             # Set component type
             if unit == "bool" or value == "enabled" or value == "disabled":
@@ -70,9 +56,12 @@ class Hass(AbstractFormat):
                     value = "ON"
 
             # Object ID
-            object_id = f"{self.entity_id_prefix}_{data_name}".lower()
-
-            name = f"{self.entity_id_prefix} {data_name}"
+            if self.entity_id_prefix is None:
+                object_id = f"{data_name}".lower().replace(" ", "_")
+                name = f"{data_name}"
+            else:
+                object_id = f"{self.entity_id_prefix}_{data_name}".lower().replace(" ", "_")
+                name = f"{self.entity_id_prefix} {data_name}"
 
             # Home Assistant MQTT Auto Discovery Message
             #
@@ -87,7 +76,7 @@ class Hass(AbstractFormat):
             payload = {
                 "name": f"{name}",
                 "state_topic": f"{state_topic}",
-                "unique_id": f"{object_id}",
+                "unique_id": f"{object_id}_{device_info.device_id}",
                 "force_update": "true",
                 "last_reset": str(datetime.now()),
             }

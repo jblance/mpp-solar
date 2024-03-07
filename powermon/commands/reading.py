@@ -7,18 +7,16 @@ class Reading:
     def __str__(self):
         return f"Reading: {self.data_name=}, {self.data_value=}, {self.data_unit=}, {self.is_valid=}"
 
-    def __init__(self, data_name: str, data_value: str, data_unit: str, device_class: str = None, state_class: str = None, icon: str = None) -> None:
-        self.data_name = data_name
-        self.data_value = data_value
-        self.data_unit = data_unit
-        self.device_class = device_class
-        self.icon = icon
-        self.state_class = state_class
+    # def __init__(self, data_name: str, data_value: str, data_unit: str, device_class: str = None, state_class: str = None, icon: str = None) -> None:
+    def __init__(self, raw_value, processed_value, definition) -> None:
+        self.raw_value = raw_value
+        self.processed_value = processed_value
+        self.definition = definition
         self.is_valid = True
 
     def to_dto(self) -> ReadingDTO:
         """ convert Reading to a data transfer object """
-        return ReadingDTO(data_name=self.get_data_name(), data_value=self.get_data_value(), data_unit=self.get_data_unit())
+        return ReadingDTO(data_name=self.data_name, data_value=self.data_value, data_unit=self.data_unit)
 
     @property
     def raw_value(self):
@@ -40,31 +38,37 @@ class Reading:
         self._processed_value = value
 
     @property
-    def reading_definition(self):
+    def definition(self):
         """ the reading definition associated with this reading """
-        return getattr(self, "_reading_definition", None)
+        return getattr(self, "_definition", None)
 
-    @reading_definition.setter
-    def reading_definition(self, value):
-        self._reading_definition = value
+    @definition.setter
+    def definition(self, value):
+        self._definition = value
 
     # the below are / should be part of reading definition
-    def get_data_name(self) -> str:
-        return self.data_name.replace(" ", "_").lower()
+    @property
+    def data_name(self) -> str:
+        return self.definition.description
 
-    def get_data_unit(self) -> str:
-        if self.data_unit is None:
+    @property
+    def data_unit(self) -> str:
+        if self.definition.unit is None:
             return ""
-        return self.data_unit
+        return self.definition.unit
 
-    def get_data_value(self) -> str:
-        return self.data_value
+    @property
+    def data_value(self) -> str:
+        return self.processed_value
 
-    def get_icon(self) -> str | None:
-        return self.icon
+    @property
+    def icon(self) -> str | None:
+        return self.definition.icon
 
-    def get_device_class(self) -> str | None:
-        return self.device_class
+    @property
+    def device_class(self) -> str | None:
+        return self.definition.device_class
 
-    def get_state_class(self) -> str | None:
-        return self.state_class
+    @property
+    def state_class(self) -> str | None:
+        return self.definition.state_class

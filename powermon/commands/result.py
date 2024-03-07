@@ -148,8 +148,7 @@ class Result:
         try:
             return reading_definition.reading_from_raw_response(response, override=self.command.override)
         except ValueError:
-            error = Reading(data_name=reading_definition.description,
-                            data_value=reading_definition.get_invalid_message(response), data_unit="")
+            error = Reading(raw_value=None, processed_value=reading_definition.get_invalid_message(response), definition=ReadingDefinition.from_config({"description": reading_definition.description}))
             error.is_valid = False
             return [error]
 

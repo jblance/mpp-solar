@@ -7,8 +7,8 @@ log = logging.getLogger("Topics")
 
 
 class Topics(AbstractFormat):
-    def __init__(self, formatConfig, topic):
-        super().__init__(formatConfig)
+    def __init__(self, config, topic):
+        super().__init__(config)
         self.name = "topics"
         self.results_topic = topic
 
@@ -30,9 +30,9 @@ class Topics(AbstractFormat):
         msgs = []
         # Loop through responses build topics and messages
         for response in result.get_responses():
-            value = response.get_data_value()
-            unit = response.get_data_unit()
-            name = response.get_data_name()
+            value = response.data_value
+            unit = response.data_unit
+            name = response.data_name
             log.debug(f"build_msgs: prefix {self.results_topic}, key {key}, value {value}, unit {unit}")
             msg = {"topic": f"{self.results_topic}/{name}/value", "payload": value}
             msgs.append(msg)

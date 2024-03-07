@@ -10,10 +10,10 @@ log = logging.getLogger("simple")
 
 class SimpleFormat(AbstractFormat):
     """ simple format - {name}={value}{unit} format """
-    def __init__(self, formatConfig):
-        super().__init__(formatConfig)
+    def __init__(self, config):
+        super().__init__(config)
         self.name = "simple"
-        self.extra_info = formatConfig.get("extra_info", False)
+        self.extra_info = config.get("extra_info", False)
 
     # def set_command_description(self, command_description):
     #     pass
@@ -36,17 +36,17 @@ class SimpleFormat(AbstractFormat):
 
         # build data to display
         for reading in display_data:
-            name = reading.get_data_name()
-            value = reading.get_data_value()
-            unit = reading.get_data_unit()
+            name = self.format_key(reading.data_name)
+            value = reading.data_value
+            unit = reading.data_unit
             if self.extra_info:
                 extra = ""
-                if reading.get_device_class() is not None:
-                    extra = " " + reading.get_device_class()
-                if reading.get_icon() is not None:
-                    extra += " " + reading.get_icon()
-                if reading.get_state_class() is not None:
-                    extra += " " + reading.get_state_class()
+                if reading.device_class is not None:
+                    extra = " " + reading.device_class
+                if reading.icon is not None:
+                    extra += " " + reading.icon
+                if reading.state_class is not None:
+                    extra += " " + reading.state_class
                 _result.append(f"{name}={value}{unit}{extra}")
             else:
                 _result.append(f"{name}={value}{unit}")
@@ -55,4 +55,4 @@ class SimpleFormat(AbstractFormat):
     @classmethod
     def from_dto(cls, dto: FormatDTO):
         """ build class object from dto """
-        return cls(formatConfig=dto)
+        return cls(config=dto)
