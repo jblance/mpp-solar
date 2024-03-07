@@ -2,9 +2,11 @@
 import logging
 
 from powermon.commands.reading import Reading
+from powermon.commands.reading_definition import ReadingDefinition
 from powermon.commands.result import Result
 from powermon.outputformats.abstractformat import (AbstractFormat,
-                                             get_max_response_lengths, pad)
+                                                   get_max_response_lengths,
+                                                   pad)
 
 log = logging.getLogger("Table")
 
@@ -15,11 +17,11 @@ class Table(AbstractFormat):
     def __str__(self):
         return "outputs the results to standard out in a table (optionally formatted with line art boxes)"
 
-    def __init__(self, formatConfig):
-        super().__init__(formatConfig)
+    def __init__(self, config):
+        super().__init__(config)
         self.name = "table"
-        self.extra_info = formatConfig.get("extra_info", False)
-        self.draw_lines = formatConfig.get("draw_lines", False)
+        self.extra_info = config.get("extra_info", False)
+        self.draw_lines = config.get("draw_lines", False)
         # self.command_description = "unknown command"
 
     # def set_command_description(self, command_description):
@@ -33,12 +35,13 @@ class Table(AbstractFormat):
 
         # check for error in result
         if result.error:
-            filtered_responses.append(Reading(data_name="Error Count", data_value=len(result.error_messages), data_unit=""))
+            filtered_responses.append(Reading(raw_value=None, processed_value=len(result.error_messages), definition=ReadingDefinition.from_config({"description": "Error Count"})))
             for i, message in enumerate(result.error_messages):
-                filtered_responses.append(Reading(data_name=f"Error #{i}", data_value=f"{message}", data_unit=""))
+                reading_definition = ReadingDefinition.from_config({"description": f"Error #{i}"})
+                filtered_responses.append(Reading(raw_value=None, processed_value=f"{message}", definition=reading_definition))
 
         if len(result.readings) == 0:
-            filtered_responses.append(Reading(data_name="Error", data_value="No readings in result", data_unit=""))
+            filtered_responses.append(Reading(raw_value=None, processed_value="No readings in result", definition=ReadingDefinition.from_config({"description": "Error"})))
 
         filtered_responses.extend(self.format_and_filter_data(result))
         log.debug("displayData: %s", "\n".join((str(a) for a in filtered_responses)))
@@ -98,9 +101,9 @@ class Table(AbstractFormat):
 
         # print data
         for response in filtered_responses:
-            name = response.get_data_name()
-            value = response.get_data_value()
-            unit = response.get_data_unit()
+            name = self.format_key(response.data_name)
+            value = response.data_value
+            unit = response.data_unit
             if self.draw_lines:
                 _result.append(f"\u2551 {pad(name, width_p)}\u2502 {pad(value, width_v)}\u2502 {pad(unit, width_u)}\u2551")
             else:
