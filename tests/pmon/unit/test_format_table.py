@@ -90,5 +90,5 @@ class TestFormatTable(unittest.TestCase):
         _result.error_messages = ["error message 1", "another error message"]
         _result.is_valid = False
         formatted_data = table_formatter.format(command, _result, device_info)
-        print(formatted_data)
+        # print(formatted_data)
         self.assertEqual(formatted_data, expected)
