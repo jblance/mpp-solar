@@ -54,8 +54,8 @@ class BaseFormatConfig(NoExtraBaseModel):
 
 class HassFormatConfig(BaseFormatConfig):
     """ model/allowed elements for hass format config """
-    discovery_prefix: None | str
-    entity_id_prefix: None | str
+    discovery_prefix: None | str = Field(default=None)
+    entity_id_prefix: None | str = Field(default=None)
 
 
 class MqttFormatConfig(BaseFormatConfig):
