@@ -6,7 +6,7 @@ from powermon.commands.result import Result
 # from powermon.device import Device
 from powermon.dto.commandDTO import CommandDTO
 from powermon.dto.outputDTO import OutputDTO
-from powermon.formats.simple import SimpleFormat
+from powermon.outputformats.simple import SimpleFormat
 from powermon.outputs.abstractoutput import AbstractOutput
 
 log = logging.getLogger("ApiMqtt")

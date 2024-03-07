@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 # from powermon.libs.mqttbroker import MqttBroker
 from powermon.commands.result import Result
 from powermon.dto.outputDTO import OutputDTO
-from powermon.formats.abstractformat import AbstractFormat
+from powermon.outputformats.abstractformat import AbstractFormat
 
 log = logging.getLogger("Output")
 
@@ -21,14 +21,14 @@ class AbstractOutput(ABC):
     @property
     def formatter(self):
         """ the formatter for this output """
-        return self._formatter
+        return getattr(self, "_formatter", None)
 
     @formatter.setter
     def formatter(self, formatter : AbstractFormat):
         self._formatter = formatter
 
     @abstractmethod
-    def process(self, command=None, result: Result=None, mqtt_broker=None, device_info=None):
+    def process(self, command=None, result: Result = None, mqtt_broker=None, device_info=None):
         """ entry point of any output class """
         raise NotImplementedError("need to implement process function")
 
@@ -40,11 +40,11 @@ class AbstractOutput(ABC):
     #     """ store the device_id """
     #     self.device_id = device_id
 
-    def set_topic(self, topic):
-        self.topic = topic
+    # def set_topic(self, topic):
+    #     self.topic = topic
 
-    def get_topic(self):
-        return self.topic
+    # def get_topic(self):
+    #     return self.topic
 
     def to_dto(self) -> OutputDTO:
         """ convert output object to a data transfer object """
