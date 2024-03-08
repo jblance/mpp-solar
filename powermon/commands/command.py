@@ -1,6 +1,7 @@
 """ commands / command.py """
 import logging
 from enum import Enum
+from datetime import date, datetime, timedelta  # pylint: disable=W0611 # noqa: 401
 
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.result import Result, ResultType, ResultError
@@ -57,17 +58,19 @@ class Command():
         for output in self.outputs:
             _outs += str(output)
 
-        return f"Command: {self.code=} {self.full_command=}, {self.type=}, \
-            [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {str(self.command_definition)} {self.override=}"
+        return f"Command: {self.code=} {self.full_command=}, {self.command_type=}, \
+            [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {str(self.command_definition)} {self.override=} {self.template=}"
 
     def __init__(self, code: str, commandtype: str, outputs: list[AbstractOutput], trigger: Trigger):
         self.code = code
-        self.type = commandtype
-
-        self.outputs = outputs
+        self.command_type = commandtype
+        self.outputs: list[AbstractOutput] = outputs
         self.trigger: Trigger = trigger
 
-        self.full_command = None
+        self.command_definition: CommandDefinition
+        self.template: str = None
+        self.full_command: str = None
+        self.override: str
 
     @classmethod
     def from_config(cls, config=None) -> "Command":
@@ -85,6 +88,15 @@ class Command():
             log.info("command must be defined")
             raise ConfigError("command must be defined in config")
         commandtype = config.get("type", "basic")
+        template = None
+        if commandtype == 'templated':
+            log.debug("got a templated command: %s", code)
+            template = code
+            try:
+                code = eval(template)  # pylint: disable=W0123
+            except SyntaxError as ex:
+                print(ex)
+                return
         override = config.get("override", None)
         # if override is not None:
         #     print("override: %s" % override)
@@ -92,6 +104,7 @@ class Command():
         trigger = Trigger.from_config(config=config.get("trigger"))
         command_object = cls(code=code, commandtype=commandtype, outputs=outputs, trigger=trigger)
         command_object.override = override
+        command_object.template = template
         return command_object
 
     @classmethod
@@ -184,9 +197,20 @@ class Command():
         return True
 
     def touch(self):
-        """ update trigger run time """
+        """ update trigger run times and re-expand templates """
         if isinstance(self.trigger, Trigger):
             self.trigger.touch()
+        # re-eval template if needed
+        if self.command_type == 'templated':
+            log.debug("updating templated command: %s", self.template)
+            try:
+                self.code = eval(self.template)  # pylint: disable=W0123
+                log.info("templated command now: %s", self.code)
+                # print(self.template)
+                # print(self.code)
+            except SyntaxError as ex:
+                print(ex)
+                return
 
     def to_dto(self):
         """ return the command data transfer object """
