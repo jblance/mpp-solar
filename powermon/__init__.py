@@ -5,7 +5,6 @@ import json
 import logging
 import time
 from argparse import ArgumentParser
-from datetime import date, timedelta  # noqa: F401
 from platform import python_version
 
 import yaml

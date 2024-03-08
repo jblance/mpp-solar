@@ -1,6 +1,7 @@
 """device.py"""
 import logging
 
+
 from powermon.commands.command import Command
 from powermon.commands.result import Result
 from powermon.dto.deviceDTO import DeviceDTO
@@ -156,10 +157,10 @@ class Device:
                 # result.error_messages.append(f"Exception args: {exception.args}")
                 raise exception
             # process result
-            payload = str(result)
+            payload = str(result)  # FIXME: finish this
             # publish result
             print(payload)
-            self.mqtt_broker.publish("powermon2/adhoc_commands_results", payload)
+            self.mqtt_broker.publish("powermon2/adhoc_commands_results", payload)  # FIXME: finish this
 
     async def run(self, force=False):
         """checks for commands to run and runs them"""

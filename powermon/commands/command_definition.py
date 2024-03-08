@@ -43,7 +43,7 @@ class CommandDefinition:
     @classmethod
     def from_config(cls, protocol_dictionary : dict) -> "CommandDefinition":
         """ build command definition object from config dict """
-        log.debug("command definition: %s", protocol_dictionary)
+        # log.debug("command definition: %s", protocol_dictionary)
         code = protocol_dictionary.get("name")
         description = protocol_dictionary.get("description")
         help_text = protocol_dictionary.get("help_text")
@@ -61,7 +61,7 @@ class CommandDefinition:
                 reading_definitions : dict[int, ReadingDefinition] = \
                     ReadingDefinition.multiple_from_config(protocol_dictionary.get("reading_definitions"))
 
-        log.debug("code: %s description: %s reading_definitions: %s", code, description, reading_definitions)
+        log.debug("code: %s description: '%s' with %s reading_definitions", code, description, len(reading_definitions))
         _command_definition = cls(
             code=code, description=description, help_text=help_text, result_type=result_type,
             reading_definitions=reading_definitions, test_responses=test_responses,

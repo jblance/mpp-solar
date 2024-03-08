@@ -58,11 +58,11 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         """ Add command definitions from the configuration """
         for command_definition_key in command_definitions_config.keys():
             try:
-                log.debug("Attempting to add command_definition_key: %s", command_definition_key)
+                # log.debug("Attempting to add command_definition_key: %s", command_definition_key)
                 _config = command_definitions_config[command_definition_key]
                 if result_type is not None:
                     # Adding command definition with supplied type, so override config
-                    log.debug("result_type override to %s", result_type)
+                    # log.debug("result_type override to %s", result_type)
                     _config["result_type"] = result_type
                 command_definition = CommandDefinition.from_config(_config)
                 self.command_definitions[command_definition_key] = command_definition
@@ -83,18 +83,18 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         if command in self.command_definitions and self.command_definitions[command].regex is None:
             log.debug("Found command %s in protocol %s", command, self._protocol_id)
             command_definition = self.command_definitions[command]
-            log.debug(command_definition)
+            # log.debug(command_definition)
             return command_definition
 
         # Try the regex commands
-        for command_code, command_definition in self.command_definitions.items():
+        for _, command_definition in self.command_definitions.items():
             if command_definition.regex is not None:
-                log.debug("Regex commands _command: %s", command_code)
+                # log.debug("Regex commands _command: %s", command_code)
                 _re = re.compile(command_definition.regex)
                 match = _re.match(command)
                 if match:
                     log.debug("Matched: %s to: %s value: %s", command, command_definition.code, match.group(1))
-                    log.debug(command_definition)
+                    # log.debug(command_definition)
                     return command_definition
         log.info("No command_defn found for %s", command)
         raise CommandDefinitionMissing(f"No command definition found for command: {command}")

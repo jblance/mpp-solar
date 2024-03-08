@@ -306,7 +306,7 @@ class ReadingDefinition():
                 if "index" in reading_definition_config:
                     i = reading_definition_config.get("index")
                 reading_definition = cls.from_config(reading_definition_config, i)
-                log.debug("reading definition: %s", reading_definition)
+                # log.debug("reading definition: %s", reading_definition)
                 reading_definitions[reading_definition.index] = reading_definition
             return reading_definitions
 
