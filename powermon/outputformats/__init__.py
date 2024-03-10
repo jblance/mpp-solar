@@ -45,6 +45,8 @@ def from_config(format_config) -> AbstractFormat:
             from powermon.outputformats.htmltable import HtmlTable as fmt
         case FormatterType.HASS:
             from powermon.outputformats.hass import Hass as fmt
+        case FormatterType.JSON:
+            from powermon.outputformats.json_fmt import Json as fmt
         # case FormatterType.TOPICS:
         #     from powermon.outputformats.topics import Topics as fmt
         case FormatterType.SIMPLE:

@@ -15,8 +15,10 @@ commands:
   outputs:
   - type: screen
     format: 
-      type: table
-      draw_lines: True
+      type: json
+      format: basic
+      # draw_lines: True
       extra_info: True
+      include_missing: False
       # filter: ^pv
 loop: once

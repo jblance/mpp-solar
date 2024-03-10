@@ -63,6 +63,12 @@ class MqttFormatConfig(BaseFormatConfig):
     topic: None | str
 
 
+class JsonFormatConfig(BaseFormatConfig):
+    """ model/allowed elements for mqtt format config """
+    format: None | str
+    include_missing: None | bool = Field(default=None)
+
+
 class LoopsTriggerConfig(NoExtraBaseModel):
     """ model/allowed elements for 'loops' trigger config """
     loops: int
@@ -82,7 +88,7 @@ class OutputConfig(NoExtraBaseModel):
     """ model/allowed elements for output config """
     type: Literal['screen'] | Literal['mqtt'] | Literal['api_mqtt']
     topic: None | str = Field(default=None)
-    format: None | str | BaseFormatConfig | HassFormatConfig | MqttFormatConfig = Field(default=None)
+    format: None | str | BaseFormatConfig | HassFormatConfig | MqttFormatConfig | JsonFormatConfig = Field(default=None)
 
 
 class CommandConfig(NoExtraBaseModel):
