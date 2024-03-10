@@ -4,9 +4,8 @@ import logging
 from powermon.commands.reading import Reading
 from powermon.commands.reading_definition import ReadingDefinition
 from powermon.commands.result import Result
-from powermon.outputformats.abstractformat import (AbstractFormat,
-                                                   get_max_response_lengths,
-                                                   pad)
+from powermon.errors import ConfigError
+from powermon.outputformats.abstractformat import AbstractFormat
 
 log = logging.getLogger("Table")
 
@@ -20,7 +19,6 @@ class Table(AbstractFormat):
     def __init__(self, config):
         super().__init__(config)
         self.name = "table"
-        self.extra_info = config.get("extra_info", False)
         self.draw_lines = config.get("draw_lines", False)
         # self.command_description = "unknown command"
 
@@ -46,71 +44,94 @@ class Table(AbstractFormat):
         filtered_responses.extend(self.format_and_filter_data(result))
         log.debug("displayData: %s", "\n".join((str(a) for a in filtered_responses)))
 
-        # build header
-        # command_code = result.command_definition.code
-
         # Determine column widths
         _pad = 1
 
-        width_p, width_v, width_u = get_max_response_lengths(filtered_responses)
-        # Width of parameter column
-        width_p += _pad
-        if width_p < 9 + _pad:
-            width_p = 9 + _pad
-        # Width of value column
-        width_v += _pad
-        if width_v < 6 + _pad:
-            width_v = 6 + _pad
-        # Width of units column
-        width_u += _pad
-        if width_u < 5 + _pad:
-            width_u = 5 + _pad
-        # Total line length
-        line_length = width_p + width_v + width_u + 7
-        # Check if command / description line is longer and extend line if needed
+        # data_name column
+        max_data_name_length = max(len(reading.data_name) + _pad for reading in filtered_responses)
+        max_data_name_length = max(max_data_name_length, 9 + _pad)
+        # data_valuye column
+        max_data_value_length = max(len(str(reading.data_value)) + _pad for reading in filtered_responses)
+        max_data_value_length = max(max_data_value_length, 5 + _pad)
+        # data_unit column
+        max_data_unit_length = max(len(reading.data_unit) + _pad for reading in filtered_responses)
+        max_data_unit_length = max(max_data_unit_length, 4 + _pad)
+
+        # Total line length - of data
+        line_length = max_data_name_length + max_data_value_length + max_data_unit_length + _pad
+
         cmd_str = f"Command: {command.code} - {command.command_definition.description}"
-        width_c = len(cmd_str)
-        # log.debug(f"{width_c=}, {line_length=}, {width_p=}, {width_v=}, {width_u=}")
-        if line_length < (width_c + 7):
-            line_length = width_c + 7
-        # Check if columns too short and expand units if needed
-        if (width_p + width_v + width_u + 7) <= line_length:
-            width_u = line_length - (width_p + width_v + 7)
-        # log.debug(f"{width_c=}, {line_length=}, {width_p=}, {width_v=}, {width_u=}")
 
-        # print header
-        if self.draw_lines:
-            _result.append("\u2554" + ("\u2550" * (line_length - 2)) + "\u2557")
-            _result.append(f"\u2551 {cmd_str}" + (" " * (line_length - len(cmd_str) - 3)) + "\u2551")
-        else:
-            _result.append("-" * (line_length))
-            _result.append(f"{cmd_str}" + (" " * (line_length - len(cmd_str) - 2)))
-            _result.append("-" * (line_length))
-
-        # print separator
-        if self.draw_lines:
-            _result.append("\u2560" + ("\u2550" * (width_p + 1)) + "\u2564" + ("\u2550" * (width_v + 1)) + "\u2564" + ("\u2550" * (width_u + 1)) + "\u2563")
-        # print column headings
-        if self.draw_lines:
-            _result.append(f"\u2551 {pad('Parameter', width_p)}\u2502 {pad('Value', width_v)}\u2502 {pad('Unit', width_u)}\u2551")
-        else:
-            _result.append(f"{pad('Parameter', width_p)} {pad('Value', width_v)} {pad('Unit', width_u)}")
-        # print separator
-        if self.draw_lines:
-            _result.append("\u255f" + ("\u2500" * (width_p + 1)) + "\u253c" + ("\u2500" * (width_v + 1)) + "\u253c" + ("\u2500" * (width_u + 1)) + "\u2562")
-
-        # print data
-        for response in filtered_responses:
-            name = self.format_key(response.data_name)
-            value = response.data_value
-            unit = response.data_unit
+        if not self.extra_info:
             if self.draw_lines:
-                _result.append(f"\u2551 {pad(name, width_p)}\u2502 {pad(value, width_v)}\u2502 {pad(unit, width_u)}\u2551")
-            else:
-                _result.append(f"{pad(name, width_p)} {pad(value, width_v)} {pad(unit, width_u)}")
+                # draw lines
+                line_length += 3
+                # Make line length longer if cmd_str exceeds data size
+                line_length = max(line_length, len(cmd_str) + 4)
+                # Check if columns too short and expand units if needed
+                if (max_data_name_length + max_data_value_length + max_data_unit_length + 7) <= line_length:
+                    max_data_unit_length = line_length - (max_data_name_length + max_data_value_length + 7)
+                # Check if data and parameter are larger than line_length
+                column_label_line_length = max(max_data_name_length, 9) + max(max_data_value_length, 5) + max(max_data_unit_length, 4) + 7
+                line_length = max(column_label_line_length, line_length)
+                # Command head / description
+                _result.append(f"{'╔':═<{line_length - 1}}╗")
+                _result.append(f"║ {cmd_str: <{line_length - 3}}║")
+                _result.append(f"{'╠':═<{max_data_name_length + 2}}{'╤':═<{max_data_value_length + 2}}{'╤':═<{max_data_unit_length + 2}}╣")
+                # Column titles
+                _result.append(f"║ {'Parameter': <{max_data_name_length}}│ {'Value': <{max_data_value_length}}│ {'Unit': <{max_data_unit_length}}║")
+                _result.append(f"{'╟':─<{max_data_name_length + 2}}{'┼':─<{max_data_value_length + 2}}{'┼':─<{max_data_unit_length + 2}}╢")
+                # Data
+                for reading in filtered_responses:
+                    name = self.format_key(reading.data_name)
+                    value = reading.data_value
+                    unit = reading.data_unit
+                    _result.append(f"║ {name: <{max_data_name_length}}│ {value: <{max_data_value_length}}│ {unit: <{max_data_unit_length}}║")
+                # Footer
+                _result.append(f"{'╚':═<{max_data_name_length + 2}}{'╧':═<{max_data_value_length + 2}}{'╧':═<{max_data_unit_length + 2}}╝")
+            else:  # no lines
+                # Make line length longer if cmd_str exceeds data size
+                line_length = max(line_length, len(cmd_str) + _pad)
+                # Command head / description
+                _result.append(f"{'':-<{line_length}}")
+                _result.append(f"{cmd_str}")
+                _result.append(f"{'':-<{line_length}}")
+                # Column titles
+                _result.append(f"{'Parameter': <{max_data_name_length}} {'Value': <{max_data_value_length}} {'Unit': <{max_data_unit_length}}")
+                # Data
+                for reading in filtered_responses:
+                    name = self.format_key(reading.data_name)
+                    value = reading.data_value
+                    unit = reading.data_unit
+                    _result.append(f"{name: <{max_data_name_length}} {value: <{max_data_value_length}} {unit: <{max_data_unit_length}}")
+        else:  # extra_info
+            if self.draw_lines:
+                raise ConfigError('drawlines with extra info is not supported')
+            else:  # no lines
+                # max_data_unit_length = max(len(reading.data_unit) + _pad for reading in filtered_responses)
+                # Make line length longer if cmd_str exceeds data size
+                line_length = max(line_length, len(cmd_str) + _pad)
+                # Command head / description
+                _result.append(f"{'':-<{line_length}}")
+                _result.append(f"{cmd_str}")
+                _result.append(f"{'':-<{line_length}}")
+                # Column titles
+                _result.append(f"{'Parameter': <{max_data_name_length}} {'Value': <{max_data_value_length}} {'Unit': <{max_data_unit_length}} Extra Info")
+                # Data
+                for reading in filtered_responses:
+                    name = self.format_key(reading.data_name)
+                    value = reading.data_value
+                    unit = reading.data_unit
+                    icon = reading.icon
+                    state_class = reading.state_class
+                    device_class = reading.device_class
+                    extra_info = ''
+                    if icon:
+                        extra_info += f"icon:{icon}, "
+                    if state_class:
+                        extra_info += f"state_class:{state_class}, "
+                    if device_class:
+                        extra_info += f"device_class:{device_class}"
+                    _result.append(f"{name: <{max_data_name_length}} {value: <{max_data_value_length}} {unit: <{max_data_unit_length}} {extra_info}")
 
-        # print footer
-        if self.draw_lines:
-            _result.append("\u255a" + ("\u2550" * (width_p + 1)) + "\u2567" + ("\u2550" * (width_v + 1)) + "\u2567" + ("\u2550" * (width_u + 1)) + "\u255d")
-        # _result.append("\n")
         return _result
