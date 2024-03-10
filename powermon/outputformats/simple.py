@@ -13,7 +13,6 @@ class SimpleFormat(AbstractFormat):
     def __init__(self, config):
         super().__init__(config)
         self.name = "simple"
-        self.extra_info = config.get("extra_info", False)
 
     # def set_command_description(self, command_description):
     #     pass

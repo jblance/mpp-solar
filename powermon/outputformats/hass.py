@@ -16,7 +16,6 @@ class Hass(AbstractFormat):
     def __init__(self, config):
         super().__init__(config)
         self.name = "hass"
-        self.extra_info = config.get("extra_info", False)
         self.discovery_prefix = config.get("discovery_prefix", "homeassistant")
         self.entity_id_prefix = config.get("entity_id_prefix", None)
 

@@ -10,7 +10,6 @@ class raw(AbstractFormat):
     def __init__(self, config):
         super().__init__(config)
         self.name = "raw"
-        self.extra_info = config.get("extra_info", False)
 
     def format(self, command, result: Result, device_info):
         log.info("Using output formatter: %s", self.name)

@@ -45,6 +45,7 @@ class AbstractFormat(ABC):
         self.keep_case = config.get("keep_case", False)
         self.key_filter = config.get("filter", None)
         self.key_exclusion_filter = config.get("excl_filter", None)
+        self.extra_info = config.get("extra_info", False)
 
     @property
     def key_filter(self):
