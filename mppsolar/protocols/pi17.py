@@ -843,7 +843,7 @@ SETTER_COMMANDS = {
     "BDCM": {
         "name": "BDCM",
         "description": "Battery discharge max current in hybrid mode",
-        "help": " -- examples: (BDCMxxxx, 0.1A)",
+        "help": " -- examples: (BDCMxxxx, A)",
         "type": "SETTER",
         "response": [
             ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
@@ -852,7 +852,7 @@ SETTER_COMMANDS = {
             b"^1\x0b\xc2\r",
             b"^0\x1b\xe3\r",
         ],
-        "regex": "BDCM(0[1-2]\\d\\d)$",
+        "regex": "BDCM(0[012]\\d\\d)$",
     },
     "BATDV": {
         "name": "BATDV",
