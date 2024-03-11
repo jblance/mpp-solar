@@ -3,6 +3,7 @@
 __BREAKING CHANGES__
 - minimum python supported 3.10 for version >=0.16.0
 - command separator changed to `#`
+.
 
 
 Python package with reference library of commands (and responses)
