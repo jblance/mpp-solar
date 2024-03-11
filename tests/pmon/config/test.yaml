@@ -7,15 +7,18 @@ device:
   port:
     type: test
     identifier: A123456789
-    response_number: 3
-    protocol: DALY
+    # response_number: 3
+    protocol: PI30
 
 commands:
-- command: SOC
+- command: QPIGS
   outputs:
   - type: screen
     format: 
-      type: table
-      draw_lines: True
+      type: json
+      format: basic
+      # draw_lines: True
       extra_info: True
+      include_missing: False
+      # filter: ^pv
 loop: once

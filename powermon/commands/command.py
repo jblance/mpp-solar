@@ -1,6 +1,7 @@
 """ commands / command.py """
 import logging
 from enum import Enum
+from datetime import date, datetime, timedelta  # pylint: disable=W0611 # noqa: 401
 
 from powermon.commands.command_definition import CommandDefinition
 from powermon.commands.result import Result, ResultType, ResultError
@@ -46,24 +47,30 @@ class Command():
         if self.code is None:
             return "empty command object"
 
-        last_run = self.trigger.get_last_run()
-        next_run = self.trigger.get_next_run()
+        if isinstance(self.trigger, Trigger):
+            last_run = self.trigger.get_last_run()
+            next_run = self.trigger.get_next_run()
+        else:
+            last_run = ""
+            next_run = ""
 
         _outs = ""
         for output in self.outputs:
             _outs += str(output)
 
-        return f"Command: {self.code=} {self.full_command=}, {self.type=}, \
-            [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {str(self.command_definition)} {self.override=}"
+        return f"Command: {self.code=} {self.full_command=}, {self.command_type=}, \
+            [{_outs=}], {last_run=}, {next_run=}, {str(self.trigger)}, {str(self.command_definition)} {self.override=} {self.template=}"
 
     def __init__(self, code: str, commandtype: str, outputs: list[AbstractOutput], trigger: Trigger):
         self.code = code
-        self.type = commandtype
-
-        self.outputs = outputs
+        self.command_type = commandtype
+        self.outputs: list[AbstractOutput] = outputs
         self.trigger: Trigger = trigger
 
-        self.full_command = None
+        self.command_definition: CommandDefinition
+        self.template: str = None
+        self.full_command: str = None
+        self.override: str
 
     @classmethod
     def from_config(cls, config=None) -> "Command":
@@ -81,6 +88,15 @@ class Command():
             log.info("command must be defined")
             raise ConfigError("command must be defined in config")
         commandtype = config.get("type", "basic")
+        template = None
+        if commandtype == 'templated':
+            log.debug("got a templated command: %s", code)
+            template = code
+            try:
+                code = eval(template)  # pylint: disable=W0123
+            except SyntaxError as ex:
+                print(ex)
+                return
         override = config.get("override", None)
         # if override is not None:
         #     print("override: %s" % override)
@@ -88,6 +104,7 @@ class Command():
         trigger = Trigger.from_config(config=config.get("trigger"))
         command_object = cls(code=code, commandtype=commandtype, outputs=outputs, trigger=trigger)
         command_object.override = override
+        command_object.template = template
         return command_object
 
     @classmethod
@@ -101,6 +118,11 @@ class Command():
                 outputs.append(ApiMqtt.from_dto(output_dto))
         command.outputs = outputs
         return command
+
+    @classmethod
+    def from_code(cls, command_code) -> "Command":
+        """ build object from just a code """
+        return cls(code=command_code, commandtype="basic", outputs=[], trigger=None)
 
     def build_result(self, raw_response=None, protocol=None) -> Result:
         """ build a result object from the raw_response """
@@ -134,7 +156,7 @@ class Command():
     @property
     def command_definition(self) -> CommandDefinition:
         """ the definition of this command """
-        return self._command_definition
+        return getattr(self, "_command_definition", None)
 
     @command_definition.setter
     def command_definition(self, command_definition: CommandDefinition):
@@ -169,18 +191,33 @@ class Command():
 
     def is_due(self):
         """ is this command due to run? """
-        return self.trigger.is_due()
+        if isinstance(self.trigger, Trigger):
+            return self.trigger.is_due()
+        # no trigger, so always run?
+        return True
 
     def touch(self):
-        """ update trigger run time """
-        self.trigger.touch()
+        """ update trigger run times and re-expand templates """
+        if isinstance(self.trigger, Trigger):
+            self.trigger.touch()
+        # re-eval template if needed
+        if self.command_type == 'templated':
+            log.debug("updating templated command: %s", self.template)
+            try:
+                self.code = eval(self.template)  # pylint: disable=W0123
+                log.info("templated command now: %s", self.code)
+                # print(self.template)
+                # print(self.code)
+            except SyntaxError as ex:
+                print(ex)
+                return
 
     def to_dto(self):
         """ return the command data transfer object """
         return CommandDTO(
             command_code=self.code,
             device_id="not set",
-            result_topic=self.outputs[0].get_topic(),
+            result_topic=self.outputs[0].topic,
             trigger=self.trigger.to_dto(),
             outputs=[output.to_dto() for output in self.outputs],
         )

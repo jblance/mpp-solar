@@ -5,9 +5,6 @@ outputs messages to mqtt broker
 import logging
 
 from powermon.commands.result import Result
-# from powermon.device import Device
-# from powermon.formats.abstractformat import AbstractFormat
-# from powermon.dto.outputDTO import OutputDTO
 from powermon.outputs.abstractoutput import AbstractOutput
 
 log = logging.getLogger("MQTT")
@@ -15,18 +12,29 @@ log = logging.getLogger("MQTT")
 
 class MQTT(AbstractOutput):
     """ mqtt output class"""
-    def __init__(self, results_topic: str):
+    def __init__(self, topic: str):
         super().__init__(name="Mqtt")
-        self.results_topic = results_topic
+        self.topic = topic
 
     def __str__(self):
-        return f"outputs.MQTT: {self.results_topic=}"
+        return f"outputs.MQTT: {self.topic=}"
 
-    def get_topic(self) -> str:
-        return self.results_topic
+    @property
+    def topic(self):
+        """ the topic to send the output to """
+        return getattr(self, "_topic", None)
 
-    def process(self, command=None, result: Result=None, mqtt_broker=None, device_info=None):
-        log.info("Using output processor: MQTT")
+    @topic.setter
+    def topic(self, value):
+        self._topic = value
+
+    # def get_topic(self) -> str:
+    #     return self.topic
+
+    def process(self, command=None, result: Result = None, mqtt_broker=None, device_info=None):
+        log.info("Using output processor: MQTT, topic: %s", self.topic)
+        log.debug("formatter: %s, result: %s, mqtt_broker: %s, device_info: %s", self.formatter, result, mqtt_broker, device_info)
+
         # exit if no data
         if result is None:
             log.debug("No result to output")
@@ -42,18 +50,29 @@ class MQTT(AbstractOutput):
             raise RuntimeError("No mqtt broker supplied")
 
         # build the messages...
-        formatted_data = self.formatter.format(result)
+        formatted_data = self.formatter.format(command=command, result=result, device_info=device_info)
         log.debug("mqtt.output msgs %s", formatted_data)
 
         # publish
-        # TODO: check this approach (single vs multiple and tidy/consolidate)
-        if self.formatter.sendsMultipleMessages():
-            mqtt_broker.publishMultiple(formatted_data)
+        if isinstance(formatted_data, (str, bytes)):
+            # simple payload, so publish as payload
+            mqtt_broker.publish(topic=self.topic, payload=formatted_data)
+        elif isinstance(formatted_data, list):
+            # iterate list
+            for item in formatted_data:
+                if isinstance(item, (str, bytes)):
+                    mqtt_broker.publish(topic=self.topic, payload=item)
+                elif isinstance(item, dict) and 'topic' in item and 'payload' in item:
+                    mqtt_broker.publish(topic=item['topic'], payload=item['payload'])
+                elif isinstance(item, dict) and 'payload' in item:
+                    mqtt_broker.publish(topic=self.topic, payload=item['payload'])
+                else:
+                    log.warning('Unknown mqtt data to publish, type: %s, data: %s', type(item), item)
         else:
-            mqtt_broker.publish(self.results_topic, formatted_data)
+            log.warning('Unknown mqtt data to publish, type: %s, data: %s', type(formatted_data), formatted_data)
 
     @classmethod
     def from_config(cls, output_config) -> "MQTT":
         """build object from config dict"""
-        results_topic = output_config.get("topic_override", None)
-        return cls(results_topic=results_topic)
+        topic = output_config.get("topic", None)
+        return cls(topic=topic)

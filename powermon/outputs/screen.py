@@ -2,9 +2,6 @@
 import logging
 
 from powermon.commands.result import Result
-# from powermon.device import Device
-# from powermon.dto.outputDTO import OutputDTO
-# from powermon.formats.abstractformat import AbstractFormat
 from powermon.outputs.abstractoutput import AbstractOutput
 
 log = logging.getLogger("screen")

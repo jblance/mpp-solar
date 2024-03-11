@@ -4,7 +4,8 @@ from enum import auto
 
 from strenum import LowercaseStrEnum
 
-from powermon.formats import DEFAULT_FORMAT, getFormatfromConfig
+from powermon.outputformats import DEFAULT_FORMAT
+from powermon.outputformats import from_config as format_from_config
 
 # Set-up logger
 log = logging.getLogger("outputs")
@@ -19,7 +20,8 @@ class OutputType(LowercaseStrEnum):
     API_MQTT = auto()
 
 
-def getOutputClass(output_type, formatter, output_config={}):
+def get_output_class(output_type, formatter, output_config=None):
+    """ return the instantiated output class - inc formatter """
     output_class = None
     # Only import the required class
     log.debug("outputType %s", output_type)
@@ -67,11 +69,10 @@ def multiple_from_config(outputs_config):
 def parse_output_config(output_config):
     """ generate a single output object from a config """
     log.debug("parse_output_config, config: %s", output_config)
-    log.debug("got dict type output_config: %s", output_config)
     output_type = output_config.get("type", DEFAULT_OUTPUT)
     format_config = output_config.get("format", DEFAULT_FORMAT)
-    _format = getFormatfromConfig(format_config)
+    _format = format_from_config(format_config)
     log.debug("got format: %s", (_format))
-    _output = getOutputClass(output_type, formatter=_format)
+    _output = get_output_class(output_type, formatter=_format, output_config=output_config)
     log.debug("got output: %s", _output)
     return _output

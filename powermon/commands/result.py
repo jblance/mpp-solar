@@ -31,7 +31,7 @@ class Result:
     - list of Readings (processed results)
     """
     def __str__(self):
-        return f"Result: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, " + ','.join(str(reading) for reading in self._readings)
+        return f"Result: {self.command.command_definition.description=}: {self.is_valid=}, {self.error=} - {self.error_messages=}, {self.raw_response=}, " + ','.join(str(reading) for reading in self._readings)
 
     # def __init__(self, result_type: ResultType, command_definition, raw_response: bytes, responses: list | dict):
     def __init__(self, command, raw_response: bytes, responses: list | dict):
@@ -148,8 +148,7 @@ class Result:
         try:
             return reading_definition.reading_from_raw_response(response, override=self.command.override)
         except ValueError:
-            error = Reading(data_name=reading_definition.description,
-                            data_value=reading_definition.get_invalid_message(response), data_unit="")
+            error = Reading(raw_value=None, processed_value=reading_definition.get_invalid_message(response), definition=ReadingDefinition.from_config({"description": reading_definition.description}))
             error.is_valid = False
             return [error]
 

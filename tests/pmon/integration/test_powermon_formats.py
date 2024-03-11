@@ -3,8 +3,8 @@ import unittest
 # import json
 import yaml
 from powermon.device import Device
-from powermon.formats.hass import Hass
-from powermon.formats.table import Table
+from powermon.outputformats.hass import Hass
+from powermon.outputformats.table import Table
 from powermon.commands.result import Result
 from powermon.commands.reading import Reading
 

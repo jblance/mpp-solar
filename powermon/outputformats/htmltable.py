@@ -1,20 +1,18 @@
+""" powermon / outputformats / htmltable.py """
 import logging
-from powermon.formats.abstractformat import AbstractFormat
+from powermon.outputformats.abstractformat import AbstractFormat
 from powermon.commands.result import Result
 from powermon.commands.reading import Reading
 
 log = logging.getLogger("htmltable")
 
 
-class htmltable(AbstractFormat):
-    def __init__(self, formatConfig):
-        super().__init__(formatConfig)
+class HtmlTable(AbstractFormat):
+    def __init__(self, config):
+        super().__init__(config)
         self.name = "htmltable"
-        
-    # def set_command_description(self, command_description):
-    #     pass
 
-    def format(self, result: Result, device_info):
+    def format(self, command, result: Result, device_info):
         log.info("Using output formatter: %s", self.name)
 
         _result = []
@@ -29,16 +27,17 @@ class htmltable(AbstractFormat):
                 data[f"Error #{i}"] = [message, ""]
 
         if len(result.readings) == 0:
+            _result.append("<b>No readings in result</b>")
             return _result
 
-        displayData : list[Reading] = self.format_and_filter_data(result)
-        log.debug(f"displayData: {displayData}")
+        display_data : list[Reading] = self.format_and_filter_data(result)
+        log.debug("display_data: %s", display_data)
 
         _result.append("<table><tr><th>Parameter</th><th>Value</th><th>Unit</th></tr>")
-        for response in displayData:
-            key = response.get_data_name()
-            value = response.get_data_value()
-            unit = response.get_data_unit()
+        for reading in display_data:
+            key = self.format_key(reading.data_name)
+            value = reading.data_value
+            unit = reading.data_unit
             _result.append(f"<tr><td>{key}</td><td>{value}</td><td>{unit}</td></tr>")
         _result.append("</table>")
         return _result

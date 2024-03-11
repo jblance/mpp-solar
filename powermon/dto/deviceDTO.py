@@ -7,7 +7,7 @@ from .commandDTO import CommandDTO
 
 
 class DeviceDTO(BaseModel):
-    device_id: str
+    device_id: str | int
     model: Optional[str]
     manufacturer: Optional[str]
     port: PortDTO

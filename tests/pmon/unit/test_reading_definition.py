@@ -51,3 +51,69 @@ class TestReadingDefinitions(unittest.TestCase):
         reading_definition = ReadingDefinition.from_config(reading_definition_config, 0)
         result = reading_definition.reading_from_raw_response(b"ignoreme")
         self.assertEqual([], result)
+
+    def test_enflags(self):
+        """  test ReadingType.MULTI_ENABLE_DISABLE """
+        reading_definition_config = {"description": "Device Status", "reading_type": ReadingType.MULTI_ENABLE_DISABLE,
+                                     "response_type": ResponseType.ENABLE_DISABLE_FLAGS,
+                                     "options": {
+                                         "a": "Buzzer",
+                                         "b": "Overload Bypass",
+                                         "j": "Power Saving",
+                                         "k": "LCD Reset to Default",
+                                         "u": "Overload Restart",
+                                         "v": "Over Temperature Restart",
+                                         "x": "LCD Backlight",
+                                         "y": "Primary Source Interrupt Alarm",
+                                         "z": "Record Fault Code",
+                                     }}
+        reading_definition = ReadingDefinition.from_config(reading_definition_config)
+        result = reading_definition.reading_from_raw_response(b"EakxyDbjuvz")
+        self.assertEqual(len(result), 9)
+        self.assertEqual(result[0].data_name, "Buzzer")
+        self.assertEqual(result[0].data_value, "enabled")
+        self.assertEqual(result[1].data_name, "LCD Reset to Default")
+        self.assertEqual(result[1].data_value, "enabled")
+        self.assertEqual(result[2].data_name, "LCD Backlight")
+        self.assertEqual(result[2].data_value, "enabled")
+        self.assertEqual(result[3].data_name, "Primary Source Interrupt Alarm")
+        self.assertEqual(result[3].data_value, "enabled")
+        self.assertEqual(result[4].data_name, "Overload Bypass")
+        self.assertEqual(result[4].data_value, "disabled")
+        self.assertEqual(result[5].data_name, "Power Saving")
+        self.assertEqual(result[5].data_value, "disabled")
+        self.assertEqual(result[6].data_name, "Overload Restart")
+        self.assertEqual(result[6].data_value, "disabled")
+        self.assertEqual(result[7].data_name, "Over Temperature Restart")
+        self.assertEqual(result[7].data_value, "disabled")
+        self.assertEqual(result[8].data_name, "Record Fault Code")
+        self.assertEqual(result[8].data_value, "disabled")
+
+    def test_flags(self):
+        """  test ReadingType.FLAGS """
+        reading_definition_config = {"description": "Device Status",
+                                     "reading_type": ReadingType.FLAGS,
+                                     "response_type": ResponseType.FLAGS,
+                                     "flags": [
+                                         "Is SBU Priority Version Added",
+                                         "Is Configuration Changed",
+                                         "Is SCC Firmware Updated",
+                                         "Is Load On",
+                                         "Is Battery Voltage to Steady While Charging",
+                                         "Is Charging On",
+                                         "Is SCC Charging On",
+                                         "Is AC Charging On",
+                                     ]}
+        reading_definition = ReadingDefinition.from_config(reading_definition_config, 0)
+        result = reading_definition.reading_from_raw_response(b"00110110")
+        self.assertEqual(len(result), 8)
+        self.assertEqual(result[0].data_name, "Is SBU Priority Version Added")
+        self.assertEqual(result[0].data_value, 0)
+        self.assertEqual(result[1].data_name, "Is Configuration Changed")
+        self.assertEqual(result[1].data_value, 0)
+        self.assertEqual(result[2].data_name, "Is SCC Firmware Updated")
+        self.assertEqual(result[2].data_value, 1)
+        self.assertEqual(result[3].data_name, "Is Load On")
+        self.assertEqual(result[3].data_value, 1)
+        self.assertEqual(result[7].data_name, "Is AC Charging On")
+        self.assertEqual(result[7].data_value, 0)

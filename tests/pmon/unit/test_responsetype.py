@@ -128,3 +128,45 @@ class TestResponseTypes(unittest.TestCase):
         result = reading_definition.translate_raw_response(b"This is a string")
         expected = 'This is a string'
         self.assertEqual(result, expected)
+
+    def test_enflags(self):
+        """  test ResponseType.ENABLE_DISABLE_FLAGS """
+        reading_definition_config = {"description": "Device Status", "reading_type": ReadingType.MULTI_ENABLE_DISABLE,
+                                     "response_type": ResponseType.ENABLE_DISABLE_FLAGS,
+                                     "options": {
+                                         "a": "Buzzer",
+                                         "b": "Overload Bypass",
+                                         "j": "Power Saving",
+                                         "k": "LCD Reset to Default",
+                                         "u": "Overload Restart",
+                                         "v": "Over Temperature Restart",
+                                         "x": "LCD Backlight",
+                                         "y": "Primary Source Interrupt Alarm",
+                                         "z": "Record Fault Code",
+                                     }}
+        reading_definition = ReadingDefinition.from_config(reading_definition_config, 0)
+        result = reading_definition.translate_raw_response(b"EakxyDbjuvz")
+        expected = {'Buzzer': 'enabled', 'LCD Reset to Default': 'enabled', 'LCD Backlight': 'enabled', 'Primary Source Interrupt Alarm': 'enabled', 'Overload Bypass': 'disabled', 'Power Saving': 'disabled', 'Overload Restart': 'disabled', 'Over Temperature Restart': 'disabled', 'Record Fault Code': 'disabled'}
+        # print(result)
+        self.assertDictEqual(result, expected)
+
+    def test_flags(self):
+        """  test ResponseType.FLAGS """
+        reading_definition_config = {"description": "Device Status",
+                                     "reading_type": ReadingType.FLAGS,
+                                     "response_type": ResponseType.FLAGS,
+                                     "flags": [
+                                         "Is SBU Priority Version Added",
+                                         "Is Configuration Changed",
+                                         "Is SCC Firmware Updated",
+                                         "Is Load On",
+                                         "Is Battery Voltage to Steady While Charging",
+                                         "Is Charging On",
+                                         "Is SCC Charging On",
+                                         "Is AC Charging On",
+                                     ]}
+        reading_definition = ReadingDefinition.from_config(reading_definition_config, 0)
+        result = reading_definition.translate_raw_response(b"00110110")
+        expected = {'Is SBU Priority Version Added': 0, 'Is Configuration Changed': 0, 'Is SCC Firmware Updated': 1, 'Is Load On': 1, 'Is Battery Voltage to Steady While Charging': 0, 'Is Charging On': 1, 'Is SCC Charging On': 1, 'Is AC Charging On': 0}
+        # print(result)
+        self.assertDictEqual(result, expected)

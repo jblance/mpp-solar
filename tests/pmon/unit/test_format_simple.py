@@ -1,7 +1,7 @@
 import unittest
 
 from powermon.device import DeviceInfo
-from powermon.formats.simple import SimpleFormat
+from powermon.outputformats.simple import SimpleFormat
 from powermon.commands.command import Command
 from powermon.commands.result import Result, ResultType
 # from powermon.commands.reading import Reading

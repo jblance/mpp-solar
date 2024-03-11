@@ -76,9 +76,9 @@ class AbstractPort(ABC):
         # FIXME: what if still not connected....
         # should, log an error and wait to try to reconnect (increasing backoff times)
 
-        # update run times
+        # update run times and re- expand any template
         command.touch()
-        # update full_command - expand any template / add crc etc
+        # update full_command - add crc etc
         # updates every run incase something has changed
         command.full_command = self.protocol.get_full_command(command.code)
 

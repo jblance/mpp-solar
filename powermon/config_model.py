@@ -25,6 +25,8 @@ class MQTTConfig(NoExtraBaseModel):
     port: None | int = Field(default=None)
     username: None | str = Field(default=None)
     password: None | str = Field(default=None)
+    adhoc_topic: None | str = Field(default=None)
+    adhoc_result_topic: None | str = Field(default=None)
 
 
 class APIConfig(NoExtraBaseModel):
@@ -52,13 +54,19 @@ class BaseFormatConfig(NoExtraBaseModel):
 
 class HassFormatConfig(BaseFormatConfig):
     """ model/allowed elements for hass format config """
-    discovery_prefix: None | str
-    entity_id_prefix: None | str
+    discovery_prefix: None | str = Field(default=None)
+    entity_id_prefix: None | str = Field(default=None)
 
 
 class MqttFormatConfig(BaseFormatConfig):
     """ model/allowed elements for mqtt format config """
     topic: None | str
+
+
+class JsonFormatConfig(BaseFormatConfig):
+    """ model/allowed elements for mqtt format config """
+    format: None | str
+    include_missing: None | bool = Field(default=None)
 
 
 class LoopsTriggerConfig(NoExtraBaseModel):
@@ -78,14 +86,15 @@ class EveryTriggerConfig(NoExtraBaseModel):
 
 class OutputConfig(NoExtraBaseModel):
     """ model/allowed elements for output config """
-    type: Literal['screen'] | Literal['mqtt'] | Literal['api_mqtt'] | Literal['table']
-    format: None | str | BaseFormatConfig | HassFormatConfig | MqttFormatConfig = Field(default=None)
+    type: Literal['screen'] | Literal['mqtt'] | Literal['api_mqtt']
+    topic: None | str = Field(default=None)
+    format: None | str | BaseFormatConfig | HassFormatConfig | MqttFormatConfig | JsonFormatConfig = Field(default=None)
 
 
 class CommandConfig(NoExtraBaseModel):
     """ model/allowed elements for command section of config """
     command: str
-    type: None | Literal["basic"] | Literal["poll"] = Field(default="basic")
+    type: None | Literal["basic"] | Literal["templated"] = Field(default="basic")
     override: None | dict = Field(default=None)
     trigger: None | LoopsTriggerConfig | AtTriggerConfig | EveryTriggerConfig = Field(default=None)
     outputs: None | List[OutputConfig] | str = Field(default=None)
@@ -95,7 +104,6 @@ class BlePortConfig(BaseModel):
     """ model/allowed elements for serial port config """
     type: Literal["ble"]
     mac: str
-    #baud: None | int  = Field(default=None)
     protocol: None | str
 
 

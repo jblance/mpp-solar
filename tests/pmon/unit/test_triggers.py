@@ -57,17 +57,10 @@ class TestTriggers(unittest.TestCase):
 
     def test_triggertype_at(self):
         """Test that the AT trigger goes off when the correct time of day passes"""
-        dt_today = datetime.datetime.now()
         x = 1
-        hour = dt_today.hour
-        minute = dt_today.minute
-        second = dt_today.second + x
-        if second > 59:
-            time.sleep(2)
-            minute = dt_today.minute
-            second = dt_today.second + x
-        time_str = str(hour).rjust(2, '0') + ":" + str(minute).rjust(2, '0') + ":" + str(second).rjust(2, '0')  # probably a better way to get an isoformat string
-        trigger = Trigger(trigger_type=TriggerType.AT, value=time_str)
+        dt_now = datetime.datetime.now()
+        dt_later = dt_now + datetime.timedelta(seconds=x)
+        trigger = Trigger(trigger_type=TriggerType.AT, value=dt_later.strftime("%H:%M:%S"))
         # Check that the initial state is correct
         now = time.time()
         next_str = time.strftime(Trigger.DATE_FORMAT, time.localtime(now + x))

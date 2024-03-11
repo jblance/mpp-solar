@@ -7,7 +7,7 @@ from powermon.commands.trigger import Trigger
 from powermon.device import Device
 from powermon.dto.commandDTO import CommandDTO
 from powermon.dto.apicoordinatorDTO import ApicoordinatorDTO
-from powermon.formats.simple import SimpleFormat
+from powermon.outputformats.simple import SimpleFormat
 from powermon.outputs.api_mqtt import ApiMqtt
 
 log = logging.getLogger("APICoordinator")
@@ -54,11 +54,15 @@ class ApiCoordinator:
 
     def set_device(self, device: Device):
         """ store the device in the apicoordinator """
+        if not self.enabled:
+            return
         self.device = device
         # self.announce(self.device)
 
     def set_mqtt_broker(self, mqtt_broker):
         """ store the mqtt broker in the apicoordinator """
+        if not self.enabled:
+            return
         log.debug("setting mqtt_broker to %s", mqtt_broker)
         self.mqtt_broker = mqtt_broker
 
@@ -74,11 +78,13 @@ class ApiCoordinator:
 
     def get_addcommand_topic(self):
         """ get the adhoc topic """
-        return self.adhoc_topic_format.format(device_id=self.device.device_id)
+        return self.adhoc_topic_format.format(device_id=self.device.device_info.device_id)
 
     def addcommand_callback(self, client, userdata, msg):
         """ add a callback """
-        log.info("Client: %s, with userdata: %s, received `%s` on topic `%s`", client, userdata,msg.payload, msg.topic)
+        if not self.enabled:
+            return
+        log.info("Client: %s, with userdata: %s, received `%s` on topic `%s`", client, userdata, msg.payload, msg.topic)
         json_string = msg.payload.decode("utf-8")
         log.debug("Yaml string: %s ", json_string)
 
@@ -90,7 +96,7 @@ class ApiCoordinator:
         outputs = []
 
         output = ApiMqtt()
-        output.set_formatter(SimpleFormat({}))
+        output.formatter = SimpleFormat({})
         outputs.append(output)
 
         command.outputs = outputs
@@ -117,9 +123,9 @@ class ApiCoordinator:
 
     def announce(self, obj):
         """ Announce jsonised obj dto to api """
-        obj_dto = obj.to_dto()
         if not self.enabled:
-            log.debug("Not announcing obj: %s as api DISABLED", obj_dto)
+            log.debug("Not announcing obj: %s as api DISABLED", obj)
             return
+        obj_dto = obj.to_dto()
         log.debug("Announcing obj: %s to api on topic: %s", obj_dto, self.announce_topic)
         self.mqtt_broker.publish(self.announce_topic, obj_dto.json())

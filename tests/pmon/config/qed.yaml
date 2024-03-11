@@ -10,16 +10,15 @@ device:
     type: test
     protocol: PI30MAX
 commands:
-- command: QED
-  # f_command: f'QED{(date.today()-timedelta(days=1)).strftime("%Y%m%d")}'
-  # f_command: f'QED{(date.today()).strftime("%Y%m%d")}'
+- command: f'QED{(date.today()-timedelta(days=1)).strftime("%Y%m%d")}'
+  type: templated
   outputs:
   - type: screen
     format:
       type: simple
       tag: Test_Inverter
       filter: ^pv
-loop: 60
+loop: once
 mqttbroker:
   name: homeassistant.lan
   port: 1883

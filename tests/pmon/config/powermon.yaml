@@ -10,7 +10,7 @@ device:
 
 commands:
 - command: QPIGS #Must be in the protocol command list
-  type: poll
+  type: basic
   outputs:
   - type: screen
     format: table
