@@ -4,4 +4,3 @@
 # (for use with makefile that bumps the poetry version)
 #
 awk '/^version/ {print "__version__ = " $3}' pyproject.toml > mppsolar/version.py
-awk '/^version/ {print "__version__ = " $3}' pyproject.toml > powermon/version.py

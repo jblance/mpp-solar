@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 HERE = Path(__file__).parent
-PROTOCOLS_DIR = HERE.parent.parent.parent / "mppsolar" / "protocols"
+PROTOCOLS_DIR = HERE.parent.parent / "mppsolar" / "protocols"
 PROTOCOLS = sorted(
     file.stem for file in PROTOCOLS_DIR.glob("*.py")
     if "init" not in file.stem
