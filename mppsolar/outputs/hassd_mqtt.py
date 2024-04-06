@@ -75,11 +75,21 @@ class hassd_mqtt(mqtt):
         for key, values in data.items():
             orig_key = key
             value = values[0]
+            print(values)
             unit = values[1]
+            if len(values) > 2 and values[2] and "unit" in values[2]:
+                unit = values[2]["unit"]
+
+            base = None
+            if len(values) > 2 and values[2] and "unit" in values[2]:
+                base = values[2]["base"]
+                value = round(value*base, 2)
+                
             icon = None
             if len(values) > 2 and values[2] and "icon" in values[2]:
                 icon = values[2]["icon"]
             device_class = None
+
             if len(values) > 2 and values[2] and "device-class" in values[2]:
                 device_class = values[2]["device-class"]
             state_class = None
@@ -129,6 +139,7 @@ class hassd_mqtt(mqtt):
                     "model": device_model,
                     "manufacturer": device_manufacturer,
                 }
+
                 if device_class:
                     payload["device_class"] = device_class
                 if state_class:

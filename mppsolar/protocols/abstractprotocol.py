@@ -393,6 +393,11 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 else:
                     log.info(f"Processing unknown response format {result}")
                     msgs[i] = [result, ""]
+
+                #add extra info about the command
+                if len(resp_format) > 3:
+                    msgs[key].append(resp_format[3])                    
+
             return msgs
 
         # Check for multiple frame type responses
