@@ -869,6 +869,20 @@ SETTER_COMMANDS = {
         ],
         "regex": "BATDV(0[45]\\d\\d,0[45]\\d\\d,0[45]\\d\\d,0[45]\\d\\d)$",
     },
+    "BCA":{
+        "name":"BCA",
+        "description":" Set battery charger application in floating charging",
+        "help": "--examples: BCA0000,060,0530 - set stop charger current level at 0 Amps, wait at least 60 minutes before recharging, recover to charge when battery stop charger in floating charging below 530",
+        "type":"SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "BCA(0\\d\\d\\d,0\\d\\d,0\\d\\d\\d)$",
+    },
 }
 
 
