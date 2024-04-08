@@ -1,6 +1,9 @@
 import logging
 
 from .abstractprotocol import AbstractProtocol
+from ..helpers import CRC_XModem
+
+from typing import Tuple
 
 log = logging.getLogger("pi17")
 
@@ -903,6 +906,9 @@ class pi17(AbstractProtocol):
         self.DEFAULT_COMMAND = "PI"
         self.PID = "PI"
         self.ID_COMMANDS = ["PI", "DM"]
+        self.POLYNOMIAL = 0x1021
+        self.PRESET = 0
+        self.crcXModem = CRC_XModem()
 
     def get_full_command(self, command) -> bytes:
         """
@@ -958,6 +964,18 @@ class pi17(AbstractProtocol):
             full_command = _pre_cmd + bytes([13])  # + _crc
             log.debug(f"full command: {full_command}")
             return full_command
+    
+    def check_response_valid(self, response) -> Tuple[bool, dict]:
+        """
+        Simplest validity check, CRC checks should be added to individual protocols
+        """
+
+        if response is None:
+            return False, {"validity check": ["Error: Response was empty", ""]}
+        crc = self.crcXModem.crc_hex(response[:-3])
+        if response[-3:-1].hex().upper() == crc:
+            return False, {"validity check": ["Error: CRC error", ""]}
+        return True, {}
 
     def get_responses(self, response):
         """

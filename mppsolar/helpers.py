@@ -99,3 +99,31 @@ def pad(text, length):
     if len(text) > length:
         return text
     return text.ljust(length, " ")
+
+class CRC_XModem:
+    def __init__(self, poly=0x1021, initial=0x0000):
+        self.poly = poly
+        self.initial = initial
+        self.table = self.generate_crc_table()
+
+    def generate_crc_table(self):
+        table = [0] * 256
+        for i in range(256):
+            crc = i << 8
+            for _ in range(8):
+                if crc & 0x8000:
+                    crc = (crc << 1) ^ self.poly
+                else:
+                    crc = crc << 1
+            table[i] = crc & 0xFFFF
+        return table
+
+    def compute_crc(self, data):
+        crc = self.initial
+        for byte in data:
+            crc = ((crc << 8) & 0xFFFF) ^ self.table[(crc >> 8) ^ byte]
+        return crc
+
+    def crc_hex(self, data):
+        crc = self.compute_crc(data)
+        return format(crc, '04x').upper()
