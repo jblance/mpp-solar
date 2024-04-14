@@ -132,7 +132,12 @@ def get_port(*args, **kwargs):
                 "port must be in format 'ip_address:port' for remote socket connection"
             )
             return None
-        remote_ip, remote_port = port.split(":")
+        remote_ip, remote_port_str = port.split(":")
+        try:
+            remote_port = int(remote_port_str)
+        except ValueError:
+            log.error(f"Invalid port: {remote_port_str}. Port should be an integer.")
+            return None
         log.debug(f"got ip: {remote_ip}, port: {remote_port}")
         from mppsolar.inout.remotesocketio import remoteSocketIO
 
