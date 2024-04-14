@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 
 HERE = Path(__file__).parent
-OUTPUTS_DIR = HERE.parent.parent.parent / "mppsolar" / "outputs"
+OUTPUTS_DIR = HERE.parent.parent / "mppsolar" / "outputs"
 OUTPUTS = sorted(
     file.stem for file in OUTPUTS_DIR.glob("*.py")
     if file.stem != "__init__"
