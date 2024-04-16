@@ -1,5 +1,15 @@
 # MPP_Solar
 
+Dashboards homepage can be found at:
+https://github.com/cordelster/mppsolar_dashboards
+
+## Gauge and graph:
+![Grafana dashboard](https://github.com/cordelster/mppsolar_dashboards/blob/main/prometheus/pics/dash_guages.png)
+
+## Stats as table:
+![Grafana dashboard stats in table](https://github.com/cordelster/mppsolar_dashboards/blob/main/prometheus/pics/dash_tables.png)
+
+
 You can also find these instructions on the top row within the dashboard.
 This Dashboard takes avantage of using prom output from mpp_solar with command output from QPGS and QPIGS.
 This output can be directed to a text file while building the file, then moved to node_exporter folder as a prom file.
