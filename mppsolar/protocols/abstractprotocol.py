@@ -233,7 +233,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         Take the raw response and turn it into a dict of name: value, unit entries
         """
 
-        log.info(f"response passed to decode: {response}")
+        log.debug(f"response passed to decode: {response}")
         msgs = {}
 
         # Add metadata
@@ -277,7 +277,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             response_type = command_defn["response_type"]
         else:
             response_type = "DEFAULT"
-        log.info(f"Processing response of type {response_type}")
+        log.debug(f"Processing response of type {response_type}")
 
         # Split the response into individual responses
         responses = self.get_responses(response)
