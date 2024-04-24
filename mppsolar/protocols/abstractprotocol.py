@@ -240,6 +240,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         msgs["_command"] = command
         # Check for a stored command definition
         command_defn = self.get_command_defn(command)
+
         if command_defn is not None:
             msgs["_command_description"] = command_defn["description"]
             len_command_defn = len(command_defn["response"])
@@ -331,6 +332,25 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         result = 0
                     msgs[key] = [float(result) / 10, resp_format[2]]
                 # eg. ['option', 'Output source priority', ['Utility first', 'Solar first', 'SBU first']],
+
+                #for any simple value change
+                elif re.search("int:r[/*+-]\d+", resp_format[0]) != None:
+                    if "--" in result:
+                        result = 0
+                    sine = re.search("[/*+-]", resp_format[0]).group()
+                    base = re.search("\d+", resp_format[0]).group()
+
+                    if sine == "/":
+                        res = float(result) / int(base)
+                    elif sine == "*":
+                        res = float(result) * int(base)
+                    elif sine == "+":
+                        res = float(result) + int(base)
+                    elif sine == "=":
+                        res = float(result) - int(base)
+
+                    msgs[key] = [res, resp_format[2]]
+
                 elif resp_format[0] == "option":
                     msgs[key] = [resp_format[2][int(result)], ""]
                 # eg. ['keyed', 'Machine type', {'00': 'Grid tie', '01': 'Off Grid', '10': 'Hybrid'}],

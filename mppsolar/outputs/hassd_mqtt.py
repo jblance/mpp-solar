@@ -75,15 +75,9 @@ class hassd_mqtt(mqtt):
         for key, values in data.items():
             orig_key = key
             value = values[0]
-            print(values)
             unit = values[1]
             if len(values) > 2 and values[2] and "unit" in values[2]:
                 unit = values[2]["unit"]
-
-            base = None
-            if len(values) > 2 and values[2] and "unit" in values[2]:
-                base = values[2]["base"]
-                value = round(value*base, 2)
                 
             icon = None
             if len(values) > 2 and values[2] and "icon" in values[2]:
@@ -146,7 +140,13 @@ class hassd_mqtt(mqtt):
                     payload["state_class"] = state_class
                 if icon:
                     payload.update({"icon": icon})
-                if unit == "W":
+                if unit == "Hz":
+                    payload.update({"state_class": "measurement", "device_class": "frequency"})
+                if unit in ["A", "mA"]:
+                    payload.update({"state_class": "measurement", "device_class": "current"})
+                if unit in ["V", "mV"]:
+                    payload.update({"state_class": "measurement", "device_class": "voltage"})
+                if unit in ["W", "kW"]:
                     payload.update({"state_class": "measurement", "device_class": "power"})
                 if unit == "Wh" or unit == "kWh":
                     payload.update(
