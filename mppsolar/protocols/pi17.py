@@ -970,7 +970,7 @@ class pi17(AbstractProtocol):
 
         if response[-3:-1].hex().upper() != crc:
             return False, {"validity check": ["Error: CRC error P17", ""]}
-        return True
+        return True, {}
 
     def get_responses(self, response):
         """
