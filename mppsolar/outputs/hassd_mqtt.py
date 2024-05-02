@@ -141,13 +141,13 @@ class hassd_mqtt(mqtt):
                 if icon:
                     payload.update({"icon": icon})
                 if unit == "Hz":
-                    payload.update({"state_class": "measurement", "device_class": "frequency"})
+                    payload.update({"device_class": "frequency"})
                 if unit in ["A", "mA"]:
-                    payload.update({"state_class": "measurement", "device_class": "current"})
+                    payload.update({"device_class": "current"})
                 if unit in ["V", "mV"]:
-                    payload.update({"state_class": "measurement", "device_class": "voltage"})
+                    payload.update({"device_class": "voltage"})
                 if unit in ["W", "kW"]:
-                    payload.update({"state_class": "measurement", "device_class": "power"})
+                    payload.update({"device_class": "power"})
                 if unit == "Wh" or unit == "kWh":
                     payload.update(
                         {

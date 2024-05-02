@@ -57,10 +57,11 @@ QUERY_COMMANDS = {
         "prefix": "^P003",
         "description": "Device Model inquiry",
         "help": " -- queries the device model",
+        "response_type" : "SEQUENTIAL",
         "type": "QUERY",
         "response": [
             [
-                "keyed",
+                "str_keyed",
                 "Machine number",
                 {
                     "000": "Infini-Solar 10KW/3P",
@@ -134,6 +135,7 @@ QUERY_COMMANDS = {
         "prefix": "^P004",
         "description": "",
         "help": "",
+        "response_type": "SEQUENTIAL",
         "type": "QUERY",
         "response": [
             ["int:r/10", "Input current R", "A"],
@@ -171,6 +173,7 @@ QUERY_COMMANDS = {
         "prefix": "^P005",
         "description": "Device rated information",
         "help": " -- queries rated information",
+        "response_type": "SEQUENTIAL",
         "type": "QUERY",
         "response": [
             ["int:r/10", "AC input rated voltage", "V"],
@@ -182,7 +185,7 @@ QUERY_COMMANDS = {
             ["int:r/10", "Battery rated voltage", "V"],
             ["string", "MPPT track number", "ea"],
             [
-                "keyed",
+                "str_keyed",
                 "Machine type",
                 {
                     "00": "Grid type",
@@ -202,12 +205,13 @@ QUERY_COMMANDS = {
         "prefix": "^P003",
         "description": "Query general status",
         "help": " -- queries general status",
+        "response_type": "SEQUENTIAL",
         "type": "QUERY",
         "response": [
             ["int:r/10", "Solar input voltage 1", "V"], 
             ["int:r/10", "Solar input voltage 2", "V"],
-            ["int:r/10", "Solar input current 1", "A"],
-            ["int:r/10", "Solar input current 2", "A"],
+            ["int:r/100", "Solar input current 1", "A"],
+            ["int:r/100", "Solar input current 2", "A"],
             ["int:r/10", "Battery voltage", "V"],
             ["int", "Battery capacity", "%", {"device-class":"battery"}],
             ["int:r/10", "Battery current", "A"],

@@ -197,6 +197,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             key = raw_value.decode()
             r = data_units.get(key, f"Invalid key: {key}")
             return [(data_name, r, "", extra_info)]
+        if data_type == "string":
+            return [(data_name, raw_value.decode(), data_units, extra_info)]
         format_string = f"{data_type}(raw_value)"
         log.debug(f"Processing format string {format_string}")
         try:
@@ -334,22 +336,15 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 # eg. ['option', 'Output source priority', ['Utility first', 'Solar first', 'SBU first']],
 
                 #for any simple value change
-                elif re.search("int:r[/*+-]\d+", resp_format[0]) != None:
-                    if "--" in result:
-                        result = 0
-                    sine = re.search("[/*+-]", resp_format[0]).group()
-                    base = re.search("\d+", resp_format[0]).group()
+                elif ':' in resp_format[0] :
+                    processed_responses = self.process_response(
+                        data_name=resp_format[1],
+                        raw_value=result,
+                        data_units=resp_format[2],
+                        data_type=resp_format[0]
+                    )
 
-                    if sine == "/":
-                        res = float(result) / int(base)
-                    elif sine == "*":
-                        res = float(result) * int(base)
-                    elif sine == "+":
-                        res = float(result) + int(base)
-                    elif sine == "=":
-                        res = float(result) - int(base)
-
-                    msgs[key] = [res, resp_format[2]]
+                    msgs[key] = [processed_responses[0][1], resp_format[2]]
 
                 elif resp_format[0] == "option":
                     msgs[key] = [resp_format[2][int(result)], ""]
