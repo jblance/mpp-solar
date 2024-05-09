@@ -8,6 +8,19 @@ from typing import Tuple
 log = logging.getLogger("pi17")
 
 QUERY_COMMANDS = {
+    "GPMP": {
+        "name": "GPMP",
+        "prefix": "^P005",
+        "description": "Query the maximum output power for feeding grid",
+        "help": " -- queries Query the maximum output power for feeding grid",
+        "type": "QUERY",
+        "response": [
+            ["int", "Maximum Feeding Grid power", "W"],
+        ],
+        "test_responses": [
+            b'^D00815000\xe1\xa1\r',
+        ]
+    },
     "PI": {
         "name": "PI",
         "prefix": "^P003",
@@ -79,7 +92,7 @@ QUERY_COMMANDS = {
             ["int", "AC output phase number", "number"],
             ["int:r/10", "Norminal AC output voltage", "V"],
             ["int:r/10", "Norminal AC input voltage", "V"],
-            ["string", "Battery piece number", "ea"],
+            ["int", "Battery piece number", "ea"],
             ["int:r/10", "Battery standard voltage per unit", "V"],
         ],
         "test_responses": [
@@ -183,7 +196,7 @@ QUERY_COMMANDS = {
             ["int:r/10", "AC output rated current", "A"],
             ["int:r/10", "MPPT rated current per string", "A"],
             ["int:r/10", "Battery rated voltage", "V"],
-            ["string", "MPPT track number", "ea"],
+            ["int", "MPPT track number", "ea"],
             [
                 "str_keyed",
                 "Machine type",
@@ -523,6 +536,20 @@ QUERY_COMMANDS = {
 }
 
 SETTER_COMMANDS = {
+    "GPMP0": {
+        "name": "GPMP0",
+        "description": "Set max power of feeding grid",
+        "help": " -- examples: GPMP0nnnnn (n: 0~9, unit: W, 0-15000W for 15KW converter)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "GPMP(0[10][12345]\d\d\d)$",
+    },
     "LON": {
         "name": "LON",
         "description": "Set enable/disable machine supply power to the loads",

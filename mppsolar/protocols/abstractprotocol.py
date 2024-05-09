@@ -334,18 +334,6 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         result = 0
                     msgs[key] = [float(result) / 10, resp_format[2]]
                 # eg. ['option', 'Output source priority', ['Utility first', 'Solar first', 'SBU first']],
-
-                #for any simple value change
-                elif ':' in resp_format[0] :
-                    processed_responses = self.process_response(
-                        data_name=resp_format[1],
-                        raw_value=result,
-                        data_units=resp_format[2],
-                        data_type=resp_format[0]
-                    )
-
-                    msgs[key] = [processed_responses[0][1], resp_format[2]]
-
                 elif resp_format[0] == "option":
                     msgs[key] = [resp_format[2][int(result)], ""]
                 # eg. ['keyed', 'Machine type', {'00': 'Grid tie', '01': 'Off Grid', '10': 'Hybrid'}],
