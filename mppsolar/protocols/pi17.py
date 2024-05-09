@@ -262,17 +262,17 @@ QUERY_COMMANDS = {
         "help": " -- queries power status",
         "type": "QUERY",
         "response": [
-            ["int", "Solar input power 1", "W", {"device-class":"power"}],
-            ["int", "Solar input power 2", "W", {"device-class":"power"}],
-            ["int", "Battery power", "W", {"device-class":"power"}],
-            ["int", "AC input active power R", "W", {"device-class":"power"}],
-            ["int", "AC input active power S", "W", {"device-class":"power"}],
-            ["int", "AC input active power T", "W", {"device-class":"power"}],
-            ["int", "AC input total active power", "W", {"device-class":"power"}],
-            ["int", "AC output active power R", "W", {"device-class":"power"}],
-            ["int", "AC output active power S", "W", {"device-class":"power"}],
-            ["int", "AC output active power T", "W", {"device-class":"power"}],
-            ["int", "AC output total active power", "W", {"device-class":"power"}],
+            ["int", "Solar input power 1", "W"],
+            ["int", "Solar input power 2", "W"],
+            ["int", "Battery power", "W"],
+            ["int", "AC input active power R", "W"],
+            ["int", "AC input active power S", "W"],
+            ["int", "AC input active power T", "W"],
+            ["int", "AC input total active power", "W"],
+            ["int", "AC output active power R", "W"],
+            ["int", "AC output active power S", "W"],
+            ["int", "AC output active power T", "W"],
+            ["int", "AC output total active power", "W"],
             ["int", "AC output apparent power R", "VA", {"device-class":"apparent_power"}],
             ["int", "AC output apparent power S", "VA", {"device-class":"apparent_power"}],
             ["int", "AC output apparent power T", "VA", {"device-class":"apparent_power"}],
@@ -484,7 +484,7 @@ QUERY_COMMANDS = {
         "help": " -- queries generated energy for the year YYYY from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated Energy Year", "Wh", {"state_class": "total_increasing"}],
+            ["int", "Generated Energy Year", "Wh"],
         ],
         "test_responses": [
             b"^D01100006591\xba\x10\r",
@@ -498,7 +498,7 @@ QUERY_COMMANDS = {
         "help": " -- queries generated energy for the month YYYYMM from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated Energy Month", "Wh", {"state_class": "total_increasing"}],
+            ["int", "Generated Energy Month", "Wh"],
         ],
         "test_responses": [
             b"^D01000006591\xba\x10\r",
@@ -512,7 +512,7 @@ QUERY_COMMANDS = {
         "help": " -- queries generated energy for the day YYYYMMDD from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated Energy Day", "Wh", {"state_class": "total_increasing"}],
+            ["int", "Generated Energy Day", "Wh"],
         ],
         "test_responses": [
             b"^D009000091\xba\x10\r",
@@ -526,7 +526,7 @@ QUERY_COMMANDS = {
         "help": " -- queries generated energy for the hour YYYYMMDDHH from the Inverter",
         "type": "QUERYEN",
         "response": [
-            ["int", "Generated Energy Hour", "Wh", {"state_class": "total_increasing"}],
+            ["int", "Generated Energy Hour", "Wh"],
         ],
         "test_responses": [
             b"^D008000001\xba\x10\r",

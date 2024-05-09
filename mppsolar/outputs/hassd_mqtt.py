@@ -153,7 +153,7 @@ class hassd_mqtt(mqtt):
                         {
                             "icon": "mdi:counter",
                             "device_class": "energy",
-                            "state_class": "total",
+                            "state_class": "total_increasing",
                             "last_reset": str(datetime.now()),
                         }
                     )
