@@ -76,10 +76,14 @@ class hassd_mqtt(mqtt):
             orig_key = key
             value = values[0]
             unit = values[1]
+            if len(values) > 2 and values[2] and "unit" in values[2]:
+                unit = values[2]["unit"]
+                
             icon = None
             if len(values) > 2 and values[2] and "icon" in values[2]:
                 icon = values[2]["icon"]
             device_class = None
+
             if len(values) > 2 and values[2] and "device-class" in values[2]:
                 device_class = values[2]["device-class"]
             state_class = None
@@ -129,20 +133,27 @@ class hassd_mqtt(mqtt):
                     "model": device_model,
                     "manufacturer": device_manufacturer,
                 }
+
                 if device_class:
                     payload["device_class"] = device_class
                 if state_class:
                     payload["state_class"] = state_class
                 if icon:
                     payload.update({"icon": icon})
-                if unit == "W":
-                    payload.update({"state_class": "measurement", "device_class": "power"})
+                if unit == "Hz":
+                    payload.update({"device_class": "frequency"})
+                if unit in ["A", "mA"]:
+                    payload.update({"device_class": "current"})
+                if unit in ["V", "mV"]:
+                    payload.update({"device_class": "voltage"})
+                if unit in ["W", "kW"]:
+                    payload.update({"device_class": "power"})
                 if unit == "Wh" or unit == "kWh":
                     payload.update(
                         {
                             "icon": "mdi:counter",
                             "device_class": "energy",
-                            "state_class": "total",
+                            "state_class": "total_increasing",
                             "last_reset": str(datetime.now()),
                         }
                     )

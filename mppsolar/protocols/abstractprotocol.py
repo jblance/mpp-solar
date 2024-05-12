@@ -197,6 +197,8 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             key = raw_value.decode()
             r = data_units.get(key, f"Invalid key: {key}")
             return [(data_name, r, "", extra_info)]
+        if data_type == "string":
+            return [(data_name, raw_value.decode(), data_units, extra_info)]
         format_string = f"{data_type}(raw_value)"
         log.debug(f"Processing format string {format_string}")
         try:
@@ -240,6 +242,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         msgs["_command"] = command
         # Check for a stored command definition
         command_defn = self.get_command_defn(command)
+
         if command_defn is not None:
             msgs["_command_description"] = command_defn["description"]
             len_command_defn = len(command_defn["response"])
@@ -393,6 +396,11 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                 else:
                     log.info(f"Processing unknown response format {result}")
                     msgs[i] = [result, ""]
+
+                #add extra info about the command
+                if len(resp_format) > 3:
+                    msgs[key].append(resp_format[3])                    
+
             return msgs
 
         # Check for multiple frame type responses

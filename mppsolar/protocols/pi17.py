@@ -1,10 +1,26 @@
 import logging
 
 from .abstractprotocol import AbstractProtocol
+from ..helpers import CRC_XModem
+
+from typing import Tuple
 
 log = logging.getLogger("pi17")
 
 QUERY_COMMANDS = {
+    "GPMP": {
+        "name": "GPMP",
+        "prefix": "^P005",
+        "description": "Query the maximum output power for feeding grid",
+        "help": " -- queries Query the maximum output power for feeding grid",
+        "type": "QUERY",
+        "response": [
+            ["int", "Maximum Feeding Grid power", "W"],
+        ],
+        "test_responses": [
+            b'^D00815000\xe1\xa1\r',
+        ]
+    },
     "PI": {
         "name": "PI",
         "prefix": "^P003",
@@ -54,10 +70,11 @@ QUERY_COMMANDS = {
         "prefix": "^P003",
         "description": "Device Model inquiry",
         "help": " -- queries the device model",
+        "response_type" : "SEQUENTIAL",
         "type": "QUERY",
         "response": [
             [
-                "keyed",
+                "str_keyed",
                 "Machine number",
                 {
                     "000": "Infini-Solar 10KW/3P",
@@ -73,10 +90,10 @@ QUERY_COMMANDS = {
             ["int", "Output power factor", "pf"],
             ["int", "AC input phase number", "number"],
             ["int", "AC output phase number", "number"],
-            ["int", "Norminal AC output voltage", "0.1V"],
-            ["int", "Norminal AC input voltage", "0.1V"],
-            ["string", "Battery piece number", "ea"],
-            ["int", "Battery standard voltage per unit", "0.1V"],
+            ["int:r/10", "Norminal AC output voltage", "V"],
+            ["int:r/10", "Norminal AC input voltage", "V"],
+            ["int", "Battery piece number", "ea"],
+            ["int:r/10", "Battery standard voltage per unit", "V"],
         ],
         "test_responses": [
             b"^D037000,010000,99,3,3,2300,2300,04,120U\x82\r",
@@ -89,31 +106,31 @@ QUERY_COMMANDS = {
         "help": "",
         "type": "QUERY",
         "response": [
-            ["int", "AC input highest voltage for feed power", "0.1V"],
-            ["int", "AC input lowest voltage for feed power", "0.1V"],
-            ["int", "AC input highest frequency for feed power", "0.01Hz"],
-            ["int", "AC input lowest frequency for feed power", "0.01Hz"],
-            ["int", "Solar input highest MPPT voltage", "0.1V"],
-            ["int", "Solar input lowest MPPT voltage", "0.1V"],
-            ["int", "Solar input highest voltage", "0.1V"],
-            ["int", "Solar input lowest voltage", "0.1V"],
-            ["int", "Solar input highest average voltage", "0.1V"],
-            ["int", "LCD sleep wait time", "30secs"],
-            ["int", "Battery maximum charge current", "0.1A"],
-            ["int", "Battery constant charge voltage CV", "0.1V"],
-            ["int", "Battery float charge voltage", "0.1V"],
-            ["int", "The wait time for feed power", "sec"],
+            ["int:r/10", "AC input highest voltage for feed power", "V"],
+            ["int:r/10", "AC input lowest voltage for feed power", "V"],
+            ["int:r/100", "AC input highest frequency for feed power", "Hz"],
+            ["int:r/100", "AC input lowest frequency for feed power", "Hz"],
+            ["int:r/10", "Solar input highest MPPT voltage", "V"],
+            ["int:r/10", "Solar input lowest MPPT voltage", "V"],
+            ["int:r/10", "Solar input highest voltage", "V"],
+            ["int:r/10", "Solar input lowest voltage", "V"],
+            ["int:r/10", "Solar input highest average voltage", "V"],
+            ["int:r*30", "LCD sleep wait time", "s", {"device-class":"duration"}],
+            ["int:r/10", "Battery maximum charge current", "A"],
+            ["int:r/10", "Battery constant charge voltage CV", "V"],
+            ["int:r/10", "Battery float charge voltage", "V"],
+            ["int", "The wait time for feed power", "s", {"device-class":"duration"}],
             ["string", "Start time for support loads", "HHMM"],
             ["string", "Ending time for support loads", "HHMM"],
             ["string", "Start time for AC charger", "HHMM"],
             ["string", "Ending time for AC charger", "HHMM"],
-            ["int", "Battery under voltage", "0.1V"],
-            ["int", "Battery under back voltage", "0.1V"],
-            ["int", "Battery weak voltage in hybrid mode", "0.1V"],
-            ["int", "Battery weak back voltage in hybrid mode", "0.1V"],
-            ["int", "Battery stop charge current level in floating charging", "0.1A"],
-            ["int", "Keep charged time of battery catch stop charger current level", "0.1A"],
-            ["int", "Battery voltage of recover to charge when battery stop charger in floating charging", "0.1V"],
+            ["int:r/10", "Battery under voltage", "V"],
+            ["int:r/10", "Battery under back voltage", "V"],
+            ["int:r/10", "Battery weak voltage in hybrid mode", "V"],
+            ["int:r/10", "Battery weak back voltage in hybrid mode", "V"],
+            ["int:r/10", "Battery stop charge current level in floating charging", "A"],
+            ["int:r/10", "Keep charged time of battery catch stop charger current level", "A"],
+            ["int:r/10", "Battery voltage of recover to charge when battery stop charger in floating charging", "V"],
         ],
         "test_responses": [],
     },
@@ -131,19 +148,20 @@ QUERY_COMMANDS = {
         "prefix": "^P004",
         "description": "",
         "help": "",
+        "response_type": "SEQUENTIAL",
         "type": "QUERY",
         "response": [
-            ["int", "Input current R", "0.1A"],
-            ["int", "Input current S", "0.1A"],
-            ["int", "Input current T", "0.1A"],
-            ["int", "Output current R", "0.1A"],
-            ["int", "Output current S", "0.1A"],
-            ["int", "Output current T", "0.1A"],
-            ["int", "PBusVolt", "0.1V"],
-            ["int", "NBusVolt", "0.1V"],
-            ["int", "PBusAvgV", "0.1V"],
-            ["int", "NBusAvgV", "0.1V"],
-            ["int", "NLintCur", "0.1A"],
+            ["int:r/10", "Input current R", "A"],
+            ["int:r/10", "Input current S", "A"],
+            ["int:r/10", "Input current T", "A"],
+            ["int:r/10", "Output current R", "A"],
+            ["int:r/10", "Output current S", "A"],
+            ["int:r/10", "Output current T", "A"],
+            ["int:r/10", "PBusVolt", "V"],
+            ["int:r/10", "NBusVolt", "V"],
+            ["int:r/10", "PBusAvgV", "V"],
+            ["int:r/10", "NBusAvgV", "V"],
+            ["int:r/10", "NLintCur", "A"],
         ],
         "test_responses": [b"^D0560020,0019,0021,0002,0004,0005,3809,3809,3810,3807,000\xf1\x1e\r"],
     },
@@ -168,18 +186,19 @@ QUERY_COMMANDS = {
         "prefix": "^P005",
         "description": "Device rated information",
         "help": " -- queries rated information",
+        "response_type": "SEQUENTIAL",
         "type": "QUERY",
         "response": [
-            ["int", "AC input rated voltage", "0.1V"],
-            ["string", "AC input rated frequency", "Hz"],
-            ["string", "AC input rated current", "0.1A"],
-            ["string", "AC output rated voltage", "0.1V"],
-            ["string", "AC output rated current", "0.1A"],
-            ["string", "MPPT rated current per string", "0.1A"],
-            ["string", "Battery rated voltage", "0.1V"],
-            ["string", "MPPT track number", "ea"],
+            ["int:r/10", "AC input rated voltage", "V"],
+            ["int:r/10", "AC input rated frequency", "Hz"],
+            ["int:r/10", "AC input rated current", "A"],
+            ["int:r/10", "AC output rated voltage", "V"],
+            ["int:r/10", "AC output rated current", "A"],
+            ["int:r/10", "MPPT rated current per string", "A"],
+            ["int:r/10", "Battery rated voltage", "V"],
+            ["int", "MPPT track number", "ea"],
             [
-                "keyed",
+                "str_keyed",
                 "Machine type",
                 {
                     "00": "Grid type",
@@ -199,32 +218,33 @@ QUERY_COMMANDS = {
         "prefix": "^P003",
         "description": "Query general status",
         "help": " -- queries general status",
+        "response_type": "SEQUENTIAL",
         "type": "QUERY",
         "response": [
-            ["int", "Solar input voltage 1", "0.1V"],
-            ["int", "Solar input voltage 2", "0.1V"],
-            ["int", "Solar input current 1", "0.1A"],
-            ["int", "Solar input current 2", "0.1A"],
-            ["int", "Battery voltage", "0.1V"],
-            ["int", "Battery capacity", "%"],
-            ["int", "Battery current", "0.1A"],
-            ["int", "AC input voltage R", "0.1V"],
-            ["int", "AC input voltage S", "0.1V"],
-            ["int", "AC input voltage T", "0.1V"],
-            ["int", "AC input frequency", "0.01Hz"],
-            ["int", "AC input current R", "0.1A"],
-            ["int", "AC input current S", "0.1A"],
-            ["int", "AC input current T", "0.1A"],
-            ["int", "AC output voltage R", "0.1V"],
-            ["int", "AC output voltage S", "0.1V"],
-            ["int", "AC output voltage T", "0.1V"],
-            ["int", "AC output frequency", "0.01Hz"],
-            ["int", "AC output current R", "0.1A"],
-            ["int", "AC output current S", "0.1A"],
-            ["int", "AC output current T", "0.1A"],
-            ["int", "Inner temperature", "°C"],
-            ["int", "Component max temperature", "°C"],
-            ["int", "External Battery temperature", "°C"],
+            ["int:r/10", "Solar input voltage 1", "V"], 
+            ["int:r/10", "Solar input voltage 2", "V"],
+            ["int:r/100", "Solar input current 1", "A"],
+            ["int:r/100", "Solar input current 2", "A"],
+            ["int:r/10", "Battery voltage", "V"],
+            ["int", "Battery capacity", "%", {"device-class":"battery"}],
+            ["int:r/10", "Battery current", "A"],
+            ["int:r/10", "AC input voltage R", "V"],
+            ["int:r/10", "AC input voltage S", "V"],
+            ["int:r/10", "AC input voltage T", "V"],
+            ["int:r/100", "AC input frequency", "Hz"],
+            ["int:r/10", "AC input current R", "A"],
+            ["int:r/10", "AC input current S", "A"],
+            ["int:r/10", "AC input current T", "A"],
+            ["int:r/10", "AC output voltage R", "V"],
+            ["int:r/10", "AC output voltage S", "V"],
+            ["int:r/10", "AC output voltage T", "V"],
+            ["int:r/100", "AC output frequency", "Hz"],
+            ["int:r/10", "AC output current R", "A"],
+            ["int:r/10", "AC output current S", "A"],
+            ["int:r/10", "AC output current T", "A"],
+            ["int", "Inner temperature", "°C", {"device-class":"temperature"}],
+            ["int", "Component max temperature", "°C", {"device-class":"temperature"}],
+            ["int", "External Battery temperature", "°C", {"device-class":"temperature"}],
             [
                 "option",
                 "Setting change bit",
@@ -253,11 +273,11 @@ QUERY_COMMANDS = {
             ["int", "AC output active power S", "W"],
             ["int", "AC output active power T", "W"],
             ["int", "AC output total active power", "W"],
-            ["int", "AC output apparent power R", "VA"],
-            ["int", "AC output apparent power S", "VA"],
-            ["int", "AC output apparent power T", "VA"],
-            ["int", "AC output total apparent power", "VA"],
-            ["int", "AC output power percentage", "%"],
+            ["int", "AC output apparent power R", "VA", {"device-class":"apparent_power"}],
+            ["int", "AC output apparent power S", "VA", {"device-class":"apparent_power"}],
+            ["int", "AC output apparent power T", "VA", {"device-class":"apparent_power"}],
+            ["int", "AC output total apparent power", "VA", {"device-class":"apparent_power"}],
+            ["int", "AC output power percentage", "%", {"device-class":"power_factor"}],
             ["option", "AC output connect status", ["Disconnected", "Connected"]],
             ["option", "Solar input 1 work status", ["Idle", "Working"]],
             ["option", "Solar input 2 work status", ["Idle", "Working"]],
@@ -266,6 +286,8 @@ QUERY_COMMANDS = {
             ["option", "Line power direction", ["Idle", "Input", "Output"]],
         ],
         "test_responses": [
+            b'^D10100263,00381,,-00855,-03141,-03156,-07152,0000,0000,0000,00000,0193,0147,0195,00535,003,1,1,1,2,2,12\x1c\r'
+            b'^D10100271,00381,,-00756,-02491,-02401,-05648,0000,0000,0000,00000,0193,0147,0194,00534,003,1,1,1,2,2,1:\xe9\r'
         ],
     },
     "MOD": {
@@ -386,24 +408,24 @@ QUERY_COMMANDS = {
         "help": " -- queries battery setting",
         "type": "QUERY",
         "response": [
-            ["int", "Battery maximum charge current", "0.1A"],
-            ["int", "Battery constant charge voltage(C.V.)", "0.1V"],
-            ["int", "Battery floating charge voltage", "0.1V"],
-            ["int", "Battery stop charger current level in floating charging", "0.1A"],
+            ["int:r/10", "Battery maximum charge current", "A"],
+            ["int:r/10", "Battery constant charge voltage(C.V.)", "V"],
+            ["int:r/10", "Battery floating charge voltage", "V"],
+            ["int:r/10", "Battery stop charger current level in floating charging", "A"],
             [
                 "int",
                 "Keep charged time of battery catch stopped charging current level",
                 "Minutes",
             ],
             [
-                "int",
+                "int:r/10",
                 "Battery voltage of recover to charge when battery stop charger in floating charging",
-                "0.1V",
+                "V"
             ],
-            ["int", "Battery under voltage", "0.1V"],
-            ["int", "Battery under voltage release", "0.1V"],
-            ["int", "Battery weak voltage in hybrid mode", "0.1V"],
-            ["int", "Battery weak voltage release in hybrid mode", "0.1V"],
+            ["int:r/10", "Battery under voltage", "V"],
+            ["int:r/10", "Battery under voltage release", "V"],
+            ["int:r/10", "Battery weak voltage in hybrid mode", "V"],
+            ["int:r/10", "Battery weak voltage release in hybrid mode", "V"],
             ["option", "Battery Type", ["Ordinary", "Li-Fe"]],
             ["string", "Reserved", ""],
             ["string", "Battery install date", "YYYYMMDDHHMMSS"],
@@ -412,17 +434,13 @@ QUERY_COMMANDS = {
                 "AC charger keep battery voltage function enable/diable",
                 ["Disabled", "Enabled"],
             ],
-            ["int", "AC charger keep battery voltage", "0.1V"],
-            ["int", "Battery temperature sensor compensation", "0.m1V"],
-            ["int", "Max. AC charging current", "0.1A"],
+            ["int:r/10", "AC charger keep battery voltage", "V"],
+            ["int:r/10", "Battery temperature sensor compensation", "mV"],
+            ["int:r/10", "Max. AC charging current", "A"],
             ["int", "Battery discharge max current in hybrid mode", "A"],
             ["option", "Enable/Disable EPS function", ["Disabled", "Enabled"]],
-            ["int", "Battery voltage of cut-off Main output in battery mode(", "0.1V"],
-            [
-                "int",
-                "Battery voltage of re-connecting Main output in battery mode",
-                "0.1V",
-            ],
+            ["int:r/10", "Battery voltage of cut-off Main output in battery mode", "V"],
+            ["int:r/10", "Battery voltage of re-connecting Main output in battery mode", "V" ],
         ],
         "test_responses": [
             b"^D0762000,0584,0576,0000,000,0576,0460,0510,0460,0510,1,,,1,0540,000,2000,0250\x85Y\r",
@@ -518,6 +536,20 @@ QUERY_COMMANDS = {
 }
 
 SETTER_COMMANDS = {
+    "GPMP0": {
+        "name": "GPMP0",
+        "description": "Set max power of feeding grid",
+        "help": " -- examples: GPMP0nnnnn (n: 0~9, unit: W, 0-15000W for 15KW converter)",
+        "type": "SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "GPMP(0[10][12345]\d\d\d)$",
+    },
     "LON": {
         "name": "LON",
         "description": "Set enable/disable machine supply power to the loads",
@@ -868,6 +900,20 @@ SETTER_COMMANDS = {
         ],
         "regex": "BATDV(0[45]\\d\\d,0[45]\\d\\d,0[45]\\d\\d,0[45]\\d\\d)$",
     },
+    "BCA":{
+        "name":"BCA",
+        "description":" Set battery charger application in floating charging",
+        "help": "--examples: BCA0000,060,0530 - set stop charger current level at 0 Amps, wait at least 60 minutes before recharging, recover to charge when battery stop charger in floating charging below 530",
+        "type":"SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "BCA(0\\d\\d\\d,0\\d\\d,0\\d\\d\\d)$",
+    },
 }
 
 
@@ -888,6 +934,9 @@ class pi17(AbstractProtocol):
         self.DEFAULT_COMMAND = "PI"
         self.PID = "PI"
         self.ID_COMMANDS = ["PI", "DM"]
+        self.POLYNOMIAL = 0x1021
+        self.PRESET = 0
+        self.crcXModem = CRC_XModem()
 
     def get_full_command(self, command) -> bytes:
         """
@@ -943,6 +992,18 @@ class pi17(AbstractProtocol):
             full_command = _pre_cmd + bytes([13])  # + _crc
             log.debug(f"full command: {full_command}")
             return full_command
+    
+    def check_response_valid(self, response) -> Tuple[bool, dict]:
+        """
+        Simplest validity check, CRC checks should be added to individual protocols
+        """
+        if response is None:
+            return False, {"validity check": ["Error: Response was empty", ""]}
+        crc = self.crcXModem.crc_hex(response[:-3])
+
+        if response[-3:-1].hex().upper() != crc:
+            return False, {"validity check": ["Error: CRC error P17", ""]}
+        return True, {}
 
     def get_responses(self, response):
         """
