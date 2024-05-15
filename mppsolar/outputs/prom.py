@@ -63,7 +63,7 @@ class prom(baseoutput):
         for key, _values in data.items():
             # remove spaces
             if remove_spaces:
-                key = key.replace(" ", "_")
+                key = key.replace(" ", "_").replace("/","_")
             if not keep_case:
                 # make lowercase
                 key = key.lower()
