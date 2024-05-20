@@ -13,7 +13,7 @@ OUTPUTS = sorted(
 class testOutputs(unittest.TestCase):
 
     def test_outputs_count(self):
-        print(len(OUTPUTS))
+        # print(len(OUTPUTS))
         assert len(OUTPUTS) == 23, len(OUTPUTS)
 
     def test_outputs_init(self):

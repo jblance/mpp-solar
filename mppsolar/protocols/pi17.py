@@ -226,7 +226,7 @@ QUERY_COMMANDS = {
             ["int:r/100", "Solar input current 1", "A"],
             ["int:r/100", "Solar input current 2", "A"],
             ["int:r/10", "Battery voltage", "V"],
-            ["int", "Battery capacity", "%", {"device-class":"battery"}],
+            ["int", "Battery capacity", "%", {"device-class": "battery"}],
             ["int:r/10", "Battery current", "A"],
             ["int:r/10", "AC input voltage R", "V"],
             ["int:r/10", "AC input voltage S", "V"],
@@ -242,9 +242,9 @@ QUERY_COMMANDS = {
             ["int:r/10", "AC output current R", "A"],
             ["int:r/10", "AC output current S", "A"],
             ["int:r/10", "AC output current T", "A"],
-            ["int", "Inner temperature", "°C", {"device-class":"temperature"}],
-            ["int", "Component max temperature", "°C", {"device-class":"temperature"}],
-            ["int", "External Battery temperature", "°C", {"device-class":"temperature"}],
+            ["int", "Inner temperature", "°C", {"device-class": "temperature"}],
+            ["int", "Component max temperature", "°C", {"device-class": "temperature"}],
+            ["int", "External Battery temperature", "°C", {"device-class": "temperature"}],
             [
                 "option",
                 "Setting change bit",
@@ -381,7 +381,7 @@ QUERY_COMMANDS = {
             ["string", "DateTime", "YYYYMMDDHHMMSS"],
         ],
         "test_responses": [
-            b"^D01720210521234743\x0eR\r",
+            b"^D01720210521234743\x0dR\r",
         ],
     },
     "ET": {
@@ -406,6 +406,7 @@ QUERY_COMMANDS = {
         "name": "BATS",
         "description": "Query battery setting",
         "help": " -- queries battery setting",
+        "response_type": "SEQUENTIAL",
         "type": "QUERY",
         "response": [
             ["int:r/10", "Battery maximum charge current", "A"],
@@ -453,10 +454,11 @@ QUERY_COMMANDS = {
         "prefix": "^P005",
         "description": "Query energy control status",
         "help": " -- queries the device energy distribution",
+        "response_type": "SEQUENTIAL",
         "type": "QUERY",
         "response": [
             [
-                "keyed",
+                "str_keyed",
                 "Solar Energy Distribution Priority",
                 {
                     "00": "Battery-Load-Grid",
@@ -471,10 +473,10 @@ QUERY_COMMANDS = {
             ["option", "Battery discharge to loads when solar input loss", ["disabled", "enabled"]],
             ["option", "Battery discharge to feed grid when solar input normal", ["disabled", "enabled"]],
             ["option", "Battery discharge to feed grid when solar input loss", ["disabled", "enabled"]],
-            ["option", "Reserved", ["disabled", "enabled"]],
+            ["exclude", "Reserved", ["disabled", "enabled"]],
         ],
         "test_responses": [
-            b"^D01900,0,0,0,0,0,0,0,0\r",
+            b"^D01900,0,0,0,0,0,0,0,0\x35\xfc\r",
         ],
     },
     "EY": {
@@ -501,7 +503,7 @@ QUERY_COMMANDS = {
             ["int", "Generated Energy Month", "Wh"],
         ],
         "test_responses": [
-            b"^D01000006591\xba\x10\r",
+            b"^D01000006591\x51\x33\r",
         ],
         "regex": "EM(\\d\\d\\d\\d\\d\\d)$",
     },
@@ -515,7 +517,7 @@ QUERY_COMMANDS = {
             ["int", "Generated Energy Day", "Wh"],
         ],
         "test_responses": [
-            b"^D009000091\xba\x10\r",
+            b"^D009000091\x0e\x73\r",
         ],
         "regex": "ED(\\d\\d\\d\\d\\d\\d\\d\\d)$",
     },
@@ -529,7 +531,7 @@ QUERY_COMMANDS = {
             ["int", "Generated Energy Hour", "Wh"],
         ],
         "test_responses": [
-            b"^D008000001\xba\x10\r",
+            b"^D008000001\x0c\x8a\r",
         ],
         "regex": "EH(\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d)$",
     },
@@ -1002,6 +1004,7 @@ class pi17(AbstractProtocol):
         crc = self.crcXModem.crc_hex(response[:-3])
 
         if response[-3:-1].hex().upper() != crc:
+            # print(response[-3:-1].hex().upper(), crc)
             return False, {"validity check": ["Error: CRC error P17", ""]}
         return True, {}
 

@@ -1,17 +1,17 @@
 import abc
-import calendar  # noqa: F401
+import calendar  # noqa: F401 # pylint: disable=W0611
 import logging
 import re
-from datetime import datetime  # noqa: F401
+from datetime import datetime  # noqa: F401 # pylint: disable=W0611
 from typing import Tuple
 from pydantic import BaseModel
 
 from ..helpers import get_resp_defn, get_value
-from .protocol_helpers import BigHex2Short, BigHex2Float  # noqa: F401
-from .protocol_helpers import LittleHex2Float, LittleHex2Short  # noqa: F401
-from .protocol_helpers import LittleHex2UInt, LittleHex2Int  # noqa: F401
-from .protocol_helpers import Hex2Ascii, Hex2Int, Hex2Str  # noqa: F401
-from .protocol_helpers import uptime  # noqa: F401
+from .protocol_helpers import BigHex2Short, BigHex2Float  # noqa: F401 # pylint: disable=W0611
+from .protocol_helpers import LittleHex2Float, LittleHex2Short  # noqa: F401 # pylint: disable=W0611
+from .protocol_helpers import LittleHex2UInt, LittleHex2Int  # noqa: F401 # pylint: disable=W0611
+from .protocol_helpers import Hex2Ascii, Hex2Int, Hex2Str  # noqa: F401 # pylint: disable=W0611
+from .protocol_helpers import uptime  # noqa: F401 # pylint: disable=W0611
 from .protocol_helpers import crcPI as crc
 
 log = logging.getLogger("AbstractProtocol")
@@ -200,22 +200,22 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         if data_type == "string":
             return [(data_name, raw_value.decode(), data_units, extra_info)]
         format_string = f"{data_type}(raw_value)"
-        log.debug(f"Processing format string {format_string}")
+        log.debug("Processing format string: '%s'", format_string)
         try:
-            r = eval(format_string)
+            r = eval(format_string)  # pylint: disable=W0123
         except ValueError as e:
-            log.info(f"Failed to eval format {format_string} (returning 0), error: {e}")
-            return [(data_name, 0, data_units, extra_info)]
+            log.info("Failed to eval format '%s' (setting r=0), error: %s", format_string, e)
+            r = 0
         except TypeError as e:
-            log.warning(f"Failed to eval format {format_string}, error: {e}")
-            return [(data_name, format_string, data_units, extra_info)]
+            log.warning("Failed to eval format: '%s', error: %s", format_string, e)
+            r = format_string
         if template is not None:
             # eg template=r/1000
-            r = eval(template)
+            r = eval(template)  # pylint: disable=W0123
         if "{" in data_name:
             # eg "f'Frame Number {f:02d}'"
             f = frame_number  # noqa: F841
-            data_name = eval(data_name)
+            data_name = eval(data_name)  # pylint: disable=W0123
         return [(data_name, r, data_units, extra_info)]
 
     def decode_result(self, result, command):
@@ -397,7 +397,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     log.info(f"Processing unknown response format {result}")
                     msgs[i] = [result, ""]
 
-                #add extra info about the command
+                # add extra info about the command
                 if len(resp_format) > 3:
                     msgs[key].append(resp_format[3])                    
 
