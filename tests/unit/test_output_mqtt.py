@@ -1,15 +1,15 @@
+""" tests / unit / test_output_mqtt.py """
 import unittest
 
-# from mppsolar.outputs import get_outputs
-from mppsolar.outputs.mqtt import mqtt as mqtt
+from mppsolar.outputs.mqtt import mqtt
 
 
-class test_mqtt_output(unittest.TestCase):
+class TestMqttOutput(unittest.TestCase):
+    """ test the mqtt output module """
     maxDiff = 9999
 
-    def test_mqtt_out(self):
-        """test the mqtt output"""
-        global run, result, count
+    def test_mqtt_msg(self):
+        """ test the mqtt msg build """
         result = []
         # Get a mqtt output processor
         # op = get_outputs("mqtt")[0]
@@ -24,7 +24,7 @@ class test_mqtt_output(unittest.TestCase):
             "Battery voltage": [51.4, "V"],
         }
 
-        msgs = mqtt().build_msgs(
+        result = mqtt().build_msgs(
             data=data, tag=tag, keep_case=False, filter=None, excl_filter=None
         )
 
@@ -34,7 +34,5 @@ class test_mqtt_output(unittest.TestCase):
             {"topic": f"{tag}/status/battery_voltage/unit", "payload": "V"},
         ]
 
-        # topic = f"{tag}/#"
-
         # print(result)
-        self.assertEqual(msgs, expected)
+        self.assertEqual(result, expected)

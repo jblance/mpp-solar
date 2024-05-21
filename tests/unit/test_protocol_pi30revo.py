@@ -1,4 +1,4 @@
-""" tests / mpp / unit / test_protocol_pi30revo.py """
+""" tests / unit / test_protocol_pi30revo.py """
 import unittest
 
 from mppsolar.protocols.pi30revo import pi30revo as pi
@@ -6,7 +6,7 @@ from mppsolar.protocols.pi30revo import pi30revo as pi
 protocol = pi()
 
 
-class test_pi30revo(unittest.TestCase):
+class TestPi30revo(unittest.TestCase):
     """ unit tests of pi30revo protocol """
     maxDiff = None
 

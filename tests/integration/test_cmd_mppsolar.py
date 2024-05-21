@@ -24,8 +24,8 @@ class test_command_line(unittest.TestCase):
         try:
             expected = """Command: QPI - Protocol ID inquiry
 --------------------------------------------------------------------------------
-Parameter   Value          \tUnit
-protocol_id PI30           \t    
+Parameter   Value          Unit
+protocol_id PI30           
 --------------------------------------------------------------------------------\n\n\n"""
             result = subprocess.run(
                 ["mpp-solar", "-c", "QPI", "-p", "test0"], check=True, capture_output=True, text=True
