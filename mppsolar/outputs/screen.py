@@ -43,7 +43,7 @@ class screen(baseoutput):
             excl_filter = get_kwargs(kwargs, "excl_filter")
 
         if _filter is not None:
-            _filter = re.compile(filter)
+            _filter = re.compile(_filter)
         if excl_filter is not None:
             excl_filter = re.compile(excl_filter)
 
