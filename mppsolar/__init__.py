@@ -253,6 +253,9 @@ def main():
     push_url = args.pushurl
 
     _commands = []
+    _setup_in_commands = []
+    _curr_in_commands = []
+
     # Initialize Daemon
     if args.daemon:
         import time
@@ -316,6 +319,7 @@ def main():
             mongo_db = config[section].get("mongo_db", fallback=None)
             push_url = config[section].get("push_url", fallback=push_url)
             mqtt_topic = config[section].get("mqtt_topic", fallback=mqtt_topic)
+            direction = config[section].get("direction", fallback="out")
             #
             device_class = get_device_class(_type)
             log.debug(f"device_class {device_class}")
@@ -338,7 +342,10 @@ def main():
             commands = _command.split("#")
 
             for command in commands:
-                _commands.append((device, command, tag, outputs, filter, excl_filter))
+                _commands.append((device, command, tag, outputs, filter, excl_filter, direction))
+            if direction == 'in':
+                for command in commands:
+                    _setup_in_commands.append((device, command, tag, outputs, filter, excl_filter, direction))
             log.debug(f"Commands from config file {_commands}")
 
             if args.daemon:
@@ -404,52 +411,62 @@ def main():
                 tag = args.tag
             else:
                 tag = command
-            _commands.append((device, command, tag, outputs, filter, excl_filter))
+            _commands.append((device, command, tag, outputs, filter, excl_filter, 'out'))
         log.debug(f"Commands {_commands}")
+
+    def mqtt_on_message(client: mqtt_client, userdata, msg: mqtt_client.MQTTMessage):
+        _payload = msg.payload.decode()
+        for _device, _command, _tag, _outputs, filter, excl_filter, direction in _setup_in_commands:
+            if _command == _payload:
+                _curr_in_commands.append((_device, _command, _tag, _outputs, filter, excl_filter, direction))
+
+    def execute_command(_device, _command, _tag, _outputs, filter, excl_filter):
+        log.info(f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}")
+        results = _device.run_command(command=_command)
+        log.debug(f"results: {results}")
+        # send to output processor(s)
+        outputs = get_outputs(_outputs)
+        for op in outputs:
+            # maybe include the command and what the command is im the output
+            # eg QDI run, Display Inverter Default Settings
+            log.debug(f"Using output filter: {filter}")
+            op.output(
+                data=results,
+                tag=_tag,
+                name=_device._name,
+                mqtt_broker=mqtt_broker,
+                udp_port=udp_port,
+                postgres_url=postgres_url,
+                mongo_url=mongo_url,
+                mongo_db=mongo_db,
+                push_url=push_url,
+                # mqtt_port=mqtt_port,
+                # mqtt_user=mqtt_user,
+                # mqtt_pass=mqtt_pass,
+                mqtt_topic=mqtt_topic,
+                filter=filter,
+                excl_filter=excl_filter,
+                keep_case=keep_case,
+            )
+
+    mqtt_broker.subscribe("Inverter/command", mqtt_on_message)
 
     while True:
         # Loop through the configured commands
         if not args.daemon:
             log.info(f"Looping {len(_commands)} commands")
-        for _device, _command, _tag, _outputs, filter, excl_filter in _commands:
+        if len(_curr_in_commands):
+            for _device, _command, _tag, _outputs, filter, excl_filter, direction in _curr_in_commands:
+                execute_command(_device, _command, _tag, _outputs, filter, excl_filter)
+            _curr_in_commands = []
+        for _device, _command, _tag, _outputs, filter, excl_filter, direction in _commands:
             # for item in mppUtilArray:
             # Tell systemd watchdog we are still alive
             if args.daemon:
                 systemd.daemon.notify("WATCHDOG=1")
-                print(
-                    f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
-                )
-            else:
-                log.info(
-                    f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
-                )
-            results = _device.run_command(command=_command)
-            log.debug(f"results: {results}")
-            # send to output processor(s)
-            outputs = get_outputs(_outputs)
-            for op in outputs:
-                # maybe include the command and what the command is im the output
-                # eg QDI run, Display Inverter Default Settings
-                log.debug(f"Using output filter: {filter}")
-                op.output(
-                    data=results,
-                    tag=_tag,
-                    name=_device._name,
-                    mqtt_broker=mqtt_broker,
-                    udp_port=udp_port,
-                    postgres_url=postgres_url,
-                    mongo_url=mongo_url,
-                    mongo_db=mongo_db,
-                    push_url=push_url,
-                    # mqtt_port=mqtt_port,
-                    # mqtt_user=mqtt_user,
-                    # mqtt_pass=mqtt_pass,
-                    mqtt_topic=mqtt_topic,
-                    filter=filter,
-                    excl_filter=excl_filter,
-                    keep_case=keep_case,
-                )
-                # Tell systemd watchdog we are still alive
+            if direction == 'out':
+                execute_command(_device, _command, _tag, _outputs, filter, excl_filter)
+                    # Tell systemd watchdog we are still alive
         if args.daemon:
             systemd.daemon.notify("WATCHDOG=1")
             print(f"Sleeping for {pause} sec")
