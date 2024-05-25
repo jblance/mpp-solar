@@ -449,7 +449,12 @@ def main():
                 keep_case=keep_case,
             )
 
-    mqtt_broker.subscribe("Inverter/command", mqtt_on_message)
+    _in_tags = []
+    for _device, _command, _tag, _outputs, filter, excl_filter, direction in _setup_in_commands:
+        if not tag in _in_tags:
+            _in_tags.append(tag)
+    for _tag in _in_tags:
+        mqtt_broker.subscribe(f"{_tag}/command", mqtt_on_message)
 
     while True:
         # Loop through the configured commands
