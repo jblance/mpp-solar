@@ -1,5 +1,6 @@
 # !/usr/bin/python3
 import logging
+import threading
 from argparse import ArgumentParser
 from platform import python_version
 
@@ -254,6 +255,7 @@ def main():
     mqtt_topic = args.mqtttopic
     push_url = args.pushurl
 
+    _event = threading.Event()
     _commands = []
     _setup_in_commands = []
     _curr_in_commands = []
@@ -421,6 +423,8 @@ def main():
         for _device, _command, _tag, _outputs, filter, excl_filter, direction in _setup_in_commands:
             if _command == _payload:
                 _curr_in_commands.append((_device, _command, _tag, _outputs, filter, excl_filter, direction))
+        if len(_curr_in_commands) > 0:
+            _event.set()
 
     def execute_command(_device, _command, _tag, _outputs, filter, excl_filter):
         log.info(f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}")
@@ -477,7 +481,8 @@ def main():
         if args.daemon:
             systemd.daemon.notify("WATCHDOG=1")
             print(f"Sleeping for {pause} sec")
-            time.sleep(pause)
+            _event.wait(timeout=pause)
+            _event.clear()
         else:
             # Dont loop unless running as daemon
             log.debug("Not daemon, so not looping")
