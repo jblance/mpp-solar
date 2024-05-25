@@ -10,6 +10,8 @@ from .libs.mqttbrokerc import MqttBroker
 from .outputs import get_outputs, list_outputs
 from .protocols import list_protocols
 
+import paho.mqtt.client as mqtt_client
+
 # Set-up logger
 log = logging.getLogger("")
 FORMAT = "%(asctime)-15s:%(levelname)s:%(module)s:%(funcName)s@%(lineno)d: %(message)s"
