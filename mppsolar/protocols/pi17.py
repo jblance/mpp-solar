@@ -550,7 +550,7 @@ SETTER_COMMANDS = {
             b"^1\x0b\xc2\r",
             b"^0\x1b\xe3\r",
         ],
-        "regex": "GPMP(0[10][12345]\d\d\d)$",
+        "regex": "GPMP(0[10]\d\d\d\d)$",
     },
     "LON": {
         "name": "LON",
