@@ -144,6 +144,14 @@ def main():
         default="http://localhost:9091/metrics/job/pushgateway",
     )
     parser.add_argument(
+        "--prom_output_dir",
+        help=(
+            "Output directory where Prometheus metrics are written as .prom files"
+            "(default: /var/lib/node_exporter)"
+        ),
+        default="/var/lib/node_exporter",
+    )
+    parser.add_argument(
         "-c",
         "--command",
         nargs="?",
@@ -251,6 +259,7 @@ def main():
     keep_case = args.keepcase
     mqtt_topic = args.mqtttopic
     push_url = args.pushurl
+    prom_output_dir = args.prom_output_dir
 
     _commands = []
     # Initialize Daemon
@@ -315,6 +324,7 @@ def main():
             mongo_url = config[section].get("mongo_url", fallback=None)
             mongo_db = config[section].get("mongo_db", fallback=None)
             push_url = config[section].get("push_url", fallback=push_url)
+            prom_output_dir = config[section].get("prom_output_dir", fallback=prom_output_dir)
             mqtt_topic = config[section].get("mqtt_topic", fallback=mqtt_topic)
             #
             device_class = get_device_class(_type)
@@ -333,6 +343,7 @@ def main():
                 mongo_url=mongo_url,
                 mongo_db=mongo_db,
                 push_url=push_url,
+                prom_output_dir=prom_output_dir,
             )
             # build array of commands
             commands = _command.split("#")
@@ -372,6 +383,7 @@ def main():
             mongo_url=mongo_url,
             mongo_db=mongo_db,
             push_url=push_url,
+            prom_output_dir=prom_output_dir,
         )
         #
 
@@ -432,7 +444,7 @@ def main():
                 # eg QDI run, Display Inverter Default Settings
                 log.debug(f"Using output filter: {filter}")
                 op.output(
-                    data=results,
+                    data=results.copy(),
                     tag=_tag,
                     name=_device._name,
                     mqtt_broker=mqtt_broker,
@@ -441,6 +453,7 @@ def main():
                     mongo_url=mongo_url,
                     mongo_db=mongo_db,
                     push_url=push_url,
+                    prom_output_dir=prom_output_dir,
                     # mqtt_port=mqtt_port,
                     # mqtt_user=mqtt_user,
                     # mqtt_pass=mqtt_pass,
