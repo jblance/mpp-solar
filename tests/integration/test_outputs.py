@@ -14,7 +14,7 @@ class testOutputs(unittest.TestCase):
 
     def test_outputs_count(self):
         # print(len(OUTPUTS))
-        assert len(OUTPUTS) == 23, len(OUTPUTS)
+        assert len(OUTPUTS) == 24, len(OUTPUTS)
 
     def test_outputs_init(self):
         for output in OUTPUTS:
