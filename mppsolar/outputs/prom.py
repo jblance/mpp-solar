@@ -51,7 +51,7 @@ class prom(baseoutput):
             excl_filter = re.compile(excl_filter)
         if name == "unnamed":
             name = "mpp_solar"
-      
+
         # remove raw response
         data.pop("raw_response", None)
         data.pop("_command_description", None)
@@ -63,7 +63,7 @@ class prom(baseoutput):
         for key, _values in data.items():
             # remove spaces
             if remove_spaces:
-                key = key.replace(" ", "_").replace("/","_")
+                key = key.replace(" ", "_").replace("/", "_").replace("-", "")
             if not keep_case:
                 # make lowercase
                 key = key.lower()
