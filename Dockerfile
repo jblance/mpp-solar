@@ -1,4 +1,4 @@
-FROM python:3.12
+FROM python:3.12-alpine
 
 RUN pip install --upgrade pip
 RUN python -V
