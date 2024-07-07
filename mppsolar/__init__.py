@@ -1,11 +1,13 @@
 # !/usr/bin/python3
 import logging
+import time
 from argparse import ArgumentParser
 from platform import python_version
 
 from mppsolar.version import __version__  # noqa: F401
 
 from .helpers import get_device_class
+from .libs.daemon import Daemon
 from .libs.mqttbrokerc import MqttBroker
 from .outputs import get_outputs, list_outputs
 from .protocols import list_protocols
@@ -263,22 +265,25 @@ def main():
 
     _commands = []
     # Initialize Daemon
-    if args.daemon:
-        import time
+    # build the daemon object (optional)
+    daemon = Daemon(enabled=args.daemon)
+    log.info(daemon)
 
-        try:
-            import systemd.daemon
-        except ImportError:
-            print("You are missing dependencies in order to be able to use the --daemon flag.")
-            print("To install them, use that command:")
-            print("    python -m pip install 'mppsolar[systemd]'")
-            exit(1)
 
-        # Tell systemd that our service is ready
-        systemd.daemon.notify("READY=1")
-        print("Service Initializing ...")
-        # set some default-defaults
-        pause = 60
+    # if args.daemon:
+    #     try:
+    #         import systemd.daemon
+    #     except ImportError:
+    #         print("You are missing dependencies in order to be able to use the --daemon flag.")
+    #         print("To install them, use that command:")
+    #         print("    python -m pip install 'mppsolar[systemd]'")
+    #         exit(1)
+
+    # Tell systemd that our service is ready
+    daemon.initialize()
+    daemon.notify("Service Initializing ...")
+    # set some default-defaults
+    pause = 60
 
     # If config file specified, process
     if args.configfile:
@@ -426,15 +431,9 @@ def main():
         for _device, _command, _tag, _outputs, filter, excl_filter in _commands:
             # for item in mppUtilArray:
             # Tell systemd watchdog we are still alive
-            if args.daemon:
-                systemd.daemon.notify("WATCHDOG=1")
-                print(
-                    f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
-                )
-            else:
-                log.info(
-                    f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
-                )
+            daemon.watchdog()
+            daemon.notify(f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}")
+            log.info(f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}")
             results = _device.run_command(command=_command)
             log.debug(f"results: {results}")
             # send to output processor(s)
@@ -464,7 +463,7 @@ def main():
                 )
                 # Tell systemd watchdog we are still alive
         if args.daemon:
-            systemd.daemon.notify("WATCHDOG=1")
+            daemon.watchdog()
             print(f"Sleeping for {pause} sec")
             time.sleep(pause)
         else:
