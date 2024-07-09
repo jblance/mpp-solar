@@ -23,6 +23,7 @@ RestartSec=60
 
 # Our service will notify systemd once it is up and running
 Type=notify
+##Type=simple 
 
 # Use a dedicated user to run our service
 # User=mpp_service
@@ -31,4 +32,5 @@ Type=notify
 [Install]
 # Tell systemd to automatically start this service when the system boots
 # (assuming the service is enabled)
-WantedBy=default.target
+## WantedBy=default.target
+WantedBy=multi-user.target

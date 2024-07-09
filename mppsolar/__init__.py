@@ -6,11 +6,12 @@ from platform import python_version
 
 from mppsolar.version import __version__  # noqa: F401
 
-from .helpers import get_device_class
-from .libs.daemon import Daemon
-from .libs.mqttbrokerc import MqttBroker
-from .outputs import get_outputs, list_outputs
-from .protocols import list_protocols
+from mppsolar.helpers import get_device_class
+from mppsolar.daemon import get_daemon
+from mppsolar.daemon import DaemonType
+from mppsolar.libs.mqttbrokerc import MqttBroker
+from mppsolar.outputs import get_outputs, list_outputs
+from mppsolar.protocols import list_protocols
 
 # Set-up logger
 log = logging.getLogger("")
@@ -264,9 +265,13 @@ def main():
     prom_output_dir = args.prom_output_dir
 
     _commands = []
+
     # Initialize Daemon
-    # build the daemon object (optional)
-    daemon = Daemon(enabled=args.daemon)
+    if not args.daemon:
+        daemon = get_daemon(daemontype=DaemonType.DISABLED)
+    else:
+        daemon = get_daemon(daemontype=DaemonType.SYSTEMD)
+        daemon.keepalive = 60
     log.info(daemon)
 
 
