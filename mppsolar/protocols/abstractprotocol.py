@@ -352,10 +352,13 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                         # if flag == "1" or flag == b"1":
                         #    output = "{}\n\t- {}".format(output, resp_format[2][j])
                         # display all flags
-                        key = resp_format[2][j]
-                        output = flag
-                        if key:  # only add msg if key is something
-                            msgs[key] = [output, ""]
+                        try:
+                            key = resp_format[2][j]
+                            output = flag
+                            if key:  # only add msg if key is something
+                                msgs[key] = [output, ""]
+                        except IndexError:
+                            pass
                 # eg. ['enflags', 'Device Status', {'a': {'name': 'Buzzer', 'state': 'disabled'},
                 elif resp_format[0] == "enflags":
                     # output = {}

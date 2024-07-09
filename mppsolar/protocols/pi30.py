@@ -870,6 +870,7 @@ QUERY_COMMANDS = {
         "description": "Warning status inquiry",
         "help": " -- queries any active warnings flags from the Inverter",
         "type": "QUERY",
+        #"response_type": "SEQUENTIAL",
         "response": [
             [
                 "stat_flags",
@@ -912,6 +913,7 @@ QUERY_COMMANDS = {
         ],
         "test_responses": [
             b"(00000100000000001000000000000000\x56\xA6\r",
+            b'(100000000000000000000000000000000000\x15\xcf\r'
         ],
     },
     "QVFW": {
