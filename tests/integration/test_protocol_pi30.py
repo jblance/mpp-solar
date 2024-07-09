@@ -190,6 +190,48 @@ class test_pi30_decode(unittest.TestCase):
         # print(result)
         self.assertEqual(result, expected)
 
+    def test_pi30_QPIWS_long(self):
+        """test the decode of a longer QPIWS response"""
+        protocol = pi()
+        response = b'(100000000000000000000000000000000000\x15\xcf\r'
+        command = "QPIWS"
+        expected = {
+            "raw_response": ["(100000000000000000000000000000000000\x15Ï\r", ""],
+            "_command": "QPIWS",
+            "_command_description": "Warning status inquiry",
+            "Inverter fault": ["0", ""],
+            "Bus over fault": ["0", ""],
+            "Bus under fault": ["0", ""],
+            "Bus soft fail fault": ["0", ""],
+            "Line fail warning": ["0", ""],
+            "OPV short warning": ["0", ""],
+            "Inverter voltage too low fault": ["0", ""],
+            "Inverter voltage too high fault": ["0", ""],
+            "Over temperature fault": ["0", ""],
+            "Fan locked fault": ["0", ""],
+            "Battery voltage too high fault": ["0", ""],
+            "Battery low alarm warning": ["0", ""],
+            "Reserved": ["0", ""],
+            "Battery under shutdown warning": ["0", ""],
+            "Overload fault": ["0", ""],
+            "EEPROM fault": ["0", ""],
+            "Inverter over current fault": ["0", ""],
+            "Inverter soft fail fault": ["0", ""],
+            "Self test fail fault": ["0", ""],
+            "OP DC voltage over fault": ["0", ""],
+            "Battery open fault": ["0", ""],
+            "Current sensor fail fault": ["0", ""],
+            "Battery short fault": ["0", ""],
+            "Power limit warning": ["0", ""],
+            "PV voltage high warning": ["0", ""],
+            "MPPT overload fault": ["0", ""],
+            "MPPT overload warning": ["0", ""],
+            "Battery too low to charge warning": ["0", ""],
+        }
+        result = protocol.decode(response, command)
+        # print(result)
+        self.assertEqual(result, expected)
+
     def test_pi30_QPGS(self):
         """test the decode of a QPGS response"""
         protocol = pi()
