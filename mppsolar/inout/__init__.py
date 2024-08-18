@@ -11,6 +11,7 @@ class PortType(Enum):
     USB = auto()
     ESP32 = auto()
     SERIAL = auto()
+    JKSERIAL = auto()
     JKBLE = auto()
     MQTT = auto()
     VSERIAL = auto()
@@ -62,6 +63,9 @@ def get_port_type(port):
     elif "vserial" in port:
         log.debug("port matches vserial")
         return PortType.VSERIAL
+    elif "jkserial" in port:
+        log.debug("port matches jkserial")
+        return PortType.JKSERIAL
     elif "serial" in port:
         log.debug("port matches serial")
         return PortType.SERIAL
@@ -112,6 +116,12 @@ def get_port(*args, **kwargs):
         from mppsolar.inout.serialio import SerialIO
 
         _port = SerialIO(device_path=port, serial_baud=baud)
+
+    elif port_type == PortType.JKSERIAL:
+        log.info("Using jkserialio for communications")
+        from mppsolar.inout.jkserialio import JKSerialIO
+
+        _port = JKSerialIO(device_path=port, serial_baud=baud)
 
     elif port_type == PortType.DALYSERIAL:
         log.info("Using dalyserialio for communications")
