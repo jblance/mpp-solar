@@ -1,13 +1,13 @@
-mppsolar-integration-tests: 
+integration-tests: 
 	python3 -m unittest discover -s tests/integration -f -v
 
-mppsolar-unit-tests: 
+unit-tests: 
 	python3 -m unittest discover -s tests/unit -f -v
 	
 test:
 	python3 -m unittest discover -s tests -f
 
-tests: mppsolar-unit-tests mppsolar-integration-tests
+tests: unit-tests integration-tests
 
 pypi:
 	rm -rf dist/*
