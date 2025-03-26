@@ -20,7 +20,7 @@ class test_pi30mst_decode(unittest.TestCase):
         try:
             expected = "PI30:044:MKS2-8000\n"
             result = subprocess.run(
-                ["mpp-solar", "-p", "test", "-P", "pi30mst", "--getDeviceId", "-o", "value"],
+                ["poetry", "run", "mpp-solar", "-p", "test", "-P", "pi30mst", "--getDeviceId", "-o", "value"],
                 check=True,
                 capture_output=True,
                 text=True,

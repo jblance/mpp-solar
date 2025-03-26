@@ -153,7 +153,7 @@ class test_pi16_decode(unittest.TestCase):
         try:
             expected = "PI16:000:00000.27\n"
             result = subprocess.run(
-                ["mpp-solar", "-p", "test", "-P", "pi16", "--getDeviceId", "-o", "value"],
+                ["poetry", "run", "mpp-solar", "-p", "test", "-P", "pi16", "--getDeviceId", "-o", "value"],
                 check=True,
                 capture_output=True,
                 text=True,

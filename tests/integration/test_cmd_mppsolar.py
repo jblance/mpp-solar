@@ -10,7 +10,7 @@ class test_command_line(unittest.TestCase):
         try:
             expected = "serial_number=9293333010501\n"
             result = subprocess.run(
-                ["mpp-solar", "-c", "QID", "-p", "test0", "-o", "simple"], check=True, capture_output=True, text=True
+                ["poetry", "run", "mpp-solar", "-c", "QID", "-p", "test0", "-o", "simple"], check=True, capture_output=True, text=True
             )
             # print(result.stdout)
             self.assertEqual(result.stdout, expected)
@@ -28,7 +28,7 @@ Parameter   Value          Unit
 protocol_id PI30           
 --------------------------------------------------------------------------------\n\n\n"""
             result = subprocess.run(
-                ["mpp-solar", "-c", "QPI", "-p", "test0"], check=True, capture_output=True, text=True
+                ["poetry", "run", "mpp-solar", "-c", "QPI", "-p", "test0"], check=True, capture_output=True, text=True
             )
             # print(result.stdout)
             self.assertEqual(result.stdout, expected)
@@ -78,7 +78,7 @@ protocol_id PI30
                 "is_reserved": {"value": 0, "unit": "bool"},
             }
             result = subprocess.run(
-                ["mpp-solar", "-c", "QPIGS", "-p", "test", "-o", "json_units"],
+                ["poetry", "run", "mpp-solar", "-c", "QPIGS", "-p", "test", "-o", "json_units"],
                 check=True,
                 capture_output=True,
                 text=True,
@@ -96,7 +96,7 @@ protocol_id PI30
         try:
             expected = "mqtt debug output only as broker name is 'screen' - topic: 'QPI/status/protocol_id/value', payload: 'PI30'\n"
             result = subprocess.run(
-                ["mpp-solar", "-p", "test", "-o", "mqtt", "-q", "screen"],
+                ["poetry", "run", "mpp-solar", "-p", "test", "-o", "mqtt", "-q", "screen"],
                 check=True,
                 capture_output=True,
                 text=True,

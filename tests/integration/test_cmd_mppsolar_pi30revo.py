@@ -33,7 +33,7 @@ def do_test(self, command, expected, respno=0):
     try:
         # print(command, end=" ")
         result = subprocess.run(
-            [
+            ["poetry", "run", 
                 "mppsolar",
                 "-p",
                 "test0",

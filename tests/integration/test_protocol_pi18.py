@@ -207,7 +207,7 @@ class test_pi18_fullcommands(unittest.TestCase):
         try:
             expected = "18:5220\n"
             result = subprocess.run(
-                ["mpp-solar", "-p", "test", "-P", "pi18", "--getDeviceId", "-o", "value"],
+                ["poetry", "run", "mpp-solar", "-p", "test", "-P", "pi18", "--getDeviceId", "-o", "value"],
                 check=True,
                 capture_output=True,
                 text=True,

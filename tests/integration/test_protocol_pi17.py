@@ -141,7 +141,7 @@ def do_test(self, command, expected, respno=0):
         # print(command, end=" ")
         respno += 1
         result = subprocess.run(
-            [
+            ["poetry", "run", 
                 "mppsolar",
                 "-p",
                 "test0",
@@ -180,7 +180,7 @@ class TestPi17(unittest.TestCase):
         try:
             expected = "17:050\n"
             result = subprocess.run(
-                ["mpp-solar", "-p", "test", "-P", "pi17", "--getDeviceId", "-o", "value"],
+                ["poetry", "run", "mpp-solar", "-p", "test", "-P", "pi17", "--getDeviceId", "-o", "value"],
                 check=True,
                 capture_output=True,
                 text=True,

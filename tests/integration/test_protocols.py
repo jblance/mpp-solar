@@ -16,7 +16,7 @@ class testProtocols(unittest.TestCase):
 
     def test_protocols_count(self):
         # print(len(PROTOCOLS))
-        assert len(PROTOCOLS) == 24, len(PROTOCOLS)
+        assert len(PROTOCOLS) == 25, len(PROTOCOLS)
 
     def test_protocols_init(self):
         for protocol in PROTOCOLS:
