@@ -92,7 +92,15 @@ class jkAbstractProtocol(AbstractProtocol):
             cmd[4] = int(self._command_defn["command_code"], 16)
             if self._command_defn["type"] == "SETTER":
                 cmd[5] = 0x04
-                value = struct.pack("<h", int(float(self._command_value) * 1000))
+                if self._command_defn["name"] == "setChargingOn":
+                    value = [1,0]
+                elif self._command_defn["name"] == "setChargingOff":
+                    value = [0,0]
+                elif self._command_defn["name"] == "setBalanceStart":
+                    value = struct.pack("<h", int(float(self._command_value) * 1000))
+                    cmd[10:19] = [0x23, 0xb2, 0xcd, 0x31, 0x2d, 0x28, 0xf2, 0x6b, 0x4]
+                else:
+                    value = struct.pack("<h", int(float(self._command_value) * 1000))
                 cmd[6] = value[0]
                 cmd[7] = value[1]
             log.debug(f"cmd with command code: {cmd}")
