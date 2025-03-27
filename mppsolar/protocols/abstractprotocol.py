@@ -123,6 +123,12 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
             # Just ignore these ones
             log.debug(f"Discarding {data_name}:{raw_value}")
             return [(None, raw_value, data_units, extra_info)]
+        if data_type == 'ack':
+            log.debug(f'ack mode {raw_value} {type(data_units)}')
+            key = raw_value.decode()
+            r = data_units.get(key)
+            print(data_name, r, "", extra_info)
+            return [(data_name, r, "", extra_info)]
         if data_type == "option":
             try:
                 key = int(raw_value)
@@ -392,7 +398,7 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                             msgs[item_name] = [item_value, ""]
                         else:
                             print(f"item type {item_type} not defined")
-                elif command_defn["type"] == "SETTER":
+                elif command_defn["type"] in ["SETTER", "BLE_SETTER"]:
                     # _key = "{}".format(command_defn["name"]).lower().replace(" ", "_")
                     _key = command_defn["name"]
                     msgs[_key] = [result, ""]
@@ -525,6 +531,18 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
                     data_type = response_defn[0]  # 1
                     data_name = response_defn[2]  # 2
                     data_units = response_defn[3]  # 3
+                elif response_type == "BLE_SETTER":
+                    #[["option", "DSP Has Bootstrap", ["No", "Yes"]]],
+                    #["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+                    raw_value = response
+                    response_defn = command_defn["response"][0]
+                    log.debug(f"Got defn {response_defn}")
+                    # length = response_defn[1] #0
+                    data_type = response_defn[0]  # 1
+                    data_name = response_defn[1]  # 2
+                    data_units = response_defn[2]  # 3
+                else:
+                    log.warning(f'Unknown response type {response_type}')
 
                 # Check for lookup
                 if data_type.startswith("lookup"):

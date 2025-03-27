@@ -90,7 +90,7 @@ class jkAbstractProtocol(AbstractProtocol):
             log.debug(f"cmd with SOR: {cmd}")
             # then has command code
             cmd[4] = int(self._command_defn["command_code"], 16)
-            if self._command_defn["type"] == "SETTER":
+            if self._command_defn["type"] in ["SETTER", "BLE_SETTER"]:
                 cmd[5] = 0x04
                 if self._command_defn["name"] == "setChargingOn":
                     value = [1,0]
@@ -142,6 +142,13 @@ class jkAbstractProtocol(AbstractProtocol):
                 response = response[size:]
             if len(response) > 0:
                 responses.append(response)
+            return responses
+        if self._command_defn is not None and self._command_defn["response_type"] == "BLE_SETTER":
+            log.debug("BLE_SETTER")
+            if response == b'\xaaU\x90\xeb\xc8\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00D':
+                responses.append(b"ACK")
+            else:
+                responses.append(b"(NAK\x73\x73\r")
             return responses
         else:
             return bytearray(response)
