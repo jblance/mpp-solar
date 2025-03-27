@@ -4,7 +4,7 @@ RUN pip install --upgrade pip
 RUN python -V
 RUN python -c 'import platform;print(platform.machine())'
 ARG TARGETARCH
-ECHO $TARGETARCH
+RUN echo $TARGETARCH
 RUN if [[ "$TARGETARCH" == "arm64" ]] ; then \
         pip install https://github.com/mosquito/cysystemd/releases/download/1.6.2/cysystemd-1.6.2-cp312-cp312-manylinux_2_28_aarch64.whl ; \
     else \
