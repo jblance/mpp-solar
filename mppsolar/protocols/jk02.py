@@ -175,6 +175,36 @@ NEW_COMMANDS = {
         ],
         #"regex": "setChargingOn$",
     },
+    "setDischargingOn" : {
+        "name": "setDischargingOn",
+        "command_code": "1E",
+        "record_type": "2",
+        "description": "Set Discharging On",
+        "type": "SETTER",
+        "response_type": "BLE_SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
+        "test_responses": [
+            b'\xaaU\x90\xeb\xc8\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00D'
+        ],
+        #"regex": "setChargingOn$",
+    },
+    "setDischargingOff" : {
+        "name": "setDischargingOff",
+        "command_code": "1E",
+        "record_type": "2",
+        "description": "Set Discharging Off",
+        "type": "SETTER",
+        "response_type": "BLE_SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}]
+        ],
+        "test_responses": [
+            b'\xaaU\x90\xeb\xc8\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00D',
+        ],
+        #"regex": "setChargingOn$",
+    },
     "setBalanceStart": {
         "name": "setBalanceStart",
         "command_code": "26",

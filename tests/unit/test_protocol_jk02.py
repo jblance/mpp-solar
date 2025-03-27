@@ -77,6 +77,28 @@ class TestJk02(unittest.TestCase):
         #     print(i, hex(result[i]), hex(expected[i]), result[i]==expected[i])
         self.assertEqual(expected, result)
 
+    def test_get_full_command_set_discharging_on(self):
+        """ test for full command generation for setDischargingOn"""
+        result = protocol.get_full_command("setDischargingOn")
+        expected = b'\xaaU\x90\xeb\x1e\x04\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x9d'
+        # print()
+        # print("result", result)
+        # print("expect", bytearray(expected))
+        # for i, x in enumerate(result):
+        #     print(i, hex(result[i]), hex(expected[i]), result[i]==expected[i])
+        self.assertEqual(expected, result)
+
+    def test_get_full_command_set_discharging_off(self):
+        """ test for full command generation for setDishargingOff """
+        result = protocol.get_full_command("setDischargingOff")
+        expected = b'\xaaU\x90\xeb\x1e\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x9c'
+        # print()
+        # print("result", result)
+        # print("expect", bytearray(expected))
+        # for i, x in enumerate(result):
+        #     print(i, hex(result[i]), hex(expected[i]), result[i]==expected[i])
+        self.assertEqual(expected, result)
+
     # def test_checksum_pset(self):
     #     """ test for correct checksum for PSET command """
     #     command = 'PSET120103 56.3 54.6 43.8 42.6 040 020 2020 02 18 17 06 00'

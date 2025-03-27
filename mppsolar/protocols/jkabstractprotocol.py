@@ -98,6 +98,10 @@ class jkAbstractProtocol(AbstractProtocol):
                     value = [1,0]
                 elif self._command_defn["name"] == "setChargingOff":
                     value = [0,0]
+                elif self._command_defn["name"] == "setDischargingOn":
+                    value = [1,0]
+                elif self._command_defn["name"] == "setDischargingOff":
+                    value = [0,0]
                 elif self._command_defn["name"] == "setBalanceStart":
                     value = struct.pack("<h", int(float(self._command_value) * 1000))
                     cmd[10:19] = [0x23, 0xb2, 0xcd, 0x31, 0x2d, 0x28, 0xf2, 0x6b, 0x4]
