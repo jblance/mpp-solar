@@ -8,6 +8,8 @@ from .protocol_helpers import crc8
 log = logging.getLogger("jkAbstractProtocol")
 
 SOR = bytes.fromhex("55aaeb90")
+XSOR = b'\xaaU\x90\xeb'
+
 
 COMMANDS = {
     "getInfo": {
@@ -154,13 +156,13 @@ class jkAbstractProtocol(AbstractProtocol):
             return bytearray(response)
 
     def is_record_start(self, record):
-        if record.startswith(SOR):
+        if record.startswith(SOR) or record.startswith(XSOR):
             log.debug("SOR found in record")
             return True
         return False
 
     def wipe_to_start(self, record):
-        sor_loc = record.find(SOR)
+        sor_loc = max(record.find(SOR), record.find(XSOR))
         if sor_loc == -1:
             log.debug("SOR not found in record")
             return bytearray()
@@ -181,9 +183,9 @@ class jkAbstractProtocol(AbstractProtocol):
             log.debug("No SOR found in record looking for completeness")
             return False
         # check that length one of the valid lengths (300, 320)
-        if len(record) == 300 or len(record) == 320:
+        if len(record) == 300 or len(record) == 320 or len(record) == 20:
             # check the crc/checksum is correct for the record data
-            crc = record[299]
+            crc = record[-1]
             calcCrc = crc8(record[:-1])
             # print (crc, calcCrc)
             if crc == calcCrc:
