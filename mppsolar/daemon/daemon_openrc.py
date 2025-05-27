@@ -33,7 +33,7 @@ class DaemonOpenRC(Daemon):
     
     def __init__(self):
         self._notify = self._openrc_notify
-        self._journal = self._dummyNotify
+        self._journal = self._journal
         self._Notification = OpenRCNotification
         self.keepalive = 60
         self._lastNotify = time()
