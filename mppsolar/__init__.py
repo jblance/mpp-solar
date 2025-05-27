@@ -41,7 +41,7 @@ def main():
     )
     parser.add_argument(
         "--dev",
-        help="Device identifier for output labeling (default: None)",
+        help="Device identifier for prometheus output labeling for complex installations (default: None)",
         default=None,
     )
     if parser.prog == "jkbms":
