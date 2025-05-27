@@ -36,7 +36,7 @@ class prom(baseoutput):
             filter = config.get("filter", None)
             excl_filter = config.get("excl_filter", None)
             name = config.get("name", "mpp_solar")
-            dev = config.get("dev", "None")
+            dev = config.get("dev", dev)
         else:
             # get formatting info
             remove_spaces = True
@@ -51,6 +51,10 @@ class prom(baseoutput):
             excl_filter = re.compile(excl_filter)
         if name == "unnamed":
             name = "mpp_solar"
+
+
+        if dev is None:
+            dev = "None"
 
         # remove raw response
         data.pop("raw_response", None)
