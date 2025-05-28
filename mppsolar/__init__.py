@@ -7,7 +7,7 @@ from platform import python_version
 from mppsolar.version import __version__  # noqa: F401
 
 from mppsolar.helpers import get_device_class
-from mppsolar.daemon import get_daemon
+from mppsolar.daemon import get_daemon, detect_daemon_type
 from mppsolar.daemon import DaemonType
 from mppsolar.libs.mqttbrokerc import MqttBroker
 from mppsolar.outputs import get_outputs, list_outputs
@@ -276,7 +276,14 @@ def main():
     if not args.daemon:
         daemon = get_daemon(daemontype=DaemonType.DISABLED)
     else:
-        daemon = get_daemon(daemontype=DaemonType.SYSTEMD)
+#        daemon = get_daemon(daemontype=DaemonType.SYSTEMD)
+#        daemon.keepalive = 60
+        try:
+            daemon_type = detect_daemon_type()
+            daemon = get_daemon(daemontype=daemon_type)
+        except Exception as e:
+            log.warning(f"Failed to detect daemon type: {e}, falling back to OpenRC")
+            daemon = get_daemon(daemontype=DaemonType.OPENRC)
         daemon.keepalive = 60
     log.info(daemon)
 
