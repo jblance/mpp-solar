@@ -9,7 +9,7 @@ log = logging.getLogger("daemon")
 class Daemon:
     """ abstraction to support different daemon approaches / solutions """
     def __str__(self):
-        return f"Daemon name: {self.type}"
+        return f"Daemon name: {self.__class__.__name__}"
 
     def initialize(self):
         """ Daemon initialization activities """
@@ -35,3 +35,10 @@ class Daemon:
         # Print log message
         if message is not None:
             self._journal(message)
+    
+    # These methods should be overridden by subclasses
+    def _notify(self, notification, message=None):
+        pass
+    
+    def _journal(self, message):
+        pass
