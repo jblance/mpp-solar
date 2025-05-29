@@ -33,6 +33,13 @@ class DaemonOpenRC(Daemon):
         return f"Daemon OpenRC (PID file: {self.pid_file_path})"
 
     def __init__(self, pid_file_path=None):
+        import logging
+        log = logging.getLogger("daemon_openrc")
+    
+        pid = os.getpid()
+        ppid = os.getppid()
+        log.info(f"[OPENRC_INIT] Creating OpenRC daemon: PID={pid}, PPID={ppid}")
+    
         self._Notification = OpenRCNotification
         self.keepalive = 60
         self._lastNotify = time.time()
@@ -218,10 +225,16 @@ class DaemonOpenRC(Daemon):
         """Initialize daemon and create PID file"""
         log.info("Initializing OpenRC daemon...")
 
+        pid = os.getpid()
+        ppid = os.getppid()
+        log.info(f"[OPENRC_INITIALIZE] Before PID file creation: PID={pid}, PPID={ppid}")
+
+
         # Create PID file
         if not self._create_pid_file():
             log.error("Failed to create PID file, daemon cannot start")
             sys.exit(1)
+        log.info(f"[OPENRC_INITIALIZE] After PID file creation: PID={pid}, PPID={ppid}")
 
         # Call parent initialization
         super().initialize()

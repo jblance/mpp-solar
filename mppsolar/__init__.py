@@ -252,6 +252,37 @@ def main():
     import sys
     import os
 
+    #### Extra Logging
+    def log_process_info(label, log_func=None):
+        """Log detailed process information for debugging"""
+        if log_func is None:
+            log_func = print
+    
+        pid = os.getpid()
+        ppid = os.getppid()
+    
+        # Get process group and session info
+        try:
+            pgid = os.getpgid(0)
+            sid = os.getsid(0)
+        except:
+            pgid = "unknown"
+            sid = "unknown"
+    
+        # Check if we're the process group leader
+        is_leader = (pid == pgid)
+    
+        log_func(f"[{label}] PID: {pid}, PPID: {ppid}, PGID: {pgid}, SID: {sid}, Leader: {is_leader}")
+    
+        # Log command line that started this process
+        try:
+            with open(f'/proc/{pid}/cmdline', 'r') as f:
+                cmdline = f.read().replace('\0', ' ').strip()
+            log_func(f"[{label}] Command: {cmdline}")
+        except:
+            log_func(f"[{label}] Command: {' '.join(sys.argv)}")
+    #######
+
     # Check if we're running as PyInstaller bundle
     is_pyinstaller = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
 
@@ -293,16 +324,18 @@ def main():
             log.warning("Failed to setup file logging, continuing with console logging")
 
         # For PyInstaller bundles, skip traditional daemonization
-        if is_pyinstaller:
-            log.info("Running as PyInstaller bundle - skipping process daemonization")
-        else:
-            log.info("Attempting traditional daemonization...")
-            try:
-                daemonize()
-                log.info("Process daemonized successfully")
-            except Exception as e:
-                log.error(f"Failed to daemonize process: {e}")
-                log.info("Continuing without daemonization...")
+# #         if is_pyinstaller:
+#         if is_pyinstaller or daemon_type != DaemonType.DISABLED:
+#             log.info("Skipping traditional daemonization - using daemon management system")
+#         else:
+        log.info("Attempting traditional daemonization...")
+        try:
+            daemonize()
+            log.info("Process daemonized successfully")
+        except Exception as e:
+            log.error(f"Failed to daemonize process: {e}")
+            log.info("Continuing without daemonization...")
+
 
     # mqttbroker setup
     mqtt_broker = MqttBroker(
@@ -335,21 +368,24 @@ def main():
     # Initialize Daemon
     if not args.daemon:
         daemon = get_daemon(daemontype=DaemonType.DISABLED)
+        log_process_info("DAEMON_DISABLED_CREATED", log.info)
     else:
         try:
             daemon_type = detect_daemon_type()
+            log.info(f"Detected daemon type: {daemon_type}")
             daemon = get_daemon(daemontype=daemon_type)
         except Exception as e:
             log.warning(f"Failed to detect daemon type: {e}, falling back to OpenRC")
             daemon = get_daemon(daemontype=DaemonType.OPENRC)
-        
+            log_process_info("FALLBACK_DAEMON_CREATED", log.info)
+
         # Set custom PID file path if provided and daemon supports it
         if hasattr(daemon, 'set_pid_file_path') and args.pidfile:
             daemon.set_pid_file_path(args.pidfile)
             log.info(f"Using custom PID file: {args.pidfile}")
         elif hasattr(daemon, 'pid_file_path'):
             # Set default PID file location if not already set
-            if is_pyinstaller or os.geteuid() != 0:  # Non-root or PyInstaller
+            if os.geteuid() != 0:  # Non-root
                 daemon.pid_file_path = "/tmp/mpp-solar.pid"
                 log.info(f"Using default PID file for non-root/PyInstaller: {daemon.pid_file_path}")
             else:
@@ -362,7 +398,9 @@ def main():
 
     # Tell systemd that our service is ready
     daemon.initialize()
+    log_process_info("AFTER_DAEMON_INITIALIZE", log.info)
     daemon.notify("Service Initializing ...")
+    log_process_info("AFTER_DAEMON_NOTIFY", log.info)
     # set some default-defaults
     pause = 60
 
