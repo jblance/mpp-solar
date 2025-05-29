@@ -32,3 +32,4 @@ class DaemonDummy(Daemon):
         # if args:
         #     print(args[0])
         return
+

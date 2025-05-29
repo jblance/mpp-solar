@@ -242,6 +242,7 @@ def main():
         # for result in results:
         #    print(result)
         return None
+
     # mqttbroker:
     #     name: null
     #     port: 1883
@@ -250,10 +251,10 @@ def main():
     # Handle daemon setup and stop requests
     import sys
     import os
-    
+
     # Check if we're running as PyInstaller bundle
     is_pyinstaller = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
-    
+
     # Handle daemon stop request
     if args.daemon_stop:
         pid_file_path = args.pidfile
@@ -263,9 +264,9 @@ def main():
                 pid_file_path = "/tmp/mpp-solar.pid"
             else:
                 pid_file_path = "/var/run/mpp-solar.pid"
-    
+
         log.info(f"Attempting to stop daemon using PID file: {pid_file_path}")
-    
+
         try:
             daemon_type = detect_daemon_type()
             daemon_class = get_daemon(daemontype=daemon_type).__class__
@@ -286,11 +287,11 @@ def main():
     # Setup daemon logging if in daemon mode
     if args.daemon:
         log.info("Setting up daemon mode...")
-    
+
         # Setup daemon logging first
         if not setup_daemon_logging("/var/log/mpp-solar.log"):
             log.warning("Failed to setup file logging, continuing with console logging")
-    
+
         # For PyInstaller bundles, skip traditional daemonization
         if is_pyinstaller:
             log.info("Running as PyInstaller bundle - skipping process daemonization")
@@ -321,7 +322,7 @@ def main():
     mongo_url = args.mongo_url
     mongo_db = args.mongo_db
     log.debug(f"Using Mongo {mongo_url} with {mongo_db}")
-    
+    ##
     filter = args.filter
     excl_filter = args.exclfilter
     keep_case = args.keepcase
@@ -354,9 +355,9 @@ def main():
             else:
                 daemon.pid_file_path = "/var/run/mpp-solar.pid"
                 log.info(f"Using default PID file for root: {daemon.pid_file_path}")
-        
+
         daemon.keepalive = 60
-    
+
     log.info(daemon)
 
     # Tell systemd that our service is ready
@@ -440,10 +441,12 @@ def main():
             if args.daemon:
                 print(f"Config file: {args.configfile}")
                 print(f"Config setting - pause: {pause}")
+                # print(f"Config setting - mqtt_broker: {mqtt_broker}, port: {mqtt_port}")
                 print(f"Config setting - command sections found: {len(sections)}")
             else:
                 log.info(f"Config file: {args.configfile}")
                 log.info(f"Config setting - pause: {pause}")
+                # log.info(f"Config setting - mqtt_broker: {mqtt_broker}, port: {mqtt_port}")
                 log.info(f"Config setting - command sections found: {len(sections)}")
 
     else:
@@ -506,6 +509,7 @@ def main():
         if not args.daemon:
             log.info(f"Looping {len(_commands)} commands")
         for _device, _command, _tag, _outputs, filter, excl_filter in _commands:
+            # for item in mppUtilArray:
             # Tell systemd watchdog we are still alive
             daemon.watchdog()
             daemon.notify(f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}")
@@ -550,3 +554,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
