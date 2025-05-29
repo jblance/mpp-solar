@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import os
+import sys
 import logging
 import importlib
 
@@ -127,3 +129,78 @@ class CRC_XModem:
     def crc_hex(self, data):
         crc = self.compute_crc(data)
         return format(crc, '04x').upper()
+
+def daemonize():
+    """
+    Properly daemonize the process (Unix double-fork)
+    NOTE: This might not work well with PyInstaller executables
+    """
+    try:
+        # First fork
+        pid = os.fork()
+        if pid > 0:
+            # Parent process exits
+            sys.exit(0)
+    except OSError as e:
+        log.error(f"First fork failed: {e}")
+        sys.exit(1)
+    
+    # Decouple from parent environment
+    os.chdir("/")
+    os.setsid()
+    os.umask(0)
+    
+    try:
+        # Second fork
+        pid = os.fork()
+        if pid > 0:
+            # Second parent exits
+            sys.exit(0)
+    except OSError as e:
+        log.error(f"Second fork failed: {e}")
+        sys.exit(1)
+    
+    # Redirect standard file descriptors
+    sys.stdout.flush()
+    sys.stderr.flush()
+    
+    # Close stdin, stdout, stderr
+    with open('/dev/null', 'r') as si:
+        os.dup2(si.fileno(), sys.stdin.fileno())
+    
+    with open('/dev/null', 'w') as so:
+        os.dup2(so.fileno(), sys.stdout.fileno())
+    
+    with open('/dev/null', 'w') as se:
+        os.dup2(se.fileno(), sys.stderr.fileno())
+
+def is_pyinstaller_bundle():
+    """Check if running as PyInstaller bundle"""
+    return getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
+
+def setup_daemon_logging(log_file="/var/log/mpp-solar.log"):
+    """Setup logging for daemon mode"""
+    try:
+        # Create log directory if it doesn't exist
+        log_dir = os.path.dirname(log_file)
+        os.makedirs(log_dir, exist_ok=True)
+
+        # Setup file logging
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setLevel(logging.INFO)
+
+        # Setup formatter
+        formatter = logging.Formatter(
+            '%(asctime)s:%(levelname)s:%(module)s:%(funcName)s@%(lineno)d: %(message)s'
+        )
+        file_handler.setFormatter(formatter)
+
+        # Get root logger and add handler
+        root_logger = logging.getLogger()
+        root_logger.addHandler(file_handler)
+
+        return True
+    except Exception as e:
+        print(f"Failed to setup daemon logging: {e}")
+        return False
+

@@ -192,6 +192,16 @@ def main():
         action="store_true",
         help="Enable Debug and above (i.e. all) messages",
     )
+    parser.add_argument(
+        "--pidfile",
+        help="Specifies the PID file location for daemon mode (default: /var/run/mpp-solar.pid, /tmp/mpp-solar.pid for PyInstaller)",
+        default=None,
+    )
+    parser.add_argument(
+        "--daemon-stop", 
+        action="store_true", 
+        help="Stop a running daemon (requires --pidfile if using non-default location)"
+    )
     parser.add_argument("-I", "--info", action="store_true", help="Enable Info and above level messages")
 
     args = parser.parse_args()
@@ -233,6 +243,91 @@ def main():
         # for result in results:
         #    print(result)
         return None
+
+    def setup_daemon_mode(args):
+        """Setup daemon mode with proper error handling and configurable PID file"""
+        import sys
+        import os
+    
+        # Check if we're running as PyInstaller bundle
+        is_pyinstaller = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
+    
+        # Handle daemon stop request
+        if args.daemon_stop:
+            pid_file_path = args.pidfile
+            if pid_file_path is None:
+                # Use default based on environment
+                if is_pyinstaller or os.geteuid() != 0:  # Non-root or PyInstaller
+                    pid_file_path = "/tmp/mpp-solar.pid"
+                else:
+                    pid_file_path = "/var/run/mpp-solar.pid"
+        
+            log.info(f"Attempting to stop daemon using PID file: {pid_file_path}")
+        
+            try:
+                daemon_type = detect_daemon_type()
+                daemon_class = get_daemon(daemontype=daemon_type).__class__
+                if hasattr(daemon_class, 'stop_daemon'):
+                    success = daemon_class.stop_daemon(pid_file_path)
+                    if success:
+                        print("Daemon stopped successfully")
+                    else:
+                        print("Failed to stop daemon")
+                    sys.exit(0 if success else 1)
+                else:
+                    print("Daemon stop functionality not available for this daemon type")
+                    sys.exit(1)
+            except Exception as e:
+                print(f"Error stopping daemon: {e}")
+                sys.exit(1)
+    
+        if args.daemon:
+            log.info("Setting up daemon mode...")
+        
+            # Setup daemon logging first
+            if not setup_daemon_logging("/var/log/mpp-solar.log"):
+                log.warning("Failed to setup file logging, continuing with console logging")
+        
+            # For PyInstaller bundles, skip traditional daemonization
+            if is_pyinstaller:
+                log.info("Running as PyInstaller bundle - skipping process daemonization")
+            else:
+                log.info("Attempting traditional daemonization...")
+                try:
+                    daemonize()
+                    log.info("Process daemonized successfully")
+                except Exception as e:
+                    log.error(f"Failed to daemonize process: {e}")
+                    log.info("Continuing without daemonization...")
+    
+        # Initialize Daemon handler
+        if not args.daemon:
+            daemon = get_daemon(daemontype=DaemonType.DISABLED)
+        else:
+            try:
+                daemon_type = detect_daemon_type()
+                daemon = get_daemon(daemontype=daemon_type)
+            except Exception as e:
+                log.warning(f"Failed to detect daemon type: {e}, falling back to OpenRC")
+                daemon = get_daemon(daemontype=DaemonType.OPENRC)
+        
+            # Set custom PID file path if provided
+            if hasattr(daemon, 'pid_file_path'):
+                if args.pidfile:
+                    daemon.pid_file_path = args.pidfile
+                    log.info(f"Using custom PID file: {daemon.pid_file_path}")
+                else:
+                    # Determine default PID file location
+                    if is_pyinstaller or os.geteuid() != 0:  # Non-root or PyInstaller
+                        daemon.pid_file_path = "/tmp/mpp-solar.pid"
+                        log.info(f"Using default PID file for non-root/PyInstaller: {daemon.pid_file_path}")
+                    else:
+                        daemon.pid_file_path = "/var/run/mpp-solar.pid"
+                        log.info(f"Using default PID file for root: {daemon.pid_file_path}")
+        
+            daemon.keepalive = 60
+    
+        return daemon
 
     # mqttbroker:
     #     name: null
