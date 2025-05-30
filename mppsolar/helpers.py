@@ -135,6 +135,8 @@ def daemonize():
     Properly daemonize the process (Unix double-fork)
     NOTE: This might not work well with PyInstaller executables
     """
+    log.info(f"[DAEMONIZE] Before fork PID : PID={pid}, PPID={ppid}")
+
     try:
         # First fork
         pid = os.fork()
