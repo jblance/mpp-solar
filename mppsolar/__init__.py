@@ -315,26 +315,56 @@ def main():
             print(f"Error stopping daemon: {e}")
             sys.exit(1)
 
-    # Setup daemon logging if in daemon mode
-    if args.daemon:
-        log.info("Setting up daemon mode...")
 
-        # Setup daemon logging first
+    # ------------------------
+    # Daemon setup and logging
+    # ------------------------
+    if args.daemon:
+        log.info("Daemon mode requested")
+
+        try:
+            daemon_type = detect_daemon_type()
+            log.info(f"Detected daemon type: {daemon_type}")
+        except Exception as e:
+            log.warning(f"Failed to detect daemon type: {e}, falling back to OpenRC")
+            daemon_type = DaemonType.OPENRC
+
+        daemon = get_daemon(daemontype=daemon_type)
+
+        # Set PID file path
+        if hasattr(daemon, 'set_pid_file_path') and args.pidfile:
+            daemon.set_pid_file_path(args.pidfile)
+            log.info(f"Using custom PID file: {args.pidfile}")
+        elif hasattr(daemon, 'pid_file_path'):
+            daemon.pid_file_path = "/tmp/mpp-solar.pid" if os.geteuid() != 0 else "/var/run/mpp-solar.pid"
+            log.info(f"Using default PID file: {daemon.pid_file_path}")
+
+        daemon.keepalive = 60
+
+        # Set up daemon log file
         if not setup_daemon_logging("/var/log/mpp-solar.log"):
             log.warning("Failed to setup file logging, continuing with console logging")
 
-        # For PyInstaller bundles, skip traditional daemonization
-# #         if is_pyinstaller:
-#         if is_pyinstaller or daemon_type != DaemonType.DISABLED:
-#             log.info("Skipping traditional daemonization - using daemon management system")
-#         else:
         log.info("Attempting traditional daemonization...")
         try:
             daemonize()
-            log.info("Process daemonized successfully")
+            log.info("Daemonized successfully")
         except Exception as e:
             log.error(f"Failed to daemonize process: {e}")
-            log.info("Continuing without daemonization...")
+            log.info("Continuing in foreground mode")
+
+    else:
+        # Not daemon mode
+        daemon = get_daemon(daemontype=DaemonType.DISABLED)
+        log_process_info("DAEMON_DISABLED_CREATED", log.info)
+
+    log.info(daemon)
+
+    # Notify systemd/init
+    daemon.initialize()
+    log_process_info("AFTER_DAEMON_INITIALIZE", log.info)
+    daemon.notify("Service Initializing ...")
+    log_process_info("AFTER_DAEMON_NOTIFY", log.info)
 
 
     # mqttbroker setup
@@ -365,44 +395,6 @@ def main():
 
     _commands = []
 
-    # Initialize Daemon
-    if not args.daemon:
-        daemon = get_daemon(daemontype=DaemonType.DISABLED)
-        log_process_info("DAEMON_DISABLED_CREATED", log.info)
-    else:
-        try:
-            daemon_type = detect_daemon_type()
-            log.info(f"Detected daemon type: {daemon_type}")
-            daemon = get_daemon(daemontype=daemon_type)
-        except Exception as e:
-            log.warning(f"Failed to detect daemon type: {e}, falling back to OpenRC")
-            daemon = get_daemon(daemontype=DaemonType.OPENRC)
-            log_process_info("FALLBACK_DAEMON_CREATED", log.info)
-
-        # Set custom PID file path if provided and daemon supports it
-        if hasattr(daemon, 'set_pid_file_path') and args.pidfile:
-            daemon.set_pid_file_path(args.pidfile)
-            log.info(f"Using custom PID file: {args.pidfile}")
-        elif hasattr(daemon, 'pid_file_path'):
-            # Set default PID file location if not already set
-            if os.geteuid() != 0:  # Non-root
-                daemon.pid_file_path = "/tmp/mpp-solar.pid"
-                log.info(f"Using default PID file for non-root/PyInstaller: {daemon.pid_file_path}")
-            else:
-                daemon.pid_file_path = "/var/run/mpp-solar.pid"
-                log.info(f"Using default PID file for root: {daemon.pid_file_path}")
-
-        daemon.keepalive = 60
-
-    log.info(daemon)
-
-    # Tell systemd that our service is ready
-    daemon.initialize()
-    log_process_info("AFTER_DAEMON_INITIALIZE", log.info)
-    daemon.notify("Service Initializing ...")
-    log_process_info("AFTER_DAEMON_NOTIFY", log.info)
-    # set some default-defaults
-    pause = 60
 
     # If config file specified, process
     if args.configfile:
