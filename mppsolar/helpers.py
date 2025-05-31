@@ -130,53 +130,67 @@ class CRC_XModem:
         crc = self.compute_crc(data)
         return format(crc, '04x').upper()
 
+def log_pyinstaller_context():
+    """
+    Log context info if running inside a PyInstaller bundle.
+    """
+    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        log.warning("Running from PyInstaller bundle. An initial loader process may appear in pstree.")
+        log.debug(f"PyInstaller context: sys.executable={sys.executable}, _MEIPASS={sys._MEIPASS}")
+
+
 def daemonize():
     """
     Properly daemonize the process (Unix double-fork)
     NOTE: This might not work well with PyInstaller executables
     """
+    import logging
+
+    log = logging.getLogger("helpers")
     pid = os.getpid()
     ppid = os.getppid()
-    log.info(f"[DAEMONIZE] Before fork PID : PID={pid}, PPID={ppid}")
+    log.info(f"[DAEMONIZE] Before fork PID: {pid}, PPID: {ppid}")
 
     try:
-        # First fork
         pid = os.fork()
         if pid > 0:
-            # Parent process exits
+            log.info(f"[DAEMONIZE] First fork successful, parent exiting. Child PID: {pid}")
             sys.exit(0)
     except OSError as e:
         log.error(f"First fork failed: {e}")
         sys.exit(1)
-    
-    # Decouple from parent environment
+
     os.chdir("/")
     os.setsid()
     os.umask(0)
-    
+
     try:
-        # Second fork
         pid = os.fork()
         if pid > 0:
-            # Second parent exits
+            log.info(f"[DAEMONIZE] Second fork successful, intermediate parent exiting. Child PID: {pid}")
             sys.exit(0)
     except OSError as e:
         log.error(f"Second fork failed: {e}")
         sys.exit(1)
-    
-    # Redirect standard file descriptors
+
+    # Redirect standard file descriptors to /dev/null
     sys.stdout.flush()
     sys.stderr.flush()
-    
-    # Close stdin, stdout, stderr
-    with open('/dev/null', 'r') as si:
-        os.dup2(si.fileno(), sys.stdin.fileno())
-    
-    with open('/dev/null', 'w') as so:
-        os.dup2(so.fileno(), sys.stdout.fileno())
-    
-    with open('/dev/null', 'w') as se:
-        os.dup2(se.fileno(), sys.stderr.fileno())
+#     with open('/dev/null', 'r') as si:
+#         os.dup2(si.fileno(), sys.stdin.fileno())
+#     with open('/dev/null', 'a+') as so:
+#         os.dup2(so.fileno(), sys.stdout.fileno())
+#     with open('/dev/null', 'a+') as se:
+#         os.dup2(se.fileno(), sys.stderr.fileno())
+
+    log.info(f"[DAEMONIZE] Daemon process forked successfully. PID: {os.getpid()}")
+
+
+def has_been_spawned():
+#    return os.environ.get("MPP_SOLAR_SPAWNED") == "1"
+    val = os.environ.get("MPP_SOLAR_SPAWNED")
+    log.warning(f"has_been_spawned(): MPP_SOLAR_SPAWNED={val}")
+    return val == "1"
 
 def is_pyinstaller_bundle():
     """Check if running as PyInstaller bundle"""

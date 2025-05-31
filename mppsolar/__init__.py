@@ -1,12 +1,17 @@
 # !/usr/bin/python3
+import os
 import logging
+import atexit
+import threading
 import time
+import sys
+import subprocess
 from argparse import ArgumentParser
 from platform import python_version
 
 from mppsolar.version import __version__  # noqa: F401
 
-from mppsolar.helpers import get_device_class, daemonize, setup_daemon_logging
+from mppsolar.helpers import get_device_class, daemonize, setup_daemon_logging, is_pyinstaller_bundle, has_been_spawned
 from mppsolar.daemon import get_daemon, detect_daemon_type
 from mppsolar.daemon import DaemonType
 from mppsolar.libs.mqttbrokerc import MqttBroker
@@ -18,6 +23,73 @@ log = logging.getLogger("")
 FORMAT = "%(asctime)-15s:%(levelname)s:%(module)s:%(funcName)s@%(lineno)d: %(message)s"
 logging.basicConfig(format=FORMAT)
 
+def log_process_info(label, log_func=None):
+
+    if log_func is None:
+        log_func = print
+
+    pid = os.getpid()
+    ppid = os.getppid()
+
+    try:
+        pgid = os.getpgid(0)
+        sid = os.getsid(0)
+    except:
+        pgid = "unknown"
+        sid = "unknown"
+
+    is_leader = (pid == pgid)
+
+    log_func(f"[{label}] PID: {pid}, PPID: {ppid}, PGID: {pgid}, SID: {sid}, Leader: {is_leader}")
+
+    try:
+        with open(f'/proc/{pid}/cmdline', 'r') as f:
+            cmdline = f.read().replace('\0', ' ').strip()
+        log_func(f"[{label}] Command: {cmdline}")
+    except:
+        log_func(f"[{label}] Command: {' '.join(sys.argv)}")
+
+def setup_daemon_if_requested(args):
+
+
+    if args.daemon:
+        log.info("Daemon mode requested")
+
+        try:
+            daemon_type = detect_daemon_type()
+            log.info(f"Detected daemon type: {daemon_type}")
+        except Exception as e:
+            log.warning(f"Failed to detect daemon type: {e}, falling back to OpenRC")
+            daemon_type = DaemonType.OPENRC
+
+        daemon = get_daemon(daemontype=daemon_type)
+
+        if hasattr(daemon, 'set_pid_file_path') and args.pidfile:
+            daemon.set_pid_file_path(args.pidfile)
+            log.info(f"Using custom PID file: {args.pidfile}")
+        elif hasattr(daemon, 'pid_file_path'):
+            daemon.pid_file_path = "/tmp/mpp-solar.pid" if os.geteuid() != 0 else "/var/run/mpp-solar.pid"
+            log.info(f"Using default PID file: {daemon.pid_file_path}")
+
+        daemon.keepalive = 60
+
+        if not setup_daemon_logging("/var/log/mpp-solar.log"):
+            log.warning("Failed to setup file logging, continuing with console logging")
+
+        log.info("Attempting traditional daemonization...")
+        try:
+            daemonize()
+            log.info("Daemonized successfully")
+        except Exception as e:
+            log.error(f"Failed to daemonize process: {e}")
+            log.info("Continuing in foreground mode")
+
+        return daemon
+    else:
+        log.info("Daemon mode NOT requested. Using DISABLED daemon.")
+        daemon = get_daemon(daemontype=DaemonType.DISABLED)
+        log_process_info("DAEMON_DISABLED_CREATED", log.info)
+        return daemon
 
 def main():
     description = f"Solar Device Command Utility, version: {__version__}, python version: {python_version()}"
@@ -210,6 +282,35 @@ def main():
         prog_name = "mpp-solar"
     s_prog_name = prog_name.replace("-", "")
 
+    def delay_cleanup():
+        time.sleep(2)  # Give subprocess time to initialize before parent dies
+
+    atexit.register(delay_cleanup)
+
+    # Check if pyinstaller, warn of extra process
+    if args.daemon and is_pyinstaller_bundle() and not has_been_spawned():
+        log.warning("Running from PyInstaller — spawning subprocess to survive bootstrap parent")
+
+        # Prepare environment
+        new_env = os.environ.copy()
+        new_env["MPP_SOLAR_SPAWNED"] = "1"
+
+        filtered_args = [arg for arg in sys.argv[1:] if arg != "--daemon"]
+        cmd = [sys.executable] + filtered_args + ["--daemon"]
+        log.debug(f"Spawning child subprocess: {cmd}")
+        proc = subprocess.Popen(cmd, env=new_env, start_new_session=True)
+        try:
+            for i in range(10):
+                if proc.poll() is not None:
+                    log.error("Child process exited too soon!")
+                    sys.exit(1)
+                time.sleep(0.5)
+            log.debug("Child process started successfully; exiting parent")
+        except Exception as e:
+            log.exception("Exception while waiting for child process")
+            sys.exit(1)
+        sys.exit(0)
+
     # logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     # Turn on debug if needed
     if args.debug:
@@ -249,8 +350,6 @@ def main():
     #     user: null
     #     pass: null
     # Handle daemon setup and stop requests
-    import sys
-    import os
 
     #### Extra Logging
     def log_process_info(label, log_func=None):
@@ -283,15 +382,13 @@ def main():
             log_func(f"[{label}] Command: {' '.join(sys.argv)}")
     #######
 
-    # Check if we're running as PyInstaller bundle
-    is_pyinstaller = getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
 
     # Handle daemon stop request
     if args.daemon_stop:
         pid_file_path = args.pidfile
         if pid_file_path is None:
             # Use default based on environment
-            if is_pyinstaller or os.geteuid() != 0:  # Non-root or PyInstaller
+            if os.geteuid() != 0:  # Non-root check
                 pid_file_path = "/tmp/mpp-solar.pid"
             else:
                 pid_file_path = "/var/run/mpp-solar.pid"
@@ -319,45 +416,7 @@ def main():
     # ------------------------
     # Daemon setup and logging
     # ------------------------
-    if args.daemon:
-        log.info("Daemon mode requested")
-
-        try:
-            daemon_type = detect_daemon_type()
-            log.info(f"Detected daemon type: {daemon_type}")
-        except Exception as e:
-            log.warning(f"Failed to detect daemon type: {e}, falling back to OpenRC")
-            daemon_type = DaemonType.OPENRC
-
-        daemon = get_daemon(daemontype=daemon_type)
-
-        # Set PID file path
-        if hasattr(daemon, 'set_pid_file_path') and args.pidfile:
-            daemon.set_pid_file_path(args.pidfile)
-            log.info(f"Using custom PID file: {args.pidfile}")
-        elif hasattr(daemon, 'pid_file_path'):
-            daemon.pid_file_path = "/tmp/mpp-solar.pid" if os.geteuid() != 0 else "/var/run/mpp-solar.pid"
-            log.info(f"Using default PID file: {daemon.pid_file_path}")
-
-        daemon.keepalive = 60
-
-        # Set up daemon log file
-        if not setup_daemon_logging("/var/log/mpp-solar.log"):
-            log.warning("Failed to setup file logging, continuing with console logging")
-
-        log.info("Attempting traditional daemonization...")
-        try:
-            daemonize()
-            log.info("Daemonized successfully")
-        except Exception as e:
-            log.error(f"Failed to daemonize process: {e}")
-            log.info("Continuing in foreground mode")
-
-    else:
-        # Not daemon mode
-        daemon = get_daemon(daemontype=DaemonType.DISABLED)
-        log_process_info("DAEMON_DISABLED_CREATED", log.info)
-
+    daemon = setup_daemon_if_requested(args)
     log.info(daemon)
 
     # Notify systemd/init

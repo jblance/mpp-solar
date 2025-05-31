@@ -13,10 +13,12 @@ class Daemon:
 
     def initialize(self):
         """ Daemon initialization activities """
+        log.debug("Base Daemon initialized")
         self._notify(self._Notification.READY)
         self._lastNotify = time()
 
     def watchdog(self):
+        log.debug("Base Daemon watchdog ping")
         elapsed = time() - self._lastNotify
         if (elapsed) > self.keepalive:
             self._notify(self._Notification.WATCHDOG)
