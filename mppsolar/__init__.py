@@ -1,17 +1,16 @@
 # !/usr/bin/python3
 import os
 import logging
-import atexit
-import threading
 import time
 import sys
-import subprocess
 from argparse import ArgumentParser
 from platform import python_version
 
 from mppsolar.version import __version__  # noqa: F401
 
-from mppsolar.helpers import get_device_class, daemonize, setup_daemon_logging, is_pyinstaller_bundle, has_been_spawned
+from mppsolar.helpers import get_device_class, daemonize, setup_daemon_logging, log_pyinstaller_context, has_been_spawned
+from mppsolar.pyinstaller_runtime import spawn_pyinstaller_subprocess, is_pyinstaller_bundle
+
 from mppsolar.daemon import get_daemon, detect_daemon_type
 from mppsolar.daemon import DaemonType
 from mppsolar.libs.mqttbrokerc import MqttBroker
@@ -282,34 +281,10 @@ def main():
         prog_name = "mpp-solar"
     s_prog_name = prog_name.replace("-", "")
 
-    def delay_cleanup():
-        time.sleep(2)  # Give subprocess time to initialize before parent dies
+  log_pyinstaller_context()
+  if spawn_pyinstaller_subprocess(args):
+    sys.exit(0)
 
-    atexit.register(delay_cleanup)
-
-    # Check if pyinstaller, warn of extra process
-    if args.daemon and is_pyinstaller_bundle() and not has_been_spawned():
-        log.warning("Running from PyInstaller — spawning subprocess to survive bootstrap parent")
-
-        # Prepare environment
-        new_env = os.environ.copy()
-        new_env["MPP_SOLAR_SPAWNED"] = "1"
-
-        filtered_args = [arg for arg in sys.argv[1:] if arg != "--daemon"]
-        cmd = [sys.executable] + filtered_args + ["--daemon"]
-        log.debug(f"Spawning child subprocess: {cmd}")
-        proc = subprocess.Popen(cmd, env=new_env, start_new_session=True)
-        try:
-            for i in range(10):
-                if proc.poll() is not None:
-                    log.error("Child process exited too soon!")
-                    sys.exit(1)
-                time.sleep(0.5)
-            log.debug("Child process started successfully; exiting parent")
-        except Exception as e:
-            log.exception("Exception while waiting for child process")
-            sys.exit(1)
-        sys.exit(0)
 
     # logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     # Turn on debug if needed

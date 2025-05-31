@@ -176,7 +176,7 @@ def daemonize():
     # Redirect standard file descriptors to /dev/null
     sys.stdout.flush()
     sys.stderr.flush()
-#     with open('/dev/null', 'r') as si:
+#     with open('/dev/null', 'r') as si:  # Disabled while testing pyinstaller code
 #         os.dup2(si.fileno(), sys.stdin.fileno())
 #     with open('/dev/null', 'a+') as so:
 #         os.dup2(so.fileno(), sys.stdout.fileno())
@@ -192,9 +192,6 @@ def has_been_spawned():
     log.warning(f"has_been_spawned(): MPP_SOLAR_SPAWNED={val}")
     return val == "1"
 
-def is_pyinstaller_bundle():
-    """Check if running as PyInstaller bundle"""
-    return getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
 
 def setup_daemon_logging(log_file="/var/log/mpp-solar.log"):
     """Setup logging for daemon mode"""
