@@ -280,6 +280,7 @@ def main():
     if prog_name is None:
         prog_name = "mpp-solar"
     s_prog_name = prog_name.replace("-", "")
+    log_file_path = "/var/log/mpp-solar.log"
 
     log_pyinstaller_context()
     # --- Optional PyInstaller bootstrap cleanup ---
