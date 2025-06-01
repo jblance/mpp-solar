@@ -48,7 +48,7 @@ def log_process_info(label, log_func=None):
     except:
         log_func(f"[{label}] Command: {' '.join(sys.argv)}")
 
-def setup_daemon_if_requested(args):
+def setup_daemon_if_requested(args, log_file_path="/var/log/mpp-solar.log"):
 
 
     if args.daemon:
