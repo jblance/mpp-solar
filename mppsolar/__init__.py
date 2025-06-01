@@ -8,8 +8,8 @@ from platform import python_version
 
 from mppsolar.version import __version__  # noqa: F401
 
-from mppsolar.helpers import get_device_class, daemonize, setup_daemon_logging, log_pyinstaller_context, has_been_spawned
-from mppsolar.pyinstaller_runtime import spawn_pyinstaller_subprocess, is_pyinstaller_bundle
+from mppsolar.helpers import get_device_class, daemonize, setup_daemon_logging, log_pyinstaller_context
+from mppsolar.pyinstaller_runtime import spawn_pyinstaller_subprocess, is_pyinstaller_bundle, has_been_spawned
 
 from mppsolar.daemon import get_daemon, detect_daemon_type
 from mppsolar.daemon import DaemonType
@@ -281,10 +281,14 @@ def main():
         prog_name = "mpp-solar"
     s_prog_name = prog_name.replace("-", "")
 
-  log_pyinstaller_context()
-  if spawn_pyinstaller_subprocess(args):
-    sys.exit(0)
-
+    log_pyinstaller_context()
+    # --- Optional PyInstaller bootstrap cleanup ---
+    # To enable single-process daemon spawn logic (avoids PyInstaller parent):
+    # Uncomment the lines below once stable or in development builds.
+    #################################################################
+#     if spawn_pyinstaller_subprocess(args):
+#       sys.exit(0)
+    #################################################################
 
     # logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     # Turn on debug if needed

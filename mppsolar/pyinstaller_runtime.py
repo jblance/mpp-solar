@@ -32,10 +32,12 @@ def spawn_pyinstaller_subprocess(args):
         new_env["MPP_SOLAR_SPAWNED"] = "1"
 
         filtered_args = [arg for arg in sys.argv[1:] if arg != "--daemon"]
-        cmd = [sys.executable] + filtered_args + ["--daemon"]
+#        cmd = [sys.executable] + filtered_args + ["--daemon"]
+        cmd = [sys.executable, os.path.join(sys._MEIPASS, 'mpp-solar.py')] + filtered_args + ["--daemon"]
 
         log.debug(f"Spawning child subprocess: {cmd}")
-        proc = subprocess.Popen(cmd, env=new_env, start_new_session=True)
+#        proc = subprocess.Popen(cmd, env=new_env, start_new_session=True)
+        proc = subprocess.Popen(cmd, env=new_env, cwd=sys._MEIPASS, start_new_session=True)
 
         for _ in range(10):
             if proc.poll() is not None:
