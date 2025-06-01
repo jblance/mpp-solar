@@ -395,7 +395,7 @@ def main():
     # ------------------------
     # Daemon setup and logging
     # ------------------------
-    daemon = setup_daemon_if_requested(args)
+    daemon = setup_daemon_if_requested(args, log_file_path=log_file_path)
     log.info(daemon)
 
     # Notify systemd/init
@@ -458,6 +458,7 @@ def main():
         mqtt_broker.update("port", config["SETUP"].getint("mqtt_port", fallback=None))
         mqtt_broker.update("username", config["SETUP"].get("mqtt_user", fallback=None))
         mqtt_broker.update("password", config["SETUP"].get("mqtt_pass", fallback=None))
+        log_file_path = config["SETUP"].get("log_file", fallback="/var/log/mpp-solar.log")
         sections.remove("SETUP")
 
         # Process 'command' sections
