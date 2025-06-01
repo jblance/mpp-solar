@@ -142,15 +142,44 @@ def log_pyinstaller_context():
 def daemonize():
     """
     Properly daemonize the process (Unix double-fork)
-    NOTE: This might not work well with PyInstaller executables
+    Enhanced for PyInstaller compatibility
     """
     import logging
+    from mppsolar.pyinstaller_runtime import is_pyinstaller_bundle, has_been_spawned
 
     log = logging.getLogger("helpers")
     pid = os.getpid()
     ppid = os.getppid()
     log.info(f"[DAEMONIZE] Before fork PID: {pid}, PPID: {ppid}")
 
+    # Special handling for PyInstaller spawned processes
+    if is_pyinstaller_bundle() and has_been_spawned():
+        log.info("[DAEMONIZE] Running in spawned PyInstaller process - using modified daemonization")
+        
+        # We're already in a subprocess, so we can do a simpler daemonization
+        # Just do a single fork and session setup
+        try:
+            pid = os.fork()
+            if pid > 0:
+                log.info(f"[DAEMONIZE] Fork successful, parent exiting. Child PID: {pid}")
+                sys.exit(0)
+        except OSError as e:
+            log.error(f"Fork failed: {e}")
+            sys.exit(1)
+
+        # Set up daemon environment
+        os.chdir("/")
+        os.setsid()
+        os.umask(0)
+        
+        # Redirect standard file descriptors
+        sys.stdout.flush()
+        sys.stderr.flush()
+        
+        log.info(f"[DAEMONIZE] PyInstaller daemon process ready. PID: {os.getpid()}")
+        return
+
+    # Standard daemonization for non-PyInstaller or direct execution
     try:
         pid = os.fork()
         if pid > 0:

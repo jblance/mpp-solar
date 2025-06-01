@@ -287,9 +287,14 @@ def main():
     # To enable single-process daemon spawn logic (avoids PyInstaller parent):
     # Uncomment the lines below once stable or in development builds.
     #################################################################
-#     if spawn_pyinstaller_subprocess(args):
-#       sys.exit(0)
+    if spawn_pyinstaller_subprocess(args):
+      sys.exit(0)
     #################################################################
+
+    from mppsolar.pyinstaller_runtime import setup_spawned_environment
+    setup_spawned_environment()
+
+
 
     # logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     # Turn on debug if needed
