@@ -285,7 +285,6 @@ def main():
     log_pyinstaller_context()
     # --- Optional PyInstaller bootstrap cleanup ---
     # To enable single-process daemon spawn logic (avoids PyInstaller parent):
-    # Uncomment the lines below once stable or in development builds.
     #################################################################
     if spawn_pyinstaller_subprocess(args):
       sys.exit(0)

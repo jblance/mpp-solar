@@ -110,8 +110,10 @@ def spawn_pyinstaller_subprocess(args):
         if not os.path.exists(executable):
             executable = sys.executable
 
-        cmd = [executable] + sys.argv[1:]
-        
+#         cmd = [executable] + sys.argv[1:]
+        cmd = [executable] + [arg for arg in sys.argv[1:] if arg != "--daemon"] + ["--daemon"]
+
+        log.info(f"Launching child with cmd: {' '.join(cmd)}")
         log.debug(f"Spawning child subprocess: {cmd}")
         log.debug(f"Working directory: {permanent_dir}")
         
@@ -129,7 +131,10 @@ def spawn_pyinstaller_subprocess(args):
             # Wait a bit to ensure child process starts successfully
             for i in range(10):
                 if proc.poll() is not None:
-                    log.error(f"Child process exited prematurely with code: {proc.returncode}")
+                    if proc.returncode == 0:
+                        log.info("Child process daemonized and exited cleanly (expected for daemon mode)")
+                    else:
+                        log.error(f"Child process exited prematurely with code: {proc.returncode}")
                     cleanup_permanent_directory(permanent_dir)
                     return True
                 time.sleep(0.5)
@@ -144,27 +149,8 @@ def spawn_pyinstaller_subprocess(args):
             return False
 
     return False
-    
-#########
-#         filtered_args = [arg for arg in sys.argv[1:] if arg != "--daemon"]
-# #        cmd = [sys.executable] + filtered_args + ["--daemon"]
-#         cmd = [sys.executable, os.path.join(sys._MEIPASS, 'mpp-solar.py')] + filtered_args + ["--daemon"]
-# 
-#         log.debug(f"Spawning child subprocess: {cmd}")
-# #        proc = subprocess.Popen(cmd, env=new_env, start_new_session=True)
-#         proc = subprocess.Popen(cmd, env=new_env, cwd=sys._MEIPASS, start_new_session=True)
-# 
-#         for _ in range(10):
-#             if proc.poll() is not None:
-#                 log.error("Child process exited too soon!")
-#                 return True
-#             time.sleep(0.5)
-# 
-#         log.debug("Child process started successfully; exiting parent")
-#         return True
-# 
-#     return False
-    
+
+
 def setup_spawned_environment():
     """
     Set up environment for spawned process to use permanent directory
