@@ -3,9 +3,10 @@ import logging
 import os
 import signal
 import sys
+import time
+import atexit
 from enum import Enum
 from pathlib import Path
-from time import time
 
 try:
     import psutil
@@ -26,30 +27,57 @@ class OpenRCNotification(Enum):
     WATCHDOG = "WATCHDOG"
 
 class DaemonOpenRC(Daemon):
-    """ OpenRC daemon implementation with signal handling and PID management """
-    
+    """ OpenRC daemon implementation with signal handling and configurable PID management """
+
     def __str__(self):
-        return "Daemon OpenRC"
+        return f"Daemon OpenRC (PID file: {self.pid_file_path})"
+
+    def __init__(self, pid_file_path=None):
+        import logging
+        log = logging.getLogger("daemon_openrc")
     
-    def __init__(self):
-        self._notify = self._openrc_notify
-        self._journal = self._journal
+        pid = os.getpid()
+        ppid = os.getppid()
+        log.info(f"[OPENRC_INIT] Creating OpenRC daemon: PID={pid}, PPID={ppid}")
+    
         self._Notification = OpenRCNotification
         self.keepalive = 60
-        self._lastNotify = time()
+        self._lastNotify = time.time()
         self._pid_file = None
         self._running = True
-        
-        # Default PID file location - can be overridden
-        self.pid_file_path = "/var/run/mpp-solar.pid"
-        
+
+        # Set PID file location with smart defaults
+        if pid_file_path:
+            self.pid_file_path = pid_file_path
+        else:
+            # Auto-determine based on permissions and environment
+            if os.geteuid() == 0:  # Running as root
+                self.pid_file_path = "/var/run/mpp-solar.pid"
+            else:  # Non-root user
+                # Try user-specific locations
+                if 'XDG_RUNTIME_DIR' in os.environ:
+                    self.pid_file_path = os.path.join(os.environ['XDG_RUNTIME_DIR'], "mpp-solar.pid")
+                else:
+                    self.pid_file_path = "/tmp/mpp-solar.pid"
+
+        log.info(f"PID file will be created at: {self.pid_file_path}")
+
+        # Register cleanup function to run on exit
+        atexit.register(self._cleanup_pid_file)
+
         # Set up signal handlers
         signal.signal(signal.SIGTERM, self._signal_handler)
         signal.signal(signal.SIGINT, self._signal_handler)
-        
+
         # Optional: Handle SIGHUP for config reload
         signal.signal(signal.SIGHUP, self._sighup_handler)
-    
+
+    def set_pid_file_path(self, path):
+        """Allow external setting of PID file path"""
+        old_path = self.pid_file_path
+        self.pid_file_path = path
+        log.info(f"PID file path changed from {old_path} to {self.pid_file_path}")
+
     def _signal_handler(self, signum, frame):
         """ Handle SIGTERM and SIGINT for clean shutdown """
         log.info(f"Received signal {signum}, initiating clean shutdown...")
@@ -57,192 +85,263 @@ class DaemonOpenRC(Daemon):
         self.stop()
         self._cleanup_pid_file()
         sys.exit(0)
-    
+
     def _sighup_handler(self, signum, frame):
         """ Handle SIGHUP for potential config reload """
         log.info("Received SIGHUP - config reload not implemented yet")
         # Future: implement config reload functionality
-    
+
+    def _check_existing_daemon(self):
+        """Check if daemon with PID from file is actually running"""
+        try:
+            with open(self.pid_file_path, 'r') as pid_file:
+                content = pid_file.read().strip()
+                if not content:
+                    log.warning("PID file is empty")
+                    return False
+
+                pid = int(content)
+                log.debug(f"Checking if PID {pid} is running...")
+                
+                if HAS_PSUTIL:
+                    # Use psutil if available for more reliable process checking
+                    try:
+                        process = psutil.Process(pid)
+                        if process.is_running():
+                            log.info(f"Process {pid} is running: {process.name()}")
+                            return True
+                        else:
+                            log.info(f"Process {pid} is not running")
+                            return False
+                    except psutil.NoSuchProcess:
+                        log.info(f"No process found with PID {pid}")
+                        return False
+                else:
+                    # Fallback to os.kill method
+                    try:
+                        # Send signal 0 to check if process exists without killing it
+                        os.kill(pid, 0)
+                        log.info(f"Process {pid} exists and is running")
+                        return True
+                    except OSError:
+                        log.info(f"No process found with PID {pid}")
+                        return False
+
+        except (ValueError, FileNotFoundError, PermissionError) as e:
+            log.warning(f"Could not check existing daemon: {e}")
+            return False
+
     def _create_pid_file(self):
         """ Create PID file with current process ID """
+        pid = os.getpid()
+        log.info(f"Creating PID file {self.pid_file_path} with PID {pid}")
+
         try:
-            # Ensure directory exists
+            # Ensure directory exists and is writable
             pid_dir = Path(self.pid_file_path).parent
             pid_dir.mkdir(parents=True, exist_ok=True)
-            
-            # Create PID file exclusively (fail if exists)
-            with open(self.pid_file_path, 'x') as pid_file:
-                pid_file.write(str(os.getpid()))
-            log.info(f"Created PID file: {self.pid_file_path}")
-            return True
-        except FileExistsError:
-            log.error(f"PID file {self.pid_file_path} already exists - daemon may already be running")
-            return False
+            log.debug(f"PID directory ensured: {pid_dir}")
+
+            # Check directory permissions
+            if not os.access(pid_dir, os.W_OK):
+                log.error(f"No write permission for PID directory: {pid_dir}")
+                return False
+
+            # Check if file already exists and handle appropriately
+            if os.path.exists(self.pid_file_path):
+                log.warning(f"PID file {self.pid_file_path} already exists, checking if daemon is running...")
+                if self._check_existing_daemon():
+                    log.error("Another daemon instance is already running")
+                    return False
+                else:
+                    log.info("Removing stale PID file")
+                    try:
+                        os.remove(self.pid_file_path)
+                    except Exception as e:
+                        log.error(f"Failed to remove stale PID file: {e}")
+                        return False
+
+            # Create PID file with explicit write and flush
+            try:
+                # Use atomic write operation where possible
+                temp_pid_file = f"{self.pid_file_path}.tmp"
+
+                with open(temp_pid_file, 'w') as pid_file:
+                    pid_file.write(str(pid))
+                    pid_file.flush()  # Ensure data is written to disk
+                    os.fsync(pid_file.fileno())  # Force kernel to write to disk
+
+                # Atomically move temp file to final location
+                os.rename(temp_pid_file, self.pid_file_path)
+
+                log.info(f"Successfully created PID file: {self.pid_file_path} with PID {pid}")
+
+                # Verify the file was written correctly
+                with open(self.pid_file_path, 'r') as verify_file:
+                    written_pid = verify_file.read().strip()
+                    if written_pid != str(pid):
+                        log.error(f"PID file verification failed: expected {pid}, got '{written_pid}'")
+                        return False
+                    log.debug(f"PID file verification successful: {written_pid}")
+
+                return True
+
+            except Exception as e:
+                log.error(f"Failed to write to PID file {self.pid_file_path}: {e}")
+                # Clean up temporary file if it exists
+                temp_pid_file = f"{self.pid_file_path}.tmp"
+                if os.path.exists(temp_pid_file):
+                    try:
+                        os.remove(temp_pid_file)
+                    except:
+                        pass
+                return False
+
         except Exception as e:
             log.error(f"Failed to create PID file {self.pid_file_path}: {e}")
             return False
-    
+
     def _cleanup_pid_file(self):
         """ Remove PID file on shutdown """
         try:
             if os.path.exists(self.pid_file_path):
-                os.remove(self.pid_file_path)
-                log.info(f"Removed PID file: {self.pid_file_path}")
+                # Verify it's our PID before removing
+                try:
+                    with open(self.pid_file_path, 'r') as pid_file:
+                        content = pid_file.read().strip()
+                        if content and int(content) == os.getpid():
+                            os.remove(self.pid_file_path)
+                            log.info(f"Removed PID file: {self.pid_file_path}")
+                        else:
+                            log.warning(f"PID file contains different PID ({content}), not removing")
+                except (ValueError, FileNotFoundError):
+                    # File doesn't exist or has invalid content, try to remove anyway
+                    os.remove(self.pid_file_path)
+                    log.info(f"Removed PID file: {self.pid_file_path}")
         except Exception as e:
             log.error(f"Failed to remove PID file {self.pid_file_path}: {e}")
-    
-    def _check_existing_daemon(self):
-        """ Check if daemon is already running """
-        if not os.path.exists(self.pid_file_path):
-            return False
-        
-        try:
-            with open(self.pid_file_path, 'r') as pid_file:
-                pid = int(pid_file.read().strip())
-            
-            if HAS_PSUTIL:
-                # Use psutil to check if process exists and is our daemon
-                try:
-                    process = psutil.Process(pid)
-                    if process.is_running():
-                        log.warning(f"Daemon already running with PID {pid}")
-                        return True
-                except psutil.NoSuchProcess:
-                    log.info(f"Stale PID file found, removing: {self.pid_file_path}")
-                    os.remove(self.pid_file_path)
-                    return False
-            else:
-                # Fallback: check if PID exists in /proc (Linux-specific)
-                if os.path.exists(f"/proc/{pid}"):
-                    log.warning(f"Daemon may already be running with PID {pid}")
-                    return True
-                else:
-                    log.info(f"Stale PID file found, removing: {self.pid_file_path}")
-                    os.remove(self.pid_file_path)
-                    return False
-                    
-        except (ValueError, FileNotFoundError) as e:
-            log.error(f"Invalid PID file {self.pid_file_path}: {e}")
-            return False
-        
-        return False
-    
+
     def initialize(self):
-        """ Initialize daemon - create PID file and set up """
+        """Initialize daemon and create PID file"""
         log.info("Initializing OpenRC daemon...")
-        
-        # Check if daemon is already running
-        if self._check_existing_daemon():
-            log.error("Daemon is already running. Exiting.")
-            sys.exit(1)
-        
+
+        pid = os.getpid()
+        ppid = os.getppid()
+        log.info(f"[OPENRC_INITIALIZE] Before PID file creation: PID={pid}, PPID={ppid}")
+
+
         # Create PID file
         if not self._create_pid_file():
-            log.error("Failed to create PID file. Exiting.")
+            log.error("Failed to create PID file, daemon cannot start")
             sys.exit(1)
-        
+        log.info(f"[OPENRC_INITIALIZE] After PID file creation: PID={pid}, PPID={ppid}")
+
         # Call parent initialization
         super().initialize()
         log.info("OpenRC daemon initialized successfully")
-    
-    def _openrc_notify(self, notification, message=None):
-        """ Internal notification method """
-        if message:
-            log.info(f"Daemon notification: {notification} - {message}")
-        else:
-            log.info(f"Daemon notification: {notification}")
-    
-    def _openrc_journal(self, message):
-        """ Internal journal method - just log """
-        log.info(f"Daemon journal: {message}")
-    
-    def watchdog(self):
-        """ Watchdog function - just log activity """
-        elapsed = time() - self._lastNotify
-        if elapsed > self.keepalive:
-            self._lastNotify = time()
-            log.debug(f"Daemon watchdog at {self._lastNotify}")
-    
-    def notify(self, status="OK"):
-        """ Send notification - just log for OpenRC """
-        log.info(f"Daemon status: {status}")
-    
+
     def stop(self):
-        """ Stop daemon gracefully """
+        """Stop daemon and clean up"""
         log.info("Stopping OpenRC daemon...")
         self._running = False
-    
+        super().stop()
+
     def is_running(self):
-        """ Check if daemon should continue running """
+        """Check if daemon should continue running"""
         return self._running
-    
-    @staticmethod
-    def stop_daemon(pid_file_path="/var/run/mpp-solar.pid"):
-        """ Static method to stop a running daemon """
-        if not os.path.exists(pid_file_path):
-            print(f"PID file {pid_file_path} not found - daemon may not be running")
-            return False
-        
+
+    @classmethod
+    def stop_daemon(cls, pid_file_path):
+        """Class method to stop a running daemon by PID file"""
+        log.info(f"Attempting to stop daemon using PID file: {pid_file_path}")
+
         try:
+            if not os.path.exists(pid_file_path):
+                log.error(f"PID file not found: {pid_file_path}")
+                return False
+
             with open(pid_file_path, 'r') as pid_file:
-                pid = int(pid_file.read().strip())
-            
-            print(f"Stopping daemon with PID {pid}")
-            
-            # Send SIGTERM first
-            os.kill(pid, signal.SIGTERM)
-            
-            if HAS_PSUTIL:
+                content = pid_file.read().strip()
+                if not content:
+                    log.error("PID file is empty")
+                    return False
+
+                pid = int(content)
+                log.info(f"Found PID {pid} in file, attempting to terminate...")
+
+                # Check if process exists before trying to kill it
                 try:
-                    process = psutil.Process(pid)
-                    # Wait up to 10 seconds for graceful shutdown
-                    process.wait(timeout=10)
-                    print("Daemon stopped gracefully")
-                except psutil.TimeoutExpired:
-                    print("Daemon didn't stop gracefully, sending SIGKILL")
-                    process.kill()
-                except psutil.NoSuchProcess:
-                    print("Daemon already stopped")
-            else:
-                # Fallback: just send SIGKILL after a delay
-                import time
-                time.sleep(2)
+                    os.kill(pid, 0)  # Signal 0 just checks if process exists
+                except OSError:
+                    log.warning(f"Process {pid} not found, removing stale PID file")
+                    try:
+                        os.remove(pid_file_path)
+                    except:
+                        pass
+                    return True  # Consider this success since daemon isn't running
+
+                # Try graceful shutdown first (SIGTERM)
                 try:
+                    log.info(f"Sending SIGTERM to PID {pid}")
+                    os.kill(pid, signal.SIGTERM)
+
+                    # Wait a bit for graceful shutdown
+                    for i in range(10):  # Wait up to 10 seconds
+                        time.sleep(1)
+                        try:
+                            os.kill(pid, 0)  # Check if still running
+                        except OSError:
+                            # Process has terminated
+                            log.info(f"Process {pid} terminated gracefully")
+                            # Clean up PID file if it still exists
+                            if os.path.exists(pid_file_path):
+                                try:
+                                    os.remove(pid_file_path)
+                                    log.info(f"Removed PID file: {pid_file_path}")
+                                except:
+                                    pass
+                            return True
+
+                    # If still running, try SIGKILL
+                    log.warning(f"Process {pid} didn't respond to SIGTERM, sending SIGKILL")
                     os.kill(pid, signal.SIGKILL)
-                    print("Sent SIGKILL to daemon")
-                except ProcessLookupError:
-                    print("Daemon already stopped")
-            
-            # Clean up PID file
-            if os.path.exists(pid_file_path):
-                os.remove(pid_file_path)
-                print(f"Removed PID file: {pid_file_path}")
-            
-            return True
-            
-        except (ValueError, FileNotFoundError, ProcessLookupError) as e:
-            print(f"Error stopping daemon: {e}")
+
+                    # Wait for force kill
+                    for i in range(5):  # Wait up to 5 seconds
+                        time.sleep(1)
+                        try:
+                            os.kill(pid, 0)  # Check if still running
+                        except OSError:
+                            # Process has terminated
+                            log.info(f"Process {pid} terminated forcefully")
+                            # Clean up PID file
+                            if os.path.exists(pid_file_path):
+                                try:
+                                    os.remove(pid_file_path)
+                                    log.info(f"Removed PID file: {pid_file_path}")
+                                except:
+                                    pass
+                            return True
+
+                    log.error(f"Failed to terminate process {pid}")
+                    return False
+
+                except OSError as e:
+                    log.error(f"Failed to send signal to process {pid}: {e}")
+                    return False
+
+        except (ValueError, FileNotFoundError, PermissionError) as e:
+            log.error(f"Error stopping daemon: {e}")
             return False
-    
+
     def _notify(self, notification, message=None):
-        """ Internal notification method """
+        """Handle daemon notifications"""
         if message:
-            log.info(f"Daemon notification: {notification.name} - {message}")
+            log.info(f"Daemon notification: {notification.value} - {message}")
         else:
-            log.info(f"Daemon notification: {notification.name}")
-    
+            log.debug(f"Daemon notification: {notification.value}")
+
     def _journal(self, message):
-        """ Internal journal method - just log """
-        log.info(f"Daemon journal: {message}")
-    
-    # Define notification enum locally since it's not in parent
-    class _Notification:
-        class NotificationType:
-            def __init__(self, name):
-                self.name = name
-        
-        READY = NotificationType("READY")
-        WATCHDOG = NotificationType("WATCHDOG")
-        STATUS = NotificationType("STATUS")
-        STOPPING = NotificationType("STOPPING")
+        """Log message to system journal (or regular log)"""
+        log.info(message)
 

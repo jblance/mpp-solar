@@ -20,6 +20,9 @@ mqtt_port=1883
 mqtt_user=username
 mqtt_pass=password
 
+# Daemon log file path and name can be configured, defaults to /var/log/mpp-solar.log
+log_file = /custom/path/to/mpp-solar.log
+ 
 ### The section name needs to be unique
 ### There can be multiple sections which are processed sequentially without pause
 ### The pause occurs after all sections are processed, before the next loop

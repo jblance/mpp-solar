@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import os
+import sys
 import logging
 import importlib
 
@@ -127,3 +129,122 @@ class CRC_XModem:
     def crc_hex(self, data):
         crc = self.compute_crc(data)
         return format(crc, '04x').upper()
+
+def log_pyinstaller_context():
+    """
+    Log context info if running inside a PyInstaller bundle.
+    """
+    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        log.info("Running from PyInstaller bundle. An initial loader process may appear in pstree.")
+        log.debug(f"PyInstaller context: sys.executable={sys.executable}, _MEIPASS={sys._MEIPASS}")
+
+
+def daemonize():
+    """
+    Properly daemonize the process (Unix double-fork)
+    Enhanced for PyInstaller compatibility
+    """
+    import logging
+    from mppsolar.pyinstaller_runtime import is_pyinstaller_bundle, has_been_spawned
+
+    log = logging.getLogger("helpers")
+    pid = os.getpid()
+    ppid = os.getppid()
+    log.info(f"[DAEMONIZE] Before fork PID: {pid}, PPID: {ppid}")
+
+    # Special handling for PyInstaller spawned processes
+    if is_pyinstaller_bundle() and has_been_spawned():
+        log.info("[DAEMONIZE] Running in spawned PyInstaller process - using modified daemonization")
+        
+        # We're already in a subprocess, so we can do a simpler daemonization
+        # Just do a single fork and session setup
+        try:
+            pid = os.fork()
+            if pid > 0:
+                log.info(f"[DAEMONIZE] Fork successful, parent exiting. Child PID: {pid}")
+                sys.exit(0)
+        except OSError as e:
+            log.error(f"Fork failed: {e}")
+            sys.exit(1)
+
+        # Set up daemon environment
+        os.chdir("/")
+        os.setsid()
+        os.umask(0)
+        
+        # Redirect standard file descriptors
+        sys.stdout.flush()
+        sys.stderr.flush()
+        
+        log.info(f"[DAEMONIZE] PyInstaller daemon process ready. PID: {os.getpid()}")
+        return
+
+    # Standard daemonization for non-PyInstaller or direct execution
+    try:
+        pid = os.fork()
+        if pid > 0:
+            log.info(f"[DAEMONIZE] First fork successful, parent exiting. Child PID: {pid}")
+            sys.exit(0)
+    except OSError as e:
+        log.error(f"First fork failed: {e}")
+        sys.exit(1)
+
+    os.chdir("/")
+    os.setsid()
+    os.umask(0)
+
+    try:
+        pid = os.fork()
+        if pid > 0:
+            log.info(f"[DAEMONIZE] Second fork successful, intermediate parent exiting. Child PID: {pid}")
+            sys.exit(0)
+    except OSError as e:
+        log.error(f"Second fork failed: {e}")
+        sys.exit(1)
+
+    # Redirect standard file descriptors to /dev/null
+    sys.stdout.flush()
+    sys.stderr.flush()
+#     with open('/dev/null', 'r') as si:  # Disabled while testing pyinstaller code
+#         os.dup2(si.fileno(), sys.stdin.fileno())
+#     with open('/dev/null', 'a+') as so:
+#         os.dup2(so.fileno(), sys.stdout.fileno())
+#     with open('/dev/null', 'a+') as se:
+#         os.dup2(se.fileno(), sys.stderr.fileno())
+
+    log.info(f"[DAEMONIZE] Daemon process forked successfully. PID: {os.getpid()}")
+
+
+def has_been_spawned():
+#    return os.environ.get("MPP_SOLAR_SPAWNED") == "1"
+    val = os.environ.get("MPP_SOLAR_SPAWNED")
+    log.info(f"has_been_spawned(): MPP_SOLAR_SPAWNED={val}")
+    return val == "1"
+
+
+def setup_daemon_logging(log_file="/var/log/mpp-solar.log"):
+    """Setup logging for daemon mode"""
+    try:
+        # Create log directory if it doesn't exist
+        log_dir = os.path.dirname(log_file)
+        os.makedirs(log_dir, exist_ok=True)
+
+        # Setup file logging
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setLevel(logging.INFO)
+
+        # Setup formatter
+        formatter = logging.Formatter(
+            '%(asctime)s:%(levelname)s:%(module)s:%(funcName)s@%(lineno)d: %(message)s'
+        )
+        file_handler.setFormatter(formatter)
+
+        # Get root logger and add handler
+        root_logger = logging.getLogger()
+        root_logger.addHandler(file_handler)
+
+        return True
+    except Exception as e:
+        print(f"Failed to setup daemon logging: {e}")
+        return False
+
