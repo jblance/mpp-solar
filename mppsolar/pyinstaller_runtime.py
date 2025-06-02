@@ -18,7 +18,7 @@ def is_pyinstaller_bundle():
 
 def has_been_spawned():
     val = os.environ.get("MPP_SOLAR_SPAWNED")
-    log.warning(f"has_been_spawned(): MPP_SOLAR_SPAWNED={val}")
+    log.info(f"has_been_spawned(): MPP_SOLAR_SPAWNED={val}")
     return val == "1"
 
 
