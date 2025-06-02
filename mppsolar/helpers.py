@@ -135,7 +135,7 @@ def log_pyinstaller_context():
     Log context info if running inside a PyInstaller bundle.
     """
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        log.warning("Running from PyInstaller bundle. An initial loader process may appear in pstree.")
+        log.info("Running from PyInstaller bundle. An initial loader process may appear in pstree.")
         log.debug(f"PyInstaller context: sys.executable={sys.executable}, _MEIPASS={sys._MEIPASS}")
 
 
@@ -218,7 +218,7 @@ def daemonize():
 def has_been_spawned():
 #    return os.environ.get("MPP_SOLAR_SPAWNED") == "1"
     val = os.environ.get("MPP_SOLAR_SPAWNED")
-    log.warning(f"has_been_spawned(): MPP_SOLAR_SPAWNED={val}")
+    log.info(f"has_been_spawned(): MPP_SOLAR_SPAWNED={val}")
     return val == "1"
 
 
