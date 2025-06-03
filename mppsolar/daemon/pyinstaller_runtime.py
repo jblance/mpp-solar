@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+""" pyinstaller_runntime.py """
 import os
 import sys
 import time
@@ -21,6 +21,8 @@ def has_been_spawned():
     log.info(f"has_been_spawned(): MPP_SOLAR_SPAWNED={val}")
     return val == "1"
 
+def is_spawned_pyinstaller_process():
+    return is_pyinstaller_bundle() and has_been_spawned()
 
 
 def copy_essential_files():
@@ -111,12 +113,22 @@ def spawn_pyinstaller_subprocess(args):
             executable = sys.executable
 
 #         cmd = [executable] + sys.argv[1:]
-        cmd = [executable] + [arg for arg in sys.argv[1:] if arg != "--daemon"] + ["--daemon"]
+#         cmd = [executable] + [arg for arg in sys.argv[1:] if arg != "--daemon"] + ["--daemon"]
+        cmd_args = sys.argv[1:]
+        if "--daemon" not in cmd_args:
+            cmd_args.append("--daemon")
+
+        cmd = [executable] + cmd_args
 
         log.info(f"Launching child with cmd: {' '.join(cmd)}")
         log.debug(f"Spawning child subprocess: {cmd}")
         log.debug(f"Working directory: {permanent_dir}")
-        
+        log.warning(f"[SPAWN] sys.argv: {sys.argv}")
+        log.warning(f"[SPAWN] final cmd: {cmd}")
+        log.warning(f"[SPAWN] is_pyinstaller_bundle: {is_pyinstaller_bundle()}")
+        log.warning(f"[SPAWN] has_been_spawned: {has_been_spawned()}")
+        log.warning(f"[SPAWN] args.daemon: {args.daemon}")
+
         try:
             proc = subprocess.Popen(
                 cmd, 

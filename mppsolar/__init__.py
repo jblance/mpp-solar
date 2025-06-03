@@ -8,9 +8,17 @@ from platform import python_version
 
 from mppsolar.version import __version__  # noqa: F401
 
-from mppsolar.helpers import get_device_class, daemonize, setup_daemon_logging, log_pyinstaller_context
-from mppsolar.pyinstaller_runtime import spawn_pyinstaller_subprocess, is_pyinstaller_bundle, has_been_spawned
-
+from mppsolar.helpers import (
+    get_device_class,
+    daemonize, setup_daemon_logging,
+    log_pyinstaller_context,
+  )
+from mppsolar.daemon.pyinstaller_runtime import (
+    spawn_pyinstaller_subprocess,
+    is_pyinstaller_bundle,
+    has_been_spawned,
+    is_spawned_pyinstaller_process,
+  )
 from mppsolar.daemon import get_daemon, detect_daemon_type
 from mppsolar.daemon import DaemonType
 from mppsolar.libs.mqttbrokerc import MqttBroker
@@ -282,18 +290,6 @@ def main():
     s_prog_name = prog_name.replace("-", "")
     log_file_path = "/var/log/mpp-solar.log"
 
-    log_pyinstaller_context()
-    # --- Optional PyInstaller bootstrap cleanup ---
-    # To enable single-process daemon spawn logic (avoids PyInstaller parent):
-    #################################################################
-    if spawn_pyinstaller_subprocess(args):
-      sys.exit(0)
-    #################################################################
-
-    from mppsolar.pyinstaller_runtime import setup_spawned_environment
-    setup_spawned_environment()
-
-
 
     # logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     # Turn on debug if needed
@@ -364,8 +360,31 @@ def main():
             log_func(f"[{label}] Command: {cmdline}")
         except:
             log_func(f"[{label}] Command: {' '.join(sys.argv)}")
-    #######
 
+
+    def log_debug_context(label, args):
+        log.debug(f"[{label}] sys.argv = {sys.argv}")
+        log.debug(f"[{label}] args.daemon = {args.daemon}")
+        log.debug(f"[{label}] args.debug = {args.debug}")
+
+    if args.debug:
+        if is_spawned_pyinstaller_process():
+            log_debug_context("CHILD", args)
+        elif is_pyinstaller_bundle():
+            log_debug_context("PARENT", args)
+        else:
+            log_debug_context("SYSTEM", args)
+
+    log_pyinstaller_context()
+    # --- Optional PyInstaller bootstrap cleanup ---
+    # To enable single-process daemon spawn logic (avoids PyInstaller parent):
+    #################################################################
+    if spawn_pyinstaller_subprocess(args):
+      sys.exit(0)
+    #################################################################
+
+    from daemon.pyinstaller_runtime import setup_spawned_environment
+    setup_spawned_environment()
 
     # Handle daemon stop request
     if args.daemon_stop:
@@ -402,7 +421,7 @@ def main():
     # ------------------------
     daemon = setup_daemon_if_requested(args, log_file_path=log_file_path)
     log.info(daemon)
-
+    DAEMON_MODE = args.daemon
     # Notify systemd/init
     daemon.initialize()
     log_process_info("AFTER_DAEMON_INITIALIZE", log.info)
@@ -511,7 +530,7 @@ def main():
             for command in commands:
                 _commands.append((device, command, tag, outputs, filter, excl_filter))
             log.debug(f"Commands from config file {_commands}")
-
+            log.debug(f"[DAEMON LOOP INIT] args.daemon={args.daemon}, pause={pause}, commands={_commands}")
             if args.daemon:
                 print(f"Config file: {args.configfile}")
                 print(f"Config setting - pause: {pause}")
@@ -615,16 +634,22 @@ def main():
                     excl_filter=excl_filter,
                     keep_case=keep_case,
                 )
+        try:
                 # Tell systemd watchdog we are still alive
-        if args.daemon:
-            daemon.watchdog()
-            print(f"Sleeping for {pause} sec")
-            time.sleep(pause)
-        else:
-            # Dont loop unless running as daemon
-            log.debug("Not daemon, so not looping")
-            break
+#            if args.daemon:
+            if DAEMON_MODE:
+                daemon.watchdog()
+                print(f"Sleeping for {pause} sec")
+                time.sleep(pause)
+            else:
+                # Dont loop unless running as daemon
+                log.debug("Not daemon, so not looping")
+                break
+        except Exception as e:
+            log.error(f"[LOOP ERROR] Exception in daemon loop: {e}", exc_info=True)
+            time.sleep(5)  # Prevent tight loop in case of recurring errors
 
+    log.warning("[LOOP EXIT] Exiting main loop — this should not happen if daemon is True.")
 
 if __name__ == "__main__":
     main()

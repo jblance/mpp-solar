@@ -145,7 +145,7 @@ def daemonize():
     Enhanced for PyInstaller compatibility
     """
     import logging
-    from mppsolar.pyinstaller_runtime import is_pyinstaller_bundle, has_been_spawned
+    from mppsolar.daemon.pyinstaller_runtime import is_pyinstaller_bundle, has_been_spawned
 
     log = logging.getLogger("helpers")
     pid = os.getpid()
