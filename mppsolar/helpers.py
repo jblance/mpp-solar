@@ -164,7 +164,7 @@ def daemonize():
                 log.info(f"[DAEMONIZE] Fork successful, parent exiting. Child PID: {pid}")
                 sys.exit(0)
         except OSError as e:
-            log.error(f"Fork failed: {e}")
+            log.error(f"Fork failed in spawned PyInstaller process: {e}")
             sys.exit(1)
 
         # Set up daemon environment
@@ -175,7 +175,16 @@ def daemonize():
         # Redirect standard file descriptors
         sys.stdout.flush()
         sys.stderr.flush()
-        
+        try:
+            with open('/dev/null', 'r') as si: # Disable only while testing.
+                os.dup2(si.fileno(), sys.stdin.fileno())
+            with open('/dev/null', 'a+') as so:
+                os.dup2(so.fileno(), sys.stdout.fileno())
+            with open('/dev/null', 'a+') as se:
+                os.dup2(se.fileno(), sys.stderr.fileno())
+            log.info("[DAEMONIZE] Standard I/O redirected to /dev/null.") # This log won't appear on console
+        except Exception as e:
+            pass # Keep original pass here, as the log might not work yet
         log.info(f"[DAEMONIZE] PyInstaller daemon process ready. PID: {os.getpid()}")
         return
 
@@ -205,18 +214,17 @@ def daemonize():
     # Redirect standard file descriptors to /dev/null
     sys.stdout.flush()
     sys.stderr.flush()
-#     with open('/dev/null', 'r') as si:  # Disabled while testing pyinstaller code
-#         os.dup2(si.fileno(), sys.stdin.fileno())
-#     with open('/dev/null', 'a+') as so:
-#         os.dup2(so.fileno(), sys.stdout.fileno())
-#     with open('/dev/null', 'a+') as se:
-#         os.dup2(se.fileno(), sys.stderr.fileno())
+    with open('/dev/null', 'r') as si:  # Disabled while testing pyinstaller code
+        os.dup2(si.fileno(), sys.stdin.fileno())
+    with open('/dev/null', 'a+') as so:
+        os.dup2(so.fileno(), sys.stdout.fileno())
+    with open('/dev/null', 'a+') as se:
+        os.dup2(se.fileno(), sys.stderr.fileno())
 
     log.info(f"[DAEMONIZE] Daemon process forked successfully. PID: {os.getpid()}")
 
 
 def has_been_spawned():
-#    return os.environ.get("MPP_SOLAR_SPAWNED") == "1"
     val = os.environ.get("MPP_SOLAR_SPAWNED")
     log.info(f"has_been_spawned(): MPP_SOLAR_SPAWNED={val}")
     return val == "1"

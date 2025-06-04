@@ -88,6 +88,35 @@ def cleanup_permanent_directory(permanent_dir):
         log.warning(f"Failed to clean up permanent directory {permanent_dir}: {e}")
 
 
+def _log_runtime_context(label, log_func=None):
+    if log_func is None:
+        log_func = log.debug
+
+    pid = os.getpid()
+    ppid = os.getppid()
+    try:
+        pgid = os.getpgid(0)
+        sid = os.getsid(0)
+    except OSError:
+        pgid = "unknown"
+        sid = "unknown"
+
+    is_leader = (pid == pgid)
+    frozen = getattr(sys, 'frozen', False)
+    meipass = getattr(sys, '_MEIPASS', 'N/A')
+    spawned = os.environ.get("MPP_SOLAR_SPAWNED", "N/A")
+    permanent_dir = os.environ.get("MPP_SOLAR_PERMANENT_DIR", "N/A")
+
+    log_func(f"[{label}] Process Info: PID={pid}, PPID={ppid}, PGID={pgid}, SID={sid}, Leader={is_leader}")
+    log_func(f"[{label}] Sys Info: sys.frozen={frozen}, _MEIPASS={meipass}")
+    log_func(f"[{label}] Env Info: MPP_SOLAR_SPAWNED={spawned}, MPP_SOLAR_PERMANENT_DIR={permanent_dir}")
+    log_func(f"[{label}] Current Working Dir: {os.getcwd()}")
+    try:
+        with open(f'/proc/{pid}/cmdline', 'r') as f:
+            cmdline = f.read().replace('\0', ' ').strip()
+        log_func(f"[{label}] Command Line: {cmdline}")
+    except FileNotFoundError:
+        log_func(f"[{label}] Command Line (sys.argv): {' '.join(sys.argv)}")
 
 
 def spawn_pyinstaller_subprocess(args):
@@ -96,13 +125,15 @@ def spawn_pyinstaller_subprocess(args):
     of daemonized processes.
     Returns True if a subprocess is spawned and parent should exit.
     """
+    _log_runtime_context("PR_PARENT_ENTRY", log.debug)
     if args.daemon and is_pyinstaller_bundle() and not has_been_spawned():
         log.warning("Running from PyInstaller — spawning subprocess to survive bootstrap parent")
-
+        _log_runtime_context("PR_PARENT_BEFORE_FORK", log.info)
+        
         # Create permanent copy of extracted files
         permanent_dir = copy_essential_files()
         if not permanent_dir:
-            log.error("Failed to create permanent copy of files")
+            log.critical("Failed to create permanent copy of files")
             return False
 
         new_env = os.environ.copy()
@@ -112,8 +143,6 @@ def spawn_pyinstaller_subprocess(args):
         if not os.path.exists(executable):
             executable = sys.executable
 
-#         cmd = [executable] + sys.argv[1:]
-#         cmd = [executable] + [arg for arg in sys.argv[1:] if arg != "--daemon"] + ["--daemon"]
         cmd_args = sys.argv[1:]
         if "--daemon" not in cmd_args:
             cmd_args.append("--daemon")
@@ -123,11 +152,7 @@ def spawn_pyinstaller_subprocess(args):
         log.info(f"Launching child with cmd: {' '.join(cmd)}")
         log.debug(f"Spawning child subprocess: {cmd}")
         log.debug(f"Working directory: {permanent_dir}")
-        log.warning(f"[SPAWN] sys.argv: {sys.argv}")
-        log.warning(f"[SPAWN] final cmd: {cmd}")
-        log.warning(f"[SPAWN] is_pyinstaller_bundle: {is_pyinstaller_bundle()}")
-        log.warning(f"[SPAWN] has_been_spawned: {has_been_spawned()}")
-        log.warning(f"[SPAWN] args.daemon: {args.daemon}")
+        _log_runtime_context("PR_PARENT_SPAWNING", log.warning)
 
         try:
             proc = subprocess.Popen(
@@ -141,22 +166,21 @@ def spawn_pyinstaller_subprocess(args):
             )
 
             # Wait a bit to ensure child process starts successfully
-            for i in range(10):
+            for i in range(20):
                 if proc.poll() is not None:
                     if proc.returncode == 0:
-                        log.info("Child process daemonized and exited cleanly (expected for daemon mode)")
+                        log.info(f"Child process (PID: {proc.pid}) exited cleanly (expected for daemon mode and PyInstaller bootstrap).")
                     else:
-                        log.error(f"Child process exited prematurely with code: {proc.returncode}")
+                        log.error(f"Child process (PID: {proc.pid}) exited prematurely with code: {proc.returncode}")
                     cleanup_permanent_directory(permanent_dir)
                     return True
-                time.sleep(0.5)
+                time.sleep(1)
 
-            log.info(f"Child process started successfully with PID: {proc.pid}")
-            log.info("Parent process exiting - child will continue as daemon")
+            log.info(f"Child process started successfully with PID: {proc.pid}. Parent exiting.")
             return True
             
         except Exception as e:
-            log.error(f"Failed to spawn subprocess: {e}")
+            log.critical(f"Failed to spawn subprocess: {e}", exc_info=True)
             cleanup_permanent_directory(permanent_dir)
             return False
 
@@ -167,12 +191,15 @@ def setup_spawned_environment():
     """
     Set up environment for spawned process to use permanent directory
     """
+    _log_runtime_context("PR_SPAWNED_CHILD_SETUP_ENTRY", log.info)
     if has_been_spawned() and is_pyinstaller_bundle():
         permanent_dir = os.environ.get("MPP_SOLAR_PERMANENT_DIR")
         if permanent_dir and os.path.exists(permanent_dir):
             setup_permanent_environment(permanent_dir)
             log.info("Spawned process environment configured")
+            _log_runtime_context("PR_SPAWNED_CHILD_SETUP_COMPLETE", log.info)
             return True
         else:
-            log.warning("Spawned process but permanent directory not found")
+            log.warning(f"Spawned process but permanent directory not found: {permanent_dir}. Continuing without explicit permanent environment setup.")
+        _log_runtime_context("PR_SPAWNED_CHILD_SETUP_EXIT", log.debug)
     return False

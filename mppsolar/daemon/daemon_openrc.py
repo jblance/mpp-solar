@@ -134,6 +134,13 @@ class DaemonOpenRC(Daemon):
     def _create_pid_file(self):
         """ Create PID file with current process ID """
         pid = os.getpid()
+        log.debug(f"[PID_CREATE] getpid()={pid}, getppid()={os.getppid()}")
+        try:
+            pgid = os.getpgid(0)
+            sid = os.getsid(0)
+            log.debug(f"[PID_CREATE] pgid={pgid}, sid={sid}")
+        except Exception as e:
+            log.debug(f"[PID_CREATE] Failed to get pgid/sid: {e}")
         log.info(f"Creating PID file {self.pid_file_path} with PID {pid}")
 
         try:

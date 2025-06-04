@@ -58,7 +58,6 @@ def log_process_info(label, log_func=None):
 
 def setup_daemon_if_requested(args, log_file_path="/var/log/mpp-solar.log"):
 
-
     if args.daemon:
         log.info("Daemon mode requested")
 
@@ -80,13 +79,16 @@ def setup_daemon_if_requested(args, log_file_path="/var/log/mpp-solar.log"):
 
         daemon.keepalive = 60
 
-        if not setup_daemon_logging("/var/log/mpp-solar.log"):
-            log.warning("Failed to setup file logging, continuing with console logging")
-
         log.info("Attempting traditional daemonization...")
         try:
             daemonize()
             log.info("Daemonized successfully")
+            # Re-setup logging for the daemonized process
+            if not setup_daemon_logging(log_file_path):
+                sys.stderr.write("CRITICAL: Failed to setup file logging for daemon. Check permissions.\n")
+            else:
+                log.info("Daemon file logging successfully re-initialized.")
+
         except Exception as e:
             log.error(f"Failed to daemonize process: {e}")
             log.info("Continuing in foreground mode")
