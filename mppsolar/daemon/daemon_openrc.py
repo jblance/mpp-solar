@@ -217,7 +217,7 @@ class DaemonOpenRC(Daemon):
 
     def _create_pid_file(self):
         """ Create PID file with current process ID """
-        pid = os.getpid()
+        pid = self._get_effective_pid()
         log.info(f"Creating PID file {self.pid_file_path} with PID {pid}")
 
         try:

@@ -147,6 +147,17 @@ class Daemon:
         # Send stopping
         self._notify(self._Notification.STOPPING)
 
+    def _get_effective_pid(self):
+        """Return the PID to use for tracking this daemon.
+        For PyInstaller parent processes, return os.getppid().
+        For normal or spawned PyInstaller processes, return os.getpid().
+        """
+        from mppsolar.daemon.pyinstaller_runtime import is_pyinstaller_bundle, is_spawned_pyinstaller_process
+        if is_pyinstaller_bundle() and not is_spawned_pyinstaller_process():
+            return os.getppid()
+        return os.getpid()
+
+
     def log(self, message=None):
         # Print log message
         if message is not None:
