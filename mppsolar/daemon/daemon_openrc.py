@@ -318,6 +318,14 @@ class DaemonOpenRC(Daemon):
                     log.info(f"Removed PID file: {self.pid_file_path}")
         except Exception as e:
             log.error(f"Failed to remove PID file {self.pid_file_path}: {e}")
+        #----- clean up watchdog file ----#
+        watchdog_path = "/var/run/mpp-solar.watchdog"
+        if os.path.exists(watchdog_path):
+            try:
+                os.remove(watchdog_path)
+                log.info(f"Removed watchdog file: {watchdog_path}")
+            except Exception as e:
+                log.warning(f"Failed to remove watchdog file: {e}")
 
     def initialize(self):
         """Initialize daemon and create PID file"""
@@ -430,6 +438,24 @@ class DaemonOpenRC(Daemon):
         except (ValueError, FileNotFoundError, PermissionError) as e:
             log.error(f"Error stopping daemon: {e}")
             return False
+            
+            
+    def watchdog(self):
+        """OpenRC watchdog heartbeat"""
+        now = time.time()
+        time_since_last = now - self._lastNotify
+        self._lastNotify = now
+
+        # You can touch a file or log the ping depending on your OpenRC setup
+        log.debug(f"[WATCHDOG] Ping at {time.strftime('%Y-%m-%d %H:%M:%S')} (Δ {time_since_last:.2f}s)")
+
+        # Optional: if OpenRC uses `supervise-daemon` with `--chdir`, touch a freshness file:
+        try:
+            with open("/var/run/mpp-solar.watchdog", "w") as f:
+                f.write(f"watchdog ping: {int(now)}\n")
+        except Exception as e:
+            log.warning(f"Watchdog write failed: {e}")
+
 
     def _notify(self, notification, message=None):
         """Handle daemon notifications"""
