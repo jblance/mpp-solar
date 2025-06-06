@@ -1,6 +1,7 @@
-""" daemon_openrc.py """
+""" daemon_openrc.py - Fixed version for PyInstaller compatibility """
 import logging
 import os
+from mppsolar.daemon.pyinstaller_runtime import handle_stale_pid
 import signal
 import sys
 import time
@@ -45,6 +46,7 @@ class DaemonOpenRC(Daemon):
         self._lastNotify = time.time()
         self._pid_file = None
         self._running = True
+        self._pid_file_created = False  # NEW: Track if we created the PID file
 
         # Set PID file location with smart defaults
         if pid_file_path:
@@ -101,15 +103,36 @@ class DaemonOpenRC(Daemon):
                     return False
 
                 pid = int(content)
+                current_pid = os.getpid()
+
+                # If the PID in the file is our current PID, that's fine
+                if pid == current_pid:
+                    log.info(f"PID file contains our own PID {pid}, continuing")
+                    return False
+
                 log.debug(f"Checking if PID {pid} is running...")
-                
+
                 if HAS_PSUTIL:
                     # Use psutil if available for more reliable process checking
                     try:
                         process = psutil.Process(pid)
                         if process.is_running():
-                            log.info(f"Process {pid} is running: {process.name()}")
-                            return True
+                            # Additional check - is it actually our process name?
+                            try:
+                                process_name = process.name()
+                                cmdline = ' '.join(process.cmdline())
+                                log.info(f"Process {pid} is running: {process_name}")
+                                log.debug(f"Process {pid} cmdline: {cmdline}")
+
+                                # Check if it's likely our own process (mpp-solar related)
+                                if 'mpp-solar' in process_name or 'mpp-solar' in cmdline:
+                                    return True
+                                else:
+                                    log.warning(f"Process {pid} exists but doesn't appear to be mpp-solar")
+                                    return False
+                            except (psutil.AccessDenied, psutil.ZombieProcess):
+                                # If we can't get process details, assume it's running
+                                return True
                         else:
                             log.info(f"Process {pid} is not running")
                             return False
@@ -131,16 +154,70 @@ class DaemonOpenRC(Daemon):
             log.warning(f"Could not check existing daemon: {e}")
             return False
 
+    def _safe_import_pyinstaller_runtime(self):
+        """
+        Safely import PyInstaller runtime functions with fallback
+        Returns tuple: (is_pyinstaller_bundle_func, has_been_spawned_func)
+        """
+        try:
+            from mppsolar.daemon.pyinstaller_runtime import is_pyinstaller_bundle, has_been_spawned
+            return is_pyinstaller_bundle, has_been_spawned
+        except ImportError:
+            log.debug("Could not import pyinstaller_runtime, using fallback functions")
+            # Fallback functions that return safe defaults
+            def fallback_is_pyinstaller_bundle():
+                return getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
+
+            def fallback_has_been_spawned():
+                return os.environ.get("MPP_SOLAR_SPAWNED") == "1"
+
+            return fallback_is_pyinstaller_bundle, fallback_has_been_spawned
+
+    
+
+            if not os.path.exists(self.pid_file_path):
+                return False
+
+            with open(self.pid_file_path, 'r') as pid_file:
+                content = pid_file.read().strip()
+                if not content:
+                    return False
+
+                old_pid = int(content)
+                current_pid = os.getpid()
+
+                if old_pid == current_pid:
+                    return False
+
+                # Check if the old PID is still running
+                if HAS_PSUTIL:
+                    try:
+                        process = psutil.Process(old_pid)
+                        if process.is_running():
+                            cmdline = ' '.join(process.cmdline())
+                            # If it's a PyInstaller bootstrap process, it's likely stale
+                            if 'mpp-solar' in cmdline and process.ppid() != os.getppid():
+                                log.info(f"Detected potential stale PyInstaller bootstrap PID {old_pid}")
+                                return True
+                    except (psutil.NoSuchProcess, psutil.AccessDenied):
+                        # Process doesn't exist, definitely stale
+                        return True
+                else:
+                    # Fallback: if we can't signal the process, assume it's stale
+                    try:
+                        os.kill(old_pid, 0)
+                        return False  # Process exists
+                    except OSError:
+                        return True  # Process doesn't exist, stale
+
+        except Exception as e:
+            log.debug(f"Error checking for stale PyInstaller PID: {e}")
+
+        return False
+
     def _create_pid_file(self):
         """ Create PID file with current process ID """
         pid = os.getpid()
-        log.debug(f"[PID_CREATE] getpid()={pid}, getppid()={os.getppid()}")
-        try:
-            pgid = os.getpgid(0)
-            sid = os.getsid(0)
-            log.debug(f"[PID_CREATE] pgid={pgid}, sid={sid}")
-        except Exception as e:
-            log.debug(f"[PID_CREATE] Failed to get pgid/sid: {e}")
         log.info(f"Creating PID file {self.pid_file_path} with PID {pid}")
 
         try:
@@ -157,7 +234,15 @@ class DaemonOpenRC(Daemon):
             # Check if file already exists and handle appropriately
             if os.path.exists(self.pid_file_path):
                 log.warning(f"PID file {self.pid_file_path} already exists, checking if daemon is running...")
-                if self._check_existing_daemon():
+
+                # Special handling for PyInstaller stale PIDs
+                if not handle_stale_pid(
+                    self.pid_file_path,
+                    *self._safe_import_pyinstaller_runtime(),
+                    self._check_existing_daemon,
+                ):
+                    return False
+                elif self._check_existing_daemon():
                     log.error("Another daemon instance is already running")
                     return False
                 else:
@@ -182,6 +267,7 @@ class DaemonOpenRC(Daemon):
                 os.rename(temp_pid_file, self.pid_file_path)
 
                 log.info(f"Successfully created PID file: {self.pid_file_path} with PID {pid}")
+                self._pid_file_created = True  # NEW: Mark that we created it
 
                 # Verify the file was written correctly
                 with open(self.pid_file_path, 'r') as verify_file:
@@ -210,6 +296,11 @@ class DaemonOpenRC(Daemon):
 
     def _cleanup_pid_file(self):
         """ Remove PID file on shutdown """
+        # Only clean up if we created the PID file
+        if not self._pid_file_created:
+            log.debug("Skipping PID file cleanup - we didn't create it")
+            return
+            
         try:
             if os.path.exists(self.pid_file_path):
                 # Verify it's our PID before removing
@@ -235,7 +326,6 @@ class DaemonOpenRC(Daemon):
         pid = os.getpid()
         ppid = os.getppid()
         log.info(f"[OPENRC_INITIALIZE] Before PID file creation: PID={pid}, PPID={ppid}")
-
 
         # Create PID file
         if not self._create_pid_file():
@@ -351,4 +441,3 @@ class DaemonOpenRC(Daemon):
     def _journal(self, message):
         """Log message to system journal (or regular log)"""
         log.info(message)
-

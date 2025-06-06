@@ -8,11 +8,8 @@ from platform import python_version
 
 from mppsolar.version import __version__  # noqa: F401
 
-from mppsolar.helpers import (
-    get_device_class,
-    daemonize, setup_daemon_logging,
-    log_pyinstaller_context,
-  )
+from mppsolar.helpers import get_device_class
+
 from mppsolar.daemon.pyinstaller_runtime import (
     spawn_pyinstaller_subprocess,
     is_pyinstaller_bundle,
@@ -21,6 +18,10 @@ from mppsolar.daemon.pyinstaller_runtime import (
   )
 from mppsolar.daemon import get_daemon, detect_daemon_type
 from mppsolar.daemon import DaemonType
+from mppsolar.daemon.daemon import (
+    setup_daemon_logging,
+    daemonize,
+)
 from mppsolar.libs.mqttbrokerc import MqttBroker
 from mppsolar.outputs import get_outputs, list_outputs
 from mppsolar.protocols import list_protocols
@@ -30,75 +31,8 @@ log = logging.getLogger("")
 FORMAT = "%(asctime)-15s:%(levelname)s:%(module)s:%(funcName)s@%(lineno)d: %(message)s"
 logging.basicConfig(format=FORMAT)
 
-def log_process_info(label, log_func=None):
 
-    if log_func is None:
-        log_func = print
 
-    pid = os.getpid()
-    ppid = os.getppid()
-
-    try:
-        pgid = os.getpgid(0)
-        sid = os.getsid(0)
-    except:
-        pgid = "unknown"
-        sid = "unknown"
-
-    is_leader = (pid == pgid)
-
-    log_func(f"[{label}] PID: {pid}, PPID: {ppid}, PGID: {pgid}, SID: {sid}, Leader: {is_leader}")
-
-    try:
-        with open(f'/proc/{pid}/cmdline', 'r') as f:
-            cmdline = f.read().replace('\0', ' ').strip()
-        log_func(f"[{label}] Command: {cmdline}")
-    except:
-        log_func(f"[{label}] Command: {' '.join(sys.argv)}")
-
-def setup_daemon_if_requested(args, log_file_path="/var/log/mpp-solar.log"):
-
-    if args.daemon:
-        log.info("Daemon mode requested")
-
-        try:
-            daemon_type = detect_daemon_type()
-            log.info(f"Detected daemon type: {daemon_type}")
-        except Exception as e:
-            log.warning(f"Failed to detect daemon type: {e}, falling back to OpenRC")
-            daemon_type = DaemonType.OPENRC
-
-        daemon = get_daemon(daemontype=daemon_type)
-
-        if hasattr(daemon, 'set_pid_file_path') and args.pidfile:
-            daemon.set_pid_file_path(args.pidfile)
-            log.info(f"Using custom PID file: {args.pidfile}")
-        elif hasattr(daemon, 'pid_file_path'):
-            daemon.pid_file_path = "/tmp/mpp-solar.pid" if os.geteuid() != 0 else "/var/run/mpp-solar.pid"
-            log.info(f"Using default PID file: {daemon.pid_file_path}")
-
-        daemon.keepalive = 60
-
-        log.info("Attempting traditional daemonization...")
-        try:
-            daemonize()
-            log.info("Daemonized successfully")
-            # Re-setup logging for the daemonized process
-            if not setup_daemon_logging(log_file_path):
-                sys.stderr.write("CRITICAL: Failed to setup file logging for daemon. Check permissions.\n")
-            else:
-                log.info("Daemon file logging successfully re-initialized.")
-
-        except Exception as e:
-            log.error(f"Failed to daemonize process: {e}")
-            log.info("Continuing in foreground mode")
-
-        return daemon
-    else:
-        log.info("Daemon mode NOT requested. Using DISABLED daemon.")
-        daemon = get_daemon(daemontype=DaemonType.DISABLED)
-        log_process_info("DAEMON_DISABLED_CREATED", log.info)
-        return daemon
 
 def main():
     description = f"Solar Device Command Utility, version: {__version__}, python version: {python_version()}"
@@ -302,7 +236,7 @@ def main():
     else:
         # set default log level
         log.setLevel(logging.WARNING)
-    logging.basicConfig()
+
 
     # Display version if asked
     log.info(description)
@@ -363,7 +297,6 @@ def main():
         except:
             log_func(f"[{label}] Command: {' '.join(sys.argv)}")
 
-
     def log_debug_context(label, args):
         log.debug(f"[{label}] sys.argv = {sys.argv}")
         log.debug(f"[{label}] args.daemon = {args.daemon}")
@@ -377,16 +310,61 @@ def main():
         else:
             log_debug_context("SYSTEM", args)
 
-    log_pyinstaller_context()
+
+    def setup_daemon_if_requested(args, log_file_path="/var/log/mpp-solar.log"):
+
+        if args.daemon:
+            log.info("Daemon mode requested")
+
+            try:
+                daemon_type = detect_daemon_type()
+                log.info(f"Detected daemon type: {daemon_type}")
+            except Exception as e:
+                log.warning(f"Failed to detect daemon type: {e}, falling back to OpenRC")
+                daemon_type = DaemonType.OPENRC
+
+            daemon = get_daemon(daemontype=daemon_type)
+
+            if hasattr(daemon, 'set_pid_file_path') and args.pidfile:
+                daemon.set_pid_file_path(args.pidfile)
+                log.info(f"Using custom PID file: {args.pidfile}")
+            elif hasattr(daemon, 'pid_file_path'):
+                daemon.pid_file_path = "/tmp/mpp-solar.pid" if os.geteuid() != 0 else "/var/run/mpp-solar.pid"
+                log.info(f"Using default PID file: {daemon.pid_file_path}")
+
+            daemon.keepalive = 60
+
+            log.info("Attempting traditional daemonization...")
+            try:
+#                 daemonize()
+                log.info("Daemonized successfully")
+                # Re-setup logging for the daemonized process
+                if not setup_daemon_logging(log_file_path):
+                    sys.stderr.write("CRITICAL: Failed to setup file logging for daemon. Check permissions.\n")
+                else:
+                    log.info("Daemon file logging successfully re-initialized.")
+
+            except Exception as e:
+                log.error(f"Failed to daemonize process: {e}")
+                log.info("Continuing in foreground mode")
+
+            return daemon
+        else:
+            log.info("Daemon mode NOT requested. Using DISABLED daemon.")
+            daemon = get_daemon(daemontype=DaemonType.DISABLED)
+            log_process_info("DAEMON_DISABLED_CREATED", log.info)
+            return daemon
+
+
     # --- Optional PyInstaller bootstrap cleanup ---
     # To enable single-process daemon spawn logic (avoids PyInstaller parent):
     #################################################################
-    if spawn_pyinstaller_subprocess(args):
-      sys.exit(0)
+#     if spawn_pyinstaller_subprocess(args):
+#       sys.exit(0)
+# 
+#     from daemon.pyinstaller_runtime import setup_spawned_environment
+#     setup_spawned_environment()
     #################################################################
-
-    from daemon.pyinstaller_runtime import setup_spawned_environment
-    setup_spawned_environment()
 
     # Handle daemon stop request
     if args.daemon_stop:
@@ -416,19 +394,6 @@ def main():
         except Exception as e:
             print(f"Error stopping daemon: {e}")
             sys.exit(1)
-
-
-    # ------------------------
-    # Daemon setup and logging
-    # ------------------------
-    daemon = setup_daemon_if_requested(args, log_file_path=log_file_path)
-    log.info(daemon)
-    DAEMON_MODE = args.daemon
-    # Notify systemd/init
-    daemon.initialize()
-    log_process_info("AFTER_DAEMON_INITIALIZE", log.info)
-    daemon.notify("Service Initializing ...")
-    log_process_info("AFTER_DAEMON_NOTIFY", log.info)
 
 
     # mqttbroker setup
@@ -599,6 +564,20 @@ def main():
             _commands.append((device, command, tag, outputs, filter, excl_filter))
         log.debug(f"Commands {_commands}")
 
+
+    # ------------------------
+    # Daemon setup and logging
+    # ------------------------
+    daemon = setup_daemon_if_requested(args, log_file_path=log_file_path)
+    log.info(daemon)
+    DAEMON_MODE = args.daemon
+    # Notify systemd/init
+    daemon.initialize()
+    log_process_info("AFTER_DAEMON_INITIALIZE", log.info)
+    daemon.notify("Service Initializing ...")
+    log_process_info("AFTER_DAEMON_NOTIFY", log.info)
+
+
     while True:
         # Loop through the configured commands
         if not args.daemon:
@@ -651,7 +630,6 @@ def main():
             log.error(f"[LOOP ERROR] Exception in daemon loop: {e}", exc_info=True)
             time.sleep(5)  # Prevent tight loop in case of recurring errors
 
-    log.warning("[LOOP EXIT] Exiting main loop — this should not happen if daemon is True.")
 
 if __name__ == "__main__":
     main()
