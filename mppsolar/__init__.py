@@ -314,6 +314,7 @@ def main():
     def setup_daemon_if_requested(args, log_file_path="/var/log/mpp-solar.log"):
 
         if args.daemon:
+            os.environ["MPP_SOLAR_DAEMON"] = "1"
             log.info("Daemon mode requested")
 
             try:
