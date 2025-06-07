@@ -131,6 +131,10 @@ class Daemon:
         self._notify(self._Notification.READY)
         self._lastNotify = time()
 
+    def get_watchdog_path(self):
+        """Return the path for the watchdog file, derived from the PID file path."""
+        return self.pid_file_path.replace(".pid", ".watchdog")
+
     def watchdog(self):
         log.debug("Base Daemon watchdog ping")
         elapsed = time() - self._lastNotify
