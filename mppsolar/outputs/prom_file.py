@@ -4,8 +4,7 @@ import tempfile
 import atexit
 
 from .prom import prom
-from ..helpers import get_kwargs
-from mppsolar.helpers import is_daemon_mode
+from ..helpers import get_kwargs, is_daemon_mode
 
 log = logging.getLogger("prom")
 
@@ -92,11 +91,11 @@ class prom_file(prom):
                 os.rename(temp_path, file_path)
 
                 # Track these files for cleanup if daemon
+                log.debug(f"is_daemon_mode(): {is_daemon_mode()}")
                 if is_daemon_mode():
-                    """Clean up all prometheus files created by this class if daemon"""
                     prom_file._created_files.add(file_path)
                     prom_file._register_cleanup()
-                    log.debug(f"Daemon: {DAEMON_MODE}, Registering files for cleanup on exit.")
+                    log.debug(f"DAEMON_MODE - Registering PROM files for cleanup on exit.")
 
                 log.debug(f"Successfully wrote prometheus file: {file_path}")
 
