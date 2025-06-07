@@ -98,16 +98,28 @@ WantedBy=multi-user.target
 ```bash
 #!/sbin/openrc-run
 
-name="mpp-solar daemon"
-description="MPP Solar Monitor Daemon"
-
-pidfile="/var/run/${RC_SVCNAME}.pid"
+name="MPP-Solar Daemon"
 command="/usr/bin/mpp-solar"
-command_args="--pidfile ${pidfile} -C /etc/mpp-solar/mpp-solar.conf"
-command_args_background="--daemon"
-#command_background="yes"
+command_args="-C /etc/mpp-solar/mpp-solar.conf --daemon"
+pidfile="/run/mpp-solar.pid"
+command_background="yes"
 
-stop_pre() {
-    /usr/bin/mpp-solar --daemon-stop --pidfile "${pidfile}"
+supervisor="supervise-daemon"
+directory="/"
+respawn_delay=5
+respawn_max=0  # 0 means unlimited restarts
+output_log="/var/log/mpp-solar.log"
+error_log="/var/log/mpp-solar.err"
+
+depend() {
+    need localmount
+    after networking
+    use logger
+}
+
+start_pre() {
+    checkpath --directory --mode 0755 /run
+    checkpath --file --mode 0644 "$output_log"
+    checkpath --file --mode 0644 "$error_log"
 }
 ```
