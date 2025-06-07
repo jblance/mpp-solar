@@ -151,10 +151,10 @@ class Daemon:
         """Return the PID to use for tracking this daemon.
         For PyInstaller parent processes, return os.getppid().
         For normal or spawned PyInstaller processes, return os.getpid().
-        """
+        Place holder"""
         from mppsolar.daemon.pyinstaller_runtime import is_pyinstaller_bundle, is_spawned_pyinstaller_process
         if is_pyinstaller_bundle() and not is_spawned_pyinstaller_process():
-            return os.getppid()
+            return os.getpid()
         return os.getpid()
 
 
