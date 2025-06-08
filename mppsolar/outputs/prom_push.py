@@ -25,11 +25,15 @@ class prom_push(prom):
         self.push_url = kwargs["push_url"]
 
         return super().output(*args, **kwargs)
-
+    
     def handle_output(self, content: str) -> None:
         if not requests:
             return
-
-        with requests.post(self.push_url, data=content) as req:
-            log.debug(f"POST'ed data to PushGateway {self.push_url!r}: {req=}")
+    
+        headers = {'Content-Type': 'text/plain'}
+        try:
+            with requests.post(self.push_url, data=content, headers=headers, timeout=5) as req:
+                log.debug(f"POST'ed data to PushGateway {self.push_url!r}: status_code={req.status_code}")
+        except requests.RequestException as e:
+            log.error(f"Failed to push to PushGateway: {e}")
     
