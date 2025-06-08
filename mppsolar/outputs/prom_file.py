@@ -86,6 +86,7 @@ class prom_file(prom):
                     temp_file.write(content)
                     temp_file.flush()
                     os.fsync(temp_file.fileno())  # Force write to disk
+                    os.chmod(temp_path, 0o744)
 
                 # Atomically move temp file to final location
                 os.rename(temp_path, file_path)
