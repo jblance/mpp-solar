@@ -54,6 +54,11 @@ def main():
         help="overrides the device communications port type",
         default=None,
     )
+    parser.add_argument(
+        "--dev",
+        help="Device identifier for prometheus output labeling for complex installations (default: None)",
+        default=None,
+    )
     if parser.prog == "jkbms":
         parser.add_argument(
             "-P",
@@ -422,6 +427,7 @@ def main():
     mqtt_topic = args.mqtttopic
     push_url = args.pushurl
     prom_output_dir = args.prom_output_dir
+    dev = args.dev
 
     _commands = []
 
@@ -473,6 +479,7 @@ def main():
             push_url = config[section].get("push_url", fallback=push_url)
             prom_output_dir = config[section].get("prom_output_dir", fallback=prom_output_dir)
             mqtt_topic = config[section].get("mqtt_topic", fallback=mqtt_topic)
+            section_dev = config[section].get("dev", fallback=None)
             #
             device_class = get_device_class(_type)
             log.debug(f"device_class {device_class}")
@@ -496,7 +503,7 @@ def main():
             commands = _command.split("#")
 
             for command in commands:
-                _commands.append((device, command, tag, outputs, filter, excl_filter))
+                _commands.append((device, command, tag, outputs, filter, excl_filter, section_dev))
             log.debug(f"Commands from config file {_commands}")
             log.debug(f"[DAEMON LOOP INIT] args.daemon={args.daemon}, pause={pause}, commands={_commands}")
             if args.daemon:
@@ -562,7 +569,7 @@ def main():
                 tag = args.tag
             else:
                 tag = command
-            _commands.append((device, command, tag, outputs, filter, excl_filter))
+            _commands.append((device, command, tag, outputs, filter, excl_filter, dev))
         log.debug(f"Commands {_commands}")
 
 
@@ -583,7 +590,7 @@ def main():
         # Loop through the configured commands
         if not args.daemon:
             log.info(f"Looping {len(_commands)} commands")
-        for _device, _command, _tag, _outputs, filter, excl_filter in _commands:
+        for _device, _command, _tag, _outputs, filter, excl_filter, dev in _commands:
             # for item in mppUtilArray:
             # Tell systemd watchdog we are still alive
             daemon.watchdog()
@@ -615,6 +622,7 @@ def main():
                     filter=filter,
                     excl_filter=excl_filter,
                     keep_case=keep_case,
+                    dev=dev,  # ADD: Pass dev parameter to output
                 )
         try:
                 # Tell systemd watchdog we are still alive
