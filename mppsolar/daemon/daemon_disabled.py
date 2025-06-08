@@ -28,7 +28,9 @@ class DaemonDummy(Daemon):
         # self.notify(f"got daemon type: {self.type}, keepalive: {self.keepalive}")
 
     def _dummyNotify(self, *args, **kwargs):
+        log.debug(f"DaemonDummy notified: args={args}, kwargs={kwargs}")
         # Print log message
         # if args:
         #     print(args[0])
         return
+

@@ -1,13 +1,17 @@
 # !/usr/bin/python3
+import os
 import logging
 import time
+import sys
 from argparse import ArgumentParser
 from platform import python_version
 
 from mppsolar.version import __version__  # noqa: F401
 
-from mppsolar.helpers import get_device_class
-from mppsolar.daemon import get_daemon
+from mppsolar.helpers import get_device_class, daemonize, setup_daemon_logging, log_pyinstaller_context
+from mppsolar.pyinstaller_runtime import spawn_pyinstaller_subprocess, is_pyinstaller_bundle, has_been_spawned
+
+from mppsolar.daemon import get_daemon, detect_daemon_type
 from mppsolar.daemon import DaemonType
 from mppsolar.libs.mqttbrokerc import MqttBroker
 from mppsolar.outputs import get_outputs, list_outputs
@@ -18,6 +22,73 @@ log = logging.getLogger("")
 FORMAT = "%(asctime)-15s:%(levelname)s:%(module)s:%(funcName)s@%(lineno)d: %(message)s"
 logging.basicConfig(format=FORMAT)
 
+def log_process_info(label, log_func=None):
+
+    if log_func is None:
+        log_func = print
+
+    pid = os.getpid()
+    ppid = os.getppid()
+
+    try:
+        pgid = os.getpgid(0)
+        sid = os.getsid(0)
+    except:
+        pgid = "unknown"
+        sid = "unknown"
+
+    is_leader = (pid == pgid)
+
+    log_func(f"[{label}] PID: {pid}, PPID: {ppid}, PGID: {pgid}, SID: {sid}, Leader: {is_leader}")
+
+    try:
+        with open(f'/proc/{pid}/cmdline', 'r') as f:
+            cmdline = f.read().replace('\0', ' ').strip()
+        log_func(f"[{label}] Command: {cmdline}")
+    except:
+        log_func(f"[{label}] Command: {' '.join(sys.argv)}")
+
+def setup_daemon_if_requested(args, log_file_path="/var/log/mpp-solar.log"):
+
+
+    if args.daemon:
+        log.info("Daemon mode requested")
+
+        try:
+            daemon_type = detect_daemon_type()
+            log.info(f"Detected daemon type: {daemon_type}")
+        except Exception as e:
+            log.warning(f"Failed to detect daemon type: {e}, falling back to OpenRC")
+            daemon_type = DaemonType.OPENRC
+
+        daemon = get_daemon(daemontype=daemon_type)
+
+        if hasattr(daemon, 'set_pid_file_path') and args.pidfile:
+            daemon.set_pid_file_path(args.pidfile)
+            log.info(f"Using custom PID file: {args.pidfile}")
+        elif hasattr(daemon, 'pid_file_path'):
+            daemon.pid_file_path = "/tmp/mpp-solar.pid" if os.geteuid() != 0 else "/var/run/mpp-solar.pid"
+            log.info(f"Using default PID file: {daemon.pid_file_path}")
+
+        daemon.keepalive = 60
+
+        if not setup_daemon_logging("/var/log/mpp-solar.log"):
+            log.warning("Failed to setup file logging, continuing with console logging")
+
+        log.info("Attempting traditional daemonization...")
+        try:
+            daemonize()
+            log.info("Daemonized successfully")
+        except Exception as e:
+            log.error(f"Failed to daemonize process: {e}")
+            log.info("Continuing in foreground mode")
+
+        return daemon
+    else:
+        log.info("Daemon mode NOT requested. Using DISABLED daemon.")
+        daemon = get_daemon(daemontype=DaemonType.DISABLED)
+        log_process_info("DAEMON_DISABLED_CREATED", log.info)
+        return daemon
 
 def main():
     description = f"Solar Device Command Utility, version: {__version__}, python version: {python_version()}"
@@ -37,6 +108,11 @@ def main():
     parser.add_argument(
         "--porttype",
         help="overrides the device communications port type",
+        default=None,
+    )
+    parser.add_argument(
+        "--dev",
+        help="Device identifier for prometheus output labeling for complex installations (default: None)",
         default=None,
     )
     if parser.prog == "jkbms":
@@ -192,6 +268,16 @@ def main():
         action="store_true",
         help="Enable Debug and above (i.e. all) messages",
     )
+    parser.add_argument(
+        "--pidfile",
+        help="Specifies the PID file location for daemon mode (default: /var/run/mpp-solar.pid, /tmp/mpp-solar.pid for PyInstaller)",
+        default=None,
+    )
+    parser.add_argument(
+        "--daemon-stop", 
+        action="store_true", 
+        help="Stop a running daemon (requires --pidfile if using non-default location)"
+    )
     parser.add_argument("-I", "--info", action="store_true", help="Enable Info and above level messages")
 
     args = parser.parse_args()
@@ -199,7 +285,20 @@ def main():
     if prog_name is None:
         prog_name = "mpp-solar"
     s_prog_name = prog_name.replace("-", "")
-    # log_name = s_prog_name.upper()
+    log_file_path = "/var/log/mpp-solar.log"
+
+    log_pyinstaller_context()
+    # --- Optional PyInstaller bootstrap cleanup ---
+    # To enable single-process daemon spawn logic (avoids PyInstaller parent):
+    #################################################################
+    if spawn_pyinstaller_subprocess(args):
+      sys.exit(0)
+    #################################################################
+
+    from mppsolar.pyinstaller_runtime import setup_spawned_environment
+    setup_spawned_environment()
+
+
 
     # logging (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     # Turn on debug if needed
@@ -239,6 +338,84 @@ def main():
     #     port: 1883
     #     user: null
     #     pass: null
+    # Handle daemon setup and stop requests
+
+    #### Extra Logging
+    def log_process_info(label, log_func=None):
+        """Log detailed process information for debugging"""
+        if log_func is None:
+            log_func = print
+    
+        pid = os.getpid()
+        ppid = os.getppid()
+    
+        # Get process group and session info
+        try:
+            pgid = os.getpgid(0)
+            sid = os.getsid(0)
+        except:
+            pgid = "unknown"
+            sid = "unknown"
+    
+        # Check if we're the process group leader
+        is_leader = (pid == pgid)
+    
+        log_func(f"[{label}] PID: {pid}, PPID: {ppid}, PGID: {pgid}, SID: {sid}, Leader: {is_leader}")
+    
+        # Log command line that started this process
+        try:
+            with open(f'/proc/{pid}/cmdline', 'r') as f:
+                cmdline = f.read().replace('\0', ' ').strip()
+            log_func(f"[{label}] Command: {cmdline}")
+        except:
+            log_func(f"[{label}] Command: {' '.join(sys.argv)}")
+    #######
+
+
+    # Handle daemon stop request
+    if args.daemon_stop:
+        pid_file_path = args.pidfile
+        if pid_file_path is None:
+            # Use default based on environment
+            if os.geteuid() != 0:  # Non-root check
+                pid_file_path = "/tmp/mpp-solar.pid"
+            else:
+                pid_file_path = "/var/run/mpp-solar.pid"
+
+        log.info(f"Attempting to stop daemon using PID file: {pid_file_path}")
+
+        try:
+            daemon_type = detect_daemon_type()
+            daemon_class = get_daemon(daemontype=daemon_type).__class__
+            if hasattr(daemon_class, 'stop_daemon'):
+                success = daemon_class.stop_daemon(pid_file_path)
+                if success:
+                    print("Daemon stopped successfully")
+                else:
+                    print("Failed to stop daemon")
+                sys.exit(0 if success else 1)
+            else:
+                print("Daemon stop functionality not available for this daemon type")
+                sys.exit(1)
+        except Exception as e:
+            print(f"Error stopping daemon: {e}")
+            sys.exit(1)
+
+
+    # ------------------------
+    # Daemon setup and logging
+    # ------------------------
+    daemon = setup_daemon_if_requested(args, log_file_path=log_file_path)
+    log.info(daemon)
+
+    # Notify systemd/init
+    daemon.initialize()
+    log_process_info("AFTER_DAEMON_INITIALIZE", log.info)
+    daemon.notify("Service Initializing ...")
+    log_process_info("AFTER_DAEMON_NOTIFY", log.info)
+
+
+    # mqttbroker setup
     mqtt_broker = MqttBroker(
         config={
             "name": args.mqttbroker,
@@ -263,32 +440,10 @@ def main():
     mqtt_topic = args.mqtttopic
     push_url = args.pushurl
     prom_output_dir = args.prom_output_dir
+    dev = args.dev
 
     _commands = []
 
-    # Initialize Daemon
-    if not args.daemon:
-        daemon = get_daemon(daemontype=DaemonType.DISABLED)
-    else:
-        daemon = get_daemon(daemontype=DaemonType.SYSTEMD)
-        daemon.keepalive = 60
-    log.info(daemon)
-
-
-    # if args.daemon:
-    #     try:
-    #         import systemd.daemon
-    #     except ImportError:
-    #         print("You are missing dependencies in order to be able to use the --daemon flag.")
-    #         print("To install them, use that command:")
-    #         print("    python -m pip install 'mppsolar[systemd]'")
-    #         exit(1)
-
-    # Tell systemd that our service is ready
-    daemon.initialize()
-    daemon.notify("Service Initializing ...")
-    # set some default-defaults
-    pause = 60
 
     # If config file specified, process
     if args.configfile:
@@ -314,6 +469,7 @@ def main():
         mqtt_broker.update("port", config["SETUP"].getint("mqtt_port", fallback=None))
         mqtt_broker.update("username", config["SETUP"].get("mqtt_user", fallback=None))
         mqtt_broker.update("password", config["SETUP"].get("mqtt_pass", fallback=None))
+        log_file_path = config["SETUP"].get("log_file", fallback="/var/log/mpp-solar.log")
         sections.remove("SETUP")
 
         # Process 'command' sections
@@ -336,6 +492,7 @@ def main():
             push_url = config[section].get("push_url", fallback=push_url)
             prom_output_dir = config[section].get("prom_output_dir", fallback=prom_output_dir)
             mqtt_topic = config[section].get("mqtt_topic", fallback=mqtt_topic)
+            section_dev = config[section].get("dev", fallback=None)
             #
             device_class = get_device_class(_type)
             log.debug(f"device_class {device_class}")
@@ -359,7 +516,7 @@ def main():
             commands = _command.split("#")
 
             for command in commands:
-                _commands.append((device, command, tag, outputs, filter, excl_filter))
+                _commands.append((device, command, tag, outputs, filter, excl_filter, section_dev))
             log.debug(f"Commands from config file {_commands}")
 
             if args.daemon:
@@ -395,7 +552,6 @@ def main():
             push_url=push_url,
             prom_output_dir=prom_output_dir,
         )
-        #
 
         # determine whether to run command or call helper function
         commands = []
@@ -426,14 +582,14 @@ def main():
                 tag = args.tag
             else:
                 tag = command
-            _commands.append((device, command, tag, outputs, filter, excl_filter))
+            _commands.append((device, command, tag, outputs, filter, excl_filter, dev))
         log.debug(f"Commands {_commands}")
 
     while True:
         # Loop through the configured commands
         if not args.daemon:
             log.info(f"Looping {len(_commands)} commands")
-        for _device, _command, _tag, _outputs, filter, excl_filter in _commands:
+        for _device, _command, _tag, _outputs, filter, excl_filter, dev in _commands:
             # for item in mppUtilArray:
             # Tell systemd watchdog we are still alive
             daemon.watchdog()
@@ -465,6 +621,7 @@ def main():
                     filter=filter,
                     excl_filter=excl_filter,
                     keep_case=keep_case,
+                    dev=dev,  # ADD: Pass dev parameter to output
                 )
                 # Tell systemd watchdog we are still alive
         if args.daemon:
@@ -479,3 +636,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
