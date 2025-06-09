@@ -7,6 +7,12 @@ import importlib
 log = logging.getLogger("helpers")
 
 
+def is_daemon_mode():
+    """Return True if running as daemon based on env or global flag."""
+    import os
+    return os.environ.get("MPP_SOLAR_DAEMON", "0") == "1"
+
+
 def get_kwargs(kwargs, key, default=None):
     return kwargs.get(key) or default
 
