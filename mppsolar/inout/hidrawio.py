@@ -1,4 +1,5 @@
 # shamelessly stolen from ccrisan https://github.com/qtoggle/qtoggleserver-mppsolar/blob/master/qtoggleserver/mppsolar/io.py
+# Added better error handling principals 2025 Corey DeLasaux <cordelster@gmail.com>
 import logging
 import os
 import time
@@ -7,10 +8,14 @@ import errno
 from .baseio import BaseIO
 from ..helpers import get_kwargs
 
-log = logging.getLogger("HIDRawIO")
+log = logging.getLogger(__name__)
 
 
 class HIDRawIO(BaseIO):
+    """
+    Handles HIDRAW serial communications.
+    Purpose: Added better error handling and progressive backoff.
+    """
     def __init__(self, device_path: str, timeout: float = 5.0, max_retries: int = 3) -> None:
         self._device = device_path
         self._timeout = timeout
