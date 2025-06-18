@@ -10,7 +10,7 @@ from .mqtt import mqtt
 log = logging.getLogger("hassd_mqtt")
 
 
-class hassd_mqtt(mqtt):
+class hassd_mqtt2(mqtt):
     def __str__(self):
         return """outputs the to the supplied mqtt broker in hass format: eg "homeassistant/sensor/mpp_{tag}_{key}/state" """
 

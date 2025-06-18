@@ -297,7 +297,12 @@ class MqttConnection:
                     if result.rc != mqtt_client.MQTT_ERR_SUCCESS:
                         log.warning(f"Failed to publish to {topic}: {result.rc}")
                     else:
-                        log.debug(f"Published to {topic}: {payload[:100]}...")
+                        if isinstance(payload, (bytes, str)):
+                            preview = payload[:100]
+                        else:
+                            preview = str(payload)[:100]
+                        log.debug(f"Published to {topic}: {preview}…")
+#                         log.debug(f"Published to {topic}: {payload[:100]}...")
                 else:
                     log.warning(f"Cannot publish to {msg_data['topic']} - not connected")
 
