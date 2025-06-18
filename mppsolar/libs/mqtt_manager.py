@@ -1,5 +1,6 @@
 import logging
 import threading
+import hashlib
 import time
 import re
 import socket
@@ -52,7 +53,12 @@ class MqttConnection:
 
     def __init__(self, broker_config: BrokerConfig):
         self.config = broker_config
-        self.client = mqtt_client.Client(clean_session=broker_config.clean_session)
+#         self.client = mqtt_client.Client(clean_session=broker_config.clean_session)
+        client_id = self._generate_client_id()
+        self.client = mqtt_client.Client(
+            client_id=client_id,
+            clean_session=broker_config.clean_session
+        )
         self.connected = False
         self.reconnect_delay = 5
         self.max_reconnect_delay = 300
@@ -72,6 +78,26 @@ class MqttConnection:
         # Setup authentication if provided
         if broker_config.username:
             self.client.username_pw_set(broker_config.username, broker_config.password)
+
+    def _generate_client_id(self) -> str:
+        """Generate a consistent client ID based on broker config and hostname"""
+        hostname = self._get_hostname()
+        
+        # Create a string that uniquely identifies this connection
+        connection_string = f"{hostname}:{self.config.name}:{self.config.port}"
+        if self.config.username:
+            connection_string += f":{self.config.username}"
+        
+        # Generate a hash for consistency
+        hash_obj = hashlib.md5(connection_string.encode('utf-8'))
+        hash_hex = hash_obj.hexdigest()[:8]  # Use first 8 chars for brevity
+        
+        # Create client ID with hostname prefix for readability
+        client_id = f"mppsolar_{hostname}_{hash_hex}"
+        
+        log.debug(f"Generated client ID: {client_id} for connection: {connection_string}")
+        return client_id
+
 
     def _get_hostname(self) -> str:
         """Get short hostname for topic structure"""
