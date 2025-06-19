@@ -23,7 +23,7 @@ class BrokerConfig:
     password: Optional[str] = None
     keepalive: int = 60
     clean_session: bool = False
-    
+
     def __hash__(self):
         return hash((self.name, self.port, self.username))
 
@@ -82,19 +82,19 @@ class MqttConnection:
     def _generate_client_id(self) -> str:
         """Generate a consistent client ID based on broker config and hostname"""
         hostname = self._get_hostname()
-        
+
         # Create a string that uniquely identifies this connection
         connection_string = f"{hostname}:{self.config.name}:{self.config.port}"
         if self.config.username:
             connection_string += f":{self.config.username}"
-        
+
         # Generate a hash for consistency
         hash_obj = hashlib.md5(connection_string.encode('utf-8'))
         hash_hex = hash_obj.hexdigest()[:8]  # Use first 8 chars for brevity
-        
+
         # Create client ID with hostname prefix for readability
         client_id = f"mppsolar_{hostname}_{hash_hex}"
-        
+
         log.debug(f"Generated client ID: {client_id} for connection: {connection_string}")
         return client_id
 
@@ -126,7 +126,7 @@ class MqttConnection:
         """Callback for when client connects to broker"""
         connection_results = {
             0: "Connection successful",
-            1: "Connection refused - incorrect protocol version", 
+            1: "Connection refused - incorrect protocol version",
             2: "Connection refused - invalid client identifier",
             3: "Connection refused - server unavailable",
             4: "Connection refused - bad username or password",
@@ -159,7 +159,7 @@ class MqttConnection:
             if len(topic_parts) >= 3 and topic_parts[-1] == 'cmd':
                 hostname = topic_parts[0]
                 device_name = topic_parts[1]
-                
+
                 # Find matching device
                 device_config = self.devices.get(device_name)
                 if not device_config:
@@ -215,7 +215,7 @@ class MqttConnection:
         else:
             payload = str(response)
         self.publish(response_topic, payload, qos=1, retain=True)
-    
+
     def _on_publish(self, client, userdata, mid):
         """Callback for when message is published"""
         log.debug(f"Message {mid} published successfully")
@@ -286,10 +286,10 @@ class MqttConnection:
             try:
                 # Get message from queue with timeout
                 msg_data = self.publish_queue.get(timeout=1)
-                
+
                 if self.connected:
                     topic = msg_data['topic']
-                    payload = msg_data['payload'] 
+                    payload = msg_data['payload']
                     qos = msg_data.get('qos', 0)
                     retain = msg_data.get('retain', False)
 
@@ -302,7 +302,6 @@ class MqttConnection:
                         else:
                             preview = str(payload)[:100]
                         log.debug(f"Published to {topic}: {preview}…")
-#                         log.debug(f"Published to {topic}: {payload[:100]}...")
                 else:
                     log.warning(f"Cannot publish to {msg_data['topic']} - not connected")
 

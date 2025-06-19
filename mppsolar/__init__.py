@@ -253,7 +253,7 @@ def main():
     def execute_device_command(device_name: str, command: str):
         """Execute a command on a specific device and return results"""
         log.info(f"Executing command '{command}' on device '{device_name}'")
-        
+
         # Find the device in our commands list
         for _device, _command, _tag, _outputs, filter, excl_filter, dev in _commands:
             if _device._name == device_name:
@@ -262,7 +262,7 @@ def main():
                     return {"result": result, "command": command, "timestamp": time.time()}
                 except Exception as e:
                     raise Exception(f"Command execution failed: {str(e)}")
-        
+
         raise Exception(f"Device '{device_name}' not found")
 
     # List available protocols if asked
@@ -519,7 +519,7 @@ def main():
             )
             # build array of commands
             commands = _command.split("#")
-            
+
             # Setup MQTT commands if configured
             if mqtt_allowed_cmds and mqtt_broker.enabled:
                 allowed_cmd_list = [cmd.strip() for cmd in mqtt_allowed_cmds.split(",") if cmd.strip()]
@@ -608,7 +608,7 @@ def main():
     # Notify systemd/init
     daemon.initialize()
     log_process_info("AFTER_DAEMON_INITIALIZE", log.info)
-    
+
     # Start MQTT manager
     mqtt_manager.start_all()
     daemon.notify("Service Initializing ...")

@@ -30,7 +30,7 @@ class MqttBroker:
         self.username = self.config.get("user")
         self.password = self.config.get("pass")
         self.results_topic = None
-        
+
         # Legacy compatibility
         self._isConnected = False
         self.enabled = self.name is not None
@@ -70,7 +70,7 @@ class MqttBroker:
         """Legacy subscribe method - not implemented in threaded version"""
         log.warning("Legacy subscribe method called - use command callbacks instead")
 
-    def _ensure_connection(self, device_name: str = None, allowed_commands: List[str] = None, 
+    def _ensure_connection(self, device_name: str = None, allowed_commands: List[str] = None,
                           command_callback = None) -> bool:
         """Ensure we have a connection set up for this broker/device combo"""
         if not self.enabled:
@@ -107,7 +107,7 @@ class MqttBroker:
         self._device_name = device_name
         return True
 
-    def publish(self, topic: str, payload: str, qos: int = 0, retain: bool = False, 
+    def publish(self, topic: str, payload: str, qos: int = 0, retain: bool = False,
                 device_name: str = None):
         """Publish a single message"""
         if self.name == "screen":
@@ -133,7 +133,7 @@ class MqttBroker:
 
         self._connection.publish_multiple(data)
 
-    def setup_device_commands(self, device_name: str, allowed_commands: List[str], 
+    def setup_device_commands(self, device_name: str, allowed_commands: List[str],
                             command_callback = None):
         """Set up command handling for a specific device"""
         self._ensure_connection(device_name, allowed_commands, command_callback)
