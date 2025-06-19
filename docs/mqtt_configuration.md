@@ -44,7 +44,7 @@ mqtt_port=1884
 
 ## Command Structure
 
-### Command Topic Pattern
+### Command Topic Pattern where hostname is mpp-solars host (FQDN) short name.
 Commands are received on: `{hostname}/{device_name}/cmd`
 
 Example: `myserver/Inverter_1/cmd`
@@ -61,12 +61,23 @@ POP02
 ```
 ### MQTT wildcards are allowed for devices:
 MQTT supports two types of wildcards: + (single-level) and # (multi-level).
-Example: `myserver/Inverter_1/cmd_response`
 
 ### Response Format
 Responses are JSON formatted:
 ```json
 {
   "result": {
-    "command_response": ["Success", "", {}]
+    "_command": "POP02",
+     "_command_description": "Set Device Output Source Priority",
+      "raw_response": [
+        "(ACK9 \r",
+         ""
+      ],
+       "POP": [
+         "ACK",
+          ""
+        ]
   },
+  "command": "POP02",
+  "timestamp": 1750305720.956817
+}
