@@ -10,7 +10,8 @@ The new MQTT system provides a threaded, centralized manager for all MQTT connec
 - **Automatic reconnection**: Built-in reconnection logic with exponential backoff
 - **Legacy compatibility**: Existing code continues to work without changes (WORK In PROGRESS)
 - **Proper qos levels**: Broker retention possible for commands if the sender set it, default for cmd_response. All outputs are still qos 0
-- **Broker retention ready**: automatically sends cmd_response with retention and qos 1, login with hash ID (using host, user, port) to allow sending commands with qos 1/2 plus retention.
+- **Broker retention ready**: automatically sends cmd_response with retention and qos 1, login with hostname plus a hash ID (using host, user, port)
+  to allow sending commands with qos 1/2 plus retention. Creates a readable client ID format: mppsolar_{hostname}_{hash}
 - **MQTT default wildcards**: are allowed.
 - **Allowed command list**: per device (regex supported).
 - Lagacy MQTT configuration in SETUP plus per device override (multiple broker support).

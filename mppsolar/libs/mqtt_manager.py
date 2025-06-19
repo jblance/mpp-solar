@@ -214,6 +214,7 @@ class MqttConnection:
             payload = json.dumps(response)
         else:
             payload = str(response)
+        log.debug(f"Sending command response with QoS=1, retain=True to topic: {response_topic}")
         self.publish(response_topic, payload, qos=1, retain=True)
 
     def _on_publish(self, client, userdata, mid):
@@ -290,9 +291,12 @@ class MqttConnection:
                 if self.connected:
                     topic = msg_data['topic']
                     payload = msg_data['payload']
-                    qos = msg_data.get('qos', 0)
-                    retain = msg_data.get('retain', False)
+                    # FIXED: Use direct dictionary access instead of .get() with defaults
+                    # This preserves the QoS and retain values that were explicitly set
+                    qos = msg_data['qos']
+                    retain = msg_data['retain']
 
+                    log.debug(f"Publishing to {topic} with QoS={qos}, retain={retain}")
                     result = self.client.publish(topic, payload, qos=qos, retain=retain)
                     if result.rc != mqtt_client.MQTT_ERR_SUCCESS:
                         log.warning(f"Failed to publish to {topic}: {result.rc}")
@@ -301,12 +305,14 @@ class MqttConnection:
                             preview = payload[:100]
                         else:
                             preview = str(payload)[:100]
-                        log.debug(f"Published to {topic}: {preview}…")
+                        log.debug(f"Published to {topic}: {preview}… (QoS={qos}, retain={retain})")
                 else:
                     log.warning(f"Cannot publish to {msg_data['topic']} - not connected")
 
             except Empty:
                 continue
+            except KeyError as e:
+                log.error(f"Missing required key in message data: {e}")
             except Exception as e:
                 log.error(f"Error in publish loop: {e}")
 
@@ -318,6 +324,7 @@ class MqttConnection:
             'qos': qos,
             'retain': retain
         }
+        log.debug(f"Queuing message for {topic} with QoS={qos}, retain={retain}")
         self.publish_queue.put(msg_data)
 
     def publish_multiple(self, messages: List[Dict[str, Any]]):
