@@ -277,10 +277,10 @@ def main():
         """Log detailed process information for debugging"""
         if log_func is None:
             log_func = print
-    
+
         pid = os.getpid()
         ppid = os.getppid()
-    
+
         # Get process group and session info
         try:
             pgid = os.getpgid(0)
@@ -288,12 +288,12 @@ def main():
         except:
             pgid = "unknown"
             sid = "unknown"
-    
+
         # Check if we're the process group leader
         is_leader = (pid == pgid)
-    
+
         log_func(f"[{label}] PID: {pid}, PPID: {ppid}, PGID: {pgid}, SID: {sid}, Leader: {is_leader}")
-    
+
         # Log command line that started this process
         try:
             with open(f'/proc/{pid}/cmdline', 'r') as f:
@@ -317,7 +317,6 @@ def main():
 
 
     def setup_daemon_if_requested(args, log_file_path="/var/log/mpp-solar.log"):
-
         if args.daemon:
             os.environ["MPP_SOLAR_DAEMON"] = "1"
             log.info("Daemon mode requested")
@@ -340,27 +339,34 @@ def main():
 
             daemon.keepalive = 60
 
-            log.info("Attempting traditional daemonization...")
-            try:
-#                 daemonize()
-                log.info("Daemonized successfully")
-                # Re-setup logging for the daemonized process
+            # Only call daemonize() for DISABLED daemon type (manual daemonization)
+            # OpenRC, systemd, and other init systems handle daemonization themselves
+            if daemon_type == DaemonType.DISABLED:
+                log.info("Using DISABLED daemon type - performing manual daemonization...")
+                try:
+                    daemonize()
+                    log.info("Daemonized successfully")
+                    # Re-setup logging for the daemonized process
+                    if not setup_daemon_logging(log_file_path):
+                        sys.stderr.write("CRITICAL: Failed to setup file logging for daemon. Check permissions.\n")
+                    else:
+                        log.info("Daemon file logging successfully re-initialized.")
+                except Exception as e:
+                    log.error(f"Failed to daemonize process: {e}")
+                    log.info("Continuing in foreground mode")
+            else:
+                log.info(f"Using {daemon_type.name} daemon type - init system will handle process management")
+                # For OpenRC/systemd, we still need to setup file logging since we're running as daemon
                 if not setup_daemon_logging(log_file_path):
-                    sys.stderr.write("CRITICAL: Failed to setup file logging for daemon. Check permissions.\n")
+                    log.warning("Failed to setup file logging for daemon. Check permissions.")
                 else:
-                    log.info("Daemon file logging successfully re-initialized.")
-
-            except Exception as e:
-                log.error(f"Failed to daemonize process: {e}")
-                log.info("Continuing in foreground mode")
+                    log.info("Daemon file logging setup successful.")
 
             return daemon
         else:
             log.info("Daemon mode NOT requested. Using DISABLED daemon.")
             daemon = get_daemon(daemontype=DaemonType.DISABLED)
-            log_process_info("DAEMON_DISABLED_CREATED", log.info)
             return daemon
-
 
     # --- Optional PyInstaller bootstrap cleanup ---
     # To enable single-process daemon spawn logic (avoids PyInstaller parent):

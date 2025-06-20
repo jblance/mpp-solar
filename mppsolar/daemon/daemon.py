@@ -38,19 +38,30 @@ def daemonize():
     """
     Properly daemonize the process (Unix double-fork)
     Enhanced for PyInstaller compatibility
+    This should ONLY be called when using DaemonType.DISABLED
     """
+    import sys
     import logging
-    from mppsolar.daemon.pyinstaller_runtime import is_pyinstaller_bundle, has_been_spawned
 
     log = logging.getLogger("daemon")
     pid = os.getpid()
     ppid = os.getppid()
     log.info(f"[DAEMONIZE] Before fork PID: {pid}, PPID: {ppid}")
 
+    # Import PyInstaller runtime functions safely
+    try:
+        from mppsolar.daemon.pyinstaller_runtime import is_pyinstaller_bundle, has_been_spawned
+    except ImportError:
+        # Fallback if module not available
+        def is_pyinstaller_bundle():
+            return getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')
+        def has_been_spawned():
+            return os.environ.get("MPP_SOLAR_SPAWNED") == "1"
+
     # Special handling for PyInstaller spawned processes
     if is_pyinstaller_bundle() and has_been_spawned():
         log.info("[DAEMONIZE] Running in spawned PyInstaller process - using modified daemonization")
-        
+
         # We're already in a subprocess, so we can do a simpler daemonization
         # Just do a single fork and session setup
         try:
@@ -66,24 +77,16 @@ def daemonize():
         os.chdir("/")
         os.setsid()
         os.umask(0)
-        
+
         # Redirect standard file descriptors
-        sys.stdout.flush()
-        sys.stderr.flush()
-        try:
-            with open('/dev/null', 'r') as si: # Disable only while testing.
-                os.dup2(si.fileno(), sys.stdin.fileno())
-            with open('/dev/null', 'a+') as so:
-                os.dup2(so.fileno(), sys.stdout.fileno())
-            with open('/dev/null', 'a+') as se:
-                os.dup2(se.fileno(), sys.stderr.fileno())
-            log.info("[DAEMONIZE] Standard I/O redirected to /dev/null.") # This log won't appear on console
-        except Exception as e:
-            pass # Keep original pass here, as the log might not work yet
+        _redirect_std_descriptors()
         log.info(f"[DAEMONIZE] PyInstaller daemon process ready. PID: {os.getpid()}")
         return
 
     # Standard daemonization for non-PyInstaller or direct execution
+    log.info("[DAEMONIZE] Performing standard double-fork daemonization")
+
+    # First fork
     try:
         pid = os.fork()
         if pid > 0:
@@ -93,10 +96,12 @@ def daemonize():
         log.error(f"First fork failed: {e}")
         sys.exit(1)
 
+    # Decouple from parent environment
     os.chdir("/")
     os.setsid()
     os.umask(0)
 
+    # Second fork
     try:
         pid = os.fork()
         if pid > 0:
@@ -106,18 +111,29 @@ def daemonize():
         log.error(f"Second fork failed: {e}")
         sys.exit(1)
 
-    # Redirect standard file descriptors to /dev/null
-    sys.stdout.flush()
-    sys.stderr.flush()
-    with open('/dev/null', 'r') as si:  # Disabled while testing pyinstaller code
-        os.dup2(si.fileno(), sys.stdin.fileno())
-    with open('/dev/null', 'a+') as so:
-        os.dup2(so.fileno(), sys.stdout.fileno())
-    with open('/dev/null', 'a+') as se:
-        os.dup2(se.fileno(), sys.stderr.fileno())
-
+    # Redirect standard file descriptors
+    _redirect_std_descriptors()
     log.info(f"[DAEMONIZE] Daemon process forked successfully. PID: {os.getpid()}")
 
+
+def _redirect_std_descriptors():
+    """Helper function to redirect standard file descriptors to /dev/null"""
+    import sys
+
+    sys.stdout.flush()
+    sys.stderr.flush()
+
+    try:
+        with open('/dev/null', 'r') as si:
+            os.dup2(si.fileno(), sys.stdin.fileno())
+        with open('/dev/null', 'a+') as so:
+            os.dup2(so.fileno(), sys.stdout.fileno())
+        with open('/dev/null', 'a+') as se:
+            os.dup2(se.fileno(), sys.stderr.fileno())
+    except Exception as e:
+        # If redirection fails, log the error but continue
+        # (logging might not work after redirection anyway)
+        pass
 
 
 class Daemon:
