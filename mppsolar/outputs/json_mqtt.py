@@ -53,3 +53,27 @@ class json_mqtt(mqtt):
         }
         msgs.append(msg)
         return msgs
+
+    def output(self, *args, **kwargs):
+        log.info("Using output processor: json_mqtt")
+        log.debug(f"kwargs {kwargs}")
+        data = get_kwargs(kwargs, "data")
+        # exit if no data
+        if data is None:
+            return
+
+        # get the broker instance
+        mqtt_broker = get_kwargs(kwargs, "mqtt_broker")
+        # exit if no broker
+        if mqtt_broker is None:
+            return
+
+        # Get device name for routing
+        device_name = get_kwargs(kwargs, "name", "mppsolar")
+
+        # build the messages...
+        msgs = self.build_msgs(**kwargs)
+        log.debug(f"json_mqtt.output msgs {msgs}")
+
+        # publish
+        mqtt_broker.publishMultiple(msgs, device_name=device_name)

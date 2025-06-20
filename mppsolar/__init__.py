@@ -22,7 +22,8 @@ from mppsolar.daemon.daemon import (
     setup_daemon_logging,
     daemonize,
 )
-from mppsolar.libs.mqttbrokerc import MqttBroker
+from mppsolar.libs.mqttbroker_legacy import MqttBroker
+from mppsolar.libs.mqtt_manager import mqtt_manager
 from mppsolar.outputs import get_outputs, list_outputs
 from mppsolar.protocols import list_protocols
 
@@ -249,6 +250,21 @@ def main():
         print(description)
         return None
 
+    def execute_device_command(device_name: str, command: str):
+        """Execute a command on a specific device and return results"""
+        log.info(f"Executing command '{command}' on device '{device_name}'")
+
+        # Find the device in our commands list
+        for _device, _command, _tag, _outputs, filter, excl_filter, dev in _commands:
+            if _device._name == device_name:
+                try:
+                    result = _device.run_command(command=command)
+                    return {"result": result, "command": command, "timestamp": time.time()}
+                except Exception as e:
+                    raise Exception(f"Command execution failed: {str(e)}")
+
+        raise Exception(f"Device '{device_name}' not found")
+
     # List available protocols if asked
     if args.protocol == "help":
         op = get_outputs("screen")[0]
@@ -459,6 +475,7 @@ def main():
         log_file_path = config["SETUP"].get("log_file", fallback="/var/log/mpp-solar.log")
         sections.remove("SETUP")
 
+        # Track device configurations for MQTT command setup
         # Process 'command' sections
         for section in sections:
             name = section
@@ -480,6 +497,7 @@ def main():
             prom_output_dir = config[section].get("prom_output_dir", fallback=prom_output_dir)
             mqtt_topic = config[section].get("mqtt_topic", fallback=mqtt_topic)
             section_dev = config[section].get("dev", fallback=None)
+            mqtt_allowed_cmds = config[section].get("mqtt_allowed_cmds", fallback="")
             #
             device_class = get_device_class(_type)
             log.debug(f"device_class {device_class}")
@@ -501,6 +519,14 @@ def main():
             )
             # build array of commands
             commands = _command.split("#")
+
+            # Setup MQTT commands if configured
+            if mqtt_allowed_cmds and mqtt_broker.enabled:
+                allowed_cmd_list = [cmd.strip() for cmd in mqtt_allowed_cmds.split(",") if cmd.strip()]
+                log.info(f"Setting up MQTT commands for device '{name}': {allowed_cmd_list}")
+                mqtt_broker.setup_device_commands(
+                    device_name=name, allowed_commands=allowed_cmd_list, command_callback=execute_device_command
+                )
 
             for command in commands:
                 _commands.append((device, command, tag, outputs, filter, excl_filter, section_dev))
@@ -582,6 +608,9 @@ def main():
     # Notify systemd/init
     daemon.initialize()
     log_process_info("AFTER_DAEMON_INITIALIZE", log.info)
+
+    # Start MQTT manager
+    mqtt_manager.start_all()
     daemon.notify("Service Initializing ...")
     log_process_info("AFTER_DAEMON_NOTIFY", log.info)
 
@@ -638,6 +667,7 @@ def main():
         except Exception as e:
             log.error(f"[LOOP ERROR] Exception in daemon loop: {e}", exc_info=True)
             time.sleep(5)  # Prevent tight loop in case of recurring errors
+    mqtt_manager.stop_all()
 
 
 if __name__ == "__main__":
