@@ -15,7 +15,7 @@ from ..helpers import get_kwargs
 log = logging.getLogger("prom")
 
 
-class prom_push(prom):
+class prom_pushd(prom):
     push_url = ""
     job = "mppsolar"  # static default
 
