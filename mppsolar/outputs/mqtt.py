@@ -101,9 +101,12 @@ class mqtt(baseoutput):
         if mqtt_broker is None:
             return
 
+        # Get device name for routing
+        device_name = get_kwargs(kwargs, "name", "mppsolar")
+
         # build the messages...
         msgs = self.build_msgs(**kwargs)
         log.debug(f"mqtt.output msgs {msgs}")
 
         # publish
-        mqtt_broker.publishMultiple(msgs)
+        mqtt_broker.publishMultiple(msgs, device_name=device_name)

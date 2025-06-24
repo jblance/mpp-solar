@@ -182,6 +182,9 @@ class hassd_mqtt(mqtt):
         if data is None:
             return
 
+        # Get device name for MQTT routing
+        device_name = get_kwargs(kwargs, "name", "mppsolar")
+
         # get the broker instance
         mqtt_broker = get_kwargs(kwargs, "mqtt_broker")
         # exit if no broker
@@ -194,6 +197,6 @@ class hassd_mqtt(mqtt):
         log.debug(f"hassd_mqtt.output value_msgs {value_msgs}")
 
         # publish
-        mqtt_broker.publishMultiple(config_msgs)
+        mqtt_broker.publishMultiple(config_msgs, device_name=device_name)
         sleep(0.5)
-        mqtt_broker.publishMultiple(value_msgs)
+        mqtt_broker.publishMultiple(value_msgs, device_name=device_name)

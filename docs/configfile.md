@@ -11,6 +11,7 @@
 pause=5
 
 # ipaddress or hostname of the mqtt broker, default is 'localhost'
+# See mqtt documentation for all the options available
 mqtt_broker=localhost
 
 # mqtt broker port number, default is 1883
