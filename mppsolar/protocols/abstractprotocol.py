@@ -4,7 +4,6 @@ import logging
 import re
 from datetime import datetime  # noqa: F401 # pylint: disable=W0611
 from typing import Tuple
-from pydantic import BaseModel
 
 from ..helpers import get_resp_defn, get_value
 from .protocol_helpers import BigHex2Short, BigHex2Float  # noqa: F401 # pylint: disable=W0611
@@ -15,11 +14,6 @@ from .protocol_helpers import uptime  # noqa: F401 # pylint: disable=W0611
 from .protocol_helpers import crcPI as crc
 
 log = logging.getLogger("AbstractProtocol")
-
-
-class ProtocolDTO(BaseModel):
-    protocol_id: str
-    commands: dict
 
 
 class AbstractProtocol(metaclass=abc.ABCMeta):
@@ -34,9 +28,6 @@ class AbstractProtocol(metaclass=abc.ABCMeta):
         self.ID_COMMANDS = None
         self._protocol_id = None
 
-    def toDTO(self) -> ProtocolDTO:
-        dto = ProtocolDTO(protocol_id=self._protocol_id, commands=self.list_commands())
-        return dto
 
     def list_commands(self) -> dict:
         # print(f"{'Parameter':<30}\t{'Value':<15} Unit")
