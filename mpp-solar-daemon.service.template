@@ -1,0 +1,28 @@
+[Unit]
+Description=MPP-Solar Inverter Monitoring Daemon
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+Group=YOUR_USERNAME
+WorkingDirectory=/path/to/your/mpp-solar
+Environment=PATH=/path/to/your/mpp-solar/venv/bin
+ExecStart=/path/to/your/mpp-solar/venv/bin/mpp-solar -C /path/to/your/mpp-solar/mpp-solar.conf --daemon
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Give the service time to start up
+TimeoutStartSec=30
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/path/to/your/mpp-solar /dev/YOUR_DEVICE
+
+[Install]
+WantedBy=multi-user.target

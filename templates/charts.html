@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPP-Solar Charts - Historical Data</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid rgba(0, 0, 0, 0.125);
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+        .nav-tabs .nav-link {
+            color: #495057;
+        }
+        .nav-tabs .nav-link.active {
+            color: #007bff;
+            font-weight: bold;
+        }
+        .time-range-selector {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row bg-white shadow-sm py-3 mb-4">
+            <div class="col">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-chart-line text-primary"></i>
+                    MPP-Solar Historical Data Charts
+                </h1>
+                <small class="text-muted">Interactive line graphs of inverter performance over time</small>
+            </div>
+            <div class="col-auto">
+                <a href="/" class="btn btn-outline-primary">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Time Range Selector -->
+        <div class="time-range-selector">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <label for="timeRange" class="form-label">Time Range:</label>
+                    <select class="form-select" id="timeRange">
+                        <option value="1">Last Hour</option>
+                        <option value="6">Last 6 Hours</option>
+                        <option value="12">Last 12 Hours</option>
+                        <option value="24" selected>Last 24 Hours</option>
+                        <option value="48">Last 48 Hours</option>
+                        <option value="168">Last Week</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <button class="btn btn-primary" id="refreshCharts">
+                        <i class="fas fa-sync-alt"></i> Refresh Charts
+                    </button>
+                    <span class="ms-3 text-muted" id="lastUpdate">Last update: Never</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Navigation -->
+        <ul class="nav nav-tabs" id="chartTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="voltage-tab" data-bs-toggle="tab" data-bs-target="#voltage" type="button" role="tab">
+                    <i class="fas fa-bolt"></i> Voltage
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="power-tab" data-bs-toggle="tab" data-bs-target="#power" type="button" role="tab">
+                    <i class="fas fa-plug"></i> Power
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="temperature-tab" data-bs-toggle="tab" data-bs-target="#temperature" type="button" role="tab">
+                    <i class="fas fa-thermometer-half"></i> Temperature
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="current-tab" data-bs-toggle="tab" data-bs-target="#current" type="button" role="tab">
+                    <i class="fas fa-tachometer-alt"></i> Current
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="status-tab" data-bs-toggle="tab" data-bs-target="#status" type="button" role="tab">
+                    <i class="fas fa-info-circle"></i> Status
+                </button>
+            </li>
+        </ul>
+
+        <!-- Charts Content -->
+        <div class="tab-content" id="chartTabsContent">
+            <!-- Voltage Charts -->
+            <div class="tab-pane fade show active" id="voltage" role="tabpanel">
+                <div class="row">
+                    <!-- Battery Voltage Chart -->
+                    <div class="col-12 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-battery-three-quarters text-warning"></i>
+                                    Battery Voltage
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="batteryVoltageChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- AC Input Voltage Chart -->
+                    <div class="col-12 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-plug text-danger"></i>
+                                    AC Input Voltage
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="acInputVoltageChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Power Charts -->
+            <div class="tab-pane fade" id="power" role="tabpanel">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-plug text-success"></i>
+                                    Power Output & Load
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="powerChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Temperature Charts -->
+            <div class="tab-pane fade" id="temperature" role="tabpanel">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-thermometer-half text-danger"></i>
+                                    Temperature Monitoring
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="temperatureChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Charts -->
+            <div class="tab-pane fade" id="current" role="tabpanel">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-tachometer-alt text-info"></i>
+                                    Current Monitoring
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="currentChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Charts -->
+            <div class="tab-pane fade" id="status" role="tabpanel">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-info-circle text-primary"></i>
+                                    System Status
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="statusChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Summary -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-table text-secondary"></i>
+                            Data Summary
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="dataSummary">
+                            <div class="loading">
+                                <i class="fas fa-spinner fa-spin"></i> Loading data summary...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let charts = {};
+        let historicalData = {};
+
+        // Chart.js configuration
+        const chartConfig = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        displayFormats: {
+                            hour: 'HH:mm',
+                            minute: 'HH:mm',
+                            second: 'HH:mm:ss'
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Time'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Value'
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
+        };
+
+        // Initialize charts
+        function initializeCharts() {
+            // Battery Voltage Chart
+            const batteryVoltageCtx = document.getElementById('batteryVoltageChart').getContext('2d');
+            charts.batteryVoltage = new Chart(batteryVoltageCtx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Battery Voltage (V)',
+                            borderColor: '#ffc107',
+                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                            data: []
+                        }
+                    ]
+                },
+                options: {
+                    ...chartConfig,
+                    scales: {
+                        ...chartConfig.scales,
+                        y: {
+                            ...chartConfig.scales.y,
+                            title: {
+                                display: true,
+                                text: 'Voltage (V)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // AC Input Voltage Chart
+            const acInputVoltageCtx = document.getElementById('acInputVoltageChart').getContext('2d');
+            charts.acInputVoltage = new Chart(acInputVoltageCtx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'AC Input Voltage (V)',
+                            borderColor: '#dc3545',
+                            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                            data: []
+                        }
+                    ]
+                },
+                options: {
+                    ...chartConfig,
+                    scales: {
+                        ...chartConfig.scales,
+                        y: {
+                            ...chartConfig.scales.y,
+                            title: {
+                                display: true,
+                                text: 'Voltage (V)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Power Chart
+            const powerCtx = document.getElementById('powerChart').getContext('2d');
+            charts.power = new Chart(powerCtx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'AC Output Active Power (W)',
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            data: []
+                        },
+                        {
+                            label: 'AC Output Apparent Power (VA)',
+                            borderColor: '#6f42c1',
+                            backgroundColor: 'rgba(111, 66, 193, 0.1)',
+                            data: []
+                        },
+                        {
+                            label: 'AC Output Load (%)',
+                            borderColor: '#fd7e14',
+                            backgroundColor: 'rgba(253, 126, 20, 0.1)',
+                            data: []
+                        }
+                    ]
+                },
+                options: chartConfig
+            });
+
+            // Temperature Chart
+            const tempCtx = document.getElementById('temperatureChart').getContext('2d');
+            charts.temperature = new Chart(tempCtx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Inverter Temperature (°C)',
+                            borderColor: '#e83e8c',
+                            backgroundColor: 'rgba(232, 62, 140, 0.1)',
+                            data: []
+                        }
+                    ]
+                },
+                options: chartConfig
+            });
+
+            // Current Chart
+            const currentCtx = document.getElementById('currentChart').getContext('2d');
+            charts.current = new Chart(currentCtx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Battery Charging Current (A)',
+                            borderColor: '#20c997',
+                            backgroundColor: 'rgba(32, 201, 151, 0.1)',
+                            data: []
+                        },
+                        {
+                            label: 'Battery Discharge Current (A)',
+                            borderColor: '#6c757d',
+                            backgroundColor: 'rgba(108, 117, 125, 0.1)',
+                            data: []
+                        }
+                    ]
+                },
+                options: chartConfig
+            });
+
+            // Status Chart
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            charts.status = new Chart(statusCtx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Is Charging On',
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            data: []
+                        },
+                        {
+                            label: 'Is Switched On',
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            data: []
+                        },
+                        {
+                            label: 'Is Load On',
+                            borderColor: '#ffc107',
+                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                            data: []
+                        }
+                    ]
+                },
+                options: chartConfig
+            });
+        }
+
+        // Update chart data
+        function updateChartData() {
+            const hours = parseInt(document.getElementById('timeRange').value);
+            
+            fetch(`/api/historical?hours=${hours}`)
+                .then(response => response.json())
+                .then(data => {
+                    historicalData = data;
+                    updateCharts();
+                    updateDataSummary();
+                    document.getElementById('lastUpdate').textContent = `Last update: ${new Date().toLocaleTimeString()}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching historical data:', error);
+                    document.getElementById('dataSummary').innerHTML = '<div class="no-data">Error loading data</div>';
+                });
+        }
+
+        // Update individual charts
+        function updateCharts() {
+            // Battery Voltage Chart
+            if (charts.batteryVoltage) {
+                charts.batteryVoltage.data.datasets[0].data = getChartData('mpp_solar_battery_voltage');
+                charts.batteryVoltage.update();
+            }
+
+            // AC Input Voltage Chart
+            if (charts.acInputVoltage) {
+                charts.acInputVoltage.data.datasets[0].data = getChartData('mpp_solar_ac_input_voltage');
+                charts.acInputVoltage.update();
+            }
+
+            // Power Chart
+            if (charts.power) {
+                charts.power.data.datasets[0].data = getChartData('mpp_solar_ac_output_active_power');
+                charts.power.data.datasets[1].data = getChartData('mpp_solar_ac_output_apparent_power');
+                charts.power.data.datasets[2].data = getChartData('mpp_solar_ac_output_load');
+                charts.power.update();
+            }
+
+            // Temperature Chart
+            if (charts.temperature) {
+                charts.temperature.data.datasets[0].data = getChartData('mpp_solar_inverter_heat_sink_temperature');
+                charts.temperature.update();
+            }
+
+            // Current Chart
+            if (charts.current) {
+                charts.current.data.datasets[0].data = getChartData('mpp_solar_battery_charging_current');
+                charts.current.data.datasets[1].data = getChartData('mpp_solar_battery_discharge_current');
+                charts.current.update();
+            }
+
+            // Status Chart
+            if (charts.status) {
+                charts.status.data.datasets[0].data = getChartData('mpp_solar_is_charging_on');
+                charts.status.data.datasets[1].data = getChartData('mpp_solar_is_switched_on');
+                charts.status.data.datasets[2].data = getChartData('mpp_solar_is_load_on');
+                charts.status.update();
+            }
+        }
+
+        // Get data for a specific metric
+        function getChartData(metricName) {
+            if (!historicalData[metricName]) return [];
+            
+            return historicalData[metricName].map(item => ({
+                x: new Date(item.timestamp),
+                y: item.value
+            }));
+        }
+
+        // Update data summary
+        function updateDataSummary() {
+            const summaryDiv = document.getElementById('dataSummary');
+            let summaryHTML = '<div class="row">';
+            
+            const metrics = [
+                { name: 'Battery Voltage', key: 'mpp_solar_battery_voltage', unit: 'V', color: 'warning' },
+                { name: 'AC Input Voltage', key: 'mpp_solar_ac_input_voltage', unit: 'V', color: 'danger' },
+                { name: 'Output Power', key: 'mpp_solar_ac_output_active_power', unit: 'W', color: 'primary' },
+                { name: 'Temperature', key: 'mpp_solar_inverter_heat_sink_temperature', unit: '°C', color: 'danger' },
+                { name: 'Load', key: 'mpp_solar_ac_output_load', unit: '%', color: 'info' },
+                { name: 'Charging Current', key: 'mpp_solar_battery_charging_current', unit: 'A', color: 'success' }
+            ];
+
+            metrics.forEach(metric => {
+                const data = historicalData[metric.key];
+                if (data && data.length > 0) {
+                    const latest = data[data.length - 1];
+                    const avg = data.reduce((sum, item) => sum + item.value, 0) / data.length;
+                    const min = Math.min(...data.map(item => item.value));
+                    const max = Math.max(...data.map(item => item.value));
+                    
+                    summaryHTML += `
+                        <div class="col-md-4 mb-3">
+                            <div class="metric-card">
+                                <h6>${metric.name}</h6>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <small>Current: ${latest.value.toFixed(1)} ${metric.unit}</small><br>
+                                        <small>Average: ${avg.toFixed(1)} ${metric.unit}</small>
+                                    </div>
+                                    <div class="col-6">
+                                        <small>Min: ${min.toFixed(1)} ${metric.unit}</small><br>
+                                        <small>Max: ${max.toFixed(1)} ${metric.unit}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            summaryHTML += '</div>';
+            summaryDiv.innerHTML = summaryHTML;
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize charts
+            initializeCharts();
+            
+            // Load initial data
+            updateChartData();
+            
+            // Set up refresh button
+            document.getElementById('refreshCharts').addEventListener('click', updateChartData);
+            
+            // Set up time range selector
+            document.getElementById('timeRange').addEventListener('change', updateChartData);
+            
+            // Auto-refresh every 5 minutes
+            setInterval(updateChartData, 300000);
+        });
+    </script>
+</body>
+</html>

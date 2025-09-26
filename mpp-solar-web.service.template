@@ -1,0 +1,15 @@
+[Unit]
+Description=MPP-Solar Web Interface
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+WorkingDirectory=/path/to/your/mpp-solar
+Environment=PATH=/path/to/your/mpp-solar/venv/bin
+ExecStart=/path/to/your/mpp-solar/venv/bin/python /path/to/your/mpp-solar/web_interface.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

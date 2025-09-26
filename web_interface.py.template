@@ -1,0 +1,190 @@
+#!/usr/bin/env python3
+"""
+MPP-Solar Web Interface
+Provides a web-based interface for monitoring and controlling MPP-Solar inverters
+"""
+
+import os
+import json
+import logging
+import glob
+from datetime import datetime, timedelta
+from flask import Flask, render_template, jsonify, request
+from mppsolar.devices import get_device_class
+from mppsolar.mqtt import MqttBroker
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app = Flask(__name__)
+
+# Global variables
+device = None
+last_update = None
+inverter_data = {}
+
+def get_inverter_data():
+    """Get current inverter data"""
+    global device, last_update, inverter_data
+    
+    # Update data if it's been more than 30 seconds
+    if last_update is None or (datetime.now() - last_update).seconds > 30:
+        try:
+            if device is None:
+                # Initialize device
+                device_class = get_device_class("mppsolar")
+                device = device_class(
+                    name="inverter",
+                    port="/dev/YOUR_DEVICE",
+                    protocol="YOUR_PROTOCOL",
+                    porttype="YOUR_PORTTYPE",
+                    mqtt_broker=MqttBroker(config={"name": "localhost", "port": 1883})
+                )
+            
+            # Get status data
+            status = device.run_command(command="YOUR_COMMANDS")
+            settings = device.run_command(command="YOUR_COMMANDS")
+            mode = device.run_command(command="YOUR_COMMANDS")
+            flags = device.run_command(command="YOUR_COMMANDS")
+            
+            inverter_data = {
+                'status': status,
+                'settings': settings,
+                'mode': mode,
+                'flags': flags,
+                'timestamp': datetime.now().isoformat()
+            }
+            last_update = datetime.now()
+            
+        except Exception as e:
+            logging.error(f"Error getting inverter data: {e}")
+            inverter_data = {'error': str(e)}
+
+def parse_prometheus_file(file_path):
+    """Parse a Prometheus file and extract metrics with timestamps"""
+    data = {}
+    try:
+        with open(file_path, 'r') as f:
+            lines = f.readlines()
+        
+        # Get file modification time as timestamp
+        file_mtime = os.path.getmtime(file_path)
+        timestamp = datetime.fromtimestamp(file_mtime)
+        
+        for line in lines:
+            line = line.strip()
+            if line and not line.startswith('#'):
+                # Parse Prometheus metric format: metric_name{labels} value
+                if '{' in line and '}' in line:
+                    # Extract metric name, labels, and value
+                    metric_part = line.split('{')[0]
+                    labels_part = line.split('{')[1].split('}')[0]
+                    value_part = line.split('}')[1].strip()
+                    
+                    try:
+                        value = float(value_part)
+                        data[metric_part] = {
+                            'value': value,
+                            'timestamp': timestamp.isoformat(),
+                            'labels': labels_part
+                        }
+                    except ValueError:
+                        continue
+                        
+    except Exception as e:
+        logging.error(f"Error parsing Prometheus file {file_path}: {e}")
+    
+    return data
+
+def get_historical_data(hours=24):
+    """Get historical data from Prometheus files for the last N hours"""
+    prometheus_dir = "/path/to/your/mpp-solar/prometheus"
+    historical_data = {}
+    
+    try:
+        # Get current time and cutoff time
+        now = datetime.now()
+        cutoff_time = now - timedelta(hours=hours)
+        
+        # Get all .prom files and sort by modification time
+        prom_files = glob.glob(os.path.join(prometheus_dir, "*.prom"))
+        prom_files.sort(key=lambda x: os.path.getmtime(x))
+        
+        for file_path in prom_files:
+            file_mtime = datetime.fromtimestamp(os.path.getmtime(file_path))
+            
+            # Only include files from the last N hours
+            if file_mtime >= cutoff_time:
+                file_data = parse_prometheus_file(file_path)
+                for metric, data in file_data.items():
+                    if metric not in historical_data:
+                        historical_data[metric] = []
+                    historical_data[metric].append(data)
+        
+        # Sort each metric's data by timestamp
+        for metric in historical_data:
+            historical_data[metric].sort(key=lambda x: x['timestamp'])
+            
+    except Exception as e:
+        logging.error(f"Error getting historical data: {e}")
+    
+    return historical_data
+
+@app.route('/')
+def dashboard():
+    """Main dashboard page"""
+    return render_template('dashboard.html')
+
+@app.route('/api/data')
+def api_data():
+    """API endpoint for current inverter data"""
+    get_inverter_data()
+    return jsonify(inverter_data)
+
+@app.route('/api/command', methods=['POST'])
+def api_command():
+    """API endpoint for sending commands to the inverter"""
+    try:
+        data = request.get_json()
+        command = data.get('command', '').strip()
+        
+        if not command:
+            return jsonify({'error': 'No command provided'}), 400
+        
+        if device is None:
+            return jsonify({'error': 'Device not initialized'}), 500
+        
+        result = device.run_command(command=command)
+        return jsonify({'result': result})
+        
+    except Exception as e:
+        logging.error(f"Error executing command: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/charts')
+def charts():
+    """Charts page"""
+    return render_template('charts.html')
+
+@app.route('/api/historical')
+def api_historical():
+    """API endpoint for historical data"""
+    hours = request.args.get('hours', 24, type=int)
+    data = get_historical_data(hours=hours)
+    return jsonify(data)
+
+@app.route('/charts/lcars')
+def charts_lcars():
+    """LCARS-themed charts page"""
+    return render_template('charts_lcars.html')
+
+@app.route('/lcars')
+def lcars_dashboard():
+    """LCARS-themed dashboard"""
+    return render_template('dashboard_lcars.html')
+
+if __name__ == '__main__':
+    print("Starting MPP-Solar Web Interface on 0.0.0.0:5000")
+    print("Access the interface at: http://0.0.0.0:5000")
+    app.run(host='0.0.0.0', port=5000, debug=False)

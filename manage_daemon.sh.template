@@ -1,0 +1,125 @@
+#!/bin/bash
+
+# MPP-Solar Daemon Management Script
+
+DAEMON_DIR="/path/to/your/mpp-solar"
+SERVICE_FILE="$DAEMON_DIR/mpp-solar-daemon.service"
+CONFIG_FILE="$DAEMON_DIR/mpp-solar.conf"
+SERVICE_NAME="mpp-solar-daemon"
+
+case "$1" in
+    install)
+        echo "Installing MPP-Solar Daemon Service..."
+        
+        # Check if config file exists
+        if [ ! -f "$CONFIG_FILE" ]; then
+            echo "Error: Config file $CONFIG_FILE not found!"
+            exit 1
+        fi
+        
+        # Copy service file to systemd
+        sudo cp "$SERVICE_FILE" /etc/systemd/system/
+        
+        # Reload systemd
+        sudo systemctl daemon-reload
+        
+        # Enable the service
+        sudo systemctl enable "$SERVICE_NAME"
+        
+        echo "Service installed and enabled successfully!"
+        echo "Use 'sudo systemctl start $SERVICE_NAME' to start the daemon"
+        echo "Use 'sudo systemctl status $SERVICE_NAME' to check status"
+        ;;
+    
+    uninstall)
+        echo "Uninstalling MPP-Solar Daemon Service..."
+        
+        # Stop the service if running
+        sudo systemctl stop "$SERVICE_NAME" 2>/dev/null
+        
+        # Disable the service
+        sudo systemctl disable "$SERVICE_NAME" 2>/dev/null
+        
+        # Remove service file
+        sudo rm -f /etc/systemd/system/"$SERVICE_NAME".service
+        
+        # Reload systemd
+        sudo systemctl daemon-reload
+        
+        echo "Service uninstalled successfully!"
+        ;;
+    
+    start)
+        echo "Starting MPP-Solar Daemon..."
+        sudo systemctl start "$SERVICE_NAME"
+        ;;
+    
+    stop)
+        echo "Stopping MPP-Solar Daemon..."
+        sudo systemctl stop "$SERVICE_NAME"
+        ;;
+    
+    restart)
+        echo "Restarting MPP-Solar Daemon..."
+        sudo systemctl restart "$SERVICE_NAME"
+        ;;
+    
+    status)
+        echo "MPP-Solar Daemon Status:"
+        sudo systemctl status "$SERVICE_NAME" --no-pager -l
+        ;;
+    
+    logs)
+        echo "MPP-Solar Daemon Logs:"
+        sudo journalctl -u "$SERVICE_NAME" -f
+        ;;
+    
+    enable)
+        echo "Enabling MPP-Solar Daemon to start on boot..."
+        sudo systemctl enable "$SERVICE_NAME"
+        ;;
+    
+    disable)
+        echo "Disabling MPP-Solar Daemon from starting on boot..."
+        sudo systemctl disable "$SERVICE_NAME"
+        ;;
+    
+    test-config)
+        echo "Testing MPP-Solar configuration..."
+        cd "$DAEMON_DIR"
+        source venv/bin/activate
+        mpp-solar -C "$CONFIG_FILE" --daemon --debug
+        ;;
+    
+    check-device)
+        echo "Checking device permissions and connectivity..."
+        echo "Device permissions:"
+        ls -la /dev/YOUR_DEVICE
+        echo ""
+        echo "Device in use:"
+        lsof /dev/YOUR_DEVICE 2>/dev/null || echo "Device not in use"
+        echo ""
+        echo "Testing direct communication:"
+        cd "$DAEMON_DIR"
+        source venv/bin/activate
+        mpp-solar -p /dev/YOUR_DEVICE -P YOUR_PROTOCOL --porttype YOUR_PORTTYPE -c QID
+        ;;
+    
+    *)
+        echo "Usage: $0 {install|uninstall|start|stop|restart|status|logs|enable|disable|test-config|check-device}"
+        echo ""
+        echo "Commands:"
+        echo "  install      - Install and enable the systemd service"
+        echo "  uninstall    - Remove the systemd service"
+        echo "  start        - Start the daemon service"
+        echo "  stop         - Stop the daemon service"
+        echo "  restart      - Restart the daemon service"
+        echo "  status       - Check service status"
+        echo "  logs         - View service logs (follow mode)"
+        echo "  enable       - Enable service to start on boot"
+        echo "  disable      - Disable service from starting on boot"
+        echo "  test-config  - Test the configuration file"
+        echo "  check-device - Check device permissions and connectivity"
+        exit 1
+        ;;
+esac

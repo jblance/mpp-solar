@@ -1,0 +1,23 @@
+[SETUP]
+pause = 60
+mqtt_broker = localhost
+mqtt_port = 1883
+log_file = /path/to/your/mpp-solar/mpp-solar.log
+
+[inverter]
+protocol = YOUR_PROTOCOL
+type = mppsolar
+port = /dev/YOUR_DEVICE
+porttype = YOUR_PORTTYPE
+baud = YOUR_BAUD_RATE
+command = YOUR_COMMANDS
+tag = YOUR_TAG
+outputs = screen,json,prom_file
+filter = 
+exclfilter = 
+udpport = 5555
+postgres_url = 
+mongo_url = 
+push_url = 
+prom_output_dir = /path/to/your/mpp-solar/prometheus
+dev = YOUR_DEVICE_ID

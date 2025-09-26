@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# MPP-Solar Web Interface Management Script
+
+WEB_DIR="/path/to/your/mpp-solar"
+VENV_DIR="$WEB_DIR/venv"
+WEB_SCRIPT="$WEB_DIR/web_interface.py"
+SERVICE_FILE="$WEB_DIR/mpp-solar-web.service"
+
+case "$1" in
+    start)
+        echo "Starting MPP-Solar Web Interface..."
+        cd "$WEB_DIR"
+        source "$VENV_DIR/bin/activate"
+        nohup python "$WEB_SCRIPT" > web_interface.log 2>&1 &
+        echo "Web interface started. Check http://localhost:5000"
+        ;;
+    stop)
+        echo "Stopping MPP-Solar Web Interface..."
+        pkill -f "python.*web_interface.py"
+        echo "Web interface stopped."
+        ;;
+    restart)
+        echo "Restarting MPP-Solar Web Interface..."
+        $0 stop
+        sleep 2
+        $0 start
+        ;;
+    status)
+        if pgrep -f "python.*web_interface.py" > /dev/null; then
+            echo "Web interface is running"
+            echo "Process ID: $(pgrep -f 'python.*web_interface.py')"
+            echo "Access at: http://localhost:5000"
+        else
+            echo "Web interface is not running"
+        fi
+        ;;
+    install-service)
+        echo "Installing systemd service..."
+        sudo cp "$SERVICE_FILE" /etc/systemd/system/
+        sudo systemctl daemon-reload
+        sudo systemctl enable mpp-solar-web.service
+        echo "Service installed and enabled. Use 'sudo systemctl start mpp-solar-web' to start"
+        ;;
+    logs)
+        if [ -f "$WEB_DIR/web_interface.log" ]; then
+            tail -f "$WEB_DIR/web_interface.log"
+        else
+            echo "No log file found"
+        fi
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status|install-service|logs}"
+        echo ""
+        echo "Commands:"
+        echo "  start          - Start the web interface"
+        echo "  stop           - Stop the web interface"
+        echo "  restart        - Restart the web interface"
+        echo "  status         - Check if web interface is running"
+        echo "  install-service - Install as systemd service"
+        echo "  logs           - Show web interface logs"
+        exit 1
+        ;;
+esac

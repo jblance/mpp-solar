@@ -7,6 +7,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+prometheus/
 .Python
 env/
 build/
@@ -20,6 +21,22 @@ lib64/
 parts/
 sdist/
 var/
+
+# Log files
+*.log
+logs/
+web_interface.log
+mpp-solar.log
+
+# Local configuration
+mpp-solar.conf
+web.yaml
+*.service
+manage_*.sh
+web_interface.py
+
+# Prometheus data
+prometheus/
 wheels/
 *.egg-info/
 .installed.cfg

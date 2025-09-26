@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPP-Solar LCARS - Main Bridge</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --lcars-orange: #FF9C00;
+            --lcars-red: #CC6666;
+            --lcars-purple: #CC99CC;
+            --lcars-blue: #9999CC;
+            --lcars-yellow: #FFFF99;
+            --lcars-dark: #1A1A1A;
+            --lcars-darker: #0D0D0D;
+            --lcars-text: #FFFFFF;
+            --lcars-text-dim: #CCCCCC;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--lcars-darker) 0%, var(--lcars-dark) 100%);
+            color: var(--lcars-text);
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .lcars-header {
+            background: linear-gradient(90deg, var(--lcars-orange) 0%, var(--lcars-red) 50%, var(--lcars-purple) 100%);
+            padding: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lcars-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.1) 10px,
+                rgba(255, 255, 255, 0.1) 20px
+            );
+        }
+
+        .lcars-header h1 {
+            color: var(--lcars-text);
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .lcars-nav-btn {
+            background: var(--lcars-orange);
+            color: var(--lcars-text);
+            border: none;
+            border-radius: 20px 0 0 20px;
+            padding: 10px 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .lcars-nav-btn:hover {
+            background: var(--lcars-red);
+            color: var(--lcars-text);
+            transform: translateX(5px);
+            text-decoration: none;
+        }
+
+        .lcars-nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .lcars-nav-btn:hover::before {
+            left: 100%;
+        }
+
+        .lcars-status-panel {
+            background: var(--lcars-dark);
+            border: 2px solid var(--lcars-orange);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .lcars-status-panel::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--lcars-orange), var(--lcars-red), var(--lcars-purple));
+            border-radius: 15px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .lcars-metric-card {
+            background: linear-gradient(135deg, var(--lcars-orange) 0%, var(--lcars-red) 100%);
+            color: var(--lcars-text);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lcars-metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 5px,
+                rgba(255, 255, 255, 0.1) 5px,
+                rgba(255, 255, 255, 0.1) 10px
+            );
+        }
+
+        .lcars-metric-card h5 {
+            color: var(--lcars-text);
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .lcars-metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--lcars-yellow);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        .lcars-metric-unit {
+            font-size: 1rem;
+            color: var(--lcars-text-dim);
+            position: relative;
+            z-index: 1;
+        }
+
+        .lcars-status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        .lcars-status-online {
+            background: var(--lcars-yellow);
+            box-shadow: 0 0 10px var(--lcars-yellow);
+        }
+
+        .lcars-status-offline {
+            background: var(--lcars-red);
+            box-shadow: 0 0 10px var(--lcars-red);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .lcars-command-panel {
+            background: var(--lcars-dark);
+            border: 2px solid var(--lcars-blue);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .lcars-command-panel::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--lcars-blue), var(--lcars-purple));
+            border-radius: 15px;
+            z-index: -1;
+            opacity: 0.2;
+        }
+
+        .lcars-input {
+            background: var(--lcars-dark);
+            color: var(--lcars-text);
+            border: 2px solid var(--lcars-orange);
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        .lcars-input:focus {
+            background: var(--lcars-dark);
+            color: var(--lcars-text);
+            border-color: var(--lcars-red);
+            box-shadow: 0 0 10px var(--lcars-orange);
+            outline: none;
+        }
+
+        .lcars-btn {
+            background: linear-gradient(45deg, var(--lcars-orange), var(--lcars-red));
+            color: var(--lcars-text);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lcars-btn:hover {
+            background: linear-gradient(45deg, var(--lcars-red), var(--lcars-purple));
+            color: var(--lcars-text);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 156, 0, 0.4);
+        }
+
+        .lcars-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .lcars-btn:hover::before {
+            left: 100%;
+        }
+
+        .lcars-status {
+            color: var(--lcars-yellow);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .lcars-loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--lcars-orange);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .lcars-error {
+            color: var(--lcars-red);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* LCARS corner decorations */
+        .lcars-corner {
+            position: fixed;
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--lcars-orange);
+            z-index: 1000;
+        }
+
+        .lcars-corner-tl {
+            top: 0;
+            left: 0;
+            border-right: none;
+            border-bottom: none;
+            border-radius: 0 0 20px 0;
+        }
+
+        .lcars-corner-tr {
+            top: 0;
+            right: 0;
+            border-left: none;
+            border-bottom: none;
+            border-radius: 0 0 0 20px;
+        }
+
+        .lcars-corner-bl {
+            bottom: 0;
+            left: 0;
+            border-right: none;
+            border-top: none;
+            border-radius: 0 20px 0 0;
+        }
+
+        .lcars-corner-br {
+            bottom: 0;
+            right: 0;
+            border-left: none;
+            border-top: none;
+            border-radius: 20px 0 0 0;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--lcars-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--lcars-orange);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--lcars-red);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .lcars-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .lcars-metric-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- LCARS Corner Decorations -->
+    <div class="lcars-corner lcars-corner-tl"></div>
+    <div class="lcars-corner lcars-corner-tr"></div>
+    <div class="lcars-corner lcars-corner-bl"></div>
+    <div class="lcars-corner lcars-corner-br"></div>
+
+    <div class="container-fluid">
+        <!-- LCARS Header -->
+        <div class="lcars-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-tachometer-alt"></i>
+                        MPP-SOLAR MAIN BRIDGE
+                    </h1>
+                    <small class="text-light">Inverter Status & Control Center</small>
+                </div>
+                <div class="col-auto">
+                    <a href="/charts" class="lcars-nav-btn me-2">
+                        <i class="fas fa-chart-line"></i> Charts
+                    </a>
+                    <a href="/charts/lcars" class="lcars-nav-btn">
+                        <i class="fas fa-rocket"></i> LCARS
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connection Status -->
+        <div class="lcars-status-panel">
+            <div class="row align-items-center">
+                <div class="col">
+                    <span class="lcars-status-indicator" id="connection-status"></span>
+                    <span class="lcars-status" id="connection-text">Initializing...</span>
+                </div>
+                <div class="col-auto">
+                    <span class="lcars-status" id="last-update">Last update: Never</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Metrics -->
+        <div class="row">
+            <!-- Battery Voltage -->
+            <div class="col-md-3">
+                <div class="lcars-metric-card">
+                    <h5><i class="fas fa-battery-three-quarters"></i> Battery Voltage</h5>
+                    <div class="lcars-metric-value" id="battery-voltage">--</div>
+                    <div class="lcars-metric-unit">Volts</div>
+                </div>
+            </div>
+
+            <!-- AC Output Voltage -->
+            <div class="col-md-3">
+                <div class="lcars-metric-card">
+                    <h5><i class="fas fa-plug"></i> AC Output</h5>
+                    <div class="lcars-metric-value" id="ac-voltage">--</div>
+                    <div class="lcars-metric-unit">Volts</div>
+                </div>
+            </div>
+
+            <!-- Output Power -->
+            <div class="col-md-3">
+                <div class="lcars-metric-card">
+                    <h5><i class="fas fa-bolt"></i> Output Power</h5>
+                    <div class="lcars-metric-value" id="output-power">--</div>
+                    <div class="lcars-metric-unit">Watts</div>
+                </div>
+            </div>
+
+            <!-- Temperature -->
+            <div class="col-md-3">
+                <div class="lcars-metric-card">
+                    <h5><i class="fas fa-thermometer-half"></i> Temperature</h5>
+                    <div class="lcars-metric-value" id="temperature">--</div>
+                    <div class="lcars-metric-unit">°C</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secondary Metrics -->
+        <div class="row">
+            <!-- Frequency -->
+            <div class="col-md-3">
+                <div class="lcars-metric-card">
+                    <h5><i class="fas fa-wave-square"></i> Frequency</h5>
+                    <div class="lcars-metric-value" id="frequency">--</div>
+                    <div class="lcars-metric-unit">Hz</div>
+                </div>
+            </div>
+
+            <!-- Load -->
+            <div class="col-md-3">
+                <div class="lcars-metric-card">
+                    <h5><i class="fas fa-percentage"></i> Load</h5>
+                    <div class="lcars-metric-value" id="load">--</div>
+                    <div class="lcars-metric-unit">%</div>
+                </div>
+            </div>
+
+            <!-- Charging Current -->
+            <div class="col-md-3">
+                <div class="lcars-metric-card">
+                    <h5><i class="fas fa-charging-station"></i> Charging Current</h5>
+                    <div class="lcars-metric-value" id="charging-current">--</div>
+                    <div class="lcars-metric-unit">Amps</div>
+                </div>
+            </div>
+
+            <!-- System Mode -->
+            <div class="col-md-3">
+                <div class="lcars-metric-card">
+                    <h5><i class="fas fa-cog"></i> System Mode</h5>
+                    <div class="lcars-metric-value" id="system-mode">--</div>
+                    <div class="lcars-metric-unit">Status</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Command Panel -->
+        <div class="lcars-command-panel">
+            <h5 class="lcars-status mb-3">
+                <i class="fas fa-terminal"></i>
+                Command Interface
+            </h5>
+            <div class="row">
+                <div class="col-md-8">
+                    <input type="text" class="lcars-input" id="command-input" placeholder="Enter MPP-Solar command (e.g., QPIGS, QMOD, QFLAG)">
+                </div>
+                <div class="col-md-4">
+                    <button class="lcars-btn w-100" id="send-command">
+                        <i class="fas fa-paper-plane"></i> Execute
+                    </button>
+                </div>
+            </div>
+            <div class="mt-3">
+                <div class="lcars-status">Response:</div>
+                <div id="command-response" class="mt-2 p-3" style="background: var(--lcars-darker); border-radius: 10px; min-height: 100px; font-family: monospace; color: var(--lcars-text-dim);">
+                    Ready for commands...
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="lcars-status-panel">
+            <h5 class="lcars-status mb-3">
+                <i class="fas fa-info-circle"></i>
+                System Status
+            </h5>
+            <div class="row" id="system-status">
+                <div class="col-md-6">
+                    <div class="lcars-status">Loading system data...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let inverterData = {};
+        let lastUpdate = null;
+
+        // Update connection status
+        function updateConnectionStatus(isOnline) {
+            const statusIndicator = document.getElementById('connection-status');
+            const statusText = document.getElementById('connection-text');
+            
+            if (isOnline) {
+                statusIndicator.className = 'lcars-status-indicator lcars-status-online';
+                statusText.textContent = 'ONLINE';
+            } else {
+                statusIndicator.className = 'lcars-status-indicator lcars-status-offline';
+                statusText.textContent = 'OFFLINE';
+            }
+        }
+
+        // Update metrics display
+        function updateMetrics(data) {
+            if (data.error) {
+                updateConnectionStatus(false);
+                return;
+            }
+
+            updateConnectionStatus(true);
+
+            // Update main metrics - extract values from array format [value, unit]
+            if (data.status && data.status['Battery Voltage']) {
+                document.getElementById('battery-voltage').textContent = data.status['Battery Voltage'][0].toFixed(1);
+            }
+            if (data.status && data.status['AC Output Voltage']) {
+                document.getElementById('ac-voltage').textContent = data.status['AC Output Voltage'][0].toFixed(1);
+            }
+            if (data.status && data.status['AC Output Active Power']) {
+                document.getElementById('output-power').textContent = data.status['AC Output Active Power'][0].toFixed(0);
+            }
+            if (data.status && data.status['Inverter Heat Sink Temperature']) {
+                document.getElementById('temperature').textContent = data.status['Inverter Heat Sink Temperature'][0].toFixed(1);
+            }
+
+            // Update secondary metrics
+            if (data.status && data.status['AC Output Frequency']) {
+                document.getElementById('frequency').textContent = data.status['AC Output Frequency'][0].toFixed(1);
+            }
+            if (data.status && data.status['AC Output Load']) {
+                document.getElementById('load').textContent = data.status['AC Output Load'][0].toFixed(1);
+            }
+            if (data.status && data.status['Battery Charging Current']) {
+                document.getElementById('charging-current').textContent = data.status['Battery Charging Current'][0].toFixed(1);
+            }
+            if (data.mode && data.mode['Device Mode']) {
+                document.getElementById('system-mode').textContent = data.mode['Device Mode'][0];
+            }
+
+            // Update system status
+            updateSystemStatus(data);
+        }
+
+        // Update system status panel
+        function updateSystemStatus(data) {
+            const statusDiv = document.getElementById('system-status');
+            let statusHTML = '';
+
+            if (data.status) {
+                const status = data.status;
+                // Extract values from array format [value, unit] or use direct values
+                const isChargingOn = status['Is Charging On'] ? status['Is Charging On'][0] : 0;
+                const isLoadOn = status['Is Load On'] ? status['Is Load On'][0] : 0;
+                const isSwitchedOn = status['Is Switched On'] ? status['Is Switched On'][0] : 0;
+                const pvVoltage = status['PV Input Voltage'] ? status['PV Input Voltage'][0] : 0;
+                const pvCurrent = status['PV Input Current for Battery'] ? status['PV Input Current for Battery'][0] : 0;
+                const pvPower = status['PV Input Power'] ? status['PV Input Power'][0] : 0;
+                
+                statusHTML += `
+                    <div class="col-md-6">
+                        <div class="lcars-status mb-2">Charging: ${isChargingOn ? 'ON' : 'OFF'}</div>
+                        <div class="lcars-status mb-2">Load: ${isLoadOn ? 'ON' : 'OFF'}</div>
+                        <div class="lcars-status mb-2">Switched: ${isSwitchedOn ? 'ON' : 'OFF'}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="lcars-status mb-2">PV Voltage: ${pvVoltage}V</div>
+                        <div class="lcars-status mb-2">PV Current: ${pvCurrent}A</div>
+                        <div class="lcars-status mb-2">PV Power: ${pvPower}W</div>
+                    </div>
+                `;
+            }
+
+            statusDiv.innerHTML = statusHTML;
+        }
+
+        // Fetch data from API
+        function fetchData() {
+            fetch('/api/data')
+                .then(response => response.json())
+                .then(data => {
+                    inverterData = data;
+                    updateMetrics(data);
+                    lastUpdate = new Date();
+                    document.getElementById('last-update').textContent = `Last update: ${lastUpdate.toLocaleTimeString()}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    updateConnectionStatus(false);
+                });
+        }
+
+        // Send command
+        function sendCommand() {
+            const command = document.getElementById('command-input').value.trim();
+            if (!command) return;
+
+            const responseDiv = document.getElementById('command-response');
+            responseDiv.textContent = 'Executing command...';
+
+            fetch('/api/command', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ command: command })
+            })
+            .then(response => response.json())
+            .then(data => {
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                responseDiv.textContent = `Error: ${error.message}`;
+            });
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initial data fetch
+            fetchData();
+
+            // Set up command execution
+            document.getElementById('send-command').addEventListener('click', sendCommand);
+            document.getElementById('command-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendCommand();
+                }
+            });
+
+            // Auto-refresh every 30 seconds
+            setInterval(fetchData, 30000);
+        });
+    </script>
+</body>
+</html>

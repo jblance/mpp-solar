@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPP-Solar Inverter Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid rgba(0, 0, 0, 0.125);
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-online { background-color: #28a745; }
+        .status-offline { background-color: #dc3545; }
+        .status-warning { background-color: #ffc107; }
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .metric-unit {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        .refresh-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row bg-white shadow-sm py-3 mb-4">
+            <div class="col">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-solar-panel text-primary"></i>
+                    MPP-Solar Inverter Dashboard
+                </h1>
+                <small class="text-muted">Real-time monitoring and control</small>
+            </div>
+            <div class="col-auto">
+                <div class="d-flex align-items-center">
+                    <a href="/lcars" class="btn btn-outline-warning me-3">
+                        <i class="fas fa-rocket"></i> LCARS Dashboard
+                    </a>
+                    <a href="/charts" class="btn btn-outline-primary me-3">
+                        <i class="fas fa-chart-line"></i> Charts
+                    </a>
+                    <a href="/charts/lcars" class="btn btn-outline-warning me-3">
+                        <i class="fas fa-rocket"></i> LCARS Charts
+                    </a>
+                    <span class="status-indicator" id="connection-status"></span>
+                    <span id="last-update">Last update: Never</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Metrics -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <div class="metric-value" id="battery-voltage">--</div>
+                        <div class="metric-unit">Battery Voltage (V)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <div class="metric-value" id="ac-output-voltage">--</div>
+                        <div class="metric-unit">AC Output (V)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <div class="metric-value" id="ac-output-power">--</div>
+                        <div class="metric-unit">Output Power (W)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <div class="metric-value" id="temperature">--</div>
+                        <div class="metric-unit">Temperature (°C)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status and Settings -->
+        <div class="row">
+            <!-- Current Status -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-line text-primary"></i>
+                            Current Status
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="status-content">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Device Settings -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-cog text-primary"></i>
+                            Device Settings
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="settings-content">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Command Interface -->
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-terminal text-primary"></i>
+                            Command Interface
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="command-input" 
+                                           placeholder="Enter command (e.g., QPIGS, QMOD, QFLAG)">
+                                    <button class="btn btn-primary" type="button" id="execute-btn">
+                                        <i class="fas fa-play"></i> Execute
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" id="quick-commands">
+                                    <option value="">Quick Commands</option>
+                                    <option value="QPIGS">QPIGS - General Status</option>
+                                    <option value="QPIRI">QPIRI - Current Settings</option>
+                                    <option value="QMOD">QMOD - Device Mode</option>
+                                    <option value="QFLAG">QFLAG - Flag Status</option>
+                                    <option value="QID">QID - Device ID</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div id="command-result" class="bg-light p-3 rounded" style="display: none;">
+                                <pre id="result-content"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refresh Button -->
+    <button class="btn btn-primary btn-lg rounded-circle refresh-btn" id="refresh-btn" title="Refresh Data">
+        <i class="fas fa-sync-alt"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let data = {};
+        let isConnected = false;
+
+        // Update connection status
+        function updateConnectionStatus() {
+            const statusElement = document.getElementById('connection-status');
+            const lastUpdateElement = document.getElementById('last-update');
+            
+            if (isConnected) {
+                statusElement.className = 'status-indicator status-online';
+                lastUpdateElement.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
+            } else {
+                statusElement.className = 'status-indicator status-offline';
+                lastUpdateElement.textContent = 'Last update: Never';
+            }
+        }
+
+        // Update main metrics
+        function updateMetrics() {
+            if (data.status) {
+                // Extract values from the array format [value, unit]
+                const batteryVoltage = data.status['Battery Voltage'] ? data.status['Battery Voltage'][0] : '--';
+                const acOutputVoltage = data.status['AC Output Voltage'] ? data.status['AC Output Voltage'][0] : '--';
+                const acOutputPower = data.status['AC Output Active Power'] ? data.status['AC Output Active Power'][0] : '--';
+                const temperature = data.status['Inverter Heat Sink Temperature'] ? data.status['Inverter Heat Sink Temperature'][0] : '--';
+                
+                document.getElementById('battery-voltage').textContent = batteryVoltage;
+                document.getElementById('ac-output-voltage').textContent = acOutputVoltage;
+                document.getElementById('ac-output-power').textContent = acOutputPower;
+                document.getElementById('temperature').textContent = temperature;
+            }
+        }
+
+        // Update status content
+        function updateStatusContent() {
+            const content = document.getElementById('status-content');
+            if (data.status) {
+                let html = '<div class="row">';
+                for (const [key, value] of Object.entries(data.status)) {
+                    if (key.startsWith('_')) continue;
+                    // Handle array format [value, unit] or direct value
+                    const displayValue = Array.isArray(value) ? value[0] : value;
+                    const unit = Array.isArray(value) && value[1] ? value[1] : '';
+                    html += `
+                        <div class="col-6 mb-2">
+                            <strong>${key}:</strong><br>
+                            <span class="text-muted">${displayValue} ${unit}</span>
+                        </div>
+                    `;
+                }
+                html += '</div>';
+                content.innerHTML = html;
+            }
+        }
+
+        // Update settings content
+        function updateSettingsContent() {
+            const content = document.getElementById('settings-content');
+            if (data.settings) {
+                let html = '<div class="row">';
+                for (const [key, value] of Object.entries(data.settings)) {
+                    if (key.startsWith('_')) continue;
+                    // Handle array format [value, unit] or direct value
+                    const displayValue = Array.isArray(value) ? value[0] : value;
+                    const unit = Array.isArray(value) && value[1] ? value[1] : '';
+                    html += `
+                        <div class="col-6 mb-2">
+                            <strong>${key}:</strong><br>
+                            <span class="text-muted">${displayValue} ${unit}</span>
+                        </div>
+                    `;
+                }
+                html += '</div>';
+                content.innerHTML = html;
+            }
+        }
+
+        // Get unit for a metric
+        function getUnit(key) {
+            const units = {
+                'battery_voltage': 'V',
+                'ac_output_voltage': 'V',
+                'ac_output_frequency': 'Hz',
+                'ac_output_active_power': 'W',
+                'ac_output_apparent_power': 'VA',
+                'temperature': '°C',
+                'battery_charging_current': 'A',
+                'battery_discharge_current': 'A'
+            };
+            return units[key] || '';
+        }
+
+        // Fetch data from API
+        async function fetchData() {
+            try {
+                const response = await fetch('/api/data');
+                if (response.ok) {
+                    data = await response.json();
+                    isConnected = true;
+                    updateConnectionStatus();
+                    updateMetrics();
+                    updateStatusContent();
+                    updateSettingsContent();
+                } else {
+                    isConnected = false;
+                    updateConnectionStatus();
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                isConnected = false;
+                updateConnectionStatus();
+            }
+        }
+
+        // Execute command
+        async function executeCommand(command) {
+            const resultDiv = document.getElementById('command-result');
+            const resultContent = document.getElementById('result-content');
+            
+            try {
+                const response = await fetch('/api/command', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ command: command })
+                });
+                
+                const result = await response.json();
+                resultContent.textContent = JSON.stringify(result, null, 2);
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                resultContent.textContent = `Error: ${error.message}`;
+                resultDiv.style.display = 'block';
+            }
+        }
+
+        // Manual refresh
+        async function manualRefresh() {
+            const refreshBtn = document.getElementById('refresh-btn');
+            refreshBtn.classList.add('loading');
+            
+            try {
+                const response = await fetch('/api/refresh');
+                if (response.ok) {
+                    await fetchData();
+                }
+            } catch (error) {
+                console.error('Error refreshing:', error);
+            } finally {
+                refreshBtn.classList.remove('loading');
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initial data fetch
+            fetchData();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(fetchData, 30000);
+            
+            // Manual refresh button
+            document.getElementById('refresh-btn').addEventListener('click', manualRefresh);
+            
+            // Execute command button
+            document.getElementById('execute-btn').addEventListener('click', function() {
+                const command = document.getElementById('command-input').value.trim();
+                if (command) {
+                    executeCommand(command);
+                }
+            });
+            
+            // Quick commands dropdown
+            document.getElementById('quick-commands').addEventListener('change', function() {
+                const command = this.value;
+                if (command) {
+                    document.getElementById('command-input').value = command;
+                    this.value = '';
+                }
+            });
+            
+            // Enter key in command input
+            document.getElementById('command-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const command = this.value.trim();
+                    if (command) {
+                        executeCommand(command);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
