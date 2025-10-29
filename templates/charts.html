@@ -84,7 +84,7 @@
                         <option value="12">Last 12 Hours</option>
                         <option value="24" selected>Last 24 Hours</option>
                         <option value="48">Last 48 Hours</option>
-                        <option value="168">Last Week</option>
+                        <option value="168">Last Week (All Data)</option>
                     </select>
                 </div>
                 <div class="col-md-6">
@@ -320,171 +320,187 @@
             }
         };
 
-        // Initialize charts
+
+        // Initialize all charts
         function initializeCharts() {
             // Battery Voltage Chart
-            const batteryVoltageCtx = document.getElementById('batteryVoltageChart').getContext('2d');
-            charts.batteryVoltage = new Chart(batteryVoltageCtx, {
-                type: 'line',
-                data: {
-                    datasets: [
-                        {
-                            label: 'Battery Voltage (V)',
-                            borderColor: '#ffc107',
-                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                            data: []
-                        }
-                    ]
-                },
-                options: {
+            const batteryVoltageCtx = document.getElementById('batteryVoltageChart');
+            if (batteryVoltageCtx) {
+                // Efficient config clone - only override what's needed
+                const batteryVoltageConfig = {
                     ...chartConfig,
                     scales: {
                         ...chartConfig.scales,
                         y: {
                             ...chartConfig.scales.y,
+                            min: 38,
+                            max: 52,
                             title: {
-                                display: true,
+                                ...chartConfig.scales.y.title,
                                 text: 'Voltage (V)'
                             }
                         }
                     }
-                }
-            });
+                };
+
+                charts.batteryVoltage = new Chart(batteryVoltageCtx, {
+                    type: 'line',
+                    data: {
+                        datasets: [{
+                            label: 'Battery Voltage (V)',
+                            borderColor: 'rgb(255, 193, 7)',
+                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                            data: []
+                        }]
+                    },
+                    options: batteryVoltageConfig
+                });
+            }
 
             // AC Input Voltage Chart
-            const acInputVoltageCtx = document.getElementById('acInputVoltageChart').getContext('2d');
-            charts.acInputVoltage = new Chart(acInputVoltageCtx, {
-                type: 'line',
-                data: {
-                    datasets: [
-                        {
+            const acInputVoltageCtx = document.getElementById('acInputVoltageChart');
+            if (acInputVoltageCtx) {
+                charts.acInputVoltage = new Chart(acInputVoltageCtx, {
+                    type: 'line',
+                    data: {
+                        datasets: [{
                             label: 'AC Input Voltage (V)',
-                            borderColor: '#dc3545',
+                            borderColor: 'rgb(220, 53, 69)',
                             backgroundColor: 'rgba(220, 53, 69, 0.1)',
                             data: []
-                        }
-                    ]
-                },
-                options: {
-                    ...chartConfig,
-                    scales: {
-                        ...chartConfig.scales,
-                        y: {
-                            ...chartConfig.scales.y,
-                            title: {
-                                display: true,
-                                text: 'Voltage (V)'
-                            }
-                        }
-                    }
-                }
-            });
+                        }]
+                    },
+                    options: chartConfig
+                });
+            }
 
             // Power Chart
-            const powerCtx = document.getElementById('powerChart').getContext('2d');
-            charts.power = new Chart(powerCtx, {
-                type: 'line',
-                data: {
-                    datasets: [
-                        {
-                            label: 'AC Output Active Power (W)',
-                            borderColor: '#007bff',
-                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                            data: []
-                        },
-                        {
-                            label: 'AC Output Apparent Power (VA)',
-                            borderColor: '#6f42c1',
-                            backgroundColor: 'rgba(111, 66, 193, 0.1)',
-                            data: []
-                        },
-                        {
-                            label: 'AC Output Load (%)',
-                            borderColor: '#fd7e14',
-                            backgroundColor: 'rgba(253, 126, 20, 0.1)',
-                            data: []
-                        }
-                    ]
-                },
-                options: chartConfig
-            });
+            const powerCtx = document.getElementById('powerChart');
+            if (powerCtx) {
+                charts.power = new Chart(powerCtx, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Active Power (W)',
+                                borderColor: 'rgb(0, 123, 255)',
+                                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                                data: []
+                            },
+                            {
+                                label: 'Apparent Power (VA)',
+                                borderColor: 'rgb(40, 167, 69)',
+                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                                data: []
+                            },
+                            {
+                                label: 'Load (%)',
+                                borderColor: 'rgb(23, 162, 184)',
+                                backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                                data: []
+                            }
+                        ]
+                    },
+                    options: chartConfig
+                });
+            }
 
             // Temperature Chart
-            const tempCtx = document.getElementById('temperatureChart').getContext('2d');
-            charts.temperature = new Chart(tempCtx, {
-                type: 'line',
-                data: {
-                    datasets: [
-                        {
-                            label: 'Inverter Temperature (°C)',
-                            borderColor: '#e83e8c',
-                            backgroundColor: 'rgba(232, 62, 140, 0.1)',
+            const temperatureCtx = document.getElementById('temperatureChart');
+            if (temperatureCtx) {
+                charts.temperature = new Chart(temperatureCtx, {
+                    type: 'line',
+                    data: {
+                        datasets: [{
+                            label: 'Temperature (°C)',
+                            borderColor: 'rgb(220, 53, 69)',
+                            backgroundColor: 'rgba(220, 53, 69, 0.1)',
                             data: []
-                        }
-                    ]
-                },
-                options: chartConfig
-            });
+                        }]
+                    },
+                    options: chartConfig
+                });
+            }
 
             // Current Chart
-            const currentCtx = document.getElementById('currentChart').getContext('2d');
-            charts.current = new Chart(currentCtx, {
-                type: 'line',
-                data: {
-                    datasets: [
-                        {
-                            label: 'Battery Charging Current (A)',
-                            borderColor: '#20c997',
-                            backgroundColor: 'rgba(32, 201, 151, 0.1)',
-                            data: []
-                        },
-                        {
-                            label: 'Battery Discharge Current (A)',
-                            borderColor: '#6c757d',
-                            backgroundColor: 'rgba(108, 117, 125, 0.1)',
-                            data: []
-                        }
-                    ]
-                },
-                options: chartConfig
-            });
+            const currentCtx = document.getElementById('currentChart');
+            if (currentCtx) {
+                charts.current = new Chart(currentCtx, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Charging Current (A)',
+                                borderColor: 'rgb(40, 167, 69)',
+                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                                data: []
+                            },
+                            {
+                                label: 'Discharge Current (A)',
+                                borderColor: 'rgb(255, 193, 7)',
+                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                data: []
+                            }
+                        ]
+                    },
+                    options: chartConfig
+                });
+            }
 
             // Status Chart
-            const statusCtx = document.getElementById('statusChart').getContext('2d');
-            charts.status = new Chart(statusCtx, {
-                type: 'line',
-                data: {
-                    datasets: [
-                        {
-                            label: 'Is Charging On',
-                            borderColor: '#28a745',
-                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                            data: []
-                        },
-                        {
-                            label: 'Is Switched On',
-                            borderColor: '#007bff',
-                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                            data: []
-                        },
-                        {
-                            label: 'Is Load On',
-                            borderColor: '#ffc107',
-                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                            data: []
-                        }
-                    ]
-                },
-                options: chartConfig
-            });
+            const statusCtx = document.getElementById('statusChart');
+            if (statusCtx) {
+                charts.status = new Chart(statusCtx, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Charging On',
+                                borderColor: 'rgb(40, 167, 69)',
+                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                                data: []
+                            },
+                            {
+                                label: 'Switched On',
+                                borderColor: 'rgb(0, 123, 255)',
+                                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                                data: []
+                            },
+                            {
+                                label: 'Load On',
+                                borderColor: 'rgb(255, 193, 7)',
+                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                data: []
+                            }
+                        ]
+                    },
+                    options: chartConfig
+                });
+            }
         }
 
         // Update chart data
         function updateChartData() {
             const hours = parseInt(document.getElementById('timeRange').value);
-            
-            fetch(`/api/historical?hours=${hours}`)
+
+            // Use all historical data endpoint for better chart visualization
+            const endpoint = hours >= 168 ? '/api/historical/all' : `/api/historical?hours=${hours}`;
+
+            fetch(endpoint)
                 .then(response => response.json())
+                .then(data => {
+                    // Check if we got sufficient data
+                    const hasData = data && Object.keys(data).length > 0;
+                    const dataPoints = hasData ? Object.values(data)[0]?.length || 0 : 0;
+
+                    // Only fallback to all data if we have NO data at all
+                    if (dataPoints === 0) {
+                        console.log(`No data returned for ${hours}h filter, falling back to all data`);
+                        return fetch('/api/historical/all').then(response => response.json());
+                    }
+
+                    return data;
+                })
                 .then(data => {
                     historicalData = data;
                     updateCharts();
@@ -545,10 +561,18 @@
         function getChartData(metricName) {
             if (!historicalData[metricName]) return [];
             
-            return historicalData[metricName].map(item => ({
-                x: new Date(item.timestamp),
-                y: item.value
-            }));
+            // Get selected time range
+            const hours = parseInt(document.getElementById('timeRange').value);
+            const now = new Date();
+            const cutoffTime = new Date(now.getTime() - (hours * 60 * 60 * 1000));
+            
+            // Filter and map data
+            return historicalData[metricName]
+                .map(item => ({
+                    x: new Date(item.timestamp),
+                    y: item.value
+                }))
+                .filter(item => item.x >= cutoffTime);
         }
 
         // Update data summary

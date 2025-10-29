@@ -2,6 +2,7 @@ import logging
 import os
 import tempfile
 import atexit
+from datetime import datetime
 
 from .prom import prom
 from ..helpers import get_kwargs, is_daemon_mode
@@ -66,7 +67,13 @@ class prom_file(prom):
         else:
             self.filename = self.cmd
 
-        file_path = f"{self.prom_output_dir.rstrip('/')}/mpp-solar-{self.filename}.prom"
+        # Create timestamped filename for backup
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamped_filename = f"{self.filename}-{timestamp}"
+
+        # File paths
+        current_file_path = f"{self.prom_output_dir.rstrip('/')}/mpp-solar-{self.filename}.prom"
+        backup_file_path = f"{self.prom_output_dir.rstrip('/')}/mpp-solar-{timestamped_filename}.prom"
 
         # Ensure output directory exists
         os.makedirs(self.prom_output_dir, exist_ok=True)
@@ -81,24 +88,36 @@ class prom_file(prom):
             )
 
             try:
-                # Write content to temporary file
+                # Write content to temporary file once
                 with os.fdopen(temp_fd, 'w') as temp_file:
                     temp_file.write(content)
                     temp_file.flush()
                     os.fsync(temp_file.fileno())  # Force write to disk
                     os.chmod(temp_path, 0o744)
 
-                # Atomically move temp file to final location
-                os.rename(temp_path, file_path)
+                # Atomically move temp file to current file
+                os.rename(temp_path, current_file_path)
+                log.debug(f"Successfully updated current file: {current_file_path}")
 
-                # Track these files for cleanup if daemon
+                # Create hard link for timestamped backup (no additional I/O)
+                try:
+                    os.link(current_file_path, backup_file_path)
+                    log.debug(f"Successfully created timestamped backup: {backup_file_path}")
+                except OSError as e:
+                    # Fallback to copy if hard link fails (e.g., cross-device)
+                    import shutil
+                    shutil.copy2(current_file_path, backup_file_path)
+                    log.debug(f"Successfully copied timestamped backup: {backup_file_path}")
+
+                # Rotate old backups - keep only last 10 backups
+                self._rotate_backups(self.prom_output_dir, self.filename, keep=10)
+
+                # Track files for cleanup if daemon
                 log.debug(f"is_daemon_mode(): {is_daemon_mode()}")
                 if is_daemon_mode():
-                    prom_file._created_files.add(file_path)
+                    prom_file._created_files.add(current_file_path)
                     prom_file._register_cleanup()
                     log.debug(f"DAEMON_MODE - Registering PROM files for cleanup on exit.")
-
-                log.debug(f"Successfully wrote prometheus file: {file_path}")
 
             except Exception as e:
                 # Clean up temp file if something went wrong
@@ -109,5 +128,31 @@ class prom_file(prom):
                 raise e
 
         except Exception as e:
-            log.error(f"Failed to write prometheus file {file_path}: {e}")
+            log.error(f"Failed to write prometheus file {current_file_path}: {e}")
             raise
+
+    def _rotate_backups(self, directory: str, filename: str, keep: int = 10) -> None:
+        """Remove old backup files, keeping only the most recent N backups."""
+        try:
+            # Find all backup files for this metric
+            import glob
+            pattern = f"{directory.rstrip('/')}/mpp-solar-{filename}-*.prom"
+            backup_files = glob.glob(pattern)
+
+            if len(backup_files) <= keep:
+                return
+
+            # Sort by modification time (oldest first)
+            backup_files.sort(key=os.path.getmtime)
+
+            # Remove oldest files
+            files_to_remove = backup_files[:-keep]
+            for old_file in files_to_remove:
+                try:
+                    os.remove(old_file)
+                    log.debug(f"Removed old backup: {old_file}")
+                except Exception as e:
+                    log.warning(f"Failed to remove old backup {old_file}: {e}")
+
+        except Exception as e:
+            log.warning(f"Backup rotation failed: {e}")

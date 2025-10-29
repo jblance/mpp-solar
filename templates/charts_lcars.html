@@ -636,6 +636,23 @@
         function initializeLcarsCharts() {
             // Voltage Chart
             const voltageCtx = document.getElementById('voltageChart').getContext('2d');
+            // Efficient config clone - only override what's needed
+            const voltageChartConfig = {
+                ...lcarsChartConfig,
+                scales: {
+                    ...lcarsChartConfig.scales,
+                    y: {
+                        ...lcarsChartConfig.scales.y,
+                        min: 38,
+                        max: 52,
+                        title: {
+                            ...lcarsChartConfig.scales.y.title,
+                            text: 'Voltage (V)'
+                        }
+                    }
+                }
+            };
+
             charts.voltage = new Chart(voltageCtx, {
                 type: 'line',
                 data: {
@@ -663,7 +680,7 @@
                         }
                     ]
                 },
-                options: lcarsChartConfig
+                options: voltageChartConfig
             });
 
             // Power Chart
