@@ -320,12 +320,59 @@
             }
         };
 
+        // Error handling helper function
+        function showChartError(canvasId, message) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) {
+                console.error(`Cannot show error: canvas ${canvasId} not found`);
+                return;
+            }
 
-        // Initialize all charts
+            // Hide the canvas
+            canvas.style.display = 'none';
+
+            // Find the chart container
+            const container = canvas.closest('.chart-container');
+            if (!container) {
+                console.error(`Cannot show error: container for ${canvasId} not found`);
+                return;
+            }
+
+            // Create error message element
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-warning d-flex align-items-center justify-content-between';
+            errorDiv.innerHTML = `
+                <div>
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span>${message}</span>
+                </div>
+                <button class="btn btn-sm btn-primary retry-chart-btn" data-canvas-id="${canvasId}">
+                    <i class="fas fa-redo"></i> Retry
+                </button>
+            `;
+
+            // Add to container
+            container.appendChild(errorDiv);
+
+            // Add retry button handler
+            const retryBtn = errorDiv.querySelector('.retry-chart-btn');
+            retryBtn.addEventListener('click', function() {
+                errorDiv.remove();
+                canvas.style.display = 'block';
+                initializeCharts();
+            });
+        }
+
+        // Initialize all charts with error handling
         function initializeCharts() {
             // Battery Voltage Chart
-            const batteryVoltageCtx = document.getElementById('batteryVoltageChart');
-            if (batteryVoltageCtx) {
+            try {
+                const batteryVoltageCtx = document.getElementById('batteryVoltageChart');
+                if (!batteryVoltageCtx) {
+                    console.warn('Battery Voltage Chart canvas not found');
+                    return;
+                }
+
                 // Efficient config clone - only override what's needed
                 const batteryVoltageConfig = {
                     ...chartConfig,
@@ -355,11 +402,20 @@
                     },
                     options: batteryVoltageConfig
                 });
+                console.log('Battery Voltage Chart initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize Battery Voltage Chart:', error);
+                showChartError('batteryVoltageChart', 'Battery Voltage chart failed to initialize');
             }
 
             // AC Input Voltage Chart
-            const acInputVoltageCtx = document.getElementById('acInputVoltageChart');
-            if (acInputVoltageCtx) {
+            try {
+                const acInputVoltageCtx = document.getElementById('acInputVoltageChart');
+                if (!acInputVoltageCtx) {
+                    console.warn('AC Input Voltage Chart canvas not found');
+                    return;
+                }
+
                 charts.acInputVoltage = new Chart(acInputVoltageCtx, {
                     type: 'line',
                     data: {
@@ -372,11 +428,20 @@
                     },
                     options: chartConfig
                 });
+                console.log('AC Input Voltage Chart initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize AC Input Voltage Chart:', error);
+                showChartError('acInputVoltageChart', 'AC Input Voltage chart failed to initialize');
             }
 
             // Power Chart
-            const powerCtx = document.getElementById('powerChart');
-            if (powerCtx) {
+            try {
+                const powerCtx = document.getElementById('powerChart');
+                if (!powerCtx) {
+                    console.warn('Power Chart canvas not found');
+                    return;
+                }
+
                 charts.power = new Chart(powerCtx, {
                     type: 'line',
                     data: {
@@ -403,11 +468,20 @@
                     },
                     options: chartConfig
                 });
+                console.log('Power Chart initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize Power Chart:', error);
+                showChartError('powerChart', 'Power chart failed to initialize');
             }
 
             // Temperature Chart
-            const temperatureCtx = document.getElementById('temperatureChart');
-            if (temperatureCtx) {
+            try {
+                const temperatureCtx = document.getElementById('temperatureChart');
+                if (!temperatureCtx) {
+                    console.warn('Temperature Chart canvas not found');
+                    return;
+                }
+
                 charts.temperature = new Chart(temperatureCtx, {
                     type: 'line',
                     data: {
@@ -420,11 +494,20 @@
                     },
                     options: chartConfig
                 });
+                console.log('Temperature Chart initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize Temperature Chart:', error);
+                showChartError('temperatureChart', 'Temperature chart failed to initialize');
             }
 
             // Current Chart
-            const currentCtx = document.getElementById('currentChart');
-            if (currentCtx) {
+            try {
+                const currentCtx = document.getElementById('currentChart');
+                if (!currentCtx) {
+                    console.warn('Current Chart canvas not found');
+                    return;
+                }
+
                 charts.current = new Chart(currentCtx, {
                     type: 'line',
                     data: {
@@ -445,11 +528,20 @@
                     },
                     options: chartConfig
                 });
+                console.log('Current Chart initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize Current Chart:', error);
+                showChartError('currentChart', 'Current chart failed to initialize');
             }
 
             // Status Chart
-            const statusCtx = document.getElementById('statusChart');
-            if (statusCtx) {
+            try {
+                const statusCtx = document.getElementById('statusChart');
+                if (!statusCtx) {
+                    console.warn('Status Chart canvas not found');
+                    return;
+                }
+
                 charts.status = new Chart(statusCtx, {
                     type: 'line',
                     data: {
@@ -476,32 +568,67 @@
                     },
                     options: chartConfig
                 });
+                console.log('Status Chart initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize Status Chart:', error);
+                showChartError('statusChart', 'Status chart failed to initialize');
             }
         }
 
-        // Update chart data
+        // Update chart data with comprehensive error handling
         function updateChartData() {
             const hours = parseInt(document.getElementById('timeRange').value);
+
+            // Show loading state
+            const dataSummaryDiv = document.getElementById('dataSummary');
+            dataSummaryDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading data...</div>';
 
             // Use all historical data endpoint for better chart visualization
             const endpoint = hours >= 168 ? '/api/historical/all' : `/api/historical?hours=${hours}`;
 
             fetch(endpoint)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    // Validate data structure
+                    if (!data || typeof data !== 'object') {
+                        throw new Error('Invalid data format received from server');
+                    }
+
                     // Check if we got sufficient data
-                    const hasData = data && Object.keys(data).length > 0;
+                    const hasData = Object.keys(data).length > 0;
                     const dataPoints = hasData ? Object.values(data)[0]?.length || 0 : 0;
 
                     // Only fallback to all data if we have NO data at all
                     if (dataPoints === 0) {
                         console.log(`No data returned for ${hours}h filter, falling back to all data`);
-                        return fetch('/api/historical/all').then(response => response.json());
+                        return fetch('/api/historical/all')
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                                }
+                                return response.json();
+                            });
                     }
 
                     return data;
                 })
                 .then(data => {
+                    if (!data || Object.keys(data).length === 0) {
+                        console.warn('No historical data available');
+                        dataSummaryDiv.innerHTML = `
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                No historical data available yet. Data will appear as the daemon collects metrics.
+                            </div>
+                        `;
+                        return;
+                    }
+
                     historicalData = data;
                     updateCharts();
                     updateDataSummary();
@@ -509,51 +636,103 @@
                 })
                 .catch(error => {
                     console.error('Error fetching historical data:', error);
-                    document.getElementById('dataSummary').innerHTML = '<div class="no-data">Error loading data</div>';
+
+                    // Show user-friendly error message with retry button
+                    dataSummaryDiv.innerHTML = `
+                        <div class="alert alert-danger d-flex align-items-center justify-content-between">
+                            <div>
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Error loading data:</strong> ${error.message}
+                            </div>
+                            <button class="btn btn-sm btn-danger" onclick="updateChartData()">
+                                <i class="fas fa-redo"></i> Retry
+                            </button>
+                        </div>
+                    `;
                 });
         }
 
-        // Update individual charts
+        // Update individual charts with graceful degradation
         function updateCharts() {
-            // Battery Voltage Chart
-            if (charts.batteryVoltage) {
-                charts.batteryVoltage.data.datasets[0].data = getChartData('mpp_solar_battery_voltage');
-                charts.batteryVoltage.update();
-            }
+            try {
+                // Battery Voltage Chart
+                if (charts.batteryVoltage) {
+                    const data = getChartData('mpp_solar_battery_voltage');
+                    charts.batteryVoltage.data.datasets[0].data = data;
+                    charts.batteryVoltage.update();
+                    if (data.length === 0) {
+                        console.warn('No data available for Battery Voltage chart');
+                    }
+                }
 
-            // AC Input Voltage Chart
-            if (charts.acInputVoltage) {
-                charts.acInputVoltage.data.datasets[0].data = getChartData('mpp_solar_ac_input_voltage');
-                charts.acInputVoltage.update();
-            }
+                // AC Input Voltage Chart
+                if (charts.acInputVoltage) {
+                    const data = getChartData('mpp_solar_ac_input_voltage');
+                    charts.acInputVoltage.data.datasets[0].data = data;
+                    charts.acInputVoltage.update();
+                    if (data.length === 0) {
+                        console.warn('No data available for AC Input Voltage chart');
+                    }
+                }
 
-            // Power Chart
-            if (charts.power) {
-                charts.power.data.datasets[0].data = getChartData('mpp_solar_ac_output_active_power');
-                charts.power.data.datasets[1].data = getChartData('mpp_solar_ac_output_apparent_power');
-                charts.power.data.datasets[2].data = getChartData('mpp_solar_ac_output_load');
-                charts.power.update();
-            }
+                // Power Chart
+                if (charts.power) {
+                    const activePower = getChartData('mpp_solar_ac_output_active_power');
+                    const apparentPower = getChartData('mpp_solar_ac_output_apparent_power');
+                    const load = getChartData('mpp_solar_ac_output_load');
 
-            // Temperature Chart
-            if (charts.temperature) {
-                charts.temperature.data.datasets[0].data = getChartData('mpp_solar_inverter_heat_sink_temperature');
-                charts.temperature.update();
-            }
+                    charts.power.data.datasets[0].data = activePower;
+                    charts.power.data.datasets[1].data = apparentPower;
+                    charts.power.data.datasets[2].data = load;
+                    charts.power.update();
 
-            // Current Chart
-            if (charts.current) {
-                charts.current.data.datasets[0].data = getChartData('mpp_solar_battery_charging_current');
-                charts.current.data.datasets[1].data = getChartData('mpp_solar_battery_discharge_current');
-                charts.current.update();
-            }
+                    if (activePower.length === 0 && apparentPower.length === 0 && load.length === 0) {
+                        console.warn('No data available for Power chart');
+                    }
+                }
 
-            // Status Chart
-            if (charts.status) {
-                charts.status.data.datasets[0].data = getChartData('mpp_solar_is_charging_on');
-                charts.status.data.datasets[1].data = getChartData('mpp_solar_is_switched_on');
-                charts.status.data.datasets[2].data = getChartData('mpp_solar_is_load_on');
-                charts.status.update();
+                // Temperature Chart
+                if (charts.temperature) {
+                    const data = getChartData('mpp_solar_inverter_heat_sink_temperature');
+                    charts.temperature.data.datasets[0].data = data;
+                    charts.temperature.update();
+                    if (data.length === 0) {
+                        console.warn('No data available for Temperature chart');
+                    }
+                }
+
+                // Current Chart
+                if (charts.current) {
+                    const chargingCurrent = getChartData('mpp_solar_battery_charging_current');
+                    const dischargeCurrent = getChartData('mpp_solar_battery_discharge_current');
+
+                    charts.current.data.datasets[0].data = chargingCurrent;
+                    charts.current.data.datasets[1].data = dischargeCurrent;
+                    charts.current.update();
+
+                    if (chargingCurrent.length === 0 && dischargeCurrent.length === 0) {
+                        console.warn('No data available for Current chart');
+                    }
+                }
+
+                // Status Chart
+                if (charts.status) {
+                    const chargingOn = getChartData('mpp_solar_is_charging_on');
+                    const switchedOn = getChartData('mpp_solar_is_switched_on');
+                    const loadOn = getChartData('mpp_solar_is_load_on');
+
+                    charts.status.data.datasets[0].data = chargingOn;
+                    charts.status.data.datasets[1].data = switchedOn;
+                    charts.status.data.datasets[2].data = loadOn;
+                    charts.status.update();
+
+                    if (chargingOn.length === 0 && switchedOn.length === 0 && loadOn.length === 0) {
+                        console.warn('No data available for Status chart');
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating charts:', error);
+                // Don't throw - allow charts to continue working with existing data
             }
         }
 
