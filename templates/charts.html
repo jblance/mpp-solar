@@ -603,16 +603,63 @@
                     const hasData = Object.keys(data).length > 0;
                     const dataPoints = hasData ? Object.values(data)[0]?.length || 0 : 0;
 
-                    // Only fallback to all data if we have NO data at all
+                    // If no data for selected range, show empty state with manual "Load All" option
                     if (dataPoints === 0) {
-                        console.log(`No data returned for ${hours}h filter, falling back to all data`);
-                        return fetch('/api/historical/all')
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                                }
-                                return response.json();
-                            });
+                        console.log(`No data available for ${hours}h time range`);
+                        dataSummaryDiv.innerHTML = `
+                            <div class="alert alert-info d-flex align-items-center justify-content-between">
+                                <div>
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>No data available for selected time range (${hours} hours).</strong>
+                                    <br>
+                                    <small>Try selecting a longer time range or load all available data.</small>
+                                </div>
+                                <button class="btn btn-sm btn-primary" id="loadAllDataBtn">
+                                    <i class="fas fa-database"></i> Load All Available Data
+                                </button>
+                            </div>
+                        `;
+
+                        // Add event listener for manual "Load All Data" button
+                        document.getElementById('loadAllDataBtn').addEventListener('click', function() {
+                            console.log('[User] Manually loading all available data');
+                            dataSummaryDiv.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading all data...</div>';
+
+                            fetch('/api/historical/all')
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                                    }
+                                    return response.json();
+                                })
+                                .then(allData => {
+                                    if (!allData || Object.keys(allData).length === 0) {
+                                        dataSummaryDiv.innerHTML = `
+                                            <div class="alert alert-warning">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                No historical data available at all. Data will appear as the daemon collects metrics.
+                                            </div>
+                                        `;
+                                        return;
+                                    }
+
+                                    historicalData = allData;
+                                    updateCharts();
+                                    updateDataSummary();
+                                    document.getElementById('lastUpdate').textContent = `Last update: ${new Date().toLocaleTimeString()} (all data)`;
+                                })
+                                .catch(error => {
+                                    console.error('[LoadAll] Error:', error);
+                                    dataSummaryDiv.innerHTML = `
+                                        <div class="alert alert-danger">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            <strong>Error loading all data:</strong> ${error.message}
+                                        </div>
+                                    `;
+                                });
+                        });
+
+                        return; // Stop processing, wait for user action
                     }
 
                     return data;
