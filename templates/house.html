@@ -382,13 +382,15 @@
         // Update chart display with current history data (no new data added)
         function updateChartsDisplay() {
             if (!temperatureChart || !humidityChart) {
-                console.warn('[updateChartsDisplay] Charts not initialized yet');
+                console.error('[updateChartsDisplay] ERROR: Charts not initialized!');
+                console.log('[updateChartsDisplay] temperatureChart:', temperatureChart);
+                console.log('[updateChartsDisplay] humidityChart:', humidityChart);
                 return;
             }
-            
+
             const now = new Date();
             const cutoffTime = new Date(now.getTime() - (currentTimeRange * 60 * 60 * 1000));
-            
+
             console.log('[updateChartsDisplay] Filtering data for', currentTimeRange, 'hour range');
             console.log('[updateChartsDisplay] History arrays:', {
                 indoorTemp: indoorTempHistory.length,
@@ -396,31 +398,35 @@
                 indoorHum: indoorHumHistory.length,
                 outdoorHum: outdoorHumHistory.length
             });
-            
+
             // Filter based on selected time range
             const filteredIndoorTemp = indoorTempHistory.filter(point => new Date(point.x) >= cutoffTime);
             const filteredOutdoorTemp = outdoorTempHistory.filter(point => new Date(point.x) >= cutoffTime);
             const filteredIndoorHum = indoorHumHistory.filter(point => new Date(point.x) >= cutoffTime);
             const filteredOutdoorHum = outdoorHumHistory.filter(point => new Date(point.x) >= cutoffTime);
-            
+
             console.log('[updateChartsDisplay] Filtered to:', {
                 indoorTemp: filteredIndoorTemp.length,
                 outdoorTemp: filteredOutdoorTemp.length,
                 indoorHum: filteredIndoorHum.length,
                 outdoorHum: filteredOutdoorHum.length
             });
-            
-            // Update chart datasets
-            temperatureChart.data.datasets[0].data = filteredIndoorTemp;
-            temperatureChart.data.datasets[1].data = filteredOutdoorTemp;
-            humidityChart.data.datasets[0].data = filteredIndoorHum;
-            humidityChart.data.datasets[1].data = filteredOutdoorHum;
-            
-            // Update charts
-            temperatureChart.update('none');
-            humidityChart.update('none');
-            
-            console.log('[updateChartsDisplay] ✓ Charts updated successfully');
+
+            // Update chart datasets with error handling
+            try {
+                temperatureChart.data.datasets[0].data = filteredIndoorTemp;
+                temperatureChart.data.datasets[1].data = filteredOutdoorTemp;
+                humidityChart.data.datasets[0].data = filteredIndoorHum;
+                humidityChart.data.datasets[1].data = filteredOutdoorHum;
+
+                // Update charts
+                temperatureChart.update('none');
+                humidityChart.update('none');
+
+                console.log('[updateChartsDisplay] ✓ Charts updated successfully');
+            } catch (error) {
+                console.error('[updateChartsDisplay] ERROR updating charts:', error);
+            }
         }
 
         let temperatureChart = null;
@@ -633,13 +639,12 @@
                 console.log('[Historical] Loading house/weather data from server...');
                 const response = await fetch('/api/house_historical');
                 if (!response.ok) {
-                    console.error('[Historical] Failed to load data');
-                    return;
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-                
+
                 const data = await response.json();
                 console.log('[Historical] Server data loaded:', Object.keys(data));
-                
+
                 // Convert server data format to our chart format
                 // Server returns: {house_temperature: [{timestamp, value}, ...], ...}
                 if (data.house_temperature && data.house_temperature.length > 0) {
@@ -649,7 +654,7 @@
                     }));
                     console.log('[Historical] Loaded', indoorTempHistory.length, 'indoor temp points');
                 }
-                
+
                 if (data.weather_temperature && data.weather_temperature.length > 0) {
                     outdoorTempHistory = data.weather_temperature.map(p => ({
                         x: new Date(p.timestamp),
@@ -657,7 +662,7 @@
                     }));
                     console.log('[Historical] Loaded', outdoorTempHistory.length, 'outdoor temp points');
                 }
-                
+
                 if (data.house_humidity && data.house_humidity.length > 0) {
                     indoorHumHistory = data.house_humidity.map(p => ({
                         x: new Date(p.timestamp),
@@ -665,7 +670,7 @@
                     }));
                     console.log('[Historical] Loaded', indoorHumHistory.length, 'indoor humidity points');
                 }
-                
+
                 if (data.weather_humidity && data.weather_humidity.length > 0) {
                     outdoorHumHistory = data.weather_humidity.map(p => ({
                         x: new Date(p.timestamp),
@@ -673,20 +678,27 @@
                     }));
                     console.log('[Historical] Loaded', outdoorHumHistory.length, 'outdoor humidity points');
                 }
-                
-                // Update charts with loaded historical data
-                if (temperatureChart && humidityChart) {
-                    updateChartsDisplay();
-                    console.log('[Historical] ✓ Charts updated with server data');
+
+                // CRITICAL: Update charts ONLY if they exist
+                if (!temperatureChart || !humidityChart) {
+                    console.error('[Historical] ERROR: Charts not initialized!');
+                    console.log('[Historical] temperatureChart:', temperatureChart);
+                    console.log('[Historical] humidityChart:', humidityChart);
+                    throw new Error('Charts not initialized before data load');
                 }
-                
+
+                updateChartsDisplay();
+                console.log('[Historical] ✓ Charts updated with server data');
+
                 // Also save to localStorage for backup
                 saveToLocalStorage();
-                
+
             } catch (error) {
                 console.error('[Historical] Error loading data:', error);
                 // Fall back to localStorage if server fails
                 console.log('[Historical] Falling back to localStorage');
+                loadFromLocalStorage();
+                throw error; // Re-throw so caller knows it failed
             }
         }
 
@@ -715,27 +727,40 @@
         }
 
         // Wait for DOM to be ready (like /charts page)
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize charts
-            initCharts();
-            
-            // Load persisted data and update display
-            loadFromLocalStorage();
-            
-            // Load historical data (currently no-op for house sensors)
-            loadHistoricalData();
-            
-            // Initial fetch to populate with live data
-            fetchData();
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('[Init] Starting house page initialization...');
 
-            // Time range selector event listener
+            // Step 1: Initialize charts FIRST
+            initCharts();
+            console.log('[Init] ✓ Charts created');
+
+            // Step 2: Load cached data (synchronous)
+            loadFromLocalStorage();
+            console.log('[Init] ✓ localStorage loaded');
+
+            // Step 3: Load historical data from server (async - WAIT for it)
+            try {
+                await loadHistoricalData();
+                console.log('[Init] ✓ Historical data loaded and charts updated');
+            } catch (error) {
+                console.error('[Init] Failed to load historical data:', error);
+                // Continue anyway - charts will show live data when it arrives
+            }
+
+            // Step 4: Fetch live data
+            fetchData();
+            console.log('[Init] ✓ Live data fetch initiated');
+
+            // Step 5: Setup event listeners
             document.getElementById('timeRange').addEventListener('change', function() {
                 currentTimeRange = parseInt(this.value);
+                console.log('[TimeRange] Changed to', currentTimeRange, 'hours');
                 updateChartsDisplay(); // Refresh display when range changes
             });
 
-            // Update every 30 seconds
+            // Step 6: Start polling for live data
             setInterval(fetchData, 30000);
+            console.log('[Init] ✓ Initialization complete');
         });
     </script>
 </body>
