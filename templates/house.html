@@ -473,51 +473,98 @@
         };
 
         function initCharts() {
+            console.log('[initCharts] Starting chart initialization...');
+
             // Temperature chart (indoor + outdoor)
-            const tempCtx = document.getElementById('temperatureChart').getContext('2d');
-            temperatureChart = new Chart(tempCtx, {
-                ...chartConfig,
-                data: {
-                    datasets: [{
-                        label: 'Indoor Temperature (°C)',
-                        data: [],
-                        borderColor: 'rgb(255, 99, 132)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
-                        tension: 0.4,
-                        fill: false
-                    }, {
-                        label: 'Outdoor Temperature (°C)',
-                        data: [],
-                        borderColor: 'rgb(54, 162, 235)',
-                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
-                        tension: 0.4,
-                        fill: false
-                    }]
+            try {
+                const tempCanvas = document.getElementById('temperatureChart');
+                if (!tempCanvas) {
+                    throw new Error('Temperature chart canvas not found');
                 }
-            });
+
+                const tempCtx = tempCanvas.getContext('2d');
+                if (!tempCtx) {
+                    throw new Error('Failed to get 2d context for temperature chart');
+                }
+
+                temperatureChart = new Chart(tempCtx, {
+                    ...chartConfig,
+                    data: {
+                        datasets: [{
+                            label: 'Indoor Temperature (°C)',
+                            data: [],
+                            borderColor: 'rgb(255, 99, 132)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                            tension: 0.4,
+                            fill: false
+                        }, {
+                            label: 'Outdoor Temperature (°C)',
+                            data: [],
+                            borderColor: 'rgb(54, 162, 235)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                            tension: 0.4,
+                            fill: false
+                        }]
+                    }
+                });
+                console.log('[initCharts] ✓ Temperature chart created successfully');
+            } catch (error) {
+                console.error('[initCharts] CRITICAL ERROR creating temperature chart:', error);
+                alert('Failed to create temperature chart: ' + error.message + '\n\nPlease refresh the page.');
+                throw error; // Re-throw to stop initialization
+            }
 
             // Humidity chart (indoor + outdoor)
-            const humCtx = document.getElementById('humidityChart').getContext('2d');
-            humidityChart = new Chart(humCtx, {
-                ...chartConfig,
-                data: {
-                    datasets: [{
-                        label: 'Indoor Humidity (%)',
-                        data: [],
-                        borderColor: 'rgb(75, 192, 192)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
-                        tension: 0.4,
-                        fill: false
-                    }, {
-                        label: 'Outdoor Humidity (%)',
-                        data: [],
-                        borderColor: 'rgb(153, 102, 255)',
-                        backgroundColor: 'rgba(153, 102, 255, 0.1)',
-                        tension: 0.4,
-                        fill: false
-                    }]
+            try {
+                const humCanvas = document.getElementById('humidityChart');
+                if (!humCanvas) {
+                    throw new Error('Humidity chart canvas not found');
                 }
-            });
+
+                const humCtx = humCanvas.getContext('2d');
+                if (!humCtx) {
+                    throw new Error('Failed to get 2d context for humidity chart');
+                }
+
+                humidityChart = new Chart(humCtx, {
+                    ...chartConfig,
+                    data: {
+                        datasets: [{
+                            label: 'Indoor Humidity (%)',
+                            data: [],
+                            borderColor: 'rgb(75, 192, 192)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                            tension: 0.4,
+                            fill: false
+                        }, {
+                            label: 'Outdoor Humidity (%)',
+                            data: [],
+                            borderColor: 'rgb(153, 102, 255)',
+                            backgroundColor: 'rgba(153, 102, 255, 0.1)',
+                            tension: 0.4,
+                            fill: false
+                        }]
+                    }
+                });
+                console.log('[initCharts] ✓ Humidity chart created successfully');
+            } catch (error) {
+                console.error('[initCharts] CRITICAL ERROR creating humidity chart:', error);
+                alert('Failed to create humidity chart: ' + error.message + '\n\nPlease refresh the page.');
+                throw error; // Re-throw to stop initialization
+            }
+
+            // Verify both charts were created
+            if (!temperatureChart || !humidityChart) {
+                const errorMsg = 'Chart initialization failed: ' +
+                    (!temperatureChart ? 'temperatureChart is null. ' : '') +
+                    (!humidityChart ? 'humidityChart is null.' : '');
+                console.error('[initCharts] ' + errorMsg);
+                alert(errorMsg + '\n\nPlease refresh the page.');
+                throw new Error(errorMsg);
+            }
+
+            console.log('[initCharts] ✓ All charts initialized successfully');
+            return true;
         }
 
         function updateCharts() {
@@ -730,13 +777,27 @@
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('[Init] Starting house page initialization...');
 
-            // Step 1: Initialize charts FIRST
-            initCharts();
-            console.log('[Init] ✓ Charts created');
+            // Step 1: Initialize charts FIRST - with comprehensive error handling
+            try {
+                const chartsCreated = initCharts();
+                if (!chartsCreated) {
+                    throw new Error('initCharts() returned false - charts not created');
+                }
+                console.log('[Init] ✓ Charts created successfully');
+            } catch (error) {
+                console.error('[Init] CRITICAL: Chart initialization failed:', error);
+                alert('Chart initialization failed. The page may not work correctly.\n\nError: ' + error.message);
+                return; // Stop initialization if charts failed
+            }
 
             // Step 2: Load cached data (synchronous)
-            loadFromLocalStorage();
-            console.log('[Init] ✓ localStorage loaded');
+            try {
+                loadFromLocalStorage();
+                console.log('[Init] ✓ localStorage loaded');
+            } catch (error) {
+                console.error('[Init] Error loading from localStorage:', error);
+                // Continue - this is not critical
+            }
 
             // Step 3: Load historical data from server (async - WAIT for it)
             try {
@@ -748,19 +809,29 @@
             }
 
             // Step 4: Fetch live data
-            fetchData();
-            console.log('[Init] ✓ Live data fetch initiated');
+            try {
+                fetchData();
+                console.log('[Init] ✓ Live data fetch initiated');
+            } catch (error) {
+                console.error('[Init] Error fetching initial data:', error);
+                // Continue - polling will retry
+            }
 
             // Step 5: Setup event listeners
-            document.getElementById('timeRange').addEventListener('change', function() {
-                currentTimeRange = parseInt(this.value);
-                console.log('[TimeRange] Changed to', currentTimeRange, 'hours');
-                updateChartsDisplay(); // Refresh display when range changes
-            });
+            try {
+                document.getElementById('timeRange').addEventListener('change', function() {
+                    currentTimeRange = parseInt(this.value);
+                    console.log('[TimeRange] Changed to', currentTimeRange, 'hours');
+                    updateChartsDisplay(); // Refresh display when range changes
+                });
+                console.log('[Init] ✓ Event listeners registered');
+            } catch (error) {
+                console.error('[Init] Error setting up event listeners:', error);
+            }
 
             // Step 6: Start polling for live data
             setInterval(fetchData, 30000);
-            console.log('[Init] ✓ Initialization complete');
+            console.log('[Init] ✓ Initialization complete - polling every 30s');
         });
     </script>
 </body>
