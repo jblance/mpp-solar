@@ -718,8 +718,28 @@ if __name__ == '__main__':
         port = 5000
         log_level = 'info'
     
-    # Set up logging
-    logging.basicConfig(level=getattr(logging, log_level.upper()))
+    # Set up logging with file rotation
+    import logging.handlers
+
+    log_file = '/home/constantine/mpp-solar/web_interface.log'
+    file_handler = logging.handlers.RotatingFileHandler(
+        log_file,
+        maxBytes=10*1024*1024,  # 10MB
+        backupCount=5
+    )
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s:%(levelname)s:%(name)s:%(funcName)s@%(lineno)d: %(message)s'
+    ))
+
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter(
+        '%(asctime)s:%(levelname)s:%(name)s: %(message)s'
+    ))
+
+    logging.basicConfig(
+        level=getattr(logging, log_level.upper()),
+        handlers=[file_handler, console_handler]
+    )
 
     # Start data update thread
     data_thread = threading.Thread(target=update_data_thread, daemon=True)
