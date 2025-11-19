@@ -690,8 +690,8 @@ def start_mqtt_subscriber():
         mqtt_client.on_message = on_mqtt_message
         mqtt_client.enable_logger(logging.getLogger())
 
-        logging.info("Connecting to MQTT broker at 127.0.0.1:1883")
-        mqtt_client.connect("127.0.0.1", 1883, 60)
+        logging.info("Connecting to MQTT broker at 192.168.1.134:1883")
+        mqtt_client.connect("192.168.1.134", 1883, 60)
         mqtt_client.loop_forever()
     except Exception as e:
         logging.error(f"Error starting MQTT subscriber: {e}", exc_info=True)
