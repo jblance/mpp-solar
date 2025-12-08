@@ -916,6 +916,80 @@ SETTER_COMMANDS = {
         ],
         "regex": "BCA(0\\d\\d\\d,0\\d\\d,0\\d\\d\\d)$",
     },
+    "PE":{
+        "name":"PE",
+        "description":"Set enable status",
+        "help":"A Mute buzzer beep
+B Mute buzzer beep in standby mode
+C Mute buzzer beep only on battery discharged status
+D Generator as AC input
+E Wide AC input range
+F N/G relay close in battery mode
+G De-rating power for Grid voltage
+H De-rating power for Grid frequency
+I BMS battery connect
+J Low frequency De-rating power
+K LVRT(Low voltage ride through)
+L reserved
+M HVRT(High voltage ride through)
+N Charge power limit(Only for VDE 4105)
+O External CT RLY
+P Ac output coupling
+Q Low frequency derating
+R Over frequency derating
+S Allow opening of second output
+T GFCI Chk
+U RAPID
+V InvDCCurrCntl
+W Allow opening of Gen intput(it will be disable when sent ^S004PDS)
+X Rapid shutdown",
+        "type":"SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "PE([A-Z])$",
+    },
+    "PD":{
+        "name":"PD",
+        "description":"Set disable status",
+        "help":"A Mute buzzer beep
+B Mute buzzer beep in standby mode
+C Mute buzzer beep only on battery discharged status
+D Generator as AC input
+E Wide AC input range
+F N/G relay close in battery mode
+G De-rating power for Grid voltage
+H De-rating power for Grid frequency
+I BMS battery connect
+J Low frequency De-rating power
+K LVRT(Low voltage ride through)
+L reserved
+M HVRT(High voltage ride through)
+N Charge power limit(Only for VDE 4105)
+O External CT RLY
+P Ac output coupling
+Q Low frequency derating
+R Over frequency derating
+S Allow opening of second output
+T GFCI Chk
+U RAPID
+V InvDCCurrCntl
+W Allow opening of Gen intput(it will be disable when sent ^S004PDS)
+X Rapid shutdown",
+        "type":"SETTER",
+        "response": [
+            ["ack", "Command execution", {"NAK": "Failed", "ACK": "Successful"}],
+        ],
+        "test_responses": [
+            b"^1\x0b\xc2\r",
+            b"^0\x1b\xe3\r",
+        ],
+        "regex": "PD([A-Z])$",
+    },
 }
 
 
