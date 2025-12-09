@@ -221,7 +221,7 @@ QUERY_COMMANDS = {
         "response_type": "SEQUENTIAL",
         "type": "QUERY",
         "response": [
-            ["int:r/10", "Solar input voltage 1", "V"], 
+            ["int:r/10", "Solar input voltage 1", "V"],
             ["int:r/10", "Solar input voltage 2", "V"],
             ["int:r/100", "Solar input current 1", "A"],
             ["int:r/100", "Solar input current 2", "A"],
@@ -366,6 +366,16 @@ QUERY_COMMANDS = {
             ["option", "Generator as AC input", ["Disabled", "Enabled"]],
             ["option", "Wide AC input range", ["Disabled", "Enabled"]],
             ["option", "N/G relay function", ["Disabled", "Enabled"]],
+            ["option", "De-rating power for Grid voltage", ["Disabled", "Enabled"]],
+            ["option", "De-rating power for Grid frequency", ["Disabled", "Enabled"]],
+            ["option", "BMS Battery Connect", ["Disabled", "Enabled"]],
+            ["option", "Underfrequency derating", ["Disabled", "Enabled"]],
+            ["option", "LVRT", ["Disabled", "Enabled"]],
+            ["option", "HVRT", ["Disabled", "Enabled"]],
+            ["option", "VDE charging Limit Enable", ["Disabled", "Enabled"]],
+            ["option", "PV Parallel", ["Disabled", "Enabled"]],
+            ["option", "GFCI Disable", ["Disabled", "Enabled"]],
+            ["option", "Gen charging Enable", ["Disabled", "Enabled"]],
         ],
         "test_responses": [
             b"^D0120,0,1,0,1\xd8\xf2\r",
@@ -404,6 +414,7 @@ QUERY_COMMANDS = {
     },
     "BATS": {
         "name": "BATS",
+        "prefix": "^P005",
         "description": "Query battery setting",
         "help": " -- queries battery setting",
         "response_type": "SEQUENTIAL",
@@ -424,24 +435,29 @@ QUERY_COMMANDS = {
                 "V"
             ],
             ["int:r/10", "Battery under voltage", "V"],
-            ["int:r/10", "Battery under voltage release", "V"],
+            ["int:r/10", "Battery under back voltage", "V"],
             ["int:r/10", "Battery weak voltage in hybrid mode", "V"],
-            ["int:r/10", "Battery weak voltage release in hybrid mode", "V"],
+            ["int:r/10", "Battery weak back voltage in hybrid mode", "V"],
             ["option", "Battery Type", ["Ordinary", "Li-Fe"]],
-            ["string", "Reserved", ""],
-            ["string", "Battery install date", "YYYYMMDDHHMMSS"],
+            ["string", "__empty_position_1_", "__empty_position__"],
+            ["string", "__empty_position_2_", "__empty_position__"],
             [
                 "option",
-                "AC charger keep battery voltage function enable/diable",
+                "AC charger keep battery voltage function",
                 ["Disabled", "Enabled"],
             ],
             ["int:r/10", "AC charger keep battery voltage", "V"],
             ["int:r/10", "Battery temperature sensor compensation", "mV"],
             ["int:r/10", "Max. AC charging current", "A"],
-            ["int", "Battery discharge max current in hybrid mode", "A"],
-            ["option", "Enable/Disable EPS function", ["Disabled", "Enabled"]],
-            ["int:r/10", "Battery voltage of cut-off Main output in battery mode", "V"],
-            ["int:r/10", "Battery voltage of re-connecting Main output in battery mode", "V" ],
+            ["int:r", "Battery discharge max current in hybrid mode", "A"],
+            ["string", "Battery under Soc", "%"],
+            ["string", "Battery under back Soc", "%"],
+            ["string", "Battery weak Soc", "%"],
+            ["string", "Battery weak back Soc", "%"],
+            ["string", "Battery under Soc to 2nd", "%"],
+            ["string", "Battery under back Soc to 2nd", "%"],
+            ["option", "BMS connection flag for parallel systems", ["disabled", "enabled"]],
+            ["int:r/10", "Max. Gen charging current", "A"]
         ],
         "test_responses": [
             b"^D0762000,0584,0576,0000,000,0576,0460,0510,0460,0510,1,,,1,0540,000,2000,0250\x85Y\r",
@@ -534,6 +550,42 @@ QUERY_COMMANDS = {
             b"^D008000001\x0c\x8a\r",
         ],
         "regex": "EH(\\d\\d\\d\\d\\d\\d\\d\\d\\d\\d)$",
+    },
+    "BMS": {  # BMS指令：协议中定义的，但响应部分与协议对不上；mpp本身没有；根据pcs上的显示值，猜测对齐部分内容
+        "name": "BMS",
+        "prefix": "^P004",
+        "description": "Query battery BMS data",
+        "help": " -- queries battery bms data",
+        "response_type": "SEQUENTIAL",
+        "type": "QUERY",
+        "response": [
+            # D051BMS0522
+            ["string", "empty1", ""],
+            # soc 100
+            ["string", "soc", "%"],
+            # -0000
+            ["string", "empty2", ""],
+            # 0
+            ["string", "empty3", ""],
+            # 0568
+            ["int:r/10", "max charging voltage", "V"],
+            # 0568
+            ["int:r/10", "max charging voltage", "V"],
+            # 00000
+            ["string", "empty4", ""],
+            # 0
+            ["string", "empty5", ""],
+            # 1
+            ["string", "empty6", ""],
+            # 0455
+            ["int:r/10", "cut off voltage", "V"],
+            # 0500
+            ["string", "empty7", ""],
+
+        ],
+        "test_responses": [
+            b'^D051BMS0522,100,-0000,0,0568,0568,00000,0 1 0455 0500\x1a{\r'
+        ]
     },
 }
 
@@ -1022,7 +1074,7 @@ class pi17(AbstractProtocol):
             full_command = _pre_cmd + bytes([13])  # + _crc
             log.debug(f"full command: {full_command}")
             return full_command
-    
+
     def check_response_valid(self, response) -> Tuple[bool, dict]:
         """
         Simplest validity check, CRC checks should be added to individual protocols
@@ -1036,11 +1088,14 @@ class pi17(AbstractProtocol):
             return False, {"validity check": ["Error: CRC error P17", ""]}
         return True, {}
 
-    def get_responses(self, response):
+    def get_responses(self, raw_response):
         """
         Override the default get_responses as its different
         """
+        response = raw_response.replace(b" ", b",")
+        print(f"raw_response: {raw_response}")
         responses = response.split(b",")
+        print(f"response: {response}")
         if responses[0] == b"^0\x1b\xe3\r":
             # is a reject response
             return ["NAK"]
