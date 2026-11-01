@@ -157,6 +157,8 @@ class hassd2_mqtt(mqtt):
                             "last_reset": str(datetime.now()),
                         }
                     )
+                if unit in ["V", "mV", "A", "mA", "Hz", "°C", "°F", "%"]:
+                    payload.setdefault("state_class", "measurement")
 
                 # msg = {"topic": topic, "payload": payload, "retain": True}
                 payloads = js.dumps(payload)
