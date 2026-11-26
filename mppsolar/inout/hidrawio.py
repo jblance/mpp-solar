@@ -1,6 +1,8 @@
 # shamelessly stolen from ccrisan https://github.com/qtoggle/qtoggleserver-mppsolar/blob/master/qtoggleserver/mppsolar/io.py
 # Added better error handling principals 2025 Corey DeLasaux <cordelster@gmail.com>
 import logging
+import math
+import select
 import os
 import time
 import errno
@@ -124,20 +126,28 @@ class HIDRawIO(BaseIO):
     def _receive_response(self, usb_fd: int) -> bytes:
         """Receive response from the USB device with timeout handling"""
         response_line = bytes()
-        start_time = time.time()
-        read_attempts = 0
-        max_read_attempts = 100
+        deadline = time.monotonic() + self._timeout
+        poller = select.poll()
+        poller.register(usb_fd, select.POLLIN)
         
         log.debug(f"Starting to read response (timeout: {self._timeout}s)")
         
-        while read_attempts < max_read_attempts:
-            # Check for overall timeout
-            if time.time() - start_time > self._timeout:
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
                 raise TimeoutError(f"Overall timeout ({self._timeout}s) exceeded while reading response")
             
+            # Wait only when no report is available; keep the overall deadline.
+            events = poller.poll(math.ceil(remaining * 1000))
+            if not events:
+                continue
+            if not events[0][1] & select.POLLIN:
+                raise OSError(errno.EIO, "USB device disconnected or unavailable")
+
             try:
-                time.sleep(0.15)
                 r = os.read(usb_fd, 256)
+                if not r:
+                    raise OSError(errno.EIO, "USB device disconnected")
                 if r:  # Only add if we got data
                     response_line += r
                     log.debug(f"Read {len(r)} bytes, total: {len(response_line)}")
@@ -157,13 +167,8 @@ class HIDRawIO(BaseIO):
                     raise TimeoutError(f"Read operation timed out: {e}") from e
                 else:
                     log.debug(f"USB read error: {e}")
-                    # For other errors, we might want to continue trying
+                    raise
                     
-            read_attempts += 1
-        
-        if read_attempts >= max_read_attempts:
-            raise TimeoutError(f"Maximum read attempts ({max_read_attempts}) exceeded")
-            
         if not response_line:
             raise TimeoutError("No response received from device")
             
