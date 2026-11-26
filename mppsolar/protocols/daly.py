@@ -246,10 +246,22 @@ class daly(AbstractProtocol):
         if not response:
             return False, {"validity check": ["Error: Response was empty", ""]}
 
-        # Check to see if the response is a multi frame response
-        if self.is_multiframe(response):
-            log.info("is multiframe response - assuming ok for now")
-            # TODO: fix check_response_valid for multiframe results
+        if self._command_defn.get("response_type") == "MULTIFRAME-POSITIONAL":
+            frame_size = self._command_defn["response_length"]
+            if len(response) % frame_size:
+                return False, {"validity check": ["Error: Incomplete DALY frame", ""]}
+            command = int(self._command_defn["command_code"], 16)
+            for index, offset in enumerate(range(0, len(response), frame_size), 1):
+                frame = response[offset:offset + frame_size]
+                if frame[0] != 0xA5 or frame[2] != command or frame[3] != 8:
+                    return False, {"validity check": ["Error: Unexpected DALY frame header", ""]}
+                if dalyChecksum(frame[:-1]) != frame[-1]:
+                    return False, {"validity check": ["Error: DALY frame checksum did not match", ""]}
+                # The positional decoder numbers cells by frame order. Missing,
+                # repeated or out-of-order frames would assign values to the
+                # wrong cells, even if their individual checksums are valid.
+                if frame[4] != index:
+                    return False, {"validity check": ["Error: Unexpected DALY frame number", ""]}
             return True, {}
 
         _r = response
