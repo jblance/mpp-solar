@@ -58,7 +58,7 @@ class jkAbstractProtocol(AbstractProtocol):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
         self._protocol_id = b"JK"
-        self.COMMANDS = COMMANDS
+        self.COMMANDS = COMMANDS.copy()
         self.STATUS_COMMANDS = [
             "",
         ]
